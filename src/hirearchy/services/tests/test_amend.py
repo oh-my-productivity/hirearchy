@@ -3,7 +3,7 @@
 
 import pytest
 from testkit.reach.hirearchy.core import ROOT, OrgError, split_frontmatter
-from testkit.services_world import BRIEF, contract_meta, define, playbook_meta
+from testkit.services_world import BRIEF, contract_meta, define, legacy_playbook, playbook_meta
 
 
 def amend(org, **kw):
@@ -224,15 +224,36 @@ def test_a_text_added_removed_and_added_again_keeps_its_id_through_define_servic
     assert [c.id for c in svc.runtime.service_catalog.criteria("ceo", "weekly-brief") if c.current] == ["C1", "C2", "C3", "C4"]
 
 
-def test_removing_a_quoted_criterion_tells_the_owner(svc):
+def test_removing_a_quoted_criterion_tells_the_owner_by_item_id(svc):
     define(svc, playbook="Steps: search, write.\n- C1: At most 600 words\n- Keep every claim sourced, at most 600 words.", name="quoted")
     amend_named(svc, "quoted", remove_acceptance=["At most 600 words"], add_acceptance=["At most 400 words"])
     note = svc.messages("ceo", "inbox")[-1].body
     assert (
-        'Removed: C1. Playbook v1 still quotes it in 2 line(s): "- [P2] C1: At most 600 words", "- [P3] Keep every claim sourced, at most 600 words.". '
-        "Where it differs from the contract, follow the contract; the playbook changes only by a revision the evidence admits (step 3)."
+        "Removed: C1. Playbook v1 still cites it in 2 item(s): P2, P3. Where it differs from the contract, follow the contract; the playbook changes "
+        "only by an item change the evidence admits (step 3)."
     ) in note
+    assert "[P2]" not in note.split("Removed: C1.")[1].split("\n")[0] and "At most 600 words" not in note.split("Removed: C1.")[1].split("\n")[0]
     assert note.index("Acceptance criteria now:") < note.index("Removed: C1.")
     amend_named(svc, "quoted", remove_acceptance=["Every factual claim has a source URL"])  # quoted by nothing
     assert "Removed:" not in svc.messages("ceo", "inbox")[-1].body
 
+
+
+def test_the_removed_line_names_the_items_that_cite_it_by_id(svc):
+    define(svc, name="cited", playbook="## Steps\n1. Open the sources.\n2. Check every claim (C2).\n3. Say it in at most 600 words.")
+    amend_named(svc, "cited", remove_acceptance=["At most 600 words"], add_acceptance=["At most 400 words"])
+    note = svc.messages("ceo", "inbox")[-1].body
+    assert "Removed: C1. Playbook v1 still cites it in 1 item(s): P3. Where it differs" in note  # its words quoted; P2 cites C2, not C1
+    amend_named(svc, "cited", remove_acceptance=["Every factual claim has a source URL"])
+    assert "Removed: C2. Playbook v1 still cites it in 1 item(s): P2." in svc.messages("ceo", "inbox")[-1].body  # its id in the item's words
+
+
+def test_a_legacy_playbook_keeps_its_quoted_lines_with_the_new_tail(svc):
+    define(svc, name="legacy")
+    legacy_playbook(svc, "Steps: search, write.\n- C1: At most 600 words\n- Keep every claim sourced, at most 600 words.", name="legacy")
+    amend_named(svc, "legacy", remove_acceptance=["At most 600 words"], add_acceptance=["At most 400 words"])
+    note = svc.messages("ceo", "inbox")[-1].body
+    assert (
+        'Removed: C1. Playbook v1 still quotes it in 2 line(s): "- C1: At most 600 words", "- Keep every claim sourced, at most 600 words.". '
+        "Where it differs from the contract, follow the contract; the playbook changes only by an item change the evidence admits (step 3)."
+    ) in note

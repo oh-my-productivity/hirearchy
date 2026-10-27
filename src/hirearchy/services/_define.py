@@ -9,7 +9,7 @@ from ..delivery import MessageDelivery
 from ..kernel import NAME_RE, ROOT, Clock, EventSink, JsonObject, Message, OrgError, clip_line, parent, stamp_of
 from ._continue import copy_contracts, copy_playbook_version
 from ._criteria import amendment_ids, answering_version, in_force, stored_basis, stored_versions, unanswered
-from ._items import checked_body, item_extra, migrate_body
+from ._items import checked_body, item_extra, migrate_body, render_items
 from ._lines import criteria_lines
 from ._protocols import (
     ContinuedServices, ContractAmendment, ContractDefinitions, LinkNotes, OwnerAddresses, PlaybookTexts, PlaybookWriter, RetiredService,
@@ -17,8 +17,8 @@ from ._protocols import (
 )
 from ._watch import watch_before
 from .api import (
-    DESCRIPTION_MAX, FEEDBACK_MAX, Contract, ContractNormalizer, Criterion, Rejection, ServiceCatalog, ServiceEvidence, ServiceStore, criteria_of,
-    number_criteria, quoting_lines, repeats_rejection,
+    DESCRIPTION_MAX, FEEDBACK_MAX, Contract, ContractNormalizer, Criterion, PlaybookSection, Rejection, ServiceCatalog, ServiceEvidence, ServiceStore,
+    criteria_of, number_criteria, quoting_lines, repeats_rejection,
 )
 
 WORDS_CLIP = 160  # characters of the user's words in the reply and in the owner's note
@@ -150,16 +150,21 @@ class RuleContractDefiner(ContractDefinitions):
         except (OrgError, OSError):
             return frozenset()
 
-    def _quoting(self, owner: str, name: str, removed: Sequence[Criterion]) -> tuple[dict[str, list[str]], int]:
-        """The lines of the current playbook that quote each removed criterion, and its version, for the owner's note. The note is advisory, so a
-        playbook that cannot be read says nothing; any other error is a bug and propagates."""
+    def _quoting(self, owner: str, name: str, removed: Sequence[Criterion]) -> tuple[dict[str, list[str]], int, bool]:
+        """What the current playbook cites of each removed criterion, its version and whether it is in item form, for the owner's note. A free-text
+        playbook gives the lines that quote the criterion; an item-format one the ids of the items that cite it (its id in their words or ``why``,
+        or its words quoted: :func:`quoting_lines` on the item's rendered line). The note is advisory, so a playbook that cannot be read says
+        nothing; any other error is a bug and propagates."""
         if not removed:
-            return {}, 0
+            return {}, 0, False
         try:
             playbook = self._catalog.read_playbook(owner, name)
         except (OrgError, OSError):
-            return {}, 0
-        return {c.id: quoting_lines(playbook.body, c) for c in removed}, playbook.version
+            return {}, 0, False
+        if playbook.items is None:
+            return {c.id: quoting_lines(playbook.body, c) for c in removed}, playbook.version, False
+        lines = {i.id: render_items([i], [PlaybookSection("", False, (i.id,))]) for i in playbook.items}
+        return {c.id: [x for x, line in lines.items() if quoting_lines(line, c)] for c in removed}, playbook.version, True
 
     def define_service(
         self, actor: str, owner: str, name: str, *, description: str | None, inputs: object, acceptance: object,
@@ -301,7 +306,7 @@ class RuleContractDefiner(ContractDefinitions):
                 link_error = error
         marked = number_criteria(numbered, {**basis, new.version: (answered.note if answered else "", answered is None)}) if recorded else after
         shown = criteria_of(marked, accept_n)
-        quoting, version = self._quoting(owner, name, [c for c in current if c.text not in accept_n])
+        quoting, version, by_item = self._quoting(owner, name, [c for c in current if c.text not in accept_n])
         told: OrgError | OSError | None = None
         try:
             try:
@@ -309,7 +314,7 @@ class RuleContractDefiner(ContractDefinitions):
                     owner, f"contract of service {name} changed to v{new.version}",
                     self._amendment.diff(
                         old, new, [*changes, *self._basis_lines(answered, about_n, words_n, added, removed, link is not None)], where, shown,
-                        {*confirmed, *((added or removed) if link is not None else ())}, quoting, version,
+                        {*confirmed, *((added or removed) if link is not None else ())}, quoting, version, by_item,
                     ), wake=False,
                 )
             except (OrgError, OSError) as error:

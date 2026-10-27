@@ -144,8 +144,8 @@ def test_a_user_initiated_criterion_is_marked_in_the_amendment_note() -> None:
 
 
 RULE_C = (
-    "Rule (c): a playbook revision that cites a criterion added by an amendment the client confirmed may add that criterion's own words, "
-    'one line each ("- C<k>: <its text>"); confirmed now: {ids}. '
+    "Rule (c): a playbook item may be the own words of a criterion added by an amendment the client confirmed (revise_playbook op=\"add\": a step "
+    "with that text, or a rule with it as then and no when; evidence: its id); confirmed now: {ids}. "
     "A criterion marked (not confirmed) counts once the client's yes is recorded (it reaches you as a criterion link); one marked "
     "(user-initiated) never does."
 )
@@ -163,13 +163,13 @@ def test_the_note_names_rule_c_and_the_confirmed_amendments() -> None:
     assert amended_note({"C4", "C3", "C1"}).splitlines()[-2] == RULE_C.format(ids="C3, C4")  # in the order of the contract; only amendments count
 
 
-def test_the_rule_c_line_says_may_add_that_criterions_own_words() -> None:
+def test_the_rule_c_line_says_an_item_may_be_the_criterions_own_words() -> None:
     line = amended_note({"C3"}).splitlines()[-2]
-    assert "is admitted" not in line
+    assert "is admitted" not in line and "a playbook revision" not in line and "one line each" not in line
     assert line == (
-        "Rule (c): a playbook revision that cites a criterion added by an amendment the client confirmed may add that criterion's own words, "
-        'one line each ("- C<k>: <its text>"); confirmed now: C3. A criterion marked (not confirmed) counts once the client\'s yes is recorded '
-        "(it reaches you as a criterion link); one marked (user-initiated) never does."
+        "Rule (c): a playbook item may be the own words of a criterion added by an amendment the client confirmed (revise_playbook op=\"add\": a step "
+        "with that text, or a rule with it as then and no when; evidence: its id); confirmed now: C3. A criterion marked (not confirmed) counts once "
+        "the client's yes is recorded (it reaches you as a criterion link); one marked (user-initiated) never does."
     )
 
 
@@ -182,7 +182,7 @@ def test_no_rule_c_line_without_amendments_or_on_a_locked_contract() -> None:
 
 # ------------------------------------------------------------------------------ the playbook lines that quote a removed criterion (4.5)
 
-TAIL = "Where it differs from the contract, follow the contract; the playbook changes only by a revision the evidence admits (step 3)."
+TAIL = "Where it differs from the contract, follow the contract; the playbook changes only by an item change the evidence admits (step 3)."
 
 
 def removal_note(quoting: dict[str, list[str]], *, locked: bool = False) -> str:
@@ -209,3 +209,17 @@ def test_no_quoting_line_adds_nothing() -> None:
     assert A.diff(contract(), contract(version=2), [], "x", ided("one", "two"), frozenset(), quoting={"C1": []}, playbook_version=2) == plain
     assert "Removed:" not in removal_note({})
 
+
+
+def test_a_removed_criterion_names_the_items_that_cite_it_by_id_at_most_five_then_and_j_more() -> None:
+    one = A.diff(
+        contract(), contract(acceptance=["one", "two", "three", "four"], version=2), [], "x", number_criteria([(1, "root", ["one", "two"]), (2, "root", ["one", "two", "three", "four"])]),
+        frozenset({"C3"}), quoting={"C2": ["P7"]}, playbook_version=2, by_item=True,
+    ).splitlines()
+    assert f"Removed: C2. Playbook v2 still cites it in 1 item(s): P7. {TAIL}" in one
+    many = A.diff(
+        contract(), contract(acceptance=["one", "two", "three", "four"], version=2), [], "x", number_criteria([(1, "root", ["one", "two"]), (2, "root", ["one", "two", "three", "four"])]),
+        frozenset({"C3"}), quoting={"C2": ["P7", "P12", "P13", "P14", "P15", "P16", "P17"]}, playbook_version=3, by_item=True,
+    ).splitlines()
+    assert f"Removed: C2. Playbook v3 still cites it in 7 item(s): P7, P12, P13, P14, P15 and 2 more. {TAIL}" in many
+    assert "quotes it" not in "".join(one + many)

@@ -92,11 +92,12 @@ class ContractAmendment(Protocol):
 
     def diff(
         self, old: Contract, new: Contract, changes: Sequence[str], where: str, criteria: Sequence[Criterion], confirmed: Collection[str],
-        quoting: Mapping[str, Sequence[str]] | None = None, playbook_version: int = 0,
+        quoting: Mapping[str, Sequence[str]] | None = None, playbook_version: int = 0, by_item: bool = False,
     ) -> str:
         """The note to the owner: who changed the contract, exactly what, every current criterion with its id, and where to read it. A criterion
         added by an amendment whose id is not in ``confirmed`` (the client's recorded yes) ends ``(not confirmed)``. ``quoting`` maps a criterion
-        the amendment removed to the lines of playbook v``playbook_version`` that quote it: each such criterion gets one advisory line."""
+        the amendment removed to the lines of playbook v``playbook_version`` that quote it (with ``by_item``: to the ids of the items that cite it):
+        each such criterion gets one advisory line."""
         ...
 
 
