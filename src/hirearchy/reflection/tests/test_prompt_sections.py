@@ -139,7 +139,7 @@ def test_the_playbook_is_shown_only_with_an_open_service_task(org):
     task = request(org)
     prompt = org.run_prompt("ceo", org.begin_run("ceo"))
     assert "# Playbook: weekly-brief (v1, yours to improve)" in prompt
-    assert "> ## Steps\n> 1. Search the web.\n> 2. Write the brief." in prompt
+    assert "> ## Steps\n> 1. [P1] Search the web.\n> 2. [P2] Write the brief." in prompt
     org.end_run("ceo", ok=True)
     deliver(org, "ceo", task)
     assert "# Playbook" not in org.run_prompt("ceo", org.begin_run("ceo"))  # the task is answered

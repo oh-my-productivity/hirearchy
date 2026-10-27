@@ -192,6 +192,24 @@ def _rules_error(drafts: Sequence[_Draft], headings: Sequence[str], rules: tuple
     return ""
 
 
+def item_extra(items: Sequence[PlaybookItem], items_max: int, op: str, **more: object) -> dict[str, object]:
+    """The frontmatter keys of an item-format version beyond ``service``, ``version``, ``revised``, ``by`` and ``reason`` (design 4.2), in the order a
+    file lists them: ``more`` first (``evidence``, ``admitted``, ...; the keys whose value is empty or None are left out), then ``items_max``, the
+    live ``rules`` in body order, the ``why`` map of the live gated items and the ``op``."""
+    given = {key: value for key, value in more.items() if value not in (None, "", 0, (), [])}
+    why = {i.id: list(canonical_why(i.why)) for i in items if i.why}
+    return {**given, "items_max": items_max, "rules": [i.id for i in items if i.kind == "rule"], "why": why, "op": op}
+
+
+def checked_body(items: Sequence[PlaybookItem], sections: Sequence[PlaybookSection], extra: Mapping[str, object]) -> str:
+    """The body to write for ``items`` (design 4.1): rendered, and asserted to parse back to exactly the items and sections written. A body the
+    parser would reject is never written: the failure is an ``AssertionError``, never a user path."""
+    body = render_items(items, sections)
+    back = parse_items(body, dict(extra))
+    assert (back.error, back.items, back.sections) == ("", tuple(items), tuple(sections)), f"the playbook does not parse back as written: {back.error}"
+    return body
+
+
 # ----------------------------------------------------------------------------------------------------------------------- migration (4.4)
 
 LIST_MARKER = re.compile(r"(?:[-*+]|\d+[.)])(?:[ \t]+|$)")  # a top-level list item: its marker, the blanks after it

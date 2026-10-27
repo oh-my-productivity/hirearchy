@@ -243,6 +243,14 @@ def test_first_restore_client_and_legacy_playbook_marks() -> None:
     assert v5.text == "playbook v5 (lead): no admission recorded (written before the evidence gate); 1 line(s) removed"
 
 
+def test_roots_item_form_v1_keeps_written_by_the_client() -> None:
+    """PC-2 (a guard): root's v1 in item form stores `op: first` and no `admitted`, so its mark keeps today's words; the item texts of 14.4 are for
+    the other ops. GREEN once `define_service` leaves the key out."""
+    v1 = Playbook(version=1, revised=T0, by="root", reason="initial playbook", body="## Steps\n1. [P1] Search.", op="first", items_max=1)
+    (mark,) = pmarks([v1])
+    assert (mark.basis, mark.text) == ("client", "playbook v1 (root): written by the client (no admission needed)")
+
+
 def test_the_client_of_a_nested_owner_is_its_parent() -> None:
     marks_ = playbook_marks("lead/writer", [playbook(1, "Original.", by="lead")], [], [])
     assert marks_[0].basis == "client"

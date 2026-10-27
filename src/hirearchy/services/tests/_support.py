@@ -26,6 +26,7 @@ BRIEF: dict[str, object] = dict(
     budget=10,
 )
 STEPS = "## Steps\n1. Search.\n2. Write.\n3. Check every claim."
+STEPS_ITEMS = "## Steps\n1. [P1] Search.\n2. [P2] Write.\n3. [P3] Check every claim."  # STEPS as root's v1 reads once the runtime has made it items
 
 
 def implementations(factories: Sequence[Callable[[Path], object]]) -> list[ParameterSet]:

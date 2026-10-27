@@ -9,6 +9,7 @@ from ..delivery import MessageDelivery
 from ..kernel import NAME_RE, ROOT, Clock, EventSink, JsonObject, Message, OrgError, clip_line, parent, stamp_of
 from ._continue import copy_contracts, copy_playbook_version
 from ._criteria import amendment_ids, answering_version, in_force, stored_basis, stored_versions, unanswered
+from ._items import checked_body, item_extra, migrate_body
 from ._lines import criteria_lines
 from ._protocols import (
     ContinuedServices, ContractAmendment, ContractDefinitions, LinkNotes, OwnerAddresses, PlaybookTexts, PlaybookWriter, RetiredService,
@@ -281,7 +282,7 @@ class RuleContractDefiner(ContractDefinitions):
         if old is None:
             text = f"defined service `{name}` (contract v1) for {owner}: {where}"
             if playbook_body is not None:
-                text += f"; playbook v1: {self._playbooks.write(owner, name, 1, playbook_body, actor, 'initial playbook')}"
+                text += f"; playbook v1: {self._first_playbook(owner, name, actor, playbook_body)}"
             else:
                 text += f". It has no playbook yet: {owner} writes v1 with revise_playbook after its first request."
             return text
@@ -323,6 +324,14 @@ class RuleContractDefiner(ContractDefinitions):
             + f"\nAcceptance criteria now ({len(accept_n)}):\n{self._amendment.listed(shown)}"
             + self._recorded(answered, link, about_n, words_n, added, removed)
         )
+
+    def _first_playbook(self, owner: str, name: str, actor: str, playbook_body: str) -> str:
+        """Write v1 from the client's text in item form (4.4): step items without losing a line, `op: first`, and no `admitted`: a version the client
+        wrote needs no admission (PC-2). A fallback of the migration is named in the reason."""
+        migration = migrate_body(playbook_body)
+        extra = item_extra(migration.items, len(migration.items), "first")
+        body = checked_body(migration.items, migration.sections, extra)
+        return self._playbooks.write(owner, name, 1, body, actor, "initial playbook" + migration.reason, None, extra)
 
     def _prior(self, owner: str, name: str) -> RetiredService | None:
         """Step 0: the retired copy this definition continues, when a request of it has a result. A copy that cannot be read refuses the definition

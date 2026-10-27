@@ -21,6 +21,34 @@ def test_define_writes_the_contract_without_a_playbook(org):
     assert not org.messages("ceo", "inbox")  # a first definition tells nobody
 
 
+def test_a_first_definition_with_a_playbook_writes_v1_in_item_form(org):
+    """Root's playbook becomes step items without losing a line (design 4.4): its markers are the runtime's, `[P1]`, `[P2]`."""
+    define(org, playbook="---\nignored: yes\n---\n## Steps\n1. Search.\n2. Write.\n\n## Budget plan\n- 12 runs.")
+    meta, body = playbook_meta(org)
+    assert body.strip() == "## Steps\n1. [P1] Search.\n2. [P2] Write.\n\n## Budget plan\n- [P3] 12 runs."
+    found = org.runtime.service_catalog.read_playbook("ceo", "weekly-brief")
+    assert found.version == 1 and found.items is not None and [(i.id, i.kind, i.text) for i in found.items] == [
+        ("P1", "step", "Search."), ("P2", "step", "Write."), ("P3", "step", "12 runs."),
+    ]
+    assert [s.heading for s in found.sections] == ["## Steps", "## Budget plan"] and found.parse_error == ""
+
+
+def test_roots_v1_has_items_max_rules_why_and_op_first_and_no_admitted(org):
+    """PC-2: a client-written version stores no `admitted` (and no `evidence`), so its quality mark keeps "written by the client"."""
+    define(org, playbook="## Steps\n1. Search.\n2. Write.")
+    meta, _ = playbook_meta(org)
+    assert (meta["items_max"], meta["rules"], meta["why"], meta["op"]) == (2, [], {}, "first")
+    assert meta["version"] == 1 and meta["by"] == ROOT and meta["reason"] == "initial playbook"
+    assert "admitted" not in meta and "evidence" not in meta and "item" not in meta
+
+
+def test_a_one_line_playbook_is_one_step_and_keeps_the_plain_reason(org):
+    """The per-block split handles ordinary text, so no fallback suffix is added to the reason (a fallback is named in it, 4.4)."""
+    define(org, playbook="Steps: search, write.")
+    meta, body = playbook_meta(org)
+    assert meta["reason"] == "initial playbook" and body.strip() == "- [P1] Steps: search, write."
+
+
 def test_define_with_a_playbook_writes_version_one(org):
     define(org, playbook="---\nignored: yes\n---\n## Steps\n1. Search.\n2. Write.")
     meta, body = playbook_meta(org)
@@ -119,7 +147,7 @@ def test_redefinition_refuses_a_playbook_and_keeps_the_existing_one(org):
     define(org, playbook="Steps: search, write.")
     with pytest.raises(OrgError, match="belongs to ceo, which revises it"):
         define(org, playbook="Another playbook.")
-    assert playbook_meta(org)[1].strip() == "Steps: search, write."
+    assert playbook_meta(org)[1].strip() == "- [P1] Steps: search, write."
     assert contract_meta(org)[0]["version"] == 1
 
 

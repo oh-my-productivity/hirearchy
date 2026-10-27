@@ -507,6 +507,15 @@ def test_apply_services_only_defines_the_service_and_gives_no_task(svc_bp, roots
     assert "weekly-brief" in services_mod.services_text(empty_org, ROOT)
 
 
+def test_apply_writes_the_generated_v1_in_item_form(svc_bp, roots, empty_org):
+    """`apply_org` writes the service through `define_service`, so the generated v1 is step items (`op: first`, no `admitted`)."""
+    bpm.apply(empty_org, svc_bp, allowed_roots=roots)
+    pb = services_mod.read_playbook(empty_org, "lead", "weekly-brief")
+    assert pb.items is not None and pb.parse_error == "" and pb.op == "first" and pb.admitted == "" and pb.items_max == len(pb.items) > 0
+    assert all(i.kind == "step" and i.why == () for i in pb.items) and pb.rules == ()
+    assert pb.body.count("[P1]") == 1 and f"[P{pb.items_max}]" in pb.body
+
+
 def test_apply_with_a_first_request_creates_a_service_task(svc_bp, roots, empty_org):
     s = bpm.apply(empty_org, request_bp(svc_bp, title="Brief on batteries", note="Keep it short."), allowed_roots=roots)
     assert s.service_request == "weekly-brief" and s.budget == 22 and s.task_id
@@ -546,7 +555,7 @@ def test_apply_uses_the_blueprints_playbook_and_lock(svc_bp, roots, empty_org):
     bp = mutate(svc_bp, lambda b: b["services"][0].update(playbook="## Steps\n1. Search.\n2. Write.\n", locked=True))
     bpm.apply(empty_org, bp, allowed_roots=roots)
     pb = services_mod.read_playbook(empty_org, "lead", "weekly-brief")
-    assert pb.body == "## Steps\n1. Search.\n2. Write." and pb.version == 1
+    assert pb.body == "## Steps\n1. [P1] Search.\n2. [P2] Write." and pb.version == 1
     assert services_mod.read_contract(empty_org, "lead", "weekly-brief").locked is True
 
 

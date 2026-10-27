@@ -12,7 +12,7 @@ import pytest
 from hirearchy.services import ServiceCatalog
 from hirearchy.services.testing import IMPLEMENTATIONS, ServicesWorld
 
-from ._support import BRIEF, STEPS, define, implementations, make, write_version
+from ._support import BRIEF, STEPS, STEPS_ITEMS, define, implementations, make, write_version
 
 
 @pytest.fixture(params=implementations(IMPLEMENTATIONS[ServiceCatalog]))
@@ -91,7 +91,7 @@ def test_a_service_without_a_playbook_has_version_zero(w: ServicesWorld) -> None
 def test_the_playbook_is_the_current_version(w: ServicesWorld) -> None:
     define(w, playbook=STEPS)
     pb = w.catalog.read_playbook("ceo", "weekly-brief")
-    assert (pb.version, pb.by, pb.reason, pb.body) == (1, "root", "initial playbook", STEPS)
+    assert (pb.version, pb.by, pb.reason, pb.body) == (1, "root", "initial playbook", STEPS_ITEMS)
     assert pb.revised is not None and pb.path is not None and pb.path.name == "PLAYBOOK.md"
 
 

@@ -31,7 +31,7 @@ def test_an_amendment_keeps_every_omitted_field(svc):
     for key in ("description", "inputs", "acceptance", "deliverable", "locked", "created", "name"):
         assert meta[key] == before[key], key
     assert new_body.strip() == body.strip() == "Mind the sources."
-    assert playbook_meta(svc)[1].strip() == "Steps: search, write." and playbook_meta(svc)[0]["version"] == 1
+    assert playbook_meta(svc)[1].strip() == "- [P1] Steps: search, write." and playbook_meta(svc)[0]["version"] == 1
 
 
 def test_single_fields_can_be_amended_and_explicit_values_replace(svc):
@@ -229,7 +229,7 @@ def test_removing_a_quoted_criterion_tells_the_owner(svc):
     amend_named(svc, "quoted", remove_acceptance=["At most 600 words"], add_acceptance=["At most 400 words"])
     note = svc.messages("ceo", "inbox")[-1].body
     assert (
-        'Removed: C1. Playbook v1 still quotes it in 2 line(s): "- C1: At most 600 words", "- Keep every claim sourced, at most 600 words.". '
+        'Removed: C1. Playbook v1 still quotes it in 2 line(s): "- [P2] C1: At most 600 words", "- [P3] Keep every claim sourced, at most 600 words.". '
         "Where it differs from the contract, follow the contract; the playbook changes only by a revision the evidence admits (step 3)."
     ) in note
     assert note.index("Acceptance criteria now:") < note.index("Removed: C1.")
