@@ -154,3 +154,39 @@ def test_one_off_tasks_are_rated_only_on_a_verdict_the_user_states():
     assert "a one-off task: record only a verdict the user states, no question, no criterion" in text
     assert "6. a service request (a one-off task: record only a verdict the user states, no question, no criterion): after the delivery ask one short" in text
     assert "when they keep a delivered version as it is after seeing it" in text  # 0a.4's line stays
+
+
+# ---------------------------------------------------------------------------------------------------- phase 1: the acknowledgement (design 14.6)
+
+# The four lines the skill's earlier phases pinned by their words (0a.4's lines 72, 92 and 100, 0a.5's line 39): Phase 1 changes none of them.
+UNCHANGED = {
+    39: "   in one line what that risks; the block ends by asking whether to use the plan's number: if they take it, set that service's `budget` to it, raise `needs.budget_runs` to it if lower, and propose again (they may keep theirs). Nothing below claude-sonnet-5.5 at high effort is available: never offer a cheaper model, tiers to",
+    72: '  the approved per-request budget, ask the user, with the number, in the same message as the question or yes/no item that needs the rework (never a turn later). A rework needs about 2 runs per delegation it requires + 1. The',
+    92: '3. A done or blocked report\'s "Questions for the client:" (ambiguous items; `progress` flags them and withholds the path; the ones it lists as notes, with no criterion, you only pass on with the delivery): ask the others in plain words, with any question from item 2, in ONE',
+    100: '   ("keep it" / "what\'s wrong"); when they keep a delivered version as it is after seeing it ("I\'ll take it as it is"), record that accept on its task, `source="human"`, with their words, also after a reject; a "keep it" about one part of it, or before they saw it, is no accept; "deliver as is" or "I\'ll read it myself" is not an accept: ask, or record nothing yet. A known unmet',
+}
+LINE_109 = (
+    "   with a question for the client is no new question (only your one item per reject asks one): read it with `inbox`, go on, and never reply to it "
+    "or mention it; an owner's request to acknowledge a playbook change is not such a note: ask the user its yes/no, then "
+    "`acknowledge_playbook(..., words=<their yes>)`. Never edit SERVICE.md or PLAYBOOK.md yourself."
+)
+
+
+def test_line_109_asks_the_users_yes_before_acknowledge_playbook():
+    """An owner's request to acknowledge a playbook change is a note with a question for the client in form, so without this clause the skill's own
+    line 109 would send root past it: the clause says to ask the user the yes/no and to pass their yes as `words` (Q4)."""
+    lines = SKILL.read_text().splitlines()
+    assert len(lines) == 125 and lines[108] == LINE_109  # one physical line; the line count does not move
+    text = flat()
+    assert (
+        "an owner's request to acknowledge a playbook change is not such a note: ask the user its yes/no, then "
+        "`acknowledge_playbook(..., words=<their yes>)`"
+    ) in text
+    assert "read it with `inbox`, go on, and never reply to it or mention it" in text  # the needle of 0a.3, case-insensitive like its test
+    assert "never edit service.md or playbook.md yourself" in text
+
+
+def test_lines_39_72_92_and_100_are_unchanged_byte_for_byte():
+    lines = SKILL.read_text().splitlines()
+    for number, text in UNCHANGED.items():
+        assert lines[number - 1] == text, number

@@ -106,7 +106,7 @@ Tell the user it is running and how many runs were planned (a ceiling: runs the 
    On yes: `define_service(owner, name, add_acceptance=[<the new criterion>])` with `answers=<the rejection's message id>`, `about=<the id
    you asked about>` and `words=<their answer, verbatim>` (and `remove_acceptance` for a clarification): it records their yes; tell the user the resulting criteria. On no, a one-off or "as it is":
    `feedback(..., source="human", confirms=<the rejection's message id>)` with criterion "none", the R id or the existing C id. A change they ask for on their own, outside a rejection: `words=` alone. An owner's note
-   with a question for the client is no new question (only your one item per reject asks one): read it with `inbox`, go on, and never reply to it or mention it. Never edit SERVICE.md or PLAYBOOK.md yourself.
+   with a question for the client is no new question (only your one item per reject asks one): read it with `inbox`, go on, and never reply to it or mention it; an owner's request to acknowledge a playbook change is not such a note: ask the user its yes/no, then `acknowledge_playbook(..., words=<their yes>)`. Never edit SERVICE.md or PLAYBOOK.md yourself.
 7. The scheduler exits on its own when nothing is left (`progress` shows "scheduler: stopped (finished: no open tasks)").
    Call `stop()` only if the user cancels, declines more budget, you hand over an unverified or partial result (say the task
    stays open/blocked, not done), or you started it with `until_done=False`.
