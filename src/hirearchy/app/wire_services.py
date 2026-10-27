@@ -27,6 +27,7 @@ from ..services._retire import RuleServiceRetirement
 from ..services._rework import ServiceReworkContext
 from ..services._store import FsServiceStore, OsServiceFiles
 from ..services._texts import CappedPlaybookTexts, DirectReportOwners, EventedPlaybookWriter
+from ..services._watch import RuleWatchSettler
 from ..settings import OrgSettings
 from ._builder import Builder
 
@@ -52,15 +53,16 @@ def _commands(b: Builder) -> ServiceCommands:
     texts, playbooks = CappedPlaybookTexts(b.get(OrgSettings)), EventedPlaybookWriter(store, clock, events)
     sender, mail = b.get(MessageSender), b.get(MailboxReader)
     restorer = FsServiceStore(places, b.get(AtomicWriter))  # the same single writer of <owner>/services/**, as the port that puts a retired copy back
+    settler = RuleWatchSettler(catalog, b.get(ServiceEvidence), playbooks, delivery)  # one, shared by the three commands that call it (8.5)
     return RuleServiceCommands(
         RuleContractDefiner(
             agents, catalog, store, places, b.get(ContractNormalizer), ContractAmender(), texts, owners, playbooks, delivery, clock, events,
-            b.get(ServiceEvidence), SenderLinkNotes(sender), RecordedContinuations(places, b.get(RetiredArchive), mail, OsServiceFiles()), restorer,
+            b.get(ServiceEvidence), SenderLinkNotes(sender), RecordedContinuations(places, b.get(RetiredArchive), mail, OsServiceFiles()), restorer, settler,
         ),
         RuleServiceRetirement(agents, catalog, store, owners, delivery, clock, events, b.get(ServiceEvidence)),
-        RuleItemReviser(agents, catalog, texts, playbooks, delivery, b.get(ServiceEvidence), mail),
+        RuleItemReviser(agents, catalog, texts, playbooks, delivery, b.get(ServiceEvidence), mail, settler),
         RuleServiceRequester(
             agents, catalog, mail, TextRequestBodies(), sender, b.get(JudgedVersions), b.get(CaseAllowance), b.get(ServiceEvidence), store,
         ),
-        RuleClientFeedback(agents, mail, sender, b.get(ServiceEvidence), store),
+        RuleClientFeedback(agents, mail, sender, b.get(ServiceEvidence), store, settler),
     )

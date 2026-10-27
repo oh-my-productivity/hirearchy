@@ -13,9 +13,11 @@ from typing import Any
 import pytest
 
 from hirearchy.kernel import Message, OrgError
-from hirearchy.services import LINK_HEADER, AmendmentBasis, Rejection
+from hirearchy.services import LINK_HEADER, AmendmentBasis, ItemWatch, Rejection
 from hirearchy.services._protocols import LinkNotes
-from hirearchy.services.testing import AdmittingServiceEvidence, FlakyDelivery, FlakyLinkNotes, ServicesWorld, fs_world, memory_world
+from hirearchy.services.testing import (
+    AdmittingServiceEvidence, FlakyDelivery, FlakyLinkNotes, RecordingSettler, ServicesWorld, fs_world, memory_world,
+)
 
 from ._support import amend, answer, define, populated, write_version
 from ._support import request as ask
@@ -34,6 +36,12 @@ class Basis(AdmittingServiceEvidence):
         self.rejections: list[Rejection] = []
         self.unrated: tuple[str, ...] = ()
         self.error: Exception | None = None
+        self.states: list[tuple[ItemWatch, ...]] = []  # the watch the files derive, one state per read (the last one from then on)
+        self.reads = 0
+
+    def watch(self, owner: str, service: str) -> tuple[ItemWatch, ...]:
+        self.reads += 1
+        return self.states[min(self.reads, len(self.states)) - 1] if self.states else ()
 
     def amendment_basis(self, owner: str, service: str) -> AmendmentBasis:
         if self.error is not None:
@@ -441,3 +449,59 @@ def test_a_note_that_fails_after_the_link_was_written_raises_as_it_always_did(fa
     with pytest.raises(OSError, match="inbox gone"):
         amend(w, add_acceptance=[RULE], answers=found.note, about="C1", words=YES)
     assert version(w) == 2 and any(m.reply_to == found.note and m.criterion for m in inbox(w))  # the contract and its link are there
+
+
+# ------------------------------------------------------------------------------ the settler after the answering version (design 8.5)
+
+BEFORE = (ItemWatch("P1", "rule", "new", 1),)
+AFTER = (ItemWatch("P1", "rule", "warning", 1, related=("R1",)),)
+
+
+def with_spy(factory: Any, tmp_path: Path, **kw: Any) -> tuple[ServicesWorld, Basis, list[RecordingSettler]]:
+    """The world of ``build`` whose settler is a recording one over the real one; ``spy[0].looks`` holds the contract version at each call."""
+    made: list[RecordingSettler] = []
+
+    def spy(inner: Any) -> RecordingSettler:
+        found = RecordingSettler(inner, look=lambda: version(w))
+        made.append(found)
+        return found
+
+    w, basis = build(factory, tmp_path, settler=spy, **kw)
+    basis.states = [BEFORE, AFTER]
+    return w, basis, made
+
+
+def test_an_answering_version_runs_the_settler_after_the_link_with_the_state_before_it(factory: Any, tmp_path: Path) -> None:
+    w, basis, made = with_spy(factory, tmp_path)
+    found = reject(w, basis)
+    basis.reads = 0
+    amend(w, add_acceptance=[RULE], answers=found.note, about="C1", words=YES)
+    (spy,) = made
+    assert spy.calls == [("ceo", SERVICE, BEFORE, False)]  # the watch read before the contract was written
+    assert spy.looks == [2]  # and the contract was v2 (the answering version was written) when the settler ran
+
+
+def test_an_answering_version_runs_the_settler_before_link_failed_is_raised(factory: Any, tmp_path: Path) -> None:
+    w, basis, made = with_spy(factory, tmp_path, links=lambda inner: FlakyLinkNotes(inner, failures=1, error=OSError("disk full")))
+    found = reject(w, basis)
+    basis.reads = 0
+    with pytest.raises(OrgError, match="the link that records the user's yes could not be written"):
+        amend(w, add_acceptance=[RULE], answers=found.note, about="C1", words=YES)
+    (spy,) = made
+    assert spy.calls == [("ceo", SERVICE, BEFORE, False)] and spy.looks == [2]  # the answering version alone already relates the rejection: no link needed
+
+
+def test_a_note_that_fails_does_not_stop_the_settler(factory: Any, tmp_path: Path) -> None:
+    w, basis, made = with_spy(factory, tmp_path, delivery=lambda inner: FlakyDelivery(inner, failures=1, error=OSError("inbox gone")))
+    found = reject(w, basis)
+    with pytest.raises(OSError, match="inbox gone"):
+        amend(w, add_acceptance=[RULE], answers=found.note, about="C1", words=YES)
+    assert len(made[0].calls) == 1  # the answer is recorded, so the watch is settled whatever the owner's note does
+
+
+def test_a_change_that_answers_nothing_runs_no_settler(factory: Any, tmp_path: Path) -> None:
+    w, basis, made = with_spy(factory, tmp_path)
+    amend(w, add_acceptance=[RULE], words="Add this, please.")  # the user's own request: no rejection is answered, nothing becomes related
+    define(w, owner="ceo/eng", name="inner", actor="ceo")
+    amend(w, owner="ceo/eng", name="inner", actor="ceo", add_acceptance=["Brief"])  # an agent client's amendment
+    assert made[0].calls == []

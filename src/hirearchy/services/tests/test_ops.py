@@ -5,6 +5,7 @@ word for word, the migration of a free-text playbook, the replies and the client
 from __future__ import annotations
 
 from collections.abc import Sequence
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -14,7 +15,7 @@ from testkit.services_world import svc  # noqa: F401  (a fixture: the wired appl
 from hirearchy.kernel import Message, OrgError, split_frontmatter
 from hirearchy.services import Admission, ItemWatch, PlaybookChange, PlaybookItem, PlaybookRace, ServiceCommands, normalize_evidence, playbook_reply
 from hirearchy.services._items import checked_body
-from hirearchy.services.testing import AdmittingServiceEvidence, RefusingServiceEvidence, ServicesWorld, fs_world, memory_world
+from hirearchy.services.testing import AdmittingServiceEvidence, RecordingSettler, RefusingServiceEvidence, ServicesWorld, fs_world, memory_world
 
 from ._support import STEPS, answer, define, populated, request
 
@@ -552,7 +553,7 @@ def test_the_repair_keeps_the_fallbacks_of_4_4(tmp_path: Path) -> None:
 
     reviser = RuleItemReviser(
         w.d.agents, w.catalog, CappedPlaybookTexts(w.d.settings), EventedPlaybookWriter(w.store, w.d.clock, w.events), PostedDelivery(w.d.post),
-        AdmittingServiceEvidence(), w.d.mail, splitters=(lossy, split_sections, split_whole),
+        AdmittingServiceEvidence(), w.d.mail, RecordingSettler(), splitters=(lossy, split_sections, split_whole),
     )
     change = reviser.revise_playbook("ceo", SERVICE, "add", "why", ["R1"], kind="step", text="Publish.")
     repaired, body = meta_of(w, HISTORY.format(2))
@@ -1210,3 +1211,95 @@ def test_an_unneeded_acknowledged_is_ignored_and_the_reply_says_so(w: ServicesWo
     )
     edit = revise(w, "edit", ("R1",), item="P1", text="Search twice.", acknowledged=ack)
     assert edit.ack_ignored == ack and "(acknowledged=" in playbook_reply(SERVICE, edit)
+
+
+# ============================================================================================== the settler at step 3 of every owner op (5.1, 8.5, B7, L11)
+
+JAN2 = datetime(2026, 1, 2, tzinfo=timezone.utc)
+WATCHED = "Write the memo."
+
+
+def due_watch(item: str = "P2", kind: str = "step") -> tuple[ItemWatch, ...]:
+    return (ItemWatch(item, kind, "warning", 2, JAN2, related=("R4", "R6"), retire_due=True),)
+
+
+def due_world(tmp_path: Path, *, settler: Any = None, locked: bool = False) -> ServicesWorld:
+    """v1 holds P1; v2 added P2 (the watched change), and the watch says P2 is due: the settler removes it (nothing came before it)."""
+    tmp_path.mkdir(parents=True, exist_ok=True)
+    w = populated(fs_world(tmp_path, AdmittingServiceEvidence(watch=due_watch()), settler=settler))
+    define(w, locked=locked)
+    owner_wrote(w, 1, "## Steps\n1. [P1] Search.", 1)
+    owner_wrote(w, 2, f"## Steps\n1. [P1] Search.\n2. [P2] {WATCHED} (WHY R2, R3)", 2, why={"P2": ["R2", "R3"]})
+    return w
+
+
+def test_an_owner_op_writes_a_due_retire_first(tmp_path: Path) -> None:
+    w = due_world(tmp_path)
+    change = revise(w, "add", ("R1",), kind="step", text="Publish the memo.")
+    assert [(p.version, p.op, p.by, p.item) for p in w.catalog.playbook_versions("ceo", SERVICE)][-2:] == [(3, "watch", "runtime (watch)", "P2"), (4, "add", "ceo", "P3")]
+    assert change.version == 4 and meta_of(w)[1] == "## Steps\n1. [P1] Search.\n2. [P3] Publish the memo. (WHY R1)"  # P2 is gone, its id never reused
+    assert [m.title for m in w.d.inbox("ceo") if m.sender == "runtime"][:1] == ["playbook of weekly-brief: the watch retired P2"]
+
+
+def test_an_owner_op_that_is_refused_still_leaves_the_due_retire_written(tmp_path: Path) -> None:
+    w = due_world(tmp_path)
+    assert refusal(w, "edit", item="P9", text="x").startswith("refused: `weekly-brief` has no live item P9.")  # no lead: P9 is not what the watch retired
+    assert w.catalog.read_playbook("ceo", SERVICE).version == 3  # a refusal writes nothing, except a migration and a watch retire that was due (5.1)
+
+
+def test_a_settler_write_that_races_refuses_the_op_with_pb_race(tmp_path: Path) -> None:
+    w = due_world(tmp_path, settler=lambda inner: RecordingSettler(inner, raises=PlaybookRace(5)))
+    assert refusal(w, "add", ("R1",), kind="step", text="Publish the memo.") == (
+        "refused: the playbook of `weekly-brief` changed while this call ran (now v5), so this change was not written: call again."
+    )
+    assert w.catalog.read_playbook("ceo", SERVICE).version == 2
+
+
+def test_a_locked_contract_refuses_the_op_before_the_settler(tmp_path: Path) -> None:
+    """L11: on a locked contract the owner's op is refused at step 1, so the settler is not reached; a due retire waits for the next recorded answer."""
+    made: list[RecordingSettler] = []
+
+    def spy(inner: Any) -> RecordingSettler:
+        made.append(RecordingSettler(inner))
+        return made[0]
+
+    w = due_world(tmp_path, settler=spy, locked=True)
+    assert "is locked by root" in refusal(w, "add", ("R1",), kind="step", text="Publish the memo.")
+    assert made[0].calls == [] and w.catalog.read_playbook("ceo", SERVICE).version == 2
+
+
+def test_the_settler_runs_with_strict_and_no_before_on_every_op(tmp_path: Path) -> None:
+    made: list[RecordingSettler] = []
+
+    def spy(inner: Any) -> RecordingSettler:
+        made.append(RecordingSettler(inner))
+        return made[0]
+
+    w = due_world(tmp_path, settler=spy)
+    revise(w, "add", ("R1",), kind="step", text="Publish the memo.")
+    assert made[0].calls == [("ceo", SERVICE, None, True)]  # `before` is the settler's own `after` here: it only writes what is due
+
+
+PB_ITEM_WATCH = (
+    "refused: The watch retired P2 in v3 (rejections R4, R6). `weekly-brief` has no live item P2. Its items: P1; retired: P2 (retired by the watch in v3: it "
+    "comes back only as a confirmed criterion's own words) (op=\"restore\" brings one back). Nothing was written."
+)
+
+
+def test_pb_item_after_this_calls_watch_retire_starts_with_the_watch_sentence(tmp_path: Path) -> None:
+    w = due_world(tmp_path)
+    assert refusal(w, "edit", ("R1",), item="P2", text="Write the memo twice.") == PB_ITEM_WATCH
+    assert w.catalog.read_playbook("ceo", SERVICE).version == 3  # the retire stays written
+
+
+def test_pb_item_marks_a_watch_retired_id(tmp_path: Path) -> None:
+    w = due_world(tmp_path)
+    revise(w, "add", ("R1",), kind="step", text="Publish the memo.")  # the retire was written by an earlier call
+    marked = "P2 (retired by the watch in v3: it comes back only as a confirmed criterion's own words)"
+    assert refusal(w, "retire", item="P2") == (  # no lead sentence: this call did not write the retire; the mark stays
+        f"refused: `weekly-brief` has no live item P2. Its items: P1, P3; retired: {marked} (op=\"restore\" brings one back). Nothing was written."
+    )
+    assert revise(w, "retire", item="P3").item == "P3"
+    assert refusal(w, "retire", item="P3") == (  # an owner's own retire is not marked
+        f"refused: `weekly-brief` has no live item P3. Its items: P1; retired: {marked}, P3 (op=\"restore\" brings one back). Nothing was written."
+    )

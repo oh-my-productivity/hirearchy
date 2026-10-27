@@ -18,7 +18,7 @@ from ._items import (
     RUNTIME_MIGRATION, SPLITTERS, PlacementError, Splitter, and_ids, canonical_why, checked_body, item_extra, migrate_body, place_add, place_restore,
     repair_of, without,
 )
-from ._protocols import PlaybookRevisions, PlaybookTexts, PlaybookWriter
+from ._protocols import PlaybookRevisions, PlaybookTexts, PlaybookWriter, WatchSettlement
 from .api import (
     REASON_MAX, Admission, Contract, Criterion, ItemWatch, PlaybookChange, PlaybookItem, PlaybookRace, PlaybookSection, ServiceCatalog, ServiceEvidence,
     Playbook, content_words, item_words, line_key, normalize_evidence, text_tokens,
@@ -163,8 +163,10 @@ PB_FIRST_LATE = (
     "refused: `{service}` already has evidence ({what}), so its playbook is built one item at a time: op=\"add\" with evidence (your Reflect "
     "section says what is admitted). The first version is only for the procedure of the first request. Nothing was written."
 )
-PB_ITEM = "refused: `{service}` has no live item {id}. Its items: {ids}{retired}. Nothing was written."
+PB_ITEM = "refused: {lead}`{service}` has no live item {id}. Its items: {ids}{retired}. Nothing was written."
 PB_ITEM_RETIRED = "; retired: {ids} (op=\"restore\" brings one back)"
+PB_ITEM_LEAD = "The watch retired {id} in v{n} (rejections {rejections}). "  # B7: only when step 3 of this call wrote the retire of the item the op names
+PB_ITEM_WATCHED = "{id} (retired by the watch in v{n}: it comes back only as a confirmed criterion's own words)"  # B7: in the list of the retired
 PB_SAME = "refused: no change: {id} {what}. Change an item only when the evidence calls for a different way of working. Nothing was written."
 PB_TEXT = "refused: {rule}. Nothing was written."
 PB_WATCHED_OUT = (
@@ -250,6 +252,7 @@ class _Book:
     note: str = ""  # what follows "Playbook v{n} is " in the note of an op that was written after a migration
     alone: str = ""  # the note of a migration whose op was then refused
     reply: str = ""
+    retired_now: tuple[str, ...] = ()  # the ids the watch settler retired at step 3 of this call (B7)
 
 
 T = TypeVar("T")
@@ -295,8 +298,9 @@ class RuleItemReviser(PlaybookRevisions):
 
     def __init__(
         self, agents: AgentDirectory, catalog: ServiceCatalog, texts: PlaybookTexts, playbooks: PlaybookWriter, delivery: MessageDelivery,
-        evidence: ServiceEvidence, mail: MailboxReader, *, splitters: Sequence[Splitter] = SPLITTERS,
+        evidence: ServiceEvidence, mail: MailboxReader, settler: WatchSettlement, *, splitters: Sequence[Splitter] = SPLITTERS,
     ) -> None:
+        self._settler = settler
         self._splitters = splitters
         self._agents = agents
         self._catalog = catalog
@@ -339,7 +343,7 @@ class RuleItemReviser(PlaybookRevisions):
             return self._first(call, current.version)
         book = self._migrated(call, current)
         try:
-            return self._change(call, book)
+            return self._change(call, self._settled(call, book))
         except OrgError:
             if book.migrated is not None:  # the migration stays written: the client is told of it on its own
                 self._delivery.notify(client, f"playbook of {service}: v{book.migrated} (items)", f"{book.alone} Nothing else changed.", wake=False)
@@ -508,6 +512,20 @@ class RuleItemReviser(PlaybookRevisions):
             raise OrgError(PB_RACE.format(service=call.service, n=race.current)) from race
         return _Book(version + 1, items, sections, top, version + 1, note, alone, reply)
 
+    # ------------------------------------------------------------------------------------------------------ step 3: the watch settler (8.5)
+
+    def _settled(self, call: _Call, book: _Book) -> _Book:
+        """A retire that is due is written first (``strict``: a write that races refuses the op with PB-RACE, any other failure propagates), on the
+        migrated body when step 2 wrote one, so a hand-broken file cannot hold a due retire back. The op then judges the playbook as the settler left it."""
+        try:
+            report = self._settler.settle(call.actor, call.service, None, strict=True)
+        except PlaybookRace as race:
+            raise OrgError(PB_RACE.format(service=call.service, n=race.current)) from race
+        if not report.retired:
+            return book
+        current = self._read(call.service, lambda: self._catalog.read_playbook(call.actor, call.service))
+        return replace(book, version=current.version, items=current.items or (), sections=current.sections, items_max=current.items_max, retired_now=report.retired)
+
     # ------------------------------------------------------------------------------------------------------ steps 4 to 6: the item, the gate, the write
 
     def _change(self, call: _Call, book: _Book) -> PlaybookChange:
@@ -533,13 +551,36 @@ class RuleItemReviser(PlaybookRevisions):
         return item_id[:1] == "P" and number.isdigit() and 1 <= int(number) <= book.items_max and item_id not in {i.id for i in book.items}
 
     def _no_item(self, call: _Call, book: _Book) -> str:
-        """PB-ITEM: the item is not live; the live and the retired ids are listed."""
+        """PB-ITEM: the item is not live; the live and the retired ids are listed. An id the watch retired is marked, and, when step 3 of this call
+        wrote that retire, the refusal says so first (B7)."""
         live = [i.id for i in book.items]
         gone = [f"P{n}" for n in range(1, book.items_max + 1) if f"P{n}" not in live]
+        by_watch = self._by_watch(call) if gone else {}
+        listed = [PB_ITEM_WATCHED.format(id=g, n=by_watch[g][0]) if g in by_watch else g for g in gone]
+        lead = ""
+        if call.item in book.retired_now and call.item in by_watch:
+            n, rejections = by_watch[call.item]
+            lead = PB_ITEM_LEAD.format(id=call.item, n=n, rejections=", ".join(rejections))
         return PB_ITEM.format(
-            service=call.service, id=call.item, ids=", ".join(live) or "none yet",
-            retired=PB_ITEM_RETIRED.format(ids=", ".join(gone)) if gone else "",
+            lead=lead, service=call.service, id=call.item, ids=", ".join(live) or "none yet",
+            retired=PB_ITEM_RETIRED.format(ids=", ".join(listed)) if gone else "",
         )
+
+    def _by_watch(self, call: _Call) -> dict[str, tuple[int, tuple[str, ...]]]:
+        """The ids whose latest removal from the body was the watch's retire, with the version of it and the rejections it rested on (B7): an id
+        that is live again, or that its owner retired later, is not one."""
+        versions = [v for v in self._read(call.service, lambda: self._catalog.playbook_versions(call.actor, call.service)) if v.items is not None]
+        out: dict[str, tuple[int, tuple[str, ...]]] = {}
+        for earlier, v in zip(versions, versions[1:]):
+            now = {i.id for i in v.items or ()}
+            for item_id in out.keys() & now:
+                del out[item_id]
+            for item_id in {i.id for i in earlier.items or ()} - now:
+                if v.op == "watch" and v.item == item_id:
+                    out[item_id] = (v.version, v.related)
+                else:
+                    out.pop(item_id, None)
+        return out
 
     def _args_error(self, call: _Call, wrong: str) -> OrgError:
         return OrgError(PB_ARGS.format(op=call.op, needed=NEEDED[call.op], wrong=wrong))

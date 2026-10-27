@@ -387,3 +387,66 @@ def test_relayed_and_agent_accepts_are_never_held(svc):
     plain = svc.delegate(ROOT, "ceo", "Plain", "g", "c", budget=2)
     deliver(svc, "ceo", plain)
     assert svc.feedback(ROOT, plain.id, "accept", source="human").feedback == "accept"  # a one-off task has no service: never held
+
+
+# ----------------------------------------------------------------------------------------- the settler after a human link (design 8.5)
+from hirearchy.services import ItemWatch  # noqa: E402
+from hirearchy.services.testing import AdmittingServiceEvidence, RecordingSettler  # noqa: E402
+
+BEFORE = (ItemWatch("P1", "rule", "new", 1),)
+AFTER = (ItemWatch("P1", "rule", "warning", 1, related=("R1",)),)
+
+
+class Evolving(AdmittingServiceEvidence):
+    """The watch the files derive, one state per read: ``states[0]`` at the first read (the state before the link), the next at the second."""
+
+    def __init__(self, *states):
+        super().__init__()
+        self.states = states
+        self.reads = 0
+
+    def watch(self, owner, service):
+        self.reads += 1
+        return self.states[min(self.reads, len(self.states)) - 1]
+
+
+@pytest.fixture(params=[fs_world, memory_world], ids=lambda f: f.__name__)
+def settled(request, tmp_path):
+    """A services world with a recording settler over the real one, and the stand-in whose watch changes after the first read."""
+    evidence = Evolving(BEFORE, AFTER)
+    made = []
+
+    def spy(inner):
+        found = RecordingSettler(inner, look=lambda: [m.id for m in w.d.inbox("ceo") if m.criterion])  # the links in the owner's inbox at the call
+        made.append(found)
+        return found
+
+    w = sup.populated(request.param(tmp_path, evidence=evidence, settler=spy))
+    sup.define(w)
+    return w, made[0], evidence
+
+
+def rejection(w, words="Too long."):
+    task = sup.request(w)
+    sup.answer(w, task)
+    return task, w.commands.feedback("root", task.id, "reject", words, source="human")
+
+
+def test_a_human_link_runs_the_settler_with_the_state_before_the_link(settled):
+    w, spy, evidence = settled
+    task, no = rejection(w)
+    assert spy.calls == []  # a verdict relates nothing: only an answer does
+    link = w.commands.feedback("root", task.id, "reject", "No, a one-off.", source="human", criterion=["none"], confirms=no.id)
+    assert spy.calls == [("ceo", "weekly-brief", BEFORE, False)]  # the watch as it stood before the link was written
+    assert spy.looks == [[link.id]]  # and the link was written when the settler ran
+    assert evidence.reads == 2  # the state before the link, then the settler's own derivation
+
+
+def test_a_relayed_link_runs_no_settler(settled):
+    w, spy, evidence = settled
+    task, no = rejection(w)
+    w.commands.feedback("root", task.id, "reject", "A one-off.", source="relayed", criterion=["none"], confirms=no.id)
+    assert spy.calls == [] and evidence.reads == 0  # a relayed link relates nothing
+    other, other_no = rejection(w, "Again.")
+    w.commands.feedback("root", other.id, "accept", source="human")
+    assert spy.calls == []  # nor does an accept

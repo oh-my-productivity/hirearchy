@@ -15,7 +15,7 @@ from ._ops import item_tokens
 from ._protocols import PlaybookWriter, SettleReport, WatchSettlement
 from .api import ItemWatch, Playbook, PlaybookItem, ServiceCatalog, ServiceEvidence
 
-__all__ = ["RuleWatchSettler", "SettleReport"]  # SettleReport is defined beside the Protocol it answers (_protocols), as 8.5 names it here
+__all__ = ["RuleWatchSettler", "SettleReport", "watch_before"]  # SettleReport is defined beside the Protocol it answers (_protocols), as 8.5 names it here
 
 WARNING_TITLE = "playbook item {id} of {service}: warning"
 WARNING_BODY = (  # to the owner, on the first related rejection (8.3)
@@ -44,6 +44,14 @@ def _cited(item: PlaybookItem) -> str:
     """The ids an item cites, for the notes: its ``why`` entry, else the ``C`` and ``R`` ids in its words."""
     ids = canonical_why(item.why) or tuple(dict.fromkeys(_CITED.findall(f"{item.text} {item.when}")))
     return ", ".join(ids) or NO_IDS
+
+
+def watch_before(evidence: ServiceEvidence, owner: str, service: str) -> tuple[ItemWatch, ...] | None:
+    """The watch as it stands now, read before a write that may change it; None when it cannot be read (the settler then sends no warning note)."""
+    try:
+        return evidence.watch(owner, service)
+    except (OrgError, OSError):
+        return None
 
 
 class RuleWatchSettler(WatchSettlement):

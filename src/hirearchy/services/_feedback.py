@@ -9,7 +9,8 @@ from ..dispatch import MessageSender
 from ..kernel import ROOT, Message, OrgError, latest_results, link_ids, verdict_tier
 from ..mail import MailboxReader
 from ._criteria import answer_ids, answering_version, unanswered
-from ._protocols import ClientFeedback, LinkNotes
+from ._protocols import ClientFeedback, LinkNotes, WatchSettlement
+from ._watch import watch_before
 from .api import FEEDBACK_HEADER, FEEDBACK_MAX, LINK_HEADER, VERDICTS, ServiceEvidence, ServiceStore, normalize_links
 
 CLIENT_ONLY = (
@@ -75,7 +76,9 @@ class RuleClientFeedback(ClientFeedback):
 
     def __init__(
         self, agents: AgentDirectory, mail: MailboxReader, sender: MessageSender, evidence: ServiceEvidence, store: ServiceStore,
+        settler: WatchSettlement,
     ) -> None:
+        self._settler = settler
         self._agents = agents
         self._mail = mail
         self._sender = sender
@@ -109,8 +112,18 @@ class RuleClientFeedback(ClientFeedback):
         if ids:
             ids = self._evidence.links(task.to, task.service, ids, verdict=confirms)
         if confirms is not None:
-            return self._links.write(actor, task.to, task.title, confirms, ids, note, source=source)
+            return self._linked(actor, task, confirms, ids, note, source)
         return self._record(actor, task, verdict, note, source, ", ".join(ids) or None)
+
+    def _linked(self, actor: str, task: Message, confirms: str, ids: Sequence[str], note: str, source: str | None) -> Message:
+        """The link note, and, when it is the user's (human tier), the watch settled (design 8.5): a rejection becomes related to an item only through
+        a human link or an answering version, so this is a moment a retire can fall due. ``before`` is read first; the settler never raises here."""
+        service = task.service or ""
+        before = watch_before(self._evidence, task.to, service) if source == "human" else None
+        link = self._links.write(actor, task.to, task.title, confirms, ids, note, source=source)
+        if verdict_tier(link) == "human":
+            self._settler.settle(task.to, service, before)
+        return link
 
     def _checked(self, actor: str, task_id: str, verdict: str, note: str) -> str:
         """The checks every verdict takes, in this order: the verdict, the note (a rejection needs one, at most ``FEEDBACK_MAX`` characters) and

@@ -35,13 +35,15 @@ from ._parse import FILE_SHAPE, as_int, merged_versions, playbook_version
 from ._places import OrgServicePlaces
 from ._ops import RuleItemReviser
 from ._protocols import (
-    ContinuedServices, LinkNotes, PlaybookWriter, RetiredService, ServiceFiles, ServicePlaces, ServiceRequests, ServiceRestorer,
+    ContinuedServices, LinkNotes, PlaybookWriter, RetiredService, ServiceFiles, ServicePlaces, ServiceRequests, ServiceRestorer, SettleReport,
+    WatchSettlement,
 )
 from ._request import RuleServiceRequester, TextRequestBodies
 from ._retire import RuleServiceRetirement
 from ._rework import ServiceReworkContext
 from ._store import FsServiceStore, OsServiceFiles
 from ._texts import CappedPlaybookTexts, DirectReportOwners, EventedPlaybookWriter
+from ._watch import RuleWatchSettler
 from .api import (
     Admission,
     AmendmentBasis,
@@ -258,6 +260,27 @@ class FlakyDelivery(MessageDelivery):
         return self._inner.notify(to, title, body, wake, trace)
 
 
+class RecordingSettler(WatchSettlement):
+    """A settler that records each call (owner, service, the watch before as a tuple or None, strict) and settles through ``inner`` (it settles
+    nothing without one). ``look`` is called at each call and its result kept in ``looks`` (what the world looked like when the settler ran);
+    ``raises`` is raised by a strict call, as the settler does when another writer's version is there (``PlaybookRace``)."""
+
+    def __init__(self, inner: WatchSettlement | None = None, *, look: Callable[[], object] | None = None, raises: Exception | None = None) -> None:
+        self._inner = inner
+        self._look = look
+        self._raises = raises
+        self.calls: list[tuple[str, str, tuple[ItemWatch, ...] | None, bool]] = []
+        self.looks: list[object] = []
+
+    def settle(self, owner: str, service: str, before: Sequence[ItemWatch] | None, *, strict: bool = False) -> SettleReport:
+        self.calls.append((owner, service, None if before is None else tuple(before), strict))
+        if self._look is not None:
+            self.looks.append(self._look())
+        if self._raises is not None and strict:
+            raise self._raises
+        return self._inner.settle(owner, service, before, strict=strict) if self._inner is not None else SettleReport()
+
+
 # ------------------------------------------------------------------------------ the worlds
 
 
@@ -354,9 +377,10 @@ def _world(
     d: DispatchWorld, harness: StoreHarness, evidence: ServiceEvidence | None = None, links: Callable[[LinkNotes], LinkNotes] | None = None,
     delivery: Callable[[MessageDelivery], MessageDelivery] | None = None, judged: JudgedVersions | None = None,
     allowance: CaseAllowance | None = None, playbook_writer: Callable[[PlaybookWriter], PlaybookWriter] | None = None,
+    settler: Callable[[WatchSettlement], WatchSettlement] | None = None,
 ) -> ServicesWorld:
-    """``links``, ``delivery`` and ``playbook_writer`` wrap the link writer, the delivery of the runtime's notes and the writer of the playbooks (a
-    write that fails, a call that is watched, a write that finds another version);
+    """``links``, ``delivery``, ``playbook_writer`` and ``settler`` wrap the link writer, the delivery of the runtime's notes, the writer of the
+    playbooks and the watch settler (a write that fails, a call that is watched, a write that finds another version);
     ``judged`` is the base a human rework is checked against (``NoJudgedVersions``: none needs one); ``allowance`` is what is left of a case's approved
     runs (``FixedAllowance({})``: every answer None, so a rework gets the contract's budget, as before 0a.3)."""
     places, store = harness.places, harness.store
@@ -371,17 +395,19 @@ def _world(
     playbooks: PlaybookWriter = EventedPlaybookWriter(store, d.clock, events)
     playbooks = playbook_writer(playbooks) if playbook_writer else playbooks
     continued = RecordedContinuations(places, harness.archive, d.mail, harness.files)
+    watcher: WatchSettlement = RuleWatchSettler(catalog, gate, playbooks, notes)  # the one settler of the three commands that call it
+    watcher = settler(watcher) if settler else watcher
     commands = RuleServiceCommands(
         RuleContractDefiner(
             d.agents, catalog, store, places, normalizer, ContractAmender(), texts, owners, playbooks, notes, d.clock, events, gate, link_notes,
-            continued, harness.restorer,
+            continued, harness.restorer, watcher,
         ),
         RuleServiceRetirement(d.agents, catalog, store, owners, notes, d.clock, events, gate),
-        RuleItemReviser(d.agents, catalog, texts, playbooks, notes, gate, d.mail),
+        RuleItemReviser(d.agents, catalog, texts, playbooks, notes, gate, d.mail, watcher),
         RuleServiceRequester(
             d.agents, catalog, d.mail, TextRequestBodies(), d.sender, judged or NoJudgedVersions(), allowance or FixedAllowance({}), gate, store,
         ),
-        RuleClientFeedback(d.agents, d.mail, d.sender, gate, store),
+        RuleClientFeedback(d.agents, d.mail, d.sender, gate, store, watcher),
     )
     return ServicesWorld(
         commands=commands, catalog=catalog, store=store, hints=ServiceReportHints(catalog), evidence=gate,
@@ -412,18 +438,19 @@ def fs_world(
     tmp_path: Path, evidence: ServiceEvidence | None = None, links: Callable[[LinkNotes], LinkNotes] | None = None,
     delivery: Callable[[MessageDelivery], MessageDelivery] | None = None, writer: Callable[[AtomicWriter], AtomicWriter] | None = None,
     judged: JudgedVersions | None = None, allowance: CaseAllowance | None = None,
-    playbooks: Callable[[PlaybookWriter], PlaybookWriter] | None = None,
+    playbooks: Callable[[PlaybookWriter], PlaybookWriter] | None = None, settler: Callable[[WatchSettlement], WatchSettlement] | None = None,
 ) -> ServicesWorld:
-    """``writer`` wraps the atomic writer of the store (a write that fails), ``playbooks`` the writer of the playbooks."""
-    return _world(dispatch_fs_world(tmp_path), fs_store(tmp_path, writer), evidence, links, delivery, judged, allowance, playbooks)
+    """``writer`` wraps the atomic writer of the store (a write that fails), ``playbooks`` the writer of the playbooks, ``settler`` the watch settler."""
+    return _world(dispatch_fs_world(tmp_path), fs_store(tmp_path, writer), evidence, links, delivery, judged, allowance, playbooks, settler)
 
 
 def memory_world(
     tmp_path: Path, evidence: ServiceEvidence | None = None, links: Callable[[LinkNotes], LinkNotes] | None = None,
     delivery: Callable[[MessageDelivery], MessageDelivery] | None = None, judged: JudgedVersions | None = None,
     allowance: CaseAllowance | None = None, playbooks: Callable[[PlaybookWriter], PlaybookWriter] | None = None,
+    settler: Callable[[WatchSettlement], WatchSettlement] | None = None,
 ) -> ServicesWorld:
-    return _world(dispatch_memory_world(tmp_path), memory_store(tmp_path), evidence, links, delivery, judged, allowance, playbooks)
+    return _world(dispatch_memory_world(tmp_path), memory_store(tmp_path), evidence, links, delivery, judged, allowance, playbooks, settler)
 
 
 def fs_rework(tmp_path: Path) -> ReworkContext:

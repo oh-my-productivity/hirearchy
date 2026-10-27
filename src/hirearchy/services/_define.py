@@ -13,8 +13,9 @@ from ._items import checked_body, item_extra, migrate_body
 from ._lines import criteria_lines
 from ._protocols import (
     ContinuedServices, ContractAmendment, ContractDefinitions, LinkNotes, OwnerAddresses, PlaybookTexts, PlaybookWriter, RetiredService,
-    ServicePlaces, ServiceRestorer,
+    ServicePlaces, ServiceRestorer, WatchSettlement,
 )
+from ._watch import watch_before
 from .api import (
     DESCRIPTION_MAX, FEEDBACK_MAX, Contract, ContractNormalizer, Criterion, Rejection, ServiceCatalog, ServiceEvidence, ServiceStore, criteria_of,
     number_criteria, quoting_lines, repeats_rejection,
@@ -121,7 +122,9 @@ class RuleContractDefiner(ContractDefinitions):
         self, agents: AgentDirectory, catalog: ServiceCatalog, store: ServiceStore, places: ServicePlaces, normalizer: ContractNormalizer,
         amendment: ContractAmendment, texts: PlaybookTexts, owners: OwnerAddresses, playbooks: PlaybookWriter, delivery: MessageDelivery,
         clock: Clock, events: EventSink, evidence: ServiceEvidence, links: LinkNotes, continued: ContinuedServices, restorer: ServiceRestorer,
+        settler: WatchSettlement,
     ) -> None:
+        self._settler = settler
         self._agents = agents
         self._catalog = catalog
         self._store = store
@@ -277,6 +280,7 @@ class RuleContractDefiner(ContractDefinitions):
         added, removed = amendment_ids(numbered, new.version) if recorded else ((), ())
         if prior is not None:  # the copy first, byte for byte, SERVICE.md last: then the next version is an ordinary amendment of it
             self._restorer.restore(owner, name, prior)
+        before = watch_before(self._evidence, owner, name) if answered is not None else None  # the watch as it stood before the answer is written
         where = self._store.write_contract(owner, name, meta, notes_n, old.version if old is not None else None)
         self._events.emit("service.define", actor=actor, owner=owner, service=name, version=new.version, by=actor, amendment=old is not None)
         if old is None:
@@ -300,17 +304,21 @@ class RuleContractDefiner(ContractDefinitions):
         quoting, version = self._quoting(owner, name, [c for c in current if c.text not in accept_n])
         told: OrgError | OSError | None = None
         try:
-            self._delivery.notify(
-                owner, f"contract of service {name} changed to v{new.version}",
-                self._amendment.diff(
-                    old, new, [*changes, *self._basis_lines(answered, about_n, words_n, added, removed, link is not None)], where, shown,
-                    {*confirmed, *((added or removed) if link is not None else ())}, quoting, version,
-                ), wake=False,
-            )
-        except (OrgError, OSError) as error:
-            if link_error is None:
-                raise
-            told = error
+            try:
+                self._delivery.notify(
+                    owner, f"contract of service {name} changed to v{new.version}",
+                    self._amendment.diff(
+                        old, new, [*changes, *self._basis_lines(answered, about_n, words_n, added, removed, link is not None)], where, shown,
+                        {*confirmed, *((added or removed) if link is not None else ())}, quoting, version,
+                    ), wake=False,
+                )
+            except (OrgError, OSError) as error:
+                if link_error is None:
+                    raise
+                told = error
+        finally:
+            if answered is not None:  # the answering version alone relates the rejection (8.5): settle whatever the owner's note or the link did
+                self._settler.settle(owner, name, before)
         if link_error is not None and answered is not None:
             raise OrgError(LINK_FAILED.format(
                 name=name, version=new.version, note=answered.note, error=link_error, task=answered.task,
