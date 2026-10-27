@@ -4,7 +4,7 @@ word for word, the migration of a free-text playbook, the replies and the client
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -14,6 +14,7 @@ from testkit.services_world import svc  # noqa: F401  (a fixture: the wired appl
 
 from hirearchy.kernel import Message, OrgError, split_frontmatter
 from hirearchy.services import Admission, ItemWatch, PlaybookChange, PlaybookItem, PlaybookRace, ServiceCommands, normalize_evidence, playbook_reply
+from hirearchy.services._acknowledge import text_hash
 from hirearchy.services._items import checked_body
 from hirearchy.services.testing import AdmittingServiceEvidence, RecordingSettler, RefusingServiceEvidence, ServicesWorld, fs_world, memory_world
 
@@ -994,10 +995,19 @@ OUT_RULE = "cite every claim"
 
 
 class FailingWatch(AdmittingServiceEvidence):
-    """A gate whose watch cannot be read: the change stands, and the reply says where the states are (19.1)."""
+    """A gate whose watch cannot be read once the playbook is past version ``readable`` (the test sets it before an op: the guard reads the watch
+    before the write, so an op whose write moves the playbook past it reads fine first and fails after): the change stands, and the reply says where
+    the states are (19.1)."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.readable = 10**6
+        self.version: Callable[[], int] = lambda: 0
 
     def watch(self, owner: str, service: str) -> tuple[ItemWatch, ...]:
-        raise OrgError("the record cannot be read")
+        if self.version() > self.readable:
+            raise OrgError("the record cannot be read")
+        return ()
 
 
 class AfterWrite(AdmittingServiceEvidence):
@@ -1157,16 +1167,21 @@ def test_a_carried_add_restore_or_edit_reply_names_the_old_id_and_its_rejections
 
 
 def test_a_failed_watch_read_after_the_write_gives_the_fixed_sentence(tmp_path: Path) -> None:
-    w = populated(fs_world(tmp_path, FailingWatch()))
+    gate = FailingWatch()
+    w = populated(fs_world(tmp_path, gate))
+    gate.version = lambda: w.catalog.read_playbook("ceo", SERVICE).version
     define(w)
+    gate.readable = 0
     add = revise(w, "add", ("R1",), kind="step", text="Cite every claim.")  # the write stands
     assert add.watch_unread is True and w.catalog.read_playbook("ceo", SERVICE).version == 1
     assert playbook_reply(SERVICE, add) == (
         "playbook of weekly-brief is now v1: added P1 (step), admitted (b) on R1. Its watch state is in your prompt's playbook section. "
         "root was told without being woken."
     )
+    gate.readable = 1
     edit = revise(w, "edit", ("R2",), item="P1", text="Cite every source twice.")
     assert playbook_reply(SERVICE, edit).endswith("edited P1, admitted (b) on R2. Its watch state is in your prompt's playbook section. root was told without being woken.")
+    gate.readable = 2
     assert playbook_reply(SERVICE, revise(w, "retire", item="P1")) == "playbook of weekly-brief is now v3: retired P1. root was told without being woken. The playbook has no items now: add one (op=\"add\") when the evidence calls for it."
 
 
@@ -1303,3 +1318,202 @@ def test_pb_item_marks_a_watch_retired_id(tmp_path: Path) -> None:
     assert refusal(w, "retire", item="P3") == (  # an owner's own retire is not marked
         f"refused: `weekly-brief` has no live item P3. Its items: P1; retired: {marked}, P3 (op=\"restore\" brings one back). Nothing was written."
     )
+
+
+# ============================================================================================== the parent's acknowledgement: PB-ACK and PB-ACK-BAD (design 9)
+
+COVERING = "## Steps\n1. Search.\n2. Write the memo carefully now.\n3. Check every claim."
+COVERED = (ItemWatch("P1", "step", "kept", 1, coverage=("C1",)), ItemWatch("P2", "step", "kept", 1, coverage=("C2", "R1")), ItemWatch("P3", "step", "kept", 1))
+WHY = "Not worth the time"
+ASK = "playbook acknowledgement"
+
+
+@pytest.fixture(params=[fs_world, memory_world], ids=lambda f: f.__name__)
+def covered(request: pytest.FixtureRequest, tmp_path: Path) -> ServicesWorld:
+    """ceo's v1 (P1-P3): P1 covers C1, P2 covers C2 and R1, P3 covers nothing; root is the client."""
+    return seeded(populated(request.param(tmp_path, AdmittingServiceEvidence(watch=COVERED))), COVERING)
+
+
+def ack_of(w: ServicesWorld, op: str, item: str, **kw: Any) -> Message:
+    """Root acknowledges (the user said yes) the change ``op`` of ``item``."""
+    return w.commands.acknowledge_playbook("root", "ceo", SERVICE, item, op, words="Yes, do it.", **kw)
+
+
+def test_retiring_a_covered_item_is_pb_ack_with_the_request_and_the_call(covered: ServicesWorld) -> None:
+    assert refusal(covered, "retire", item="P2", reason=WHY) == (
+        "refused: P2 covers C2, R1 (what the client required or rejected), so retiring it lowers the bar: it needs root's acknowledgement. "
+        "Nothing was written. Send root (`send`) this once: \"May we retire P2 of weekly-brief (C2, R1) because Not worth the time? If yes: "
+        "acknowledge_playbook(owner=\"ceo\", service=\"weekly-brief\", item=\"P2\", op=\"retire\", words=<the user's yes, verbatim>).\" "
+        "When the acknowledgement arrives (a note \"playbook acknowledgement\"), call this again with acknowledged=<its id>."
+    )
+    assert covered.catalog.read_playbook("ceo", SERVICE).version == 1  # nothing was written
+    assert revise(covered, "retire", item="P3").version == 2  # an item that covers nothing needs nothing
+
+
+def test_a_weakening_edit_by_a_dropped_covered_id_or_deleted_words_is_pb_ack_with_its_hash(covered: ServicesWorld) -> None:
+    longer = "Search twice."
+    dropped = refusal(covered, "edit", ("R9",), item="P1", text=longer, reason=WHY)  # its WHY (R9) lacks C1
+    assert dropped == (
+        "refused: P1 covers C1 (what the client required or rejected), so this edit, which drops C1, lowers the bar: it needs root's acknowledgement. "
+        'Nothing was written. Send root (`send`) this once: "May we change P1 of weekly-brief (C1) because Not worth the time? If yes: '
+        f'acknowledge_playbook(owner="ceo", service="weekly-brief", item="P1", op="edit", text_hash="{text_hash("step", longer)}", '
+        "words=<the user's yes, verbatim>).\" When the acknowledgement arrives (a note \"playbook acknowledgement\"), call this again with acknowledged=<its id>."
+    )
+    both = refusal(covered, "edit", ("R9",), item="P2", text="Write the memo now carefully again.", reason=WHY)
+    assert "so this edit, which drops C2 and R1, lowers the bar" in both
+    shorter = "Write the memo."
+    deleted = refusal(covered, "edit", ("C2", "R1"), item="P2", text=shorter, reason=WHY)  # keeps C2 and R1, but only deletes words
+    assert "so this edit, which only deletes words, lowers the bar" in deleted
+    assert f'op="edit", text_hash="{text_hash("step", shorter)}", words=<' in deleted
+    assert covered.catalog.read_playbook("ceo", SERVICE).version == 1
+    kept = revise(covered, "edit", ("C1",), item="P1", text="Search twice, then compare.")  # keeps C1 and adds words: not weakening
+    assert kept.version == 2
+
+
+def test_an_exempt_restore_of_a_client_text_that_drops_a_covered_id_is_pb_ack(tmp_path: Path) -> None:
+    w = populated(fs_world(tmp_path, AdmittingServiceEvidence(watch=(ItemWatch("P1", "step", "kept", 1, coverage=("C1",)),))))
+    define(w, playbook="## Steps\n1. Search the web.\n2. Write.")  # root's v1 (the client's words, no WHY)
+    revise(w, "edit", ("C1",), item="P1", text="Search the web and cite every source.")  # the owner's v2 rests on C1
+    asked = refusal(w, "restore", item="P1", version=1, reason=WHY)  # back to the client's words: they do not cite C1
+    assert asked.startswith("refused: P1 covers C1 (what the client required or rejected), so restoring it to the text of v1, which drops C1, lowers the bar:")
+    assert 'May we restore to v1 P1 of weekly-brief (C1) because Not worth the time? If yes: acknowledge_playbook(owner="ceo"' in asked
+    assert f'op="edit", text_hash="{text_hash("step", "Search the web.")}", words=<' in asked
+    assert w.catalog.read_playbook("ceo", SERVICE).version == 2
+    note = w.commands.acknowledge_playbook("root", "ceo", SERVICE, "P1", "edit", text_hash=text_hash("step", "Search the web."), words="Yes, go back.")
+    back = revise(w, "restore", item="P1", version=1, acknowledged=note.id)
+    assert (back.version, back.acknowledged) == (3, note.id)
+    assert playbook_reply(SERVICE, back) == (
+        f"playbook of weekly-brief is now v3: restored P1 to the text of v1 (written by root: no evidence needed) (acknowledged by root, note {note.id}). "
+        "root was told without being woken."
+    )
+
+
+def test_with_its_acknowledgement_the_change_is_written_and_recorded(covered: ServicesWorld) -> None:
+    note = ack_of(covered, "retire", "P2")
+    gone = revise(covered, "retire", item="P2", acknowledged=note.id, reason=WHY)
+    assert (gone.version, gone.acknowledged, gone.ack_ignored) == (2, note.id, "")
+    meta, body = meta_of(covered)
+    assert meta["acknowledged"] == note.id and meta["op"] == "retire" and meta["item"] == "P2" and "[P2]" not in body
+    assert playbook_reply(SERVICE, gone) == (
+        f"playbook of weekly-brief is now v2: retired P2 (acknowledged by root, note {note.id}). root was told without being woken."
+    )
+    edit_note = ack_of(covered, "edit", "P1", text_hash=text_hash("step", "Search twice more."))
+    edited = revise(covered, "edit", ("R9",), item="P1", text="Search twice more.", acknowledged=edit_note.id)
+    assert (edited.version, edited.acknowledged) == (3, edit_note.id) and meta_of(covered)[0]["acknowledged"] == edit_note.id
+
+
+def test_a_manager_parent_is_named_and_gets_no_words_clause(tmp_path: Path) -> None:
+    w = populated(fs_world(tmp_path, AdmittingServiceEvidence(watch=(ItemWatch("P2", "step", "kept", 1, coverage=("C1",)),))))
+    define(w)
+    define(w, owner="ceo/eng", name="notes", actor="ceo")
+    w.commands.revise_playbook("ceo/eng", "notes", "first", "start", [], text=COVERING)
+    with pytest.raises(OrgError) as refused:
+        w.commands.revise_playbook("ceo/eng", "notes", "retire", WHY, [], item="P2")
+    assert str(refused.value) == (
+        "refused: P2 covers C1 (what the client required or rejected), so retiring it lowers the bar: it needs ceo's acknowledgement. "
+        "Nothing was written. Send ceo (`send`) this once: \"May we retire P2 of notes (C1) because Not worth the time? If yes: "
+        "acknowledge_playbook(owner=\"ceo/eng\", service=\"notes\", item=\"P2\", op=\"retire\").\" "
+        "When the acknowledgement arrives (a note \"playbook acknowledgement\"), call this again with acknowledged=<its id>."
+    )
+    note = w.commands.acknowledge_playbook("ceo", "ceo/eng", "notes", "P2", "retire")
+    done = w.commands.revise_playbook("ceo/eng", "notes", "retire", WHY, [], item="P2", acknowledged=note.id)
+    assert playbook_reply("notes", done) == (
+        f"playbook of notes is now v2: retired P2 (acknowledged by ceo, note {note.id}). ceo was told without being woken."
+    )
+
+
+def stored_ack(w: ServicesWorld, ack: str, version: int = 2) -> None:
+    """A stored version (a move of P3 that cites ``ack``) that no honest call writes: the acknowledgement is already used."""
+    meta, body = w.store.read_playbook("ceo", SERVICE) or ({}, "")
+    w.store.write_playbook("ceo", SERVICE, version, {**meta, "version": version, "acknowledged": ack}, body, version - 1)
+
+
+def plain_note(w: ServicesWorld, sender: str, header: str, source: str | None = None) -> Message:
+    return w.d.post(Message(sender=sender, to="ceo", type="note", body="ok", title=ASK, acknowledges=header, source=source, wake=False))
+
+
+def test_pb_ack_bad_names_the_failed_condition(covered: ServicesWorld) -> None:
+    def bad(ack: str, why: str, **kw: Any) -> None:
+        kw = {"item": "P2", **kw}
+        assert refusal(covered, kw.pop("op", "retire"), kw.pop("evidence", ()), acknowledged=ack, **kw) == (
+            f"refused: acknowledged={ack} is not root's acknowledgement of this change ({why}). Nothing was written."
+        )
+
+    bad("20261024T000000000001-root-ab12", "not found in your mail")
+    ops = plain_note(covered, "ops", f"{SERVICE} retire P2")
+    bad(ops.id, "not from root")
+    other = ack_of(covered, "retire", "P1")
+    bad(other.id, "for retire P1 of weekly-brief")
+    edit = ack_of(covered, "edit", "P2", text_hash="0123456789ab")
+    bad(edit.id, "for edit P2 of weekly-brief")  # an edit was acknowledged, a retire is asked
+    bad(edit.id, "for another text (hash 0123456789ab)", op="edit", evidence=("R9",), text="Write the memo carefully now, twice.")
+    plain = covered.d.post(Message(sender="root", to="ceo", type="note", body="hello", title="a note", wake=False))
+    bad(plain.id, "for no change: it is not an acknowledgement")
+    unsigned = plain_note(covered, "root", f"{SERVICE} retire P2")  # a root note without source human
+    bad(unsigned.id, "not the user's (no source human)")
+    used = ack_of(covered, "retire", "P2")
+    stored_ack(covered, used.id)
+    bad(used.id, "already used by v2")
+    assert covered.catalog.read_playbook("ceo", SERVICE).version == 2  # only the stored version: every refusal wrote nothing
+
+
+def test_an_acknowledgement_older_than_the_current_text_is_pb_ack_bad(covered: ServicesWorld) -> None:
+    note = ack_of(covered, "retire", "P2")
+    revise(covered, "edit", item="P2", text="WRITE the memo carefully now.")  # a formatting fix: the item's text is a new one, live after the note
+    assert refusal(covered, "retire", acknowledged=note.id, item="P2") == (
+        f"refused: acknowledged={note.id} is not root's acknowledgement of this change (older than the current text of P2). Nothing was written."
+    )
+    assert covered.catalog.read_playbook("ceo", SERVICE).version == 2
+
+
+def test_a_malformed_acknowledged_is_pb_args_only_when_the_change_needs_one(covered: ServicesWorld) -> None:
+    assert refusal(covered, "retire", item="P2", acknowledged="abc") == (
+        'refused: op="retire" takes item, and optionally acknowledged; acknowledged is not a message id (abc). Nothing was written.'
+    )
+    assert revise(covered, "retire", item="P3", acknowledged="abc").ack_ignored == "abc"  # P3 covers nothing: ignored, not checked
+
+
+def test_an_item_whose_refs_are_only_removed_criteria_needs_nothing(tmp_path: Path) -> None:
+    """D14 (the study's B): the client already lowered that bar, so the watch reports no coverage and the retire is not asked."""
+    w = populated(fs_world(tmp_path, AdmittingServiceEvidence(watch=(ItemWatch("P2", "step", "kept", 1, coverage=()),))))
+    seeded(w, COVERING)
+    gone = revise(w, "retire", item="P2")
+    assert (gone.version, gone.acknowledged, gone.ack_ignored) == (2, "", "")
+
+
+def test_a_formatting_fix_and_a_move_of_a_covered_item_need_no_acknowledgement(covered: ServicesWorld) -> None:
+    assert revise(covered, "edit", item="P2", text="WRITE the memo carefully now.").formatting
+    assert revise(covered, "move", item="P2", after="start").version == 3
+
+
+class RefusingCovered(RefusingServiceEvidence):
+    def watch(self, owner: str, service: str) -> tuple[ItemWatch, ...]:
+        return COVERED
+
+
+class UnreadableCovered(AdmittingServiceEvidence):
+    def watch(self, owner: str, service: str) -> tuple[ItemWatch, ...]:
+        raise OrgError("boom")
+
+
+def test_the_guard_runs_after_the_gate_and_its_refusal_writes_nothing(tmp_path: Path) -> None:
+    w = populated(fs_world(tmp_path, RefusingCovered("refused by the stand-in for the gate")))
+    seeded(w, COVERING)
+    assert refusal(w, "edit", ("R9",), item="P1", text="Search twice.") == "refused by the stand-in for the gate"  # the gate speaks first
+    kept = ItemWatch("P1", "step", "kept", 1, coverage=("C1",))
+    (tmp_path / "g").mkdir()
+    guarded = populated(fs_world(tmp_path / "g", AdmittingServiceEvidence(watch=(kept,))))
+    seeded(guarded, COVERING)
+    before = len(guarded.d.inbox("root"))
+    assert refusal(guarded, "retire", item="P1").startswith("refused: P1 covers C1")
+    assert guarded.catalog.read_playbook("ceo", SERVICE).version == 1 and guarded.text("ceo/services/weekly-brief/history/PLAYBOOK.v1.md") is None
+    assert len(guarded.d.inbox("root")) == before  # no note to the client either
+
+
+def test_an_unreadable_watch_refuses_a_guarded_op_it_cannot_judge(tmp_path: Path) -> None:
+    w = populated(fs_world(tmp_path, UnreadableCovered()))
+    seeded(w, COVERING)
+    assert refusal(w, "retire", item="P2") == (
+        "refused: the record of `weekly-brief` cannot be read (boom), so the playbook was not changed. Try again; if it persists, tell your parent."
+    )
+    assert revise(w, "move", item="P2", after="start").version == 2  # an op that needs no guard does not read the watch for it

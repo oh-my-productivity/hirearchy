@@ -14,6 +14,7 @@ from ..agents import AgentDirectory
 from ..delivery import MessageDelivery
 from ..kernel import NAME_RE, ROOT, OrgError, clip_line, parent, split_frontmatter, stamp_of
 from ..mail import MailboxReader
+from ._acknowledge import text_hash
 from ._items import (
     RUNTIME_MIGRATION, SPLITTERS, PlacementError, Splitter, and_ids, canonical_why, checked_body, item_extra, migrate_body, place_add, place_restore,
     repair_of, without,
@@ -176,6 +177,32 @@ PB_WATCHED_OUT = (
     "please add it to the contract as a criterion.\""
 )
 PB_RACE = "refused: the playbook of `{service}` changed while this call ran (now v{n}), so this change was not written: call again."
+PB_ACK = (
+    "refused: {id} covers {ids} (what the client required or rejected), so {change} lowers the bar: it needs {parent}'s acknowledgement. "
+    "Nothing was written. Send {parent} (`send`) this once: \"May we {ask} {id} of {service} ({ids}) because {reason}? If yes: "
+    "acknowledge_playbook(owner=\"{owner}\", service=\"{service}\", item=\"{id}\", op=\"{op}\"{hash}{words}).\" When the acknowledgement "
+    "arrives (a note \"playbook acknowledgement\"), call this again with acknowledged=<its id>."
+)
+PB_ACK_RETIRE = "retiring it"  # the {change} of a retire, of an edit and of a restore
+PB_ACK_EDIT = "this edit, which {how},"
+PB_ACK_RESTORE = "restoring it to the text of v{k}, which {how},"
+PB_ACK_DROPS = "drops {ids}"  # the {how}: a covered id the new text lacks (i), else the new text only deletes words (ii)
+PB_ACK_DELETES = "only deletes words"
+PB_ACK_ASK = {"retire": "retire", "edit": "change", "restore": "restore to v{k}"}  # the {ask} of the question to the parent
+PB_ACK_HASH = ', text_hash="{hash}"'
+PB_ACK_WORDS = ", words=<the user's yes, verbatim>"  # only when the parent is root
+PB_ACK_BAD = "refused: acknowledged={id} is not {parent}'s acknowledgement of this change ({failed}). Nothing was written."
+PB_ACK_MISSING = "not found in your mail"  # the {failed} conditions of PB-ACK-BAD, in the order they are judged
+PB_ACK_SENDER = "not from {parent}"
+PB_ACK_OTHER = "for {what}"
+PB_ACK_NOT_ONE = "for no change: it is not an acknowledgement"
+PB_ACK_TEXT = "for another text (hash {hash})"
+PB_ACK_OLD = "older than the current text of {item}"
+PB_ACK_USED = "already used by v{k}"
+PB_ACK_USER = "not the user's (no source human)"
+ACK_NOT_AN_ID = "acknowledged is not a message id ({x})"  # a PB-ARGS clause, judged only when the change needs an acknowledgement
+MESSAGE_ID = re.compile(r"\d{8}T\d{12}-[A-Za-z0-9._-]+-[0-9a-f]{4}")  # a message id: its 21 timestamp characters, the sender (/ as .), 4 hex digits
+REF = re.compile(r"\b[CR]\d+\b")  # a criterion or assertion id in an item's words
 PB_UNREADABLE = (
     "refused: the record of `{service}` cannot be read ({error}), so the playbook was not changed. Try again; if it persists, tell your parent."
 )
@@ -237,6 +264,7 @@ class _Call:
     after: str = ""
     version: int | None = None
     acknowledged: str | None = None
+    used: str = ""  # the id of the acknowledgement note the guard accepted for this call ("" when the change needed none)
 
 
 @dataclass(frozen=True)
@@ -627,6 +655,7 @@ class RuleItemReviser(PlaybookRevisions):
         if not formatting:
             self._limits(call, book, items, book.sections, admission)
             self._watched_out(call, text, admission)
+            call = self._guarded(call, book, old, new, admission.why)
         path = self._write(call, book, items, book.sections, book.items_max, admission, item=old.id)
         change = PlaybookChange(book.version + 1, "edit", old.id, old.kind, admission, None, len(items), formatting=formatting, client=call.client)
         if not formatting:
@@ -637,6 +666,7 @@ class RuleItemReviser(PlaybookRevisions):
     def _retire(self, call: _Call, book: _Book, old: PlaybookItem) -> PlaybookChange:
         items, sections = without(book.items, book.sections, old)
         admission = Admission("exempt", (), EXEMPT)
+        call = self._guarded(call, book, old, None, ())
         path = self._write(call, book, items, sections, book.items_max, admission, item=old.id)
         change = PlaybookChange(book.version + 1, "retire", old.id, old.kind, admission, None, len(items), client=call.client)
         return self._told(call, book, path, change, f"retired {old.id}", _item_line(old))
@@ -680,6 +710,8 @@ class RuleItemReviser(PlaybookRevisions):
             items, sections = place_restore(book.items, book.sections, restored, layout)
         self._limits(call, book, items, sections, admission)
         self._watched_out(call, old.text, admission)
+        if live is not None:  # a restore of a retired item replaces no live text: it lowers no bar
+            call = self._guarded(call, book, live, restored, self._refs(restored), restored_from=source)
         path = self._write(call, book, items, sections, book.items_max, admission, item=call.item, restores=source)
         change = PlaybookChange(
             book.version + 1, "restore", call.item, old.kind, admission, None, len(items), restored_from=source, client=call.client,
@@ -714,6 +746,93 @@ class RuleItemReviser(PlaybookRevisions):
         path = self._write(call, book, items, sections, book.items_max, admission, item=old.id)
         change = PlaybookChange(book.version + 1, "move", old.id, old.kind, admission, None, len(items), client=call.client, after=call.after)
         return self._told(call, book, path, change, f"moved {old.id} after {call.after}", "")
+
+    # ------------------------------------------------------------------------------------------------------ the parent's acknowledgement (9)
+
+    @staticmethod
+    def _refs(item: PlaybookItem) -> tuple[str, ...]:
+        """The ids a text stands on (3): its ``WHY`` entry when it has one (a gated item), else the ``C<k>`` and ``R<k>`` in its words."""
+        return item.why or tuple(dict.fromkeys(REF.findall(f"{item.text} {item.when}")))
+
+    def _covered(self, call: _Call, item: str) -> tuple[str, ...]:
+        """What ``item`` covers now (its ``ItemWatch.coverage``). A watch that cannot be read refuses the op, as an unreadable record does everywhere
+        else in this class: a guard that could not be judged is not skipped."""
+        try:
+            found = self._evidence.watch(call.actor, call.service)
+        except (OrgError, OSError) as error:
+            raise OrgError(PB_UNREADABLE.format(service=call.service, error=error)) from error
+        return next((w.coverage for w in found if w.id == item), ())
+
+    def _guarded(
+        self, call: _Call, book: _Book, old: PlaybookItem, new: PlaybookItem | None, refs: Sequence[str], *, restored_from: int = 0,
+    ) -> _Call:
+        """The guard (9.1), last in step 5: retiring an item with coverage, or replacing its live text (``new``; its ``refs`` are the ids the new text
+        stands on) with one that drops a covered id or only deletes words, needs the parent's acknowledgement. Without ``acknowledged``: PB-ACK; with
+        one: it is checked (PB-ACK-BAD) and the call carries it, so the version records it. A change that needs none is returned as it is."""
+        covered = self._covered(call, old.id)
+        if not covered:
+            return call
+        dropped = [i for i in covered if new is not None and i not in refs]
+        if new is not None and not weakening(old, new, covered, refs):
+            return call
+        op = "retire" if new is None else "edit"
+        stored = text_hash(new.kind, new.text, new.when) if new is not None else ""
+        if call.acknowledged is None:
+            raise OrgError(self._ack_request(call, old, new, covered, dropped, stored, restored_from))
+        return replace(call, used=self._acknowledgement(call, book, old, f"{call.service} {op} {old.id}" + (f" {stored}" if stored else "")))
+
+    @staticmethod
+    def _ack_request(
+        call: _Call, old: PlaybookItem, new: PlaybookItem | None, covered: Sequence[str], dropped: Sequence[str], stored: str, restored_from: int,
+    ) -> str:
+        """PB-ACK (9.2): why the change lowers the bar, the question to send the parent once and the call that answers it."""
+        how = PB_ACK_DROPS.format(ids=and_ids(dropped)) if dropped else PB_ACK_DELETES
+        if new is None:
+            change, ask = PB_ACK_RETIRE, PB_ACK_ASK["retire"]
+        elif call.op == "restore":
+            change, ask = PB_ACK_RESTORE.format(k=restored_from, how=how), PB_ACK_ASK["restore"].format(k=restored_from)
+        else:
+            change, ask = PB_ACK_EDIT.format(how=how), PB_ACK_ASK["edit"]
+        return PB_ACK.format(
+            id=old.id, ids=", ".join(covered), change=change, parent=call.client, ask=ask, service=call.service, reason=clip_line(call.reason, LINE_CLIP),
+            owner=call.actor, op="retire" if new is None else "edit", hash=PB_ACK_HASH.format(hash=stored) if stored else "",
+            words=PB_ACK_WORDS if call.client == ROOT else "",
+        )
+
+    def _acknowledgement(self, call: _Call, book: _Book, item: PlaybookItem, expected: str) -> str:
+        """The acknowledgement ``call.acknowledged`` names, checked (9.2): it is in the owner's received mail, from its parent, for this very change
+        (``expected``: ``{service} {op} {item}`` and, for an edit or a restore, the hash of the new text), written after the item's current text went
+        live, not cited by any stored version and, for root, the user's (``source: human``). Returns its id; PB-ACK-BAD names the condition that fails."""
+        ack = (call.acknowledged or "").strip()
+        if not MESSAGE_ID.fullmatch(ack):
+            raise self._args_error(call, ACK_NOT_AN_ID.format(x=ack))
+
+        def bad(failed: str) -> OrgError:
+            return OrgError(PB_ACK_BAD.format(id=ack, parent=call.client, failed=failed))
+
+        note = self._read(call.service, lambda: self._mail.find_received(call.actor, ack))
+        if note is None:
+            raise bad(PB_ACK_MISSING)
+        if note.sender != call.client:
+            raise bad(PB_ACK_SENDER.format(parent=call.client))
+        header, wanted = (note.acknowledges or "").split(), expected.split()
+        if header[:3] != wanted[:3]:
+            what = f"{header[1]} {header[2]} of {header[0]}" if len(header) >= 3 else ""
+            raise bad(PB_ACK_OTHER.format(what=what) if what else PB_ACK_NOT_ONE)
+        if header[3:] != wanted[3:]:
+            raise bad(PB_ACK_TEXT.format(hash=header[3] if len(header) > 3 else "none"))
+        versions = self._read(call.service, lambda: self._catalog.playbook_versions(call.actor, call.service))
+        held = {p.version: i for p in versions if p.items is not None for i in p.items if i.id == item.id}
+        live = next((p.revised for p in versions if p.version == self._run_start(held, book.version)), None)
+        sent = stamp_of(note.id)
+        if live is not None and sent is not None and sent <= live:
+            raise bad(PB_ACK_OLD.format(item=item.id))
+        used = next((p.version for p in versions if p.acknowledged == ack), None)
+        if used is not None:
+            raise bad(PB_ACK_USED.format(k=used))
+        if call.client == ROOT and note.source != "human":
+            raise bad(PB_ACK_USER)
+        return ack
 
     def _watched_out(self, call: _Call, text: str, admission: Admission) -> None:
         """PB-WATCHED-OUT (8.6, B2): an add, a gated edit (of any live item) or a restore whose text key is the key of a text the watch retired, or of
@@ -804,7 +923,9 @@ class RuleItemReviser(PlaybookRevisions):
         item: str = "", reason: str = "", restores: int = 0,
     ) -> str:
         """The round-trip assertion (4.1), then the write: a compare-and-swap against the version this call judged (4.3)."""
-        extra = item_extra(items, items_max, call.op, evidence=list(admission.evidence), admitted=admission.rule, item=item, restores=restores)
+        extra = item_extra(
+            items, items_max, call.op, evidence=list(admission.evidence), admitted=admission.rule, item=item, restores=restores, acknowledged=call.used,
+        )
         body = checked_body(items, sections, extra)
         try:
             return self._playbooks.write(call.actor, call.service, book.version + 1, body, call.actor, reason or call.reason, book.version or None, extra)
@@ -835,5 +956,5 @@ class RuleItemReviser(PlaybookRevisions):
             lines.append(f"Text: {shown}")
         lines.append(f"File: {path}")
         self._delivery.notify(call.client, f"playbook of {call.service} revised to v{change.version}", "\n".join(lines), wake=False)
-        ignored = call.acknowledged or "" if call.op in ("edit", "retire", "restore") else ""
-        return replace(change, migrated=book.migrated, migration=book.reply, ack_ignored=ignored)
+        ignored = (call.acknowledged or "") if call.op in ("edit", "retire", "restore") and not call.used else ""
+        return replace(change, migrated=book.migrated, migration=book.reply, acknowledged=call.used, ack_ignored=ignored)

@@ -7,6 +7,7 @@ from .api import PlaybookChange
 TOLD = "{client} was told without being woken."
 STARTS_NEW = "It starts new and is watched: a related client rejection warns it, a second retires it."
 ACK_IGNORED = " (acknowledged={id} was not needed for this change and is not recorded.)"
+ACK_USED = " (acknowledged by {parent}, note {id})"  # a retire or a restore that rested on the parent's acknowledgement
 WATCH_UNREAD = "Its watch state is in your prompt's playbook section."
 NO_ITEMS = ' The playbook has no items now: add one (op="add") when the evidence calls for it.'
 
@@ -19,6 +20,7 @@ def playbook_reply(service: str, change: PlaybookChange) -> str:
     old = ", ".join(c.carried_related or c.related)
     carried = f"; it continues the watch of {c.carried}: warning ({old}), one more related rejection retires it" if c.carried else ""
     own = ", ".join(r for r in c.related if r not in c.carried_related)
+    used = ACK_USED.format(parent=c.client, id=c.acknowledged) if c.acknowledged else ""
     if c.op == "first":
         done = f"wrote playbook v1: {c.items} items ({', '.join(c.sections) or 'none'})."
     elif c.op == "add":
@@ -32,11 +34,11 @@ def playbook_reply(service: str, change: PlaybookChange) -> str:
         done = f"edited {c.item}, admitted ({c.admission.rule}) on {on}. {watch}"
     elif c.op == "restore":
         how = f" (written by {c.client}: no evidence needed)" if c.admission.rule == "restore" else f", admitted ({c.admission.rule}) on {on}"
-        done = f"restored {c.item} to the text of v{c.restored_from}{how}{carried}." + (f" {WATCH_UNREAD}" if c.watch_unread else "")
+        done = f"restored {c.item} to the text of v{c.restored_from}{how}{used}{carried}." + (f" {WATCH_UNREAD}" if c.watch_unread else "")
     elif c.op == "move":
         done = f"moved {c.item} after {c.after} (no evidence needed)."
     else:
-        done = f"retired {c.item}."
+        done = f"retired {c.item}{used}."
     ack = ACK_IGNORED.format(id=c.ack_ignored) if c.ack_ignored else ""
     end = NO_ITEMS if c.op == "retire" and c.items == 0 else ""
     return f"{c.migration}playbook of {service} is now v{c.version}: {done}{ack} {TOLD.format(client=c.client)}{end}"
