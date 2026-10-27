@@ -31,7 +31,7 @@ from ._define import RuleContractDefiner
 from ._feedback import RuleClientFeedback, SenderLinkNotes
 from ._hints import ServiceReportHints
 from ._normalizer import TextContractNormalizer
-from ._parse import FILE_SHAPE, as_int, merged_versions
+from ._parse import FILE_SHAPE, as_int, merged_versions, playbook_version
 from ._places import OrgServicePlaces
 from ._playbook import RulePlaybookReviser
 from ._protocols import ContinuedServices, LinkNotes, RetiredService, ServiceFiles, ServicePlaces, ServiceRequests, ServiceRestorer
@@ -47,6 +47,7 @@ from .api import (
     ContractNormalizer,
     JudgedBase,
     JudgedVersions,
+    PlaybookRace,
     ServiceCatalog,
     ServiceCommands,
     ServiceEvidence,
@@ -90,8 +91,13 @@ class MemoryServiceStore(ServiceStore, ServiceRestorer):
         self, owner: str, name: str, version: int, meta: JsonObject, body: str, archive_version: int | None = None,
     ) -> str:
         path = self._places.playbook_file(owner, name)
-        if archive_version is not None:
-            self.files[self._places.history_file(owner, name, "PLAYBOOK", archive_version)] = self.files[path]
+        found = playbook_version(self.files.get(path))  # the same check as the store on disk, without a lock
+        if found != (archive_version or 0):
+            raise PlaybookRace(found)
+        if archive_version is not None and path in self.files:
+            history = self._places.history_file(owner, name, "PLAYBOOK", archive_version)
+            if self.files.setdefault(history, self.files[path]) != self.files[path]:  # a history file is never overwritten
+                raise PlaybookRace(found)
         self.files[path] = join_frontmatter(meta, body)
         return self._places.rel(path)
 

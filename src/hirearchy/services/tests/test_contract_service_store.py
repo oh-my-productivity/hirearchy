@@ -11,7 +11,8 @@ from typing import cast
 
 import pytest
 
-from hirearchy.services import ServiceStore
+from hirearchy.kernel import OrgError
+from hirearchy.services import PlaybookRace, ServiceStore
 from hirearchy.services.testing import IMPLEMENTATIONS, StoreHarness
 
 from ._support import implementations
@@ -133,6 +134,71 @@ def test_a_service_without_a_playbook_has_no_history(h: StoreHarness) -> None:
 def test_a_playbook_without_a_version_is_version_zero(h: StoreHarness) -> None:
     h.store.write_playbook("ceo", "brief", 1, {"reason": "no version"}, "Steps.")
     assert h.store.playbook_history("ceo", "brief") == [(0, {"reason": "no version"})]
+
+
+# ------------------------------------------------------------------------------ the playbook is a compare-and-swap (4.3)
+
+
+def written(h: StoreHarness, versions: int) -> None:
+    """The playbook at ``versions``, each version archived by the next."""
+    for version in range(1, versions + 1):
+        h.store.write_playbook("ceo", "brief", version, {"version": version}, f"Text {version}.", version - 1 or None)
+
+
+def test_write_playbook_refuses_a_stale_archive_version_with_playbook_race(h: StoreHarness) -> None:
+    written(h, 5)
+    before = {rel: h.text(rel) for rel in h.rels()}
+    with pytest.raises(PlaybookRace):
+        h.store.write_playbook("ceo", "brief", 5, {"version": 5}, "Stale.", 4)  # the caller judged v4; v5 is the current one
+    with pytest.raises(PlaybookRace):
+        h.store.write_playbook("ceo", "brief", 8, {"version": 8}, "Ahead.", 7)  # a version that is not there yet
+    assert {rel: h.text(rel) for rel in h.rels()} == before  # nothing was written, archived or overwritten
+    h.store.write_playbook("ceo", "brief", 6, {"version": 6}, "Text 6.", 5)  # the version the caller judged: written
+    assert (h.store.read_playbook("ceo", "brief") or ({}, ""))[0]["version"] == 6
+
+
+def test_a_history_file_with_other_bytes_is_a_race_and_one_with_the_current_bytes_is_accepted(h: StoreHarness) -> None:
+    written(h, 2)
+    current = h.text("ceo/services/brief/PLAYBOOK.md")
+    h.put("ceo/services/brief/history/PLAYBOOK.v2.md", "---\nversion: 2\n---\nOther bytes.\n")  # someone else's v2
+    with pytest.raises(PlaybookRace):
+        h.store.write_playbook("ceo", "brief", 3, {"version": 3}, "Text 3.", 2)
+    assert h.text("ceo/services/brief/history/PLAYBOOK.v2.md") == "---\nversion: 2\n---\nOther bytes.\n"  # never overwritten
+    assert h.text("ceo/services/brief/PLAYBOOK.md") == current
+    assert current is not None
+    h.put("ceo/services/brief/history/PLAYBOOK.v2.md", current)  # the leftover of an interrupted write: archived, then the main write failed
+    h.store.write_playbook("ceo", "brief", 3, {"version": 3}, "Text 3.", 2)
+    assert (h.store.read_playbook("ceo", "brief") or ({}, ""))[0]["version"] == 3
+    assert h.text("ceo/services/brief/history/PLAYBOOK.v2.md") == current
+
+
+def test_the_first_write_expects_no_file(h: StoreHarness) -> None:
+    h.store.write_playbook("ceo", "brief", 1, {"version": 1}, "One.")
+    with pytest.raises(PlaybookRace):
+        h.store.write_playbook("ceo", "brief", 1, {"version": 1}, "Again.")  # a first write over a file that is there
+    assert (h.store.read_playbook("ceo", "brief") or ({}, ""))[1] == "One.\n"
+    with pytest.raises(PlaybookRace):
+        h.store.write_playbook("ceo", "other", 2, {"version": 2}, "Two.", 1)  # a version to archive, and no file
+    assert h.store.read_playbook("ceo", "other") is None
+
+
+def test_playbook_race_carries_the_current_version(h: StoreHarness) -> None:
+    written(h, 3)
+    with pytest.raises(PlaybookRace) as stale:
+        h.store.write_playbook("ceo", "brief", 3, {"version": 3}, "Stale.", 2)
+    assert stale.value.current == 3 and isinstance(stale.value, OrgError)
+    with pytest.raises(PlaybookRace) as missing:
+        h.store.write_playbook("ceo", "none", 2, {"version": 2}, "Two.", 1)
+    assert missing.value.current == 0  # no file: version 0
+    with pytest.raises(PlaybookRace) as first:
+        h.store.write_playbook("ceo", "brief", 1, {"version": 1}, "One.")
+    assert first.value.current == 3
+
+
+def test_a_versionless_file_is_no_version_and_is_written_over_as_before(h: StoreHarness) -> None:
+    h.store.write_playbook("ceo", "brief", 1, {"reason": "no version"}, "Hand made.")
+    h.store.write_playbook("ceo", "brief", 1, {"version": 1}, "Steps.")  # the reviser passes None for a playbook that states no version
+    assert (h.store.read_playbook("ceo", "brief") or ({}, ""))[0] == {"version": 1}
 
 
 # ------------------------------------------------------------------------------ retiring

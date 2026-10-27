@@ -6,6 +6,10 @@ files, and the product's own services read it. A missing evidence file fails the
 expectation is never edited to match the product.
 """
 
+import os
+import shutil
+import subprocess
+
 import pytest
 from testkit.e7_replay import materialize
 
@@ -59,3 +63,23 @@ def test_an_l_asis_accept_recorded_before_its_answer_is_feedback_unanswered(tmp_
     assert waiting.feedback(ROOT, S1_REWORK, "accept", "The assistant's reading.", source="relayed").source == "relayed"
     answered = Org(materialize("s1", S1_ANSWER[:21], tmp_path / "answered"))
     assert answered.feedback(ROOT, S1_REWORK, "accept", "It is right as it is.", source="human").feedback == "accept"
+
+
+def test_the_playbook_lock_file_is_never_committed(tmp_path):
+    """Design 4.3, 19.3: a playbook write takes its lock on `services/<name>/.tmp-playbook.lock`. The `.tmp-` prefix is one `Org.init`'s `.gitignore`
+    has ignored since the atomic writer's temp files, so `git add -A` does not commit it, and no reader lists it."""
+    if shutil.which("git") is None:
+        pytest.skip("git is not installed")
+    org = Org.init(tmp_path / "org", "Mission.", {"poll_seconds": 0.05})
+    org.hire(ROOT, "lead", "Lead", "Run the memos.", can_hire=True, max_children=2)
+    org.define_service(
+        ROOT, "lead", SERVICE, description="A memo.", inputs=[{"name": "topic", "description": "what it is about", "required": True}],
+        acceptance=["A Summary line first"], deliverable={"description": "one markdown file"}, budget=10, playbook="# Memo\n\n1. Write it.\n",
+    )
+    lock = org.root / "lead" / "services" / SERVICE / ".tmp-playbook.lock"
+    assert lock.is_file() and lock.stat().st_size == 0
+    env = {**os.environ, "GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@t", "GIT_COMMITTER_NAME": "t", "GIT_COMMITTER_EMAIL": "t@t"}
+    subprocess.run(["git", "add", "-A"], cwd=org.root, check=True, capture_output=True, env=env)
+    tracked = subprocess.run(["git", "ls-files"], cwd=org.root, check=True, capture_output=True, text=True, env=env).stdout.splitlines()
+    assert f"lead/services/{SERVICE}/PLAYBOOK.md" in tracked
+    assert not [path for path in tracked if path.endswith(".tmp-playbook.lock")]

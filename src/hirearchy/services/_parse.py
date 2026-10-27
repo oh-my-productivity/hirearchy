@@ -8,7 +8,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import SupportsInt, cast
 
-from ..kernel import JsonObject, parse_time
+from ..kernel import JsonObject, parse_time, split_frontmatter
 from ._items import parse_items, rules_of, why_of
 from .api import Contract, Playbook
 
@@ -25,6 +25,11 @@ def as_int(value: object, default: int = 0) -> int:
         return int(cast("SupportsInt | str", value))
     except (TypeError, ValueError):
         return default
+
+
+def playbook_version(text: str | None) -> int:
+    """The version a ``PLAYBOOK.md``'s frontmatter states; 0 for no file and for a file that states none."""
+    return as_int(split_frontmatter(text)[0].get("version")) if text is not None else 0
 
 
 def as_time(value: object) -> datetime | None:

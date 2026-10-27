@@ -54,6 +54,7 @@ __all__ = [
     "LINK_HEADER",
     "Playbook",
     "PlaybookItem",
+    "PlaybookRace",
     "PlaybookSection",
     "REASON_MAX",
     "Rejection",
@@ -389,6 +390,16 @@ class Playbook:
     parse_error: str = ""  # why an item-format body did not parse ("line {n}: {why}"); "" otherwise
 
 
+class PlaybookRace(OrgError):
+    """``ServiceStore.write_playbook`` found a playbook other than the one the caller judged: another process wrote it since the caller read it
+    (the watch settler in root's process, the owner's ``revise_playbook`` in the agent's), or a history file holds other bytes. Nothing was written.
+    ``current`` is the version that is there now (0 when there is no playbook); calling again reads it."""
+
+    def __init__(self, current: int) -> None:
+        super().__init__(f"the playbook was changed by another writer while this call ran: it is at v{current} now, so this write was not made")
+        self.current = current
+
+
 @runtime_checkable
 class ServiceStore(Protocol):
     """The files of one owner's services (the only writer of ``<owner>/services/**``)."""
@@ -414,7 +425,9 @@ class ServiceStore(Protocol):
         self, owner: str, name: str, version: int, meta: JsonObject, body: str, archive_version: int | None = None,
     ) -> str:
         """Write ``PLAYBOOK.md`` (``version`` is the one in ``meta``); first the current one is kept as ``history/PLAYBOOK.v<archive_version>.md``
-        when ``archive_version`` is given. Returns the path of ``PLAYBOOK.md`` relative to the organization."""
+        when ``archive_version`` is given. Returns the path of ``PLAYBOOK.md`` relative to the organization. A compare-and-swap: ``archive_version`` is
+        the version the caller judged (None: there is no playbook yet); when the playbook is another version, or a history file of that version holds
+        other bytes, ``PlaybookRace`` is raised and nothing is written."""
         ...
 
     def retire(self, owner: str, name: str, stamp: str) -> str:
