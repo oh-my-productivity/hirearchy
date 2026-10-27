@@ -14,11 +14,12 @@ from hirearchy.kernel import ROOT, STAMP_FORMAT, Message
 from hirearchy.mail import MailboxReader
 from hirearchy.reflection import Case
 from hirearchy.reflection._cases import DerivedCaseHistory
-from hirearchy.reflection._watch import Records, records_of
-from hirearchy.services import Contract
+from hirearchy.reflection._watch import Records, records_of, watch_states
+from hirearchy.services import Contract, ItemWatch, Playbook, PlaybookItem, number_criteria
 
 OWNER = "ceo"
 SERVICE = "weekly-brief"
+AGENT = "boss"  # an agent client: its verdicts are hypotheses (tier agent)
 BASE = datetime(2026, 1, 1, tzinfo=timezone.utc)
 
 
@@ -100,10 +101,10 @@ class Mailbag:
     def verdict(
         self, task: Message, tick: int, kind: str, *, source: str = "human", words: str = "No.", name: str | None = None, us: int = 0,
     ) -> Message:
-        """The client's verdict note on ``task``: ``accept`` or ``reject`` (``source`` is its tier: ``human`` or ``relayed``)."""
+        """The client's verdict note on ``task``: ``accept`` or ``reject`` (``source`` is its tier: ``human``, ``relayed`` or ``agent``)."""
         note = Message(
-            sender=ROOT, to=OWNER, type="note", body=words, title="feedback", feedback=kind, reply_to=task.id, source=source,
-            id=mid(tick, name or f"{task.title}.{kind}", us),
+            sender=AGENT if source == "agent" else ROOT, to=OWNER, type="note", body=words, title="feedback", feedback=kind, reply_to=task.id,
+            source=None if source == "agent" else source, id=mid(tick, name or f"{task.title}.{kind}", us),
         )
         self.sent.append(note)
         return note
@@ -144,3 +145,57 @@ def contract(
 
 def records(bag: Mailbag, *contracts: Contract) -> Records:
     return records_of(bag.cases(), bag.results(), list(contracts))
+
+
+def step(item_id: str, text: str, why: Sequence[str] = ()) -> PlaybookItem:
+    return PlaybookItem(item_id, "step", "## Steps", text, "", tuple(why))
+
+
+def rule(item_id: str, when: str, then: str, why: Sequence[str] = ()) -> PlaybookItem:
+    return PlaybookItem(item_id, "rule", "## Rules", then, when, tuple(why))
+
+
+def playbook(
+    version: int, tick: int, items: Sequence[PlaybookItem], *, op: str, item: str = "", admitted: str = "", us: int = 0,
+    related: Sequence[str] = (), parse_error: str = "",
+) -> Playbook:
+    """A stored version of the playbook in item form (``parse_error`` set: a hand-broken file that does not parse, with no items)."""
+    return Playbook(
+        version=version, revised=stamp(tick, us), by="runtime (watch)" if op == "watch" else OWNER, items=None if parse_error else tuple(items),
+        items_max=max([int(i.id[1:]) for i in items], default=0), op=op, item=item, admitted=admitted,
+        why={i.id: i.why for i in items if i.why}, related=tuple(related), parse_error=parse_error,
+    )
+
+
+@dataclass
+class Watching:
+    """One service under the watch: its contract versions, playbook versions and mail, and the states they derive."""
+
+    bag: Mailbag = field(default_factory=Mailbag)
+    contracts: list[Contract] = field(default_factory=list)
+    versions: list[Playbook] = field(default_factory=list)
+    notes: dict[str, Message] = field(default_factory=dict)  # the verdict note of each case ``case`` made, by the case's name
+    tasks: dict[str, Message] = field(default_factory=dict)  # the request of each, by name
+
+    def states(self) -> dict[str, ItemWatch]:
+        stored = [(c.version, c.defined_by or "", c.acceptance) for c in self.contracts]
+        criteria = number_criteria(stored, {c.version: (c.answers, c.initiated == "user") for c in self.contracts})
+        found = watch_states(self.versions, self.bag.cases(), self.bag.results(), criteria, self.contracts)
+        return {w.id: w for w in found}
+
+    def case(
+        self, name: str, ask: int, done: int | None = None, *, verdict: tuple[int, str] | None = None, link: tuple[int, Sequence[str]] | None = None,
+        source: str = "human", status: str = "done", revises: Message | None = None, asked_by: str | None = None,
+    ) -> Message:
+        """A request at ``ask`` (a result ``status`` at ``done``), the client's verdict ``(tick, "accept" | "reject")`` on it and a human link to
+        it ``(tick, [ids])``; returns the request. ``revises``: the request it sends back (a rework; ``asked_by`` is its ``source``)."""
+        task = self.bag.ask(name, ask, revises=revises.id if revises is not None else None, source=asked_by)
+        self.tasks[name] = task
+        if done is not None:
+            self.bag.answer(task, done, status)
+        if verdict is not None:
+            note = self.bag.verdict(task, verdict[0], verdict[1], source=source)
+            self.notes[name] = note
+            if link is not None:
+                self.bag.link(note, link[0], *link[1])
+        return task

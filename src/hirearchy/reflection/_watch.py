@@ -3,8 +3,8 @@
 Pure: every function reads values (cases, results, contract versions, playbook versions), never a file. Its one caller is
 ``CaseServiceEvidence.watch``, so every reader of a watch state goes through one derivation path.
 
-This part holds the facts the watch reads: the records as of a moment, the subjects of a rejection, the lineage of a criterion as of a time
-(B3, B4), coverage and refs."""
+The facts it reads come first: the records as of a moment, the subjects of a rejection, the lineage of a criterion as of a time (B3, B4),
+coverage and refs. Then the items' texts over time, the candidate cases and the window of a watched change, and ``watch_states``."""
 
 from __future__ import annotations
 
@@ -14,8 +14,11 @@ from dataclasses import dataclass, field, replace
 from datetime import datetime, timezone
 
 from ..kernel import Message, link_ids, msg_time, verdict_tier
-from ..services import Contract, Criterion, amendment_ids, number_criteria
-from .api import Assertion, Case, Verdict, regressions
+from ..services import Contract, Criterion, ItemWatch, Playbook, PlaybookItem, amendment_ids, migrate_body, number_criteria, text_tokens
+from ._quality_rules import deliveries_of
+from .api import Assertion, Case, Delivery, Verdict, regressions
+
+K_DEFAULT = 3  # the clean cases a watch needs unless the failure's recurrence rate is known (8.4)
 
 EPOCH = datetime(1970, 1, 1, tzinfo=timezone.utc)
 Moment = tuple[datetime, int, str]  # (when, rank, id): where a record sits among the records; a contract version (rank 0) comes before a message (rank 1)
@@ -225,3 +228,189 @@ def refs_of(records: Records, text: str, why: Sequence[str], live_from: datetime
         if a is not None:
             found |= {c for c in a.about if c.startswith("C")}
     return frozenset(found)
+
+
+# ----------------------------------------------------------------------------------------------------------------- the texts of an item over time
+
+
+@dataclass
+class _Seg:
+    """One text of an item, live from the version that gave it to the next change of it (its ``end``; None while it is live)."""
+
+    item: str
+    version: int
+    start: datetime
+    end: datetime | None
+    kind: str
+    text: str
+    when: str
+    why: tuple[str, ...]
+    refs: frozenset[str]
+
+
+@dataclass
+class _Change:
+    """A watched change (section 3): the gated change that put a text on trial, live from ``at``. The cases of its ``why`` assertions are no candidates."""
+
+    version: int
+    at: datetime
+    excluded: frozenset[str]
+
+
+@dataclass
+class _Track:
+    """What the versions say of one item: its texts over time, whether it is live, and the watched change it is on trial for (None: never watched)."""
+
+    id: str
+    kind: str
+    segs: list[_Seg]
+    live: bool = True
+    changes: list[_Change] = field(default_factory=list)
+
+
+def _words_of(item: PlaybookItem) -> str:
+    """The words refs are read from: a step's text, a rule's condition and action."""
+    return item.text if item.kind == "step" or item.when in ("", "always") else f"{item.when} {item.text}"
+
+
+def _tracks(versions: Sequence[Playbook], rec: Records) -> dict[str, _Track]:
+    """The texts and watched changes of every item, version by version (oldest first; ``versions`` all parse)."""
+    tracks: dict[str, _Track] = {}
+    live: dict[str, PlaybookItem] = {}
+    for v in versions:
+        at = v.revised or EPOCH
+        now = {i.id: i for i in v.items or ()}
+        for gone in [x for x in live if x not in now]:
+            tracks[gone].live = False
+            tracks[gone].segs[-1].end = at
+        for item in now.values():
+            if live.get(item.id) == item:
+                continue
+            track = tracks.setdefault(item.id, _Track(item.id, item.kind, []))
+            if track.segs and track.live:
+                track.segs[-1].end = at
+            track.live = True
+            track.kind = item.kind
+            track.segs.append(_Seg(item.id, v.version, at, None, item.kind, item.text, item.when, item.why, refs_of(rec, _words_of(item), item.why, at)))
+            if v.admitted in ("b", "c") and v.item == item.id:  # a gated change puts the text on trial
+                track.changes = [_Change(v.version, at, frozenset(rec.by_id[x].case for x in item.why if x in rec.by_id))]
+        live = now
+    return tracks
+
+
+def _seg_at(track: _Track, when: datetime) -> _Seg | None:
+    """The text of the item that was live at ``when``, None when it was not live then."""
+    return next((s for s in track.segs if s.start <= when and (s.end is None or when < s.end)), None)
+
+
+# ----------------------------------------------------------------------------------------------------------------- candidates and the window
+
+
+@dataclass(frozen=True)
+class _Candidate:
+    """A candidate case of a watched change (section 3): the deliveries of the case made after the change's live-from, and the first of them."""
+
+    case: Case
+    deliveries: tuple[Delivery, ...]
+    first: Message  # the first such done result: candidates are ordered by it
+
+
+def _candidates(rec: Records, change: _Change) -> list[_Candidate]:
+    """The candidate cases of ``change``, in the order of their first delivery after its live-from. A case of the change's ``why`` is none."""
+    found = []
+    for case in rec.cases:
+        if case.id in change.excluded:
+            continue
+        made = tuple(d for d in deliveries_of(case, rec.latest, {}) if when_of(d.result) > change.at)
+        if made:
+            found.append(_Candidate(case, made, min((d.result for d in made), key=lambda r: r.id)))
+    return sorted(found, key=lambda c: c.first.id)
+
+
+def _judging(candidate: _Candidate) -> tuple[Verdict, Delivery] | None:
+    """``judged(c)``: the delivery of the candidate that carries its first counted verdict (the human-tier verdict with the lowest note id among
+    those on its deliveries after the live-from), with that verdict. A delivery superseded with no verdict holds nothing."""
+    best: tuple[Verdict, Delivery] | None = None
+    for d in candidate.deliveries:
+        for v in d.counted:
+            if best is None or v.message.id < best[0].message.id:
+                best = (v, d)
+    return best
+
+
+@dataclass(frozen=True)
+class _Derived:
+    """What one watched change derives: its window's rejections (related and pending), the first k candidates' count, ``E`` and ``D``."""
+
+    related: tuple[str, ...]
+    pending: tuple[str, ...]
+    clean: int
+    waiting: int
+    closed: bool  # ``E`` is defined: each of the first k candidates has its judged delivery
+
+
+def _derive(rec: Records, track: _Track, change: _Change, k: int) -> _Derived:
+    """The window and the counts of ``change`` over ``rec``: candidates, ``judged(c)``, ``E``, ``D``, the window, related and pending rejections."""
+    first = _candidates(rec, change)[:k]
+    judged = [_judging(c) for c in first]
+    closed = len(first) == k and all(j is not None for j in judged)
+    last = [j for j in judged if j is not None]
+    e = max(when_of(d.result) for _, d in last) if closed else None
+    d_id = max(v.message.id for v, _ in last) if closed else ""
+    window: list[tuple[Assertion, Message]] = []  # each rejection of the window with the result it was given on
+    for a in rec.assertions:
+        result = rejected_result(rec, a)
+        if result is None or when_of(result) < change.at:
+            continue
+        if e is None or when_of(result) <= e or a.verdict.message.id < d_id:
+            window.append((a, result))
+    pending = [a for a, _ in window if pending_rejection(rec, a.id)]
+    held = {a.id for a in pending}
+    related = []
+    for a, result in window:
+        seg = _seg_at(track, when_of(result))
+        if a.id not in held and seg is not None and subjects_of(rec, a.id) & seg.refs:
+            related.append(a)
+    unclean = {a.case for a in (*pending, *related)}
+    return _Derived(
+        tuple(sorted((a.id for a in related), key=number_of)), tuple(sorted((a.id for a in pending), key=number_of)),
+        sum(1 for c, j in zip(first, judged) if j is not None and c.case.id not in unclean), sum(1 for j in judged if j is None), closed,
+    )
+
+
+def _virtual(versions: Sequence[Playbook]) -> tuple[ItemWatch, ...]:
+    """A legacy playbook has no items yet: it reads as it would migrate (4.4), every item ``kept`` (it predates the watch)."""
+    last = versions[-1] if versions else None
+    if last is None or last.items is not None or last.parse_error or not last.body.strip():
+        return ()
+    return tuple(ItemWatch(i.id, i.kind, "kept", last.version) for i in migrate_body(last.body).items)
+
+
+def watch_states(
+    versions: Sequence[Playbook], cases: Sequence[Case], results: Mapping[str, Sequence[Message]], criteria: Sequence[Criterion],
+    contract_versions: Sequence[Contract],
+) -> tuple[ItemWatch, ...]:
+    """The watch of every playbook item, derived (design 8.1; pure). ``versions`` are every stored playbook version, oldest first; ``cases`` the
+    service's, from the mail alone; ``results`` every result of every task the client sent, by task id, oldest first; ``criteria`` the contract's;
+    ``contract_versions`` every stored version of the contract, for the answering versions. One ``ItemWatch`` per item, retired ones included, by
+    number; ``()`` for no playbook. A legacy playbook gives its virtual items, all kept."""
+    parseable = [v for v in versions if v.items is not None]
+    if not parseable:
+        return _virtual(versions)
+    rec = records_of(cases, results, contract_versions)
+    out = []
+    for track in sorted(_tracks(parseable, rec).values(), key=lambda t: number_of(t.id)):
+        last = track.segs[-1]
+        coverage = coverage_of(last.refs, criteria, rec.assertions)
+        if not track.changes:
+            out.append(ItemWatch(track.id, track.kind, "kept" if track.live else "retired", last.version, coverage=coverage))
+            continue
+        change = track.changes[-1]
+        found = _derive(rec, track, change, K_DEFAULT)
+        due = len(found.related) >= 2
+        state = "retired" if not track.live else "warning" if found.related else "kept" if found.closed and not found.pending else "new"
+        out.append(ItemWatch(
+            track.id, track.kind, state, change.version, change.at, K_DEFAULT, (0, 0), found.clean, found.waiting, found.related, found.pending,
+            0, coverage, due and track.live,
+        ))
+    return tuple(out)

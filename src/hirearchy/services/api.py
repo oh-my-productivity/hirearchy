@@ -47,6 +47,7 @@ __all__ = [
     "FEEDBACK_HEADER",
     "FEEDBACK_MAX",
     "INPUT_RE",
+    "ItemWatch",
     "JUDGED_BYTES",
     "JudgedBase",
     "JudgedVersions",
@@ -74,6 +75,7 @@ __all__ = [
     "criterion_words",
     "item_words",
     "line_key",
+    "migrate_body",
     "normalize_evidence",
     "normalize_links",
     "number_criteria",
@@ -303,6 +305,28 @@ class PlaybookItem:
     text: str  # a step's words (several lines only for a migrated one), or a rule's THEN
     when: str = ""  # a rule's condition ("always" when none); "" for a step
     why: tuple[str, ...] = ()  # the R and C ids the runtime wrote (the frontmatter `why` entry); () for an item never gated
+
+
+@dataclass(frozen=True)
+class ItemWatch:
+    """The watch of one playbook item, derived from the files on every read and never stored (design 3, 8.1). ``watch_states`` computes it;
+    ``ServiceEvidence.watch`` returns it to ``services``, and every reader of a watch state goes through that one method."""
+
+    id: str  # "P<k>"
+    kind: str  # "step" | "rule"
+    state: str  # "new" | "warning" | "retired" | "restored" | "kept"
+    text_version: int  # the version that gave the item its current text (its last live text when retired); in a watch, the version that wrote the watched change
+    watch_start: datetime | None = None  # the start of its watch (a carried watch keeps the start of the watch it continues); None when it was never watched
+    k: int = 0  # the clean cases its watch needs (3, or more when the failure's recurrence rate is known); 0 when never watched
+    r: tuple[int, int] = (0, 0)  # (judged cases with a related rejection, judged cases) before the watch start: r is known at 10 or more and 1 or more
+    clean: int = 0  # of the first k candidates, the cases judged with no related or pending rejection in the window
+    waiting: int = 0  # of the first k candidates, the cases without a judged delivery yet
+    related: tuple[str, ...] = ()  # the R ids of the related rejections (a retired item keeps those of its last watch)
+    pending: tuple[str, ...] = ()  # the R ids in the window with no answer yet
+    restores: int = 0  # the version whose text the watch retire brought back (state "restored"); 0 otherwise
+    coverage: tuple[str, ...] = ()  # the criteria and confirmed assertions the item covers (section 3)
+    retire_due: bool = False  # two or more related rejections and the runtime's retire not written yet
+    carried: str = ""  # the id whose watch the item continues ("" when none)
 
 
 @dataclass(frozen=True)
@@ -688,4 +712,5 @@ class CaseAllowance(Protocol):
 
 # Pure rules re-exported from their modules; they import the types above, so these imports come last.
 from ._criteria import amendment_ids, version_in_force  # noqa: E402
+from ._items import migrate_body  # noqa: E402
 from ._parse import contract_of  # noqa: E402
