@@ -327,6 +327,89 @@ def test_the_same_chain_on_an_edited_rule_restores_its_previous_text(svc):
     assert (back.state, back.related) == ("restored", ("R2", "R3"))  # live with a text the watch brought back
 
 
+OUT_START = (
+    "refused: this text is P3's text that the watch retired in v3, because the client rejected R2 and R3 on what it cited (R1, C3). It comes back only as "
+    "the own words of a criterion the client confirms after that (rule (c)). Nothing was written."
+)
+
+
+def edited_then_retired(org, server, *, client_wrote_v1=False):
+    """G1(b)'s chain: P3 (a step of v1) is edited into the planted rule's words on C3, two related rejections (R2 on `first`, R3) retire that text and the
+    runtime restores v1's (playbook v3). v1 is the owner's, or the client's (the caller defined the service with ``playbook=STEPS``) when
+    ``client_wrote_v1``: a restore of its text is then exempt. Returns (C3, the task R2 was given on, R2)."""
+    if not client_wrote_v1:
+        org.revise_playbook("ceo", WEEK, "first", "first draft", [], text=STEPS)
+    c3 = confirmed_amendment(org, INITIALS)
+    org.revise_playbook("ceo", WEEK, "edit", "the client's rule", [c3], item="P3", text=INITIALS)
+    first = delivered(org, "again")
+    no = org.feedback(ROOT, first.id, "reject", "No.", source="human")
+    call(server, "feedback", task_id=first.id, verdict="reject", note="Yes, it is about that.", source="human", criterion=[c3], confirms=no.id)
+    third = delivered(org, "again and again")
+    answer = org.feedback(ROOT, third.id, "reject", "Full names again.", source="human")
+    call(server, "define_service", owner="ceo", name=WEEK, add_acceptance=[FULL_NAMES], answers=answer.id, about=c3, words="Yes, add it.")
+    assert playbook_of(org).version == 3 and "Check every claim." in playbook_of(org).body and INITIALS not in playbook_of(org).body
+    return c3, first, no.id
+
+
+def gated_edit_of_p3(org):
+    """A gated (c) edit of P3 into the words of another criterion the client confirms after the retire: P3 starts a new watch (playbook v4)."""
+    other = confirmed_amendment(org, "Cite sources by name", topic="sources")
+    edited = org.revise_playbook("ceo", WEEK, "edit", "the client's other rule", [other], item="P3", text="Cite sources by name")
+    assert (edited.version, edited.admission.rule) == (4, "c") and watched(org, "P3").state == "new"
+
+
+def test_a_gated_edit_of_the_retired_id_then_an_add_of_the_retired_text_is_pb_watched_out(svc):
+    """F1, design 8.6, B2: the refusal belongs to the retire, not to the id's current watch. A later gated change of P3 starts another watch of P3 whose
+    related rejections are none; the two rejections that retired the text still stand, so the text is still kept out."""
+    server = build_server(svc, ROOT)
+    c3, _, _ = edited_then_retired(svc, server)
+    gated_edit_of_p3(svc)
+    assert watched(svc, "P3").related == ()
+    owner = build_server(svc, "ceo")
+    version = playbook_of(svc).version
+    for given in (dict(op="add", kind="step", text=INITIALS), dict(op="add", kind="rule", then=INITIALS), dict(op="edit", item="P1", text=INITIALS)):
+        assert OUT_START in fails(owner, "revise_playbook", service=WEEK, reason="the client wants it", evidence=[c3], **given), given
+        assert playbook_of(svc).version == version  # a refusal writes nothing
+
+
+def test_a_gated_edit_of_the_retired_id_then_an_edit_back_to_the_retired_text_is_pb_watched_out(svc):
+    """F1 (b): P3 is edited back into the words the watch retired from it: refused by PB-WATCHED-OUT before the acknowledgement guard is asked."""
+    server = build_server(svc, ROOT)
+    c3, _, _ = edited_then_retired(svc, server)
+    gated_edit_of_p3(svc)
+    version = playbook_of(svc).version
+    message = fails(build_server(svc, "ceo"), "revise_playbook", service=WEEK, reason="back", op="edit", item="P3", text=INITIALS, evidence=[c3])
+    assert OUT_START in message
+    assert playbook_of(svc).version == version
+
+
+def test_an_owner_retire_and_an_exempt_restore_of_the_id_then_an_add_of_the_retired_text_is_pb_watched_out(org):
+    """F1 (c): retiring P3 and restoring it to its client-written text (both exempt) ends the id's watch; the retired text is still out."""
+    svc = org
+    define(svc, playbook=STEPS)
+    server = build_server(svc, ROOT)
+    c3, _, _ = edited_then_retired(svc, server, client_wrote_v1=True)
+    svc.revise_playbook("ceo", WEEK, "retire", "not needed", [], item="P3")
+    restored = svc.revise_playbook("ceo", WEEK, "restore", "needed after all", [], item="P3", version=1)
+    assert restored.admission.rule == "restore" and "Check every claim." in playbook_of(svc).body
+    version = playbook_of(svc).version
+    message = fails(build_server(svc, "ceo"), "revise_playbook", service=WEEK, reason="the client wants it", op="add", kind="step", text=INITIALS, evidence=[c3])
+    assert OUT_START in message
+    assert playbook_of(svc).version == version
+
+
+def test_a_corrected_link_leaving_fewer_than_two_related_lets_the_retired_text_back_after_a_gated_edit(svc):
+    """F1, L9: the user corrects R2's link ("no lasting rule"); only R3 is still related to the retire, so the text is a gated change again, even after
+    the id has started another watch."""
+    server = build_server(svc, ROOT)
+    c3, first, r2 = edited_then_retired(svc, server)
+    gated_edit_of_p3(svc)
+    call(server, "feedback", task_id=first.id, verdict="reject", note="I meant no lasting rule.", source="human", criterion=["none"], confirms=r2)
+    owner = build_server(svc, "ceo")
+    reply = call(owner, "revise_playbook", service=WEEK, reason="the client wants it", op="add", kind="step", text=INITIALS, evidence=[c3])
+    assert "refused" not in reply and INITIALS in playbook_of(svc).body
+
+
 def test_a_failed_retire_write_reads_retire_due_and_is_retried_at_the_owners_next_op(svc):
     """Design 8.5 (Failure), 8.1, 20 e2e (3): the answer is the client's record and stays written when the runtime cannot write the retire. The reply says the
     watch could not retire the rule yet; every reader says `retire due`; nothing was written to the playbook. The owner's next op retries the due retire first

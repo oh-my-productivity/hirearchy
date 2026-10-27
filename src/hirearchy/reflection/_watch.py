@@ -285,7 +285,7 @@ class _Watch:
 @dataclass
 class _Track:
     """What the versions say of one item: its texts over time, whether it is live, the watch it is on trial in (None: never watched, or the watch is
-    over and its text is another) and the version whose text the runtime's retire brought back (0: none)."""
+    over and its text is another), the version whose text the runtime's retire brought back (0: none) and the watches its retires ended (``ended``)."""
 
     id: str
     kind: str
@@ -293,6 +293,7 @@ class _Track:
     live: bool = True
     watch: _Watch | None = None
     restored: int = 0
+    ended: list[tuple[int, _Watch]] = field(default_factory=list)  # the retires 8.6 keeps out: (version, the watch it ended), whatever the item does next
 
 
 @dataclass(frozen=True)
@@ -594,11 +595,18 @@ def _repaired(tr: _Tracking, item: PlaybookItem, at: datetime, version: int, sou
     return False
 
 
+def _due(tr: _Tracking, w: _Watch, at: datetime) -> bool:
+    """Was the runtime's retire of the watch ``w`` due just before ``at`` (two related rejections by the files created before it)?"""
+    return len(_derive_watch(until(tr.rec, before(at)), w).related) >= 2
+
+
 def _gone(tr: _Tracking, track: _Track, v: Playbook, at: datetime) -> None:
     """The item left the body: an owner's retire (a warned text is remembered: carried watch (i)), the runtime's retire, a repair or a hand edit."""
     track.live = False
     track.segs[-1].end = at
     w = track.watch
+    if w is not None and v.item == track.id and (v.op == "watch" or (v.op == "retire" and not w.ended and _due(tr, w, at))):
+        track.ended.append((v.version, w))
     if w is None or w.ended:
         return
     if v.op == "retire" and v.item == track.id and _status(tr, w, at) == "warning":
@@ -623,6 +631,7 @@ def _changed(tr: _Tracking, v: Playbook, at: datetime, item: PlaybookItem, previ
     if v.op == "watch" and target and previous is not None:  # W3: the runtime's retire brought a previous text back
         if w is not None:
             w.ended = True
+            track.ended.append((v.version, w))
         track.restored = max(v.restores, 1)
         return
     carry = _carry(tr, item, v, previous, gated) if target else None
@@ -677,6 +686,14 @@ def _virtual(versions: Sequence[Playbook]) -> tuple[ItemWatch, ...]:
     return tuple(ItemWatch(i.id, i.kind, "kept", last.version) for i in migrate_body(last.body).items)
 
 
+def _retires(rec: Records, track: _Track, known: tuple[_Watch, _Derived] | None = None) -> tuple[tuple[int, tuple[str, ...]], ...]:
+    """``ItemWatch.retires`` of an item: for each retire its watch ended, the rejections still related to that watch over the files as they stand
+    (design 8.6; ``known``: the current watch and what it derives, not derived twice)."""
+    return tuple(
+        (version, (known[1] if known is not None and known[0] is w else _derive_watch(rec, w)).related) for version, w in track.ended
+    )
+
+
 def watch_states(
     versions: Sequence[Playbook], cases: Sequence[Case], results: Mapping[str, Sequence[Message]], criteria: Sequence[Criterion],
     contract_versions: Sequence[Contract],
@@ -696,7 +713,7 @@ def watch_states(
         w = track.watch
         if w is None:
             state = "retired" if not track.live else "restored" if track.restored else "kept"
-            out.append(ItemWatch(track.id, track.kind, state, last.version, restores=track.restored, coverage=coverage))
+            out.append(ItemWatch(track.id, track.kind, state, last.version, restores=track.restored, coverage=coverage, retires=_retires(rec, track)))
             continue
         found = _derive_watch(rec, w)
         state = (
@@ -705,6 +722,6 @@ def watch_states(
         )
         out.append(ItemWatch(
             track.id, track.kind, state, w.changes[-1].version, w.start, w.k, w.r, found.clean, found.waiting, found.related, found.pending,
-            track.restored, coverage, len(found.related) >= 2 and track.live and not w.ended, w.carried,
+            track.restored, coverage, len(found.related) >= 2 and track.live and not w.ended, w.carried, _retires(rec, track, (w, found)),
         ))
     return tuple(out)

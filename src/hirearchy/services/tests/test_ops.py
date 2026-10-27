@@ -1034,8 +1034,14 @@ def watch_retired(
     w.store.write_playbook("ceo", SERVICE, 2, meta, "## Steps\n1. [P1] Search.", 1)
 
 
+def ended(item: str, still: tuple[str, ...], *, retire: int = 2, state: str = "retired") -> ItemWatch:
+    """The watch of ``item`` as the derivation reports it after the retire ``retire``: ``retires`` holds the rejections still related to the watch
+    that retire ended; ``related`` those of the id's current watch, the same here (the id was not watched again)."""
+    return ItemWatch(item, "rule", state, 1, related=still, retires=((retire, still),))
+
+
 def out_world(tmp_path: Path, watch: Sequence[ItemWatch] | None = None, gate: AdmittingServiceEvidence | None = None) -> ServicesWorld:
-    given = (ItemWatch("P1", "step", "kept", 1), ItemWatch("P2", "rule", "retired", 1, related=("R4", "R6"))) if watch is None else tuple(watch)
+    given = (ItemWatch("P1", "step", "kept", 1), ended("P2", ("R4", "R6"))) if watch is None else tuple(watch)
     tmp_path.mkdir(parents=True, exist_ok=True)
     return populated(fs_world(tmp_path, gate or AdmittingServiceEvidence(watch=given)))
 
@@ -1085,25 +1091,25 @@ def test_a_text_its_owner_retired_while_its_retire_was_due_is_pb_watched_out(tmp
     w = out_world(tmp_path)
     watch_retired(w, by="ceo", op="retire")
     assert refusal(w, "add", ("R1",), kind="step", text=OUT_RULE) == WATCHED_OUT.replace("that the watch retired in v2", "that you retired while the watch's retire of it was due in v2")
-    quiet = out_world(tmp_path / "quiet", watch=(ItemWatch("P2", "rule", "retired", 1, related=("R4",)),))  # one related rejection: it was not due
+    quiet = out_world(tmp_path / "quiet", watch=(ItemWatch("P2", "rule", "retired", 1, related=("R4",)),))  # one related rejection: the retire was not due, so it has none recorded
     watch_retired(quiet, by="ceo", op="retire")
     assert revise(quiet, "add", ("R1",), kind="step", text=OUT_RULE).version == 3
 
 
 def test_a_c_admission_by_a_criterion_confirmed_after_the_retire_passes(tmp_path: Path) -> None:
     after = "20260103T000000000000-root-ab12"  # the user's link, a day after v2 (2026-01-02)
-    w = out_world(tmp_path, gate=AfterWrite(after, (ItemWatch("P2", "rule", "retired", 1, related=("R4", "R6")),)))
+    w = out_world(tmp_path, gate=AfterWrite(after, (ended("P2", ("R4", "R6")),)))
     watch_retired(w)
     change = revise(w, "add", ("C3",), kind="step", text=OUT_RULE)  # the client made it the contract
     assert change.admission.rule == "c" and change.version == 3
-    before = out_world(tmp_path / "before", gate=AfterWrite("20260101T000000000000-root-ab12", (ItemWatch("P2", "rule", "retired", 1, related=("R4", "R6")),)))
+    before = out_world(tmp_path / "before", gate=AfterWrite("20260101T000000000000-root-ab12", (ended("P2", ("R4", "R6")),)))
     watch_retired(before)
     assert refusal(before, "add", ("C3",), kind="step", text=OUT_RULE) == WATCHED_OUT  # a criterion confirmed before the retire does not bring it back
 
 
 def test_fewer_than_2_still_related_lets_it_back_as_a_gated_change(tmp_path: Path) -> None:
     """L9: a user's corrected link can undo the relation; with fewer than two of the retire's rejections still related, the text is a gated change."""
-    w = out_world(tmp_path, watch=(ItemWatch("P2", "rule", "retired", 1, related=("R4",)),))  # R6 is related no more
+    w = out_world(tmp_path, watch=(ended("P2", ("R4",)),))  # R6 is related no more
     watch_retired(w)
     change = revise(w, "add", ("R7", "R8"), kind="step", text=OUT_RULE)
     assert change.admission.rule == "b" and change.version == 3 and change.item == "P3"
@@ -1111,7 +1117,7 @@ def test_fewer_than_2_still_related_lets_it_back_as_a_gated_change(tmp_path: Pat
 
 def test_a_text_the_watch_replaced_by_its_previous_one_stays_out(tmp_path: Path) -> None:
     """A watch retire that put the previous text back: the watched text is still out; the restored one is live and takes no refusal."""
-    w = out_world(tmp_path)
+    w = out_world(tmp_path, watch=(ItemWatch("P1", "step", "kept", 1), ended("P2", ("R4", "R6"), retire=3, state="restored")))
     define(w)
     owner_wrote(w, 1, "## Steps\n1. [P1] Search.\n2. [P2] older words", 2)
     owner_wrote(w, 2, f"## Steps\n1. [P1] Search.\n2. [P2] {OUT_RULE} (WHY R1, R2; C2)", 2, why={"P2": ["R1", "R2", "C2"]})
@@ -1121,6 +1127,41 @@ def test_a_text_the_watch_replaced_by_its_previous_one_stays_out(tmp_path: Path)
     }
     w.store.write_playbook("ceo", SERVICE, 3, meta, "## Steps\n1. [P1] Search.\n2. [P2] older words", 2)
     assert refusal(w, "edit", ("R1",), item="P1", text=OUT_RULE).startswith("refused: this text is P2's text that the watch retired in v3")
+
+
+def test_a_later_watch_of_the_retired_id_does_not_lift_the_refusal(tmp_path: Path) -> None:
+    """F1: the refusal belongs to the retire. The id's current watch (a gated change started another one) has no related rejection, and the text
+    the watch retired is still out for as long as 2 of that retire's rejections are related."""
+    again = ItemWatch("P2", "rule", "new", 3, related=(), retires=((2, ("R4", "R6")),))
+    w = out_world(tmp_path, watch=(ItemWatch("P1", "step", "kept", 1), again))
+    watch_retired(w)
+    assert refusal(w, "add", ("R1",), kind="step", text=OUT_RULE) == WATCHED_OUT
+    assert refusal(w, "edit", ("R1",), item="P1", text=OUT_RULE) == WATCHED_OUT
+    assert refusal(w, "add", ("R1",), kind="rule", then=OUT_RULE, when="a claim has no source") == WATCHED_OUT
+    assert w.catalog.read_playbook("ceo", SERVICE).version == 2
+    fewer = ItemWatch("P2", "rule", "new", 3, related=("R4", "R6"), retires=((2, ("R4",)),))  # the retire's R6 is related no more: only the retire counts
+    other = out_world(tmp_path / "fewer", watch=(ItemWatch("P1", "step", "kept", 1), fewer))
+    watch_retired(other)
+    assert revise(other, "add", ("R7", "R8"), kind="step", text=OUT_RULE).version == 3
+
+
+def test_a_watch_retire_the_derivation_does_not_know_refuses_nothing(tmp_path: Path) -> None:
+    """The refusal rests on the rejections the derivation names for the retire; an id whose retires it does not list (an owner's retire that was not
+    due, a hand-written version) refuses nothing, whatever the id's current watch holds."""
+    w = out_world(tmp_path, watch=(ItemWatch("P1", "step", "kept", 1), ItemWatch("P2", "rule", "warning", 3, related=("R4", "R6"))))
+    watch_retired(w)
+    assert revise(w, "add", ("R1",), kind="step", text=OUT_RULE).version == 3
+
+
+def test_an_unreadable_watch_refuses_instead_of_letting_a_watch_retired_text_through(tmp_path: Path) -> None:
+    """N1: the guard that cannot be judged is not skipped (19.1, PB-UNREADABLE), as for the acknowledgement's coverage."""
+    gate = FailingWatch()
+    w = populated(fs_world(tmp_path, gate))
+    gate.version = lambda: w.catalog.read_playbook("ceo", SERVICE).version
+    watch_retired(w)
+    gate.readable = 1
+    assert refusal(w, "add", ("R1",), kind="step", text=OUT_RULE).startswith("refused: the record of `weekly-brief` cannot be read (the record cannot be read)")
+    assert w.catalog.read_playbook("ceo", SERVICE).version == 2
 
 
 def test_a_carried_add_restore_or_edit_reply_names_the_old_id_and_its_rejections(tmp_path: Path) -> None:

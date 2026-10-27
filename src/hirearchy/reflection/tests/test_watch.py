@@ -519,6 +519,52 @@ def test_a_watch_retire_without_a_previous_text_reads_retired() -> None:
     assert (gone.state, gone.related, gone.retire_due, gone.restores) == ("retired", ("R2", "R3"), False, 0)
 
 
+def test_a_watch_retire_without_a_previous_text_reads_retired() -> None:
+    w = world()
+    w.case("c1", 20, 21, verdict=(30, "reject"), link=(31, ["C5"]))
+    w.case("c2", 22, 23, verdict=(32, "reject"), link=(33, ["C5"]))
+    w.versions.append(playbook(3, 40, [w.items(1)[0]], op="watch", item="P2", admitted="watch", related=("R2", "R3")))
+    gone = p2(w)
+    assert (gone.state, gone.related, gone.retire_due, gone.restores) == ("retired", ("R2", "R3"), False, 0)
+    assert gone.retires == ((3, ("R2", "R3")),)  # the retire v3 and the rejections still related to the watch it ended
+
+
+def test_a_watch_retire_keeps_its_rejections_whatever_the_id_does_next() -> None:
+    """F1 (design 8.6): ``retires`` is derived from the watch each retire ended, so a later watch of the same id (a gated change) or an exempt restore
+    that leaves it unwatched does not change it; a user's corrected link undoes the relation (L9)."""
+    w = world()
+    p1, rule2 = w.versions[1].items or ()
+    text_b = rule("P2", "a date is relative", "convert it, and write the date down", why=("R1", "C5"))
+    w.versions.append(playbook(3, 12, [p1, text_b], op="edit", item="P2", admitted="c"))
+    w.case("c1", 20, 21, verdict=(30, "reject"), link=(31, ["C5"]))
+    w.case("c2", 22, 23, verdict=(32, "reject"), link=(33, ["C5"]))
+    w.versions.append(playbook(4, 40, [p1, rule2], op="watch", item="P2", admitted="watch", restores=2, related=("R2", "R3")))
+    assert p2(w).retires == ((4, ("R2", "R3")),)
+    w.versions.append(playbook(5, 41, [p1, rule("P2", "a date is relative", "convert it twice", why=("R1", "C5"))], op="edit", item="P2", admitted="c"))
+    fresh = p2(w)
+    assert (fresh.state, fresh.related, fresh.retires) == ("new", (), ((4, ("R2", "R3")),))  # the new watch has no related rejection; the retire keeps its
+    w.versions.append(playbook(6, 42, [p1], op="retire", item="P2", admitted="exempt"))
+    w.versions.append(playbook(7, 43, [p1, rule("P2", "a date is relative", "convert it twice", why=("R1", "C5"))], op="restore", item="P2", admitted="restore", restores=5))
+    assert p2(w).retires == ((4, ("R2", "R3")),)  # retired and restored outside a watch: the id's watch is gone, the retire's rejections are not
+    w.bag.link(w.notes["c1"], 60, "none")  # R2's link is corrected: it is related no more
+    assert p2(w).retires == ((4, ("R3",)),)
+
+
+def test_an_owner_retire_while_the_watch_retire_was_due_keeps_its_rejections_but_one_made_when_it_was_not_does_not() -> None:
+    """F1: an owner's retire counts only when 2 related rejections stood at the retire (the runtime's retire was due); one made with a single related
+    rejection, or of a text whose watch already ended, has none, however many rejections come later."""
+    due = world()
+    due.case("c1", 20, 21, verdict=(30, "reject"), link=(31, ["C5"]))
+    due.case("c2", 22, 23, verdict=(32, "reject"), link=(33, ["C5"]))
+    due.versions.append(playbook(3, 40, [due.items(1)[0]], op="retire", item="P2", admitted="exempt"))
+    assert p2(due).retires == ((3, ("R2", "R3")),)
+    quiet = world()
+    quiet.case("c1", 20, 21, verdict=(30, "reject"), link=(31, ["C5"]))
+    quiet.versions.append(playbook(3, 40, [quiet.items(1)[0]], op="retire", item="P2", admitted="exempt"))
+    quiet.case("c2", 42, 43, verdict=(44, "reject"), link=(45, ["C5"]))  # a second related rejection, recorded after the retire
+    assert p2(quiet).retires == ()
+
+
 def test_restored_lasts_until_a_gated_change() -> None:
     w = world()
     p1, rule2 = w.versions[1].items or ()

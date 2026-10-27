@@ -754,14 +754,17 @@ class RuleItemReviser(PlaybookRevisions):
         """The ids a text stands on (3): its ``WHY`` entry when it has one (a gated item), else the ``C<k>`` and ``R<k>`` in its words."""
         return item.why or tuple(dict.fromkeys(REF.findall(f"{item.text} {item.when}")))
 
-    def _covered(self, call: _Call, item: str) -> tuple[str, ...]:
-        """What ``item`` covers now (its ``ItemWatch.coverage``). A watch that cannot be read refuses the op, as an unreadable record does everywhere
-        else in this class: a guard that could not be judged is not skipped."""
+    def _watch_read(self, call: _Call) -> tuple[ItemWatch, ...]:
+        """The watch of every item, for a guard (PB-ACK, PB-WATCHED-OUT). A watch that cannot be read refuses the op, as an unreadable record does
+        everywhere else in this class: a guard that could not be judged is not skipped."""
         try:
-            found = self._evidence.watch(call.actor, call.service)
+            return self._evidence.watch(call.actor, call.service)
         except (OrgError, OSError) as error:
             raise OrgError(PB_UNREADABLE.format(service=call.service, error=error)) from error
-        return next((w.coverage for w in found if w.id == item), ())
+
+    def _covered(self, call: _Call, item: str) -> tuple[str, ...]:
+        """What ``item`` covers now (its ``ItemWatch.coverage``)."""
+        return next((w.coverage for w in self._watch_read(call) if w.id == item), ())
 
     def _guarded(
         self, call: _Call, book: _Book, old: PlaybookItem, new: PlaybookItem | None, refs: Sequence[str], *, restored_from: int = 0,
@@ -838,23 +841,21 @@ class RuleItemReviser(PlaybookRevisions):
         """PB-WATCHED-OUT (8.6, B2): an add, a gated edit (of any live item) or a restore whose text key is the key of a text the watch retired, or of
         a text its owner retired while its watch retire was due, is refused while at least 2 of that retire's rejections are still related (a corrected
         link can undo the relation), unless a rule-(c) admission rests on a criterion the user confirmed after that retire. A rule's key is that of its
-        ``then``, so a rule re-added as a step is caught."""
+        ``then``, so a rule re-added as a step is caught. The rejections still related are those of the watch that retire ended (``ItemWatch.retires``),
+        not of the item's current watch: a later watch of the same id lifts nothing. A watch that cannot be read is PB-UNREADABLE."""
         key = line_key(text)
         versions = self._read(call.service, lambda: self._catalog.playbook_versions(call.actor, call.service))
         retires = [(k, v) for k, v in enumerate(versions) if v.op in ("watch", "retire") and v.item and v.items is not None]
         if not key or not retires:
             return
-        try:
-            watches = {w.id: w for w in self._evidence.watch(call.actor, call.service)}
-        except (OrgError, OSError):
-            watches = {}
+        watches = {w.id: w for w in self._watch_read(call)}
         for k, v in retires:
             before = next((p for p in reversed(versions[:k]) if p.items is not None), None)
             gone = next((i for i in (before.items if before and before.items else ()) if i.id == v.item), None)
             if gone is None or line_key(gone.text) != key or v.item not in watches:
                 continue
-            related = set(watches[v.item].related)
-            still = sorted(related & set(v.related)) if v.op == "watch" else sorted(related)
+            ended = dict(watches[v.item].retires).get(v.version, ())  # what is still related to the watch this very retire ended (F1)
+            still = sorted(set(ended) & set(v.related)) if v.op == "watch" else sorted(ended)
             if len(still) < 2:
                 continue
             confirmed = stamp_of(admission.confirmed) if admission.rule == "c" and admission.confirmed else None

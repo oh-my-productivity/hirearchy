@@ -315,7 +315,11 @@ class PlaybookItem:
 @dataclass(frozen=True)
 class ItemWatch:
     """The watch of one playbook item, derived from the files on every read and never stored (design 3, 8.1). ``watch_states`` computes it;
-    ``ServiceEvidence.watch`` returns it to ``services``, and every reader of a watch state goes through that one method."""
+    ``ServiceEvidence.watch`` returns it to ``services``, and every reader of a watch state goes through that one method.
+
+    ``retires`` is not the item's current watch: it lists each retire of one of its texts that 8.6 (PB-WATCHED-OUT) keeps out, the runtime's (``op:
+    watch``) and its owner's when the runtime's was due, as ``(version, R ids)``, the ids being the rejections still related to the watch that retire
+    ended (a corrected link can undo one). It does not change when the item starts another watch."""
 
     id: str  # "P<k>"
     kind: str  # "step" | "rule"
@@ -332,7 +336,7 @@ class ItemWatch:
     coverage: tuple[str, ...] = ()  # the criteria and confirmed assertions the item covers (section 3)
     retire_due: bool = False  # two or more related rejections and the runtime's retire not written yet
     carried: str = ""  # the id whose watch the item continues ("" when none)
-
+    retires: tuple[tuple[int, tuple[str, ...]], ...] = ()  # see the docstring
 
 @dataclass(frozen=True)
 class PlaybookSection:
