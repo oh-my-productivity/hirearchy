@@ -1,4 +1,4 @@
-"""Characterization: the ``--help`` of the program, of each of the 26 commands and of the 4 views of ``obs`` is argparse's text of the flat
+"""Characterization: the ``--help`` of the program, of each of the 27 commands and of the 4 views of ``obs`` is argparse's text of the flat
 ``cli.py``, byte for byte (names, flags, help strings and defaults are the interface)."""
 
 from __future__ import annotations
@@ -13,7 +13,7 @@ from . import _scenario
 from ._golden import check
 
 
-def test_the_program_lists_the_26_commands() -> None:
+def test_the_program_lists_the_27_commands() -> None:
     text = _scenario.help_text(main)
     assert tuple(re.search(r"\{([a-z,\-]+)\}", text).group(1).split(",")) == _scenario.SUBCOMMANDS  # type: ignore[union-attr]
     check("help.txt", text)

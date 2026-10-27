@@ -242,3 +242,34 @@ def test_feedback_confirms_the_automatic_link_and_define_service_answers_print_t
     capsys.readouterr()
     cli(org, "feedback", fourth.id, "reject", "--note", "A one-off.", "--criterion", "none", "--confirms", no4.id)
     assert capsys.readouterr().out.splitlines()[-1].startswith(f"link on {no4.id} -> ceo: none")  # nothing is related: no extra line
+
+
+COVERING = "## Steps\n1. Search.\n2. Keep it at most 600 words (C1).\n3. Write."  # P2 cites C1: retiring it lowers a bar
+
+
+def test_acknowledge_playbook_prints_its_line_and_commits_the_snapshot(org, capsys):
+    import subprocess
+
+    define(org, playbook=COVERING)
+    capsys.readouterr()
+    cli(org, "acknowledge-playbook", "ceo", "weekly-brief", "p2", "retire", "--words", "Yes, retire it.")
+    (note,) = [m for m in org.received("ceo") if m.acknowledges]
+    assert capsys.readouterr().out.splitlines()[-1] == f"acknowledged retire of P2 (weekly-brief) for ceo: note {note.id}"
+    assert (note.sender, note.source, note.body, note.acknowledges, note.wake) == ("root", "human", "Yes, retire it.", "weekly-brief retire P2", False)
+    subject = subprocess.run(["git", "-C", str(org.root), "log", "-1", "--format=%s"], capture_output=True, text=True, check=True).stdout.strip()
+    assert subject == f"root: acknowledge {note.id} -> ceo"
+    cli(org, "acknowledge-playbook", "ceo", "weekly-brief", "P2", "edit", "--text-hash", "0123456789ab", "--words", "Yes, change it.")
+    assert capsys.readouterr().out.splitlines()[-1].startswith("acknowledged edit of P2 (weekly-brief) for ceo: note ")
+    assert [m.acknowledges for m in org.received("ceo") if m.acknowledges] == ["weekly-brief retire P2", "weekly-brief edit P2 0123456789ab"]
+
+
+def test_acknowledge_playbook_needs_words(org, capsys):
+    define(org, playbook=COVERING)
+    capsys.readouterr()
+    with pytest.raises(SystemExit):
+        cli(org, "acknowledge-playbook", "ceo", "weekly-brief", "P2", "retire")
+    assert "an acknowledgement from root records the user's yes: pass words=<their answer, verbatim> (CLI: --words)" in capsys.readouterr().err
+    with pytest.raises(SystemExit):
+        cli(org, "acknowledge-playbook", "ceo", "weekly-brief", "P2", "restore", "--words", "Yes.")
+    assert "op is retire or edit (CLI: retire|edit; a restore is acknowledged as edit): restore" in capsys.readouterr().err
+    assert [m for m in org.received("ceo") if m.acknowledges] == []

@@ -1,4 +1,4 @@
-"""The commands of the standing services: ``services define-service request feedback retire-service``."""
+"""The commands of the standing services: ``services define-service request feedback acknowledge-playbook retire-service``."""
 
 from __future__ import annotations
 
@@ -206,6 +206,36 @@ class FeedbackCommand(Command):
             self._snapshots().commit(f"root: feedback {link.id} -> {link.to}")
             self._out.say(f"link on {msg.id} -> {link.to}: {link.criterion} (message {link.id}, source {link.source})")
             say_watch(self._out, self._steps(), msg.id)
+
+
+class AcknowledgePlaybookCommand(Command):
+    def __init__(self, session: OrgSession, commands: Provider[ServiceCommands], snapshots: Provider[OrgSnapshotter], text: TextSource, out: Output) -> None:
+        self._session = session
+        self._commands = commands
+        self._snapshots = snapshots
+        self._text = text
+        self._out = out
+
+    def add_arguments(self, sub: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
+        s = sub.add_parser(
+            "acknowledge-playbook",
+            help="acknowledge a change of a playbook that lowers a bar, once the user said yes (as root): the owner then makes the change again",
+        )
+        s.add_argument("owner", help="the top-level agent whose playbook it is")
+        s.add_argument("service", help="the service whose playbook it is")
+        s.add_argument("item", help="the playbook item, P<k>")
+        s.add_argument("op", metavar="retire|edit", help="what the owner asked: retire the item, or change (edit, or restore to an earlier text) it")
+        s.add_argument("--text-hash", metavar="H", help="for edit: the 12 hex digits of the new text, as the owner's request named them")
+        s.add_argument("--words", metavar="TEXT|@FILE", help="the user's yes, verbatim (their answer to the owner's question)")
+        s.set_defaults(fn=self.run)
+
+    def run(self, args: Arguments) -> None:
+        self._session.open(args, mutating=True)
+        words = self._text.read(args.words) if args.words is not None else None
+        msg = self._commands().acknowledge_playbook(ROOT, args.owner, args.service, args.item, args.op, text_hash=args.text_hash, words=words)
+        self._snapshots().commit(f"root: acknowledge {msg.id} -> {msg.to}")
+        service, op, item = (msg.acknowledges or "").split()[:3]  # the header holds the normalized form of what was typed
+        self._out.say(f"acknowledged {op} of {item} ({service}) for {msg.to}: note {msg.id}")
 
 
 class RetireServiceCommand(Command):

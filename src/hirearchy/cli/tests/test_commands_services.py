@@ -6,7 +6,9 @@ from pathlib import Path
 
 import pytest
 
-from hirearchy.cli._commands_services import DefineServiceCommand, FeedbackCommand, RequestCommand, RetireServiceCommand, ServicesCommand
+from hirearchy.cli._commands_services import (
+    AcknowledgePlaybookCommand, DefineServiceCommand, FeedbackCommand, RequestCommand, RetireServiceCommand, ServicesCommand,
+)
 from hirearchy.cli.testing import MemoryText
 from hirearchy.kernel import Message, OrgError
 from hirearchy.services import Contract
@@ -262,6 +264,32 @@ def test_feedback_accepts_only_a_verdict(tmp_path: Path) -> None:
     f, services, office = Fixture(tmp_path), new_services(), new_office()
     with pytest.raises(SystemExit):
         parse(FeedbackCommand(f.session, lambda: services, lambda: office, lambda: new_steps(), f.out), "feedback", "r-1", "maybe")
+
+
+def test_acknowledge_playbook_passes_the_arguments_says_its_line_and_snapshots(tmp_path: Path) -> None:
+    f, services, office = Fixture(tmp_path), new_services(), new_office()
+    command = AcknowledgePlaybookCommand(f.session, lambda: services, lambda: office, TEXT, f.out)
+    go(command, "acknowledge-playbook", "ceo", "weekly", "P3", "retire", "--words", "Yes, retire it.")
+    assert f.session.calls == [("open", True)]
+    assert services.last("acknowledge_playbook") == (("root", "ceo", "weekly", "P3", "retire"), {"text_hash": None, "words": "Yes, retire it."})
+    assert f.out.stdout == "acknowledged retire of P3 (weekly) for ceo: note a-1\n"
+    assert office.last("commit") == (("root: acknowledge a-1 -> ceo",), {})
+    go(command, "acknowledge-playbook", "ceo", "weekly", "P3", "edit", "--text-hash", "0123456789ab", "--words", "@notes.md")  # words read like define-service's
+    assert services.last("acknowledge_playbook") == (("root", "ceo", "weekly", "P3", "edit"), {"text_hash": "0123456789ab", "words": "For the owner.\n"})
+    assert f.out.stdout.splitlines()[-1] == "acknowledged edit of P3 (weekly) for ceo: note a-1"
+
+
+def test_acknowledge_playbook_leaves_the_op_and_the_words_to_the_rule(tmp_path: Path) -> None:
+    """The op and ``--words`` are passed as typed: the rule refuses a wrong op (ACK-OP) or no words (ACK-WORDS), and both texts name the CLI form."""
+    f, services, office = Fixture(tmp_path), new_services(), new_office()
+    command = AcknowledgePlaybookCommand(f.session, lambda: services, lambda: office, TEXT, f.out)
+    go(command, "acknowledge-playbook", "ceo", "weekly", "P3", "restore")
+    assert services.last("acknowledge_playbook") == (("root", "ceo", "weekly", "P3", "restore"), {"text_hash": None, "words": None})
+    services.refuse = OrgError("refused: nothing")
+    before = len(commits(office))
+    with pytest.raises(OrgError, match="refused: nothing"):
+        go(command, "acknowledge-playbook", "ceo", "weekly", "P3", "retire", "--words", "Yes.")
+    assert len(commits(office)) == before  # a refusal is not snapshotted
 
 
 def test_retire_service_says_what_happened_before_it_snapshots(tmp_path: Path) -> None:

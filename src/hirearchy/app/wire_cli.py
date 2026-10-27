@@ -44,6 +44,7 @@ from ..cli._commands_ops import (
 )
 from ..cli._commands_org import HireCommand, InboxCommand, InitCommand, ResumeCommand, SendCommand, TaskCommand
 from ..cli._commands_services import (
+    AcknowledgePlaybookCommand,
     DefineServiceCommand,
     FeedbackCommand,
     RequestCommand,
@@ -340,6 +341,7 @@ def commands_over(session: OrgSession, out: Output, terminal: Terminal, clock: C
         DefineServiceCommand(session, commands, get(ServiceCatalog), get(ContractNormalizer), snapshots, get(ServiceSteps), text, out),
         RequestCommand(session, commands, snapshots, get(ServiceSteps), out),
         FeedbackCommand(session, commands, snapshots, get(ServiceSteps), out),
+        AcknowledgePlaybookCommand(session, commands, snapshots, text, out),
         RetireServiceCommand(session, commands, snapshots, out),
         PlanCommand(session, loader, validator_of(session, plan_time), renderer_of(session, plan_time), out),
         ApplyCommand(session, loader, get(BlueprintApplier), out),

@@ -1,8 +1,8 @@
 
 [stderr]
 usage: hirearchy [-h] [--root ROOT]
-                 {init,hire,task,services,define-service,request,feedback,retire-service,plan,apply,send,status,health,progress,quality,upgrade-rules,install-skill,review,inbox,resume,run,mcp,dash,obs,check,kiro-profile}
+                 {init,hire,task,services,define-service,request,feedback,acknowledge-playbook,retire-service,plan,apply,send,status,health,progress,quality,upgrade-rules,install-skill,review,inbox,resume,run,mcp,dash,obs,check,kiro-profile}
                  ...
-hirearchy: error: argument cmd: invalid choice: 'frobnicate' (choose from 'init', 'hire', 'task', 'services', 'define-service', 'request', 'feedback', 'retire-service', 'plan', 'apply', 'send', 'status', 'health', 'progress', 'quality', 'upgrade-rules', 'install-skill', 'review', 'inbox', 'resume', 'run', 'mcp', 'dash', 'obs', 'check', 'kiro-profile')
+hirearchy: error: argument cmd: invalid choice: 'frobnicate' (choose from 'init', 'hire', 'task', 'services', 'define-service', 'request', 'feedback', 'acknowledge-playbook', 'retire-service', 'plan', 'apply', 'send', 'status', 'health', 'progress', 'quality', 'upgrade-rules', 'install-skill', 'review', 'inbox', 'resume', 'run', 'mcp', 'dash', 'obs', 'check', 'kiro-profile')
 
 [exit 2]

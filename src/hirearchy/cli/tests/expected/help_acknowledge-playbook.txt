@@ -1,0 +1,15 @@
+usage: hirearchy acknowledge-playbook [-h] [--text-hash H] [--words TEXT|@FILE]
+                                      owner service item retire|edit
+
+positional arguments:
+  owner               the top-level agent whose playbook it is
+  service             the service whose playbook it is
+  item                the playbook item, P<k>
+  retire|edit         what the owner asked: retire the item, or change (edit, or restore to an
+                      earlier text) it
+
+options:
+  -h, --help          show this help message and exit
+  --text-hash H       for edit: the 12 hex digits of the new text, as the owner's request named
+                      them
+  --words TEXT|@FILE  the user's yes, verbatim (their answer to the owner's question)

@@ -163,7 +163,7 @@ def test_every_tool_of_every_role_is_instrumented(org, tmp_path):
             assert hasattr(tool.fn, "__wrapped__"), f"{who}: {tool.name} is not recorded"
             seen.add(tool.name)
     for name in ("whoami", "inbox", "delegate", "report", "send", "reclaim", "hire", "retire", "read", "write", "status",
-                 "health", "services", "define_service", "request", "feedback", "revise_playbook", "create_org", "start",
+                 "health", "services", "define_service", "request", "feedback", "acknowledge_playbook", "revise_playbook", "create_org", "start",
                  "stop", "blueprint_example", "propose_org", "apply_org", "progress"):
         assert name in seen, name
 

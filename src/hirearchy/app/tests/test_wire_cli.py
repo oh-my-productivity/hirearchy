@@ -1,4 +1,4 @@
-"""``wire_cli``: the command line over a real organization - the 26 commands in the order of the parser, the session that opens the runtime, the process's own
+"""``wire_cli``: the command line over a real organization - the 27 commands in the order of the parser, the session that opens the runtime, the process's own
 output and terminal, the tail of the event files, the scheduler's loop and the other entry points behind their ports, the plan before there is an organization."""
 
 from __future__ import annotations
@@ -31,8 +31,8 @@ from hirearchy.snapshots import RUNTIME_IGNORE_LINES
 
 
 COMMANDS = [
-    "init", "hire", "task", "services", "define-service", "request", "feedback", "retire-service", "plan", "apply", "send", "status", "health", "progress",
-    "quality", "upgrade-rules", "install-skill", "review", "inbox", "resume", "run", "mcp", "dash", "obs", "check", "kiro-profile",
+    "init", "hire", "task", "services", "define-service", "request", "feedback", "acknowledge-playbook", "retire-service", "plan", "apply", "send", "status", "health",
+    "progress", "quality", "upgrade-rules", "install-skill", "review", "inbox", "resume", "run", "mcp", "dash", "obs", "check", "kiro-profile",
 ]
 
 
@@ -43,7 +43,7 @@ def team(tmp_path: Path) -> Org:
     return made
 
 
-def test_the_program_is_the_command_line_with_the_25_commands_in_order() -> None:
+def test_the_program_is_the_command_line_with_the_27_commands_in_order() -> None:
     assert isinstance(wire_cli.cli_app(), CliApp)
     session = AnnouncingOrgSession(os_locator(), wire_cli.RuntimeOrgOpener(), wire_cli.StandardOutput())
     commands = wire_cli.commands_over(session, wire_cli.StandardOutput(), wire_cli.StandardTerminal(), FakeClock())

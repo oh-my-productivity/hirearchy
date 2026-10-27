@@ -47,7 +47,7 @@ def test_tool_list(org):
     names = {t.name for t in asyncio.run(build_server(org, "ceo").list_tools())}
     assert names == {
         "whoami", "inbox", "delegate", "report", "send", "reclaim", "hire", "retire", "read", "write", "status", "health",
-        "services", "define_service", "request", "feedback",  # ceo can hire, so it is a potential client
+        "services", "define_service", "request", "feedback", "acknowledge_playbook",  # ceo can hire, so it is a potential client
     }
     worker = {t.name for t in asyncio.run(build_server(org, "ceo/eng").list_tools())}
-    assert not worker & {"services", "define_service", "request", "feedback", "revise_playbook"}
+    assert not worker & {"services", "define_service", "request", "feedback", "acknowledge_playbook", "revise_playbook"}

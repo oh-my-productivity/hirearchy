@@ -94,7 +94,7 @@ def tools(agents: MemoryAgents | None = None, offered: dict[str, list[str]] | No
     ), commands
 
 
-CLIENT = ["services", "define_service", "request", "feedback"]
+CLIENT = ["services", "define_service", "request", "feedback", "acknowledge_playbook"]
 
 
 def test_root_is_a_client() -> None:

@@ -347,7 +347,7 @@ def tool_names(org, addr):
     return {t.name for t in asyncio.run(build_server(org, addr).list_tools())}
 
 
-CLIENT_TOOLS = {"services", "define_service", "request", "feedback"}
+CLIENT_TOOLS = {"services", "define_service", "request", "feedback", "acknowledge_playbook"}
 
 
 def test_tools_are_registered_by_role(org):
@@ -540,3 +540,69 @@ def test_feedback_confirms_and_define_service_answers_append_the_watch_sentences
         "\nThe watch retired P1 of weekly-brief (playbook v2) because rejections R2 and R3 are related to it; ceo was told."
     )
     assert "P1" not in svc.runtime.service_catalog.read_playbook("ceo", WEEKDAY).body  # the rule is out (it had no text before its watch)
+
+
+# ------------------------------------------------------------------------------------ acknowledge_playbook (design 9.2)
+COVERING = "## Steps\n1. Search.\n2. Keep it at most 600 words (C1).\n3. Write."  # P2 cites C1: retiring it lowers a bar
+
+
+def acknowledgements(org, addr):
+    return [m for m in org.received(addr) if m.acknowledges]
+
+
+def test_acknowledge_playbook_is_for_root_and_managers_only(org):
+    assert "acknowledge_playbook" in tool_names(org, ROOT) and "acknowledge_playbook" in tool_names(org, "ceo")
+    assert "acknowledge_playbook" not in tool_names(org, ENG)  # a plain worker
+    define(org)
+    define(org, owner=ENG, actor="ceo", name="eng-brief")
+    assert "acknowledge_playbook" not in tool_names(org, ENG)  # an owner without reports is no parent
+    org.hire(ROOT, "lone", "Lone worker", "Works alone.")
+    define(org, owner="lone", name="lone-brief")
+    assert tool_names(org, "lone") & {"acknowledge_playbook", "define_service"} == set()
+    one, other = described(org, ROOT)["acknowledge_playbook"], described(org, "ceo")["acknowledge_playbook"]
+    assert one.inputSchema == other.inputSchema  # one signature for root and managers (PC-8)
+    assert set(one.inputSchema["properties"]) == {"owner", "service", "item", "op", "text_hash", "words"}
+    assert one.inputSchema["required"] == ["owner", "service", "item", "op"]
+    text = " ".join(one.description.split())
+    assert text.startswith("Acknowledge a change of the playbook of one of your direct reports")
+    assert "words=<the user's yes, verbatim>" in text and "ask the user" in text and "text_hash" in text
+
+
+def test_acknowledge_playbook_replies_with_the_note(org):
+    define(org, playbook=COVERING)
+    root = build_server(org, ROOT)
+    out = call(root, "acknowledge_playbook", owner="ceo", service=WEEKDAY, item="p2", op=" Retire ", words="Yes, retire it.")
+    (note,) = acknowledgements(org, "ceo")
+    assert out == (
+        f"Acknowledged retire of P2 ({WEEKDAY}): note {note.id}. ceo applies it at its next run by making the refused change again with "
+        f'acknowledged="{note.id}".'
+    )
+    assert (note.sender, note.acknowledges, note.source, note.body, note.wake) == ("root", f"{WEEKDAY} retire P2", "human", "Yes, retire it.", False)
+    edit = call(root, "acknowledge_playbook", owner="ceo", service=WEEKDAY, item="P2", op="edit", text_hash="0123456789ab", words="Yes, change it.")
+    assert edit.startswith(f"Acknowledged edit of P2 ({WEEKDAY}): note ")
+    assert [m.acknowledges for m in acknowledgements(org, "ceo")] == [f"{WEEKDAY} retire P2", f"{WEEKDAY} edit P2 0123456789ab"]
+    assert "refused: P1 covers no current criterion or confirmed assertion, so ceo needs no acknowledgement to retire it." in fails(
+        root, "acknowledge_playbook", owner="ceo", service=WEEKDAY, item="P1", op="retire", words="Yes.",
+    )
+    assert "refused: an acknowledgement from root records the user's yes" in fails(root, "acknowledge_playbook", owner="ceo", service=WEEKDAY, item="P2", op="retire")
+    assert len(acknowledgements(org, "ceo")) == 2  # a refusal writes nothing
+
+
+def test_a_manager_acknowledges_without_words(org):
+    define(org)
+    define(org, owner=ENG, actor="ceo", name="eng-brief", playbook=COVERING)
+    ceo = build_server(org, "ceo")
+    out = call(ceo, "acknowledge_playbook", owner="eng", service="eng-brief", item="P2", op="retire")
+    (note,) = acknowledgements(org, ENG)
+    assert out.startswith(f"Acknowledged retire of P2 (eng-brief): note {note.id}. ceo/eng applies it")
+    assert (note.sender, note.body, note.source, note.acknowledges) == ("ceo", "Acknowledged.", None, "eng-brief retire P2")
+
+
+def test_a_manager_passing_words_meets_ack_agent_words(org):
+    define(org)
+    define(org, owner=ENG, actor="ceo", name="eng-brief", playbook=COVERING)
+    ceo = build_server(org, "ceo")
+    assert fails(ceo, "acknowledge_playbook", owner="eng", service="eng-brief", item="P2", op="retire", words="yes") .endswith(
+        "refused: words= records the user's own yes, so only root passes it; acknowledge without it. Nothing was written."
+    )
+    assert acknowledgements(org, ENG) == []

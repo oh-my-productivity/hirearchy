@@ -1001,3 +1001,83 @@ Tell the owner of a service whether a delivered request was good: verdict "accep
         earlier reject is still shown to the owner with your words. Feedback is for reflection only: it never waives an
         acceptance criterion or changes the outcome of the request.
         
+
+### tool: acknowledge_playbook
+input: {
+  "properties": {
+    "owner": {
+      "title": "Owner",
+      "type": "string"
+    },
+    "service": {
+      "title": "Service",
+      "type": "string"
+    },
+    "item": {
+      "title": "Item",
+      "type": "string"
+    },
+    "op": {
+      "title": "Op",
+      "type": "string"
+    },
+    "text_hash": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Text Hash"
+    },
+    "words": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Words"
+    }
+  },
+  "required": [
+    "owner",
+    "service",
+    "item",
+    "op"
+  ],
+  "title": "acknowledge_playbookArguments",
+  "type": "object"
+}
+output: {
+  "properties": {
+    "result": {
+      "title": "Result",
+      "type": "string"
+    }
+  },
+  "required": [
+    "result"
+  ],
+  "title": "acknowledge_playbookOutput",
+  "type": "object"
+}
+other: {}
+description:
+Acknowledge a change of the playbook of one of your direct reports that lowers a bar: its owner asked you for it.
+
+        When an owner wants to retire an item of its playbook that covers a criterion or a confirmed rejection, or to change it so that the bar
+        is lower, or to restore it to a weaker text, its change is refused until its parent acknowledges it; the owner sends you the question.
+        owner: your direct report. service: its service. item: the playbook item, "P<k>". op: "retire", or "edit" (a restore to an earlier text is
+        acknowledged as the edit to that text). For "edit" pass text_hash, the 12 hex digits the owner's request named (one new text); for
+        "retire" pass none.
+        Root: ask the user the owner's question first (one yes/no), then pass words=<the user's yes, verbatim>. A manager passes no words.
+        This writes one quiet note to the owner and changes nothing else; the owner then makes the refused change again with acknowledged=<the
+        note's id>. A refusal writes nothing.
+        

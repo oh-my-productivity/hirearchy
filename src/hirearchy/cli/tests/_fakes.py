@@ -127,6 +127,13 @@ class FakeServices(Recording, ServiceCommands, ServiceCatalog, ContractNormalize
             sender=actor, to="ceo", type="note", body="", id=f"f-{self._feedbacks}", source=source, criterion=", ".join(criterion) if criterion else None,
         )
 
+    def acknowledge_playbook(
+        self, actor: str, owner: str, service: str, item: str, op: str, *, text_hash: str | None = None, words: str | None = None,
+    ) -> Message:
+        self.note("acknowledge_playbook", actor, owner, service, item, op, text_hash=text_hash, words=words)
+        header = f"{service} {op} {item}" + (f" {text_hash}" if text_hash else "")
+        return Message(sender=actor, to=owner, type="note", body=words or "", id="a-1", acknowledges=header)
+
     def read_contract(self, owner: str, name: str) -> Contract | None:
         self.note("read_contract", owner, name)
         return self.contracts.get((owner, name))

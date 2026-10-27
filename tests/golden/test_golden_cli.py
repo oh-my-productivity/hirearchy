@@ -93,8 +93,8 @@ def test_cli_errors(busy, capsys, norm):
 
 
 SUBCOMMANDS = [
-    "init", "hire", "task", "services", "define-service", "request", "feedback", "retire-service", "plan", "apply", "send",
-    "status", "health", "progress", "quality", "upgrade-rules", "install-skill", "review", "inbox", "resume", "run", "mcp", "dash",
+    "init", "hire", "task", "services", "define-service", "request", "feedback", "acknowledge-playbook", "retire-service", "plan", "apply",
+    "send", "status", "health", "progress", "quality", "upgrade-rules", "install-skill", "review", "inbox", "resume", "run", "mcp", "dash",
     "obs", "obs now", "obs trace", "obs metrics", "obs events", "check", "kiro-profile",
 ]
 

@@ -10,7 +10,7 @@ from ..agents import AgentDirectory, CharterReader
 from ..budget import BudgetQuery
 from ..kernel import ROOT, Message, OrgError, Provider
 from ..reflection import ServiceReports, ServiceSteps
-from ..services import BASE_HEADING, ServiceCatalog, ServiceCommands, playbook_reply
+from ..services import BASE_HEADING, ServiceCatalog, ServiceCommands, acknowledge_reply, playbook_reply
 from ._ports import ServiceRoles, SetupMode, ToolGroup
 
 if TYPE_CHECKING:
@@ -91,6 +91,8 @@ class ServiceTools(ToolGroup):
             self._register_root_feedback(mcp, me)
         else:
             self._register_agent_feedback(mcp, me)
+
+        self._register_acknowledge(mcp, me)  # root and every manager: the same signature (an agent's `words` is refused by the rule)
 
     def _register_root_define(self, mcp: FastMCP, me: str) -> None:
         @mcp.tool()
@@ -228,6 +230,30 @@ class ServiceTools(ToolGroup):
         """
             msg = self._commands().feedback(me, task_id, verdict, note)
             return f"feedback {verdict} recorded on {task_id} for {msg.to} (message {msg.id}); it does not wake {msg.to}"
+
+    def _register_acknowledge(self, mcp: FastMCP, me: str) -> None:
+        @mcp.tool()
+        def acknowledge_playbook(
+            owner: str,
+            service: str,
+            item: str,
+            op: str,
+            text_hash: str | None = None,
+            words: str | None = None,
+        ) -> str:
+            """Acknowledge a change of the playbook of one of your direct reports that lowers a bar: its owner asked you for it.
+
+        When an owner wants to retire an item of its playbook that covers a criterion or a confirmed rejection, or to change it so that the bar
+        is lower, or to restore it to a weaker text, its change is refused until its parent acknowledges it; the owner sends you the question.
+        owner: your direct report. service: its service. item: the playbook item, "P<k>". op: "retire", or "edit" (a restore to an earlier text is
+        acknowledged as the edit to that text). For "edit" pass text_hash, the 12 hex digits the owner's request named (one new text); for
+        "retire" pass none.
+        Root: ask the user the owner's question first (one yes/no), then pass words=<the user's yes, verbatim>. A manager passes no words.
+        This writes one quiet note to the owner and changes nothing else; the owner then makes the refused change again with acknowledged=<the
+        note's id>. A refusal writes nothing.
+        """
+            note = self._commands().acknowledge_playbook(me, owner, service, item, op, text_hash=text_hash, words=words)
+            return acknowledge_reply(op.strip().lower(), item.strip().upper(), service, note.to, note.id)
 
     def _requested(self, me: str, msg: Message, service: str, revises: str | None, base: str | None = None) -> str:
         tail = "Call start() if the scheduler is not running." if me == ROOT else f"Your budget is now {self._budgets().budget(me)}."

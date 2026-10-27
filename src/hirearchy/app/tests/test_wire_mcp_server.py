@@ -67,10 +67,10 @@ def test_the_tools_of_each_role(team: Org) -> None:
         return tool_names(cast(FastMCP, wire_mcp_server.server_factory(OrgBinding(team.root, team)).build(me)))
 
     assert tools(ROOT) == ["whoami", "inbox", "delegate", "report", "send", "reclaim", "hire", "retire", "read", "write", "status", "health", "services",
-                           "define_service", "request", "feedback", "observe", "create_org", "start", "stop", "blueprint_example", "propose_org",
+                           "define_service", "request", "feedback", "acknowledge_playbook", "observe", "create_org", "start", "stop", "blueprint_example", "propose_org",
                            "apply_org", "progress", "quality"]
     assert tools("ceo") == ["whoami", "inbox", "delegate", "report", "send", "reclaim", "hire", "retire", "read", "write", "status", "health", "services",
-                            "define_service", "request", "feedback"]
+                            "define_service", "request", "feedback", "acknowledge_playbook"]
     assert tools("ceo/eng") == ["whoami", "inbox", "delegate", "report", "send", "reclaim", "hire", "retire", "read", "write", "status", "health"]
 
 

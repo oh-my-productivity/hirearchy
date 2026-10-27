@@ -25,6 +25,7 @@ CHANGING = [
     ["define-service", "ceo", "weekly", "--description", "d"],
     ["request", "weekly"],
     ["feedback", "t-1", "accept"],
+    ["acknowledge-playbook", "ceo", "weekly", "P1", "retire", "--words", "Yes."],
     ["retire-service", "ceo", "weekly", "--reason", "r"],
 ]
 READING = [

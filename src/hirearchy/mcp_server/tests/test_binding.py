@@ -14,7 +14,7 @@ from testkit.mcp_server_world import OrgBinding, build_server, ensure_kiro_profi
 ROOT_TOOLS = {
     "whoami", "inbox", "delegate", "report", "send", "reclaim", "hire", "retire", "read", "write", "status", "health",
     "create_org", "start", "stop", "propose_org", "apply_org", "progress", "quality", "blueprint_example", "observe",
-    "services", "define_service", "request", "feedback",  # the client's service tools: root and managers
+    "services", "define_service", "request", "feedback", "acknowledge_playbook",  # the client's service tools: root and managers
 }
 AGENT_TOOLS = ROOT_TOOLS - {"create_org", "start", "stop", "propose_org", "apply_org", "progress", "quality", "blueprint_example", "observe"}
 
