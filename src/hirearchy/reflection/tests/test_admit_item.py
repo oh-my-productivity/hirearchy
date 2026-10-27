@@ -365,3 +365,13 @@ def test_the_why_orders_the_r_ids_by_number_then_the_others() -> None:
     from hirearchy.reflection._evidence import _by_number
 
     assert _by_number({"C10", "C9", "R10", "R2", "R1"}) == ("R1", "R2", "R10", "C9", "C10")
+
+
+def test_a_c_admission_names_the_link_that_confirmed_its_criterion(w: ReflectionWorld, evidence: CaseServiceEvidence) -> None:
+    """8.6 compares the time of the user's link with the retire of a watched-out text: the admission carries its id (a (b) admission carries none)."""
+    confirmed_c3(w)
+    (case,) = w.history.cases("ceo", SERVICE)
+    (link,) = [m for v in case.verdicts for m in v.link_notes]
+    assert item(evidence, ["C3"], WEEK).confirmed == link.id
+    failed_twice(w)
+    assert item(evidence, ["C2"], "Cite every claim.").confirmed == ""

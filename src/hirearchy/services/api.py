@@ -609,6 +609,7 @@ class Admission:
     evidence: tuple[str, ...]  # the normalized ids cited
     detail: str  # one line for the client's note, e.g. "C6 failed in 2 cases the client rejected: <id>, <id>"
     why: tuple[str, ...] = ()  # the R and C ids the item rests on (design 6.3): the runtime writes them as its WHY; () for an exempt admission
+    confirmed: str = ""  # rule (c): the id of the user's link note that confirmed the criterion the item is the words of ("" otherwise; 8.6 compares its time)
 
 
 @dataclass(frozen=True)
@@ -628,6 +629,7 @@ class PlaybookChange:
     formatting: bool = False  # an exempt edit
     related: tuple[str, ...] = ()  # the related rejections the written item's watch holds
     carried: str = ""  # the id whose watch the written item continues ("" when none)
+    carried_related: tuple[str, ...] = ()  # the related rejections of that carried watch (``related`` also holds the item's own, B2)
     client: str = ""  # who was told
     after: str = ""  # a move: the item it now follows, or ``start``
     sections: tuple[str, ...] = ()  # ``first``: the heading lines of the new body, without their ``#`` run

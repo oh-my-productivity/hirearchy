@@ -987,6 +987,188 @@ def test_a_legacy_playbook_over_the_cap_migrates_first_and_still_takes_a_retire(
     assert w.catalog.read_playbook("ceo", SERVICE).version == 3
 
 
+# ============================================================================================== a watch-retired text stays out (8.6, B2) and a carried watch says so (5.2)
+
+OUT_RULE = "cite every claim"
+
+
+class FailingWatch(AdmittingServiceEvidence):
+    """A gate whose watch cannot be read: the change stands, and the reply says where the states are (19.1)."""
+
+    def watch(self, owner: str, service: str) -> tuple[ItemWatch, ...]:
+        raise OrgError("the record cannot be read")
+
+
+class AfterWrite(AdmittingServiceEvidence):
+    """A gate that admits by rule (c) on a criterion the user confirmed at ``confirmed`` (a link note id), as the real one reports it."""
+
+    def __init__(self, confirmed_at: str, watch: Sequence[ItemWatch] = ()) -> None:
+        super().__init__(watch=watch)
+        self._at = confirmed_at
+
+    def admit_item(self, owner: str, service: str, evidence: Sequence[str], reason: str, *, kind: str, text: str, when: str | None) -> Admission:
+        return Admission("c", normalize_evidence(evidence), "cites C3", why=("R1", "C3"), confirmed=self._at)
+
+
+def watch_retired(
+    w: ServicesWorld, *, by: str = "runtime (watch)", op: str = "watch", related: tuple[str, ...] = ("R4", "R6"), restores: int = 0,
+) -> None:
+    """v1 is the owner's (a step, and the rule P2 with its WHY); v2 removes P2 as the watch's retire (or as the owner's, `op="retire"`) would write it."""
+    define(w)
+    owner_wrote(w, 1, f"## Steps\n1. [P1] Search.\n\n## Rules\n- [P2] WHEN always THEN {OUT_RULE} WHY R1, R2; C2", 2, rules=("P2",), why={"P2": ["R1", "R2", "C2"]})
+    meta: dict[str, object] = {
+        "service": SERVICE, "version": 2, "revised": "2026-01-02T00:00:00+00:00", "by": by, "reason": "retired", "items_max": 2, "rules": [], "why": {},
+        "op": op, "item": "P2", "admitted": "watch" if op == "watch" else "exempt", **({"related": list(related)} if op == "watch" else {}),
+    }
+    w.store.write_playbook("ceo", SERVICE, 2, meta, "## Steps\n1. [P1] Search.", 1)
+
+
+def out_world(tmp_path: Path, watch: Sequence[ItemWatch] | None = None, gate: AdmittingServiceEvidence | None = None) -> ServicesWorld:
+    given = (ItemWatch("P1", "step", "kept", 1), ItemWatch("P2", "rule", "retired", 1, related=("R4", "R6"))) if watch is None else tuple(watch)
+    tmp_path.mkdir(parents=True, exist_ok=True)
+    return populated(fs_world(tmp_path, gate or AdmittingServiceEvidence(watch=given)))
+
+
+WATCHED_OUT = (
+    "refused: this text is P2's text that the watch retired in v2, because the client rejected R4 and R6 on what it cited (R1, R2, C2). It comes back "
+    "only as the own words of a criterion the client confirms after that (rule (c)). Nothing was written. If you think the client wants it, send root "
+    "(`send`) this question once: \"Your rejections R4 and R6 retired this from how we deliver weekly-brief: cite every claim. Do you want it back "
+    "from now on? If yes, please add it to the contract as a criterion.\""
+)
+
+
+def test_pb_watched_out_word_for_word(tmp_path: Path) -> None:
+    w = out_world(tmp_path)
+    watch_retired(w)
+    assert refusal(w, "add", ("R1",), kind="step", text=OUT_RULE) == WATCHED_OUT
+    assert w.catalog.read_playbook("ceo", SERVICE).version == 2
+
+
+def test_an_add_or_restore_of_a_watch_retired_text_is_pb_watched_out(tmp_path: Path) -> None:
+    w = out_world(tmp_path)
+    watch_retired(w)
+    assert refusal(w, "add", ("R1",), kind="step", text="Cite every claim.") == WATCHED_OUT  # the lenient key: punctuation and case do not matter
+    assert refusal(w, "add", ("R1",), kind="rule", then="CITE every claim", when="a claim has no source") == WATCHED_OUT  # a rule too: its then
+    assert refusal(w, "restore", ("R1",), item="P2") == WATCHED_OUT  # the retired item's last live text
+    assert w.catalog.read_playbook("ceo", SERVICE).version == 2
+    assert revise(w, "add", ("R1",), kind="step", text="Cite every source twice.").version == 3  # other words are not caught
+
+
+def test_a_gated_edit_of_another_item_into_a_watch_retired_text_is_pb_watched_out(tmp_path: Path) -> None:
+    """B2: the edit would carry the warned text back under another id."""
+    w = out_world(tmp_path)
+    watch_retired(w)
+    assert refusal(w, "edit", ("R1",), item="P1", text=OUT_RULE) == WATCHED_OUT
+    assert meta_of(w)[1] == "## Steps\n1. [P1] Search."
+    assert revise(w, "edit", item="P1", text="SEARCH.").formatting is True  # a formatting edit is exempt and carries no text over
+
+
+def test_a_rule_re_added_as_a_step_with_its_thens_words_is_caught(tmp_path: Path) -> None:
+    w = out_world(tmp_path)
+    watch_retired(w)
+    assert refusal(w, "add", ("R1",), kind="step", text="cite  every   CLAIM!") == WATCHED_OUT
+    assert refusal(w, "add", ("R1",), kind="rule", then="cite every claim", when="the memo is long") == WATCHED_OUT  # the when is not part of the text key
+
+
+def test_a_text_its_owner_retired_while_its_retire_was_due_is_pb_watched_out(tmp_path: Path) -> None:
+    w = out_world(tmp_path)
+    watch_retired(w, by="ceo", op="retire")
+    assert refusal(w, "add", ("R1",), kind="step", text=OUT_RULE) == WATCHED_OUT.replace("that the watch retired in v2", "that you retired while the watch's retire of it was due in v2")
+    quiet = out_world(tmp_path / "quiet", watch=(ItemWatch("P2", "rule", "retired", 1, related=("R4",)),))  # one related rejection: it was not due
+    watch_retired(quiet, by="ceo", op="retire")
+    assert revise(quiet, "add", ("R1",), kind="step", text=OUT_RULE).version == 3
+
+
+def test_a_c_admission_by_a_criterion_confirmed_after_the_retire_passes(tmp_path: Path) -> None:
+    after = "20260103T000000000000-root-ab12"  # the user's link, a day after v2 (2026-01-02)
+    w = out_world(tmp_path, gate=AfterWrite(after, (ItemWatch("P2", "rule", "retired", 1, related=("R4", "R6")),)))
+    watch_retired(w)
+    change = revise(w, "add", ("C3",), kind="step", text=OUT_RULE)  # the client made it the contract
+    assert change.admission.rule == "c" and change.version == 3
+    before = out_world(tmp_path / "before", gate=AfterWrite("20260101T000000000000-root-ab12", (ItemWatch("P2", "rule", "retired", 1, related=("R4", "R6")),)))
+    watch_retired(before)
+    assert refusal(before, "add", ("C3",), kind="step", text=OUT_RULE) == WATCHED_OUT  # a criterion confirmed before the retire does not bring it back
+
+
+def test_fewer_than_2_still_related_lets_it_back_as_a_gated_change(tmp_path: Path) -> None:
+    """L9: a user's corrected link can undo the relation; with fewer than two of the retire's rejections still related, the text is a gated change."""
+    w = out_world(tmp_path, watch=(ItemWatch("P2", "rule", "retired", 1, related=("R4",)),))  # R6 is related no more
+    watch_retired(w)
+    change = revise(w, "add", ("R7", "R8"), kind="step", text=OUT_RULE)
+    assert change.admission.rule == "b" and change.version == 3 and change.item == "P3"
+
+
+def test_a_text_the_watch_replaced_by_its_previous_one_stays_out(tmp_path: Path) -> None:
+    """A watch retire that put the previous text back: the watched text is still out; the restored one is live and takes no refusal."""
+    w = out_world(tmp_path)
+    define(w)
+    owner_wrote(w, 1, "## Steps\n1. [P1] Search.\n2. [P2] older words", 2)
+    owner_wrote(w, 2, f"## Steps\n1. [P1] Search.\n2. [P2] {OUT_RULE} (WHY R1, R2; C2)", 2, why={"P2": ["R1", "R2", "C2"]})
+    meta: dict[str, object] = {
+        "service": SERVICE, "version": 3, "revised": "2026-01-03T00:00:00+00:00", "by": "runtime (watch)", "reason": "retired", "items_max": 2, "rules": [],
+        "why": {}, "op": "watch", "item": "P2", "admitted": "watch", "related": ["R4", "R6"], "restores": 1,
+    }
+    w.store.write_playbook("ceo", SERVICE, 3, meta, "## Steps\n1. [P1] Search.\n2. [P2] older words", 2)
+    assert refusal(w, "edit", ("R1",), item="P1", text=OUT_RULE).startswith("refused: this text is P2's text that the watch retired in v3")
+
+
+def test_a_carried_add_restore_or_edit_reply_names_the_old_id_and_its_rejections(tmp_path: Path) -> None:
+    told = "root was told without being woken."
+    warned = ItemWatch("P2", "step", "warning", 1, related=("R4", "R6"))
+    carried_add = ItemWatch("P3", "step", "warning", 3, related=("R4", "R6"), carried="P2")
+    w = populated(fs_world(tmp_path, AdmittingServiceEvidence(watch=(warned, carried_add))))
+    define(w)
+    owner_wrote(w, 1, "## Steps\n1. [P1] Search.\n2. [P2] Write.", 2)
+    added = revise(w, "add", ("R1",), kind="step", text="Write.")  # an add with the text of an item its owner retired in warning: P3 continues P2's watch
+    assert (added.carried, added.related, added.item) == ("P2", ("R4", "R6"), "P3")
+    assert playbook_reply(SERVICE, added) == (
+        "playbook of weekly-brief is now v2: added P3 (step), admitted (b) on R1. It continues the watch of P2: warning (R4, R6); one more related "
+        f"rejection retires it. {told}"
+    )
+    edited_watch = ItemWatch("P1", "step", "warning", 3, related=("R2", "R4", "R6"), carried="P2")  # B2: the edited item keeps its own R2 as well
+    w2 = out_world(tmp_path / "edit", gate=AdmittingServiceEvidence(watch=(ItemWatch("P1", "step", "warning", 1, related=("R2",)), warned, edited_watch)))
+    define(w2)
+    owner_wrote(w2, 1, "## Steps\n1. [P1] Search.\n2. [P2] Write.", 2)
+    edited = revise(w2, "edit", ("R1",), item="P1", text="Write twice.")
+    assert (edited.carried, edited.related, edited.carried_related) == ("P2", ("R2", "R4", "R6"), ("R4", "R6"))
+    assert playbook_reply(SERVICE, edited) == (
+        "playbook of weekly-brief is now v2: edited P1, admitted (b) on R1. Its watch starts again; its warning stays (R2): one more related rejection "
+        f"retires it; it continues the watch of P2: warning (R4, R6), one more related rejection retires it. {told}"
+    )
+    own = ItemWatch("P1", "step", "warning", 2, related=("R2",))  # an edit of a warned item with no carried watch keeps its own warning
+    w3 = out_world(tmp_path / "own", gate=AdmittingServiceEvidence(watch=(own,)))
+    define(w3)
+    owner_wrote(w3, 1, "## Steps\n1. [P1] Search.", 1)
+    kept = revise(w3, "edit", ("R1",), item="P1", text="Search twice.")
+    assert playbook_reply(SERVICE, kept) == (
+        f"playbook of weekly-brief is now v2: edited P1, admitted (b) on R1. Its watch starts again; its warning stays (R2): one more related rejection retires it. {told}"
+    )
+    restored_watch = ItemWatch("P1", "step", "warning", 3, related=("R4", "R6"), carried="P1")
+    w4 = out_world(tmp_path / "restore", gate=AdmittingServiceEvidence(watch=(restored_watch,)))
+    define(w4)
+    owner_wrote(w4, 1, "## Steps\n1. [P1] Search.", 1)
+    owner_wrote(w4, 2, "## Steps", 1)  # P1 was retired
+    back = revise(w4, "restore", ("R1",), item="P1")
+    assert playbook_reply(SERVICE, back) == (
+        "playbook of weekly-brief is now v3: restored P1 to the text of v1, admitted (b) on R1; it continues the watch of P1: warning (R4, R6), "
+        f"one more related rejection retires it. {told}"
+    )
+
+
+def test_a_failed_watch_read_after_the_write_gives_the_fixed_sentence(tmp_path: Path) -> None:
+    w = populated(fs_world(tmp_path, FailingWatch()))
+    define(w)
+    add = revise(w, "add", ("R1",), kind="step", text="Cite every claim.")  # the write stands
+    assert add.watch_unread is True and w.catalog.read_playbook("ceo", SERVICE).version == 1
+    assert playbook_reply(SERVICE, add) == (
+        "playbook of weekly-brief is now v1: added P1 (step), admitted (b) on R1. Its watch state is in your prompt's playbook section. "
+        "root was told without being woken."
+    )
+    edit = revise(w, "edit", ("R2",), item="P1", text="Cite every source twice.")
+    assert playbook_reply(SERVICE, edit).endswith("edited P1, admitted (b) on R2. Its watch state is in your prompt's playbook section. root was told without being woken.")
+    assert playbook_reply(SERVICE, revise(w, "retire", item="P1")) == "playbook of weekly-brief is now v3: retired P1. root was told without being woken. The playbook has no items now: add one (op=\"add\") when the evidence calls for it."
+
+
 # ============================================================================================== the replies of 5.2
 
 

@@ -116,7 +116,8 @@ class CaseServiceEvidence(ServiceEvidence):
             c = next(c for c in added_h if c.id == own)
             detail = f"cites {c.id}, which {st.client} added to the contract (v{c.since}) and the client confirmed"
             why = {c.id, *(a.id for a in st.found if c.id in a.verdict.confirmed or (c.answers and a.verdict.message.id == c.answers))}
-            return Admission("c", st.ids, detail, why=_by_number(why))
+            link = min((m.id for a in st.found for m in a.verdict.link_notes if verdict_tier(m) == "human" and c.id in link_ids(m)), default="")
+            return Admission("c", st.ids, detail, why=_by_number(why), confirmed=link)
         if qualifying:
             failed = cases_of(qualifying[0])
             detail = f"{qualifying[0]} failed in {len(failed)} cases the client rejected: {', '.join(failed)}"

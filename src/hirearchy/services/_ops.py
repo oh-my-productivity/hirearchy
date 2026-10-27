@@ -12,7 +12,7 @@ from typing import TypeVar
 
 from ..agents import AgentDirectory
 from ..delivery import MessageDelivery
-from ..kernel import NAME_RE, ROOT, OrgError, clip_line, parent, split_frontmatter
+from ..kernel import NAME_RE, ROOT, OrgError, clip_line, parent, split_frontmatter, stamp_of
 from ..mail import MailboxReader
 from ._items import (
     RULES_HEADING, RUNTIME_MIGRATION, SPLITTERS, PlacementError, Splitter, canonical_why, checked_body, item_extra, migrate_body, place_add, place_restore,
@@ -21,7 +21,7 @@ from ._items import (
 from ._protocols import PlaybookRevisions, PlaybookTexts, PlaybookWriter
 from .api import (
     REASON_MAX, Admission, Contract, Criterion, ItemWatch, PlaybookChange, PlaybookItem, PlaybookRace, PlaybookSection, ServiceCatalog, ServiceEvidence,
-    Playbook, content_words, item_words, normalize_evidence, text_tokens,
+    Playbook, content_words, item_words, line_key, normalize_evidence, text_tokens,
 )
 
 # ----------------------------------------------------------------------------------------------------------------------- the 30% rule (7)
@@ -167,6 +167,12 @@ PB_ITEM = "refused: `{service}` has no live item {id}. Its items: {ids}{retired}
 PB_ITEM_RETIRED = "; retired: {ids} (op=\"restore\" brings one back)"
 PB_SAME = "refused: no change: {id} {what}. Change an item only when the evidence calls for a different way of working. Nothing was written."
 PB_TEXT = "refused: {rule}. Nothing was written."
+PB_WATCHED_OUT = (
+    "refused: this text is {id}'s text that {how} in v{n}, because the client rejected {rejections} on what it cited ({ids}). It comes back only as the "
+    "own words of a criterion the client confirms after that (rule (c)). Nothing was written. If you think the client wants it, send {client} (`send`) "
+    "this question once: \"Your rejections {rejections} retired this from how we deliver {service}: {first}. Do you want it back from now on? If yes, "
+    "please add it to the contract as a criterion.\""
+)
 PB_RACE = "refused: the playbook of `{service}` changed while this call ran (now v{n}), so this change was not written: call again."
 PB_UNREADABLE = (
     "refused: the record of `{service}` cannot be read ({error}), so the playbook was not changed. Try again; if it persists, tell your parent."
@@ -205,6 +211,9 @@ ITEM_ID = re.compile(r"\[P\d+\]", re.IGNORECASE)
 THEN_WORD = re.compile(r"\bTHEN\b")
 EXEMPT = "no evidence needed"
 LINE_CLIP = 200  # characters of an item's text in the note to an agent client
+WATCH_TEXT_CLIP = 160  # characters of the retired text in the question of PB-WATCHED-OUT
+THE_WATCH = "the watch retired"
+YOU_WHILE_DUE = "you retired while the watch's retire of it was due"
 
 
 @dataclass(frozen=True)
@@ -256,6 +265,11 @@ def _rebuilt_in_order(items: Sequence[PlaybookItem], sections: Sequence[Playbook
     """The items in the order of the sections (the body order), each carrying the heading of its section."""
     by_id = {i.id: i for i in items}
     return tuple(replace(by_id[i], section=s.heading) for s in sections for i in s.ids), tuple(sections)
+
+
+def _and(ids: Sequence[str]) -> str:
+    """``R4``, ``R4 and R6``, ``R4, R5 and R6``."""
+    return ids[0] if len(ids) == 1 else ", ".join(ids[:-1]) + " and " + ids[-1]
 
 
 def _headings(sections: Sequence[PlaybookSection]) -> list[str]:
@@ -570,10 +584,12 @@ class RuleItemReviser(PlaybookRevisions):
         admission = self._evidence.admit_item(call.actor, call.service, call.ids, call.reason, kind=call.kind, text=text, when=when)
         items = tuple(replace(i, why=canonical_why(admission.why)) if i.id == new.id else i for i in items)
         self._limits(call, book, items, sections, admission)
+        self._watched_out(call, text, admission)
         path = self._write(call, book, items, sections, book.items_max + 1, admission, item=new.id)
         change = PlaybookChange(
             book.version + 1, "add", new.id, call.kind, admission, None, len(items), client=call.client,
         )
+        change = self._with_watch(call, change)
         return self._told(call, book, path, change, f"added {new.id} ({call.kind})", _item_line(next(i for i in items if i.id == new.id)))
 
     def _edit(self, call: _Call, book: _Book, old: PlaybookItem) -> PlaybookChange:
@@ -597,8 +613,11 @@ class RuleItemReviser(PlaybookRevisions):
         items = tuple(new if i.id == old.id else i for i in book.items)
         if not formatting:
             self._limits(call, book, items, book.sections, admission)
+            self._watched_out(call, text, admission)
         path = self._write(call, book, items, book.sections, book.items_max, admission, item=old.id)
         change = PlaybookChange(book.version + 1, "edit", old.id, old.kind, admission, None, len(items), formatting=formatting, client=call.client)
+        if not formatting:
+            change = self._with_watch(call, change)
         what = f"fixed the formatting of {old.id}" if formatting else f"edited {old.id}"
         return self._told(call, book, path, change, what, _item_line(new))
 
@@ -647,10 +666,12 @@ class RuleItemReviser(PlaybookRevisions):
             layout = next(p.sections for p in versions if p.version == source)
             items, sections = place_restore(book.items, book.sections, restored, layout)
         self._limits(call, book, items, sections, admission)
+        self._watched_out(call, old.text, admission)
         path = self._write(call, book, items, sections, book.items_max, admission, item=call.item, restores=source)
         change = PlaybookChange(
             book.version + 1, "restore", call.item, old.kind, admission, None, len(items), restored_from=source, client=call.client,
         )
+        change = self._with_watch(call, change)
         return self._told(call, book, path, change, f"restored {call.item} to the text of v{source}", _item_line(restored))
 
     def _written_by(self, versions: Sequence[Playbook], held: Mapping[int, PlaybookItem], source: int) -> str:
@@ -680,6 +701,50 @@ class RuleItemReviser(PlaybookRevisions):
         path = self._write(call, book, items, sections, book.items_max, admission, item=old.id)
         change = PlaybookChange(book.version + 1, "move", old.id, old.kind, admission, None, len(items), client=call.client, after=call.after)
         return self._told(call, book, path, change, f"moved {old.id} after {call.after}", "")
+
+    def _watched_out(self, call: _Call, text: str, admission: Admission) -> None:
+        """PB-WATCHED-OUT (8.6, B2): an add, a gated edit (of any live item) or a restore whose text key is the key of a text the watch retired, or of
+        a text its owner retired while its watch retire was due, is refused while at least 2 of that retire's rejections are still related (a corrected
+        link can undo the relation), unless a rule-(c) admission rests on a criterion the user confirmed after that retire. A rule's key is that of its
+        ``then``, so a rule re-added as a step is caught."""
+        key = line_key(text)
+        versions = self._read(call.service, lambda: self._catalog.playbook_versions(call.actor, call.service))
+        retires = [(k, v) for k, v in enumerate(versions) if v.op in ("watch", "retire") and v.item and v.items is not None]
+        if not key or not retires:
+            return
+        try:
+            watches = {w.id: w for w in self._evidence.watch(call.actor, call.service)}
+        except (OrgError, OSError):
+            watches = {}
+        for k, v in retires:
+            before = next((p for p in reversed(versions[:k]) if p.items is not None), None)
+            gone = next((i for i in (before.items if before and before.items else ()) if i.id == v.item), None)
+            if gone is None or line_key(gone.text) != key or v.item not in watches:
+                continue
+            related = set(watches[v.item].related)
+            still = sorted(related & set(v.related)) if v.op == "watch" else sorted(related)
+            if len(still) < 2:
+                continue
+            confirmed = stamp_of(admission.confirmed) if admission.rule == "c" and admission.confirmed else None
+            if confirmed is not None and v.revised is not None and confirmed > v.revised:
+                continue
+            raise OrgError(PB_WATCHED_OUT.format(
+                id=gone.id, how=THE_WATCH if v.op == "watch" else YOU_WHILE_DUE, n=v.version, rejections=_and(still),
+                ids=", ".join(gone.why or ()) or "nothing", client=call.client, service=call.service, first=clip_line(gone.text, WATCH_TEXT_CLIP),
+            ))
+
+    def _with_watch(self, call: _Call, change: PlaybookChange) -> PlaybookChange:
+        """The watch of the item that was just written, read once more from the files (one definition of a carried watch, ``reflection``): the id it
+        continues and the rejections it holds. A read that fails after the write leaves the change as it is, and the reply says where the states are."""
+        try:
+            found = {w.id: w for w in self._evidence.watch(call.actor, call.service)}
+        except (OrgError, OSError):
+            return replace(change, watch_unread=True)
+        mine = found.get(change.item)
+        if mine is None:
+            return change
+        old = found.get(mine.carried) if mine.carried else None
+        return replace(change, carried=mine.carried, related=mine.related, carried_related=old.related if old is not None else ())
 
     def _limits(
         self, call: _Call, book: _Book, items: Sequence[PlaybookItem], sections: Sequence[PlaybookSection], admission: Admission,
