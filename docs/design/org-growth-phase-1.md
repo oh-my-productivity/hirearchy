@@ -2,14 +2,16 @@
 
 Status: design, revision 4 (the third and last fix pass, after design review 3 of the relaunch `wf_7425beced1ec8bb4`, under the manager's
 binding directives of passes 3 and 4; the first run `wf_b5e00b63cdb0f479` wrote nothing; how each finding of review 1 (30), review 2 (25) and
-review 3 (11) was resolved is in section 23). Branch
+review 3 (11) was resolved is in section 23), **approved with the manager's binding amendments B1-B10** after design review 4 (0 HIGH, 4
+MEDIUM, 5 LOW), when the manager closed the design loop by decision; section 24 lists each amendment and where it landed, and where an
+amendment and older text of this file differ, the amendment wins. Branch
 `feat/org-growth-phase-1`, worktree `/Volumes/workspace/hirearchy/.worktrees/org-growth-p1`, base `main` = `05cfc2bf` (0a to 0a.5, 0b and 0b.1).
 Every function named below was read at `05cfc2bf` in the worktree. `SRC` is `src/hirearchy/`, `RESEARCH` is
 `/Volumes/workspace/hirearchy/docs/research/org-growth/`. Binding briefs: `RESEARCH/phase-1-resume-brief.md` (wins) and `RESEARCH/phase-1-brief.md`.
 
 Where the brief's 14 required items are (brief item -> section): 1 -> 4, 2 -> 5, 3 -> 6, 4 -> 7, 5 -> 8, 6 -> 9, 7 -> 10, 8 -> 11, 9 -> 12,
 10 -> 14, 11 -> 15 (with 13, clause 2's refusals, and 16, no bypass), 12 -> 17, 13 -> 18, 14 -> 21. The six mandatory review checks are audited in 22;
-the review resolutions are in 23.
+the review resolutions are in 23; the manager's amendments B1-B10 are in 24.
 
 ## 1. Overview
 
@@ -23,7 +25,8 @@ client confirmed); rule (a) has no data path yet and admits nothing. 0a.2's line
 the files on every read, it stays `new` until k (3, or more when the failure's recurrence rate is known) later cases, each judged by the human
 client on whichever of its deliveries the client judged first, pass without a related rejection (one recorded before the k-th of those verdicts
 counts, whatever delivery it is on, and once the item is `kept` its watch is over); the first related rejection makes it `warning`
-and tells the owner; the second makes the runtime, as the `services` single writer, retire it and restore its previous text, and tell the owner
+and tells the owner; the second (read over every later delivery while the warned text is live: the warned window, B1) makes the runtime,
+as the `services` single writer, retire it and restore its previous text, and tell the owner
 and the parent. Retiring, weakening or restoring an item that covers a criterion or an assertion needs the parent's acknowledgement; the cap
 offers retire candidates; a change of more than about 30% of the words is refused with "split it". Lessons take an after-action-review shape and
 stay the owner's view. Clause 2 of the exit criterion gets two refusals of its own: root's next new request of a service waits until every human
@@ -76,24 +79,25 @@ policy: FAST scoped tests per commit, SCOPED tests per FEAT and per fix pass, on
 | item-format playbook | `services.api` | A `PLAYBOOK.md` whose frontmatter has `items_max`. Any other playbook is **legacy** (every playbook written before Phase 1). |
 | item id | `services.api` | `P<k>`, k >= 1; the next id is `items_max + 1`; an id is never reused, not even after a retire. Ids are compared upper-case. |
 | content words | `services.api.content_words` | The words (`str.split`) of every live item's `text` and `when` (a `when` of `"always"` counts 0) and of the section headings. Item markers, the `WHEN`/`THEN`/`WHY` keywords and the ids after `WHY` are not counted. For a legacy body: `len(body.split())`, today's count. |
-| text key | `services.api.line_key` (exists) | The letters and digits of a text, case-folded, after its leading markdown markers, joined into one string. Used, unchanged, for the legacy marks of the timeline, the migration's loss check (4.4), the lenient text comparisons of 8.6 and the carried watches (below); never to decide that an edit is formatting only. (The acknowledgement's **text hash**, 9.2, is a different value.) |
-| text tokens | `services.api.text_tokens` (new, pure) | ``[tok for i, line in enumerate(t.splitlines()) for tok in TOKEN.findall((strip_markers(line) if i else line).casefold())]`` with ``TOKEN = re.compile(r"\d+(?:[.,:/-]\d+)*\|[^\W\d_]+\|[^\w\s.,;:!?'\"()\[\]*_`~#]")``: the numbers with their inner separators kept (`3.5`, `3,5`, `35`, `1`, `2`, `2024-05-01` are five different tokens or token lists), the runs of letters (any script), and **every other symbol as a token of its own** (`<`, `>`, `=`, `≠`, `%`, `$`, `€`, `+`, `-`, `✓`, `\|`, ...). Only whitespace, sentence punctuation (`. , ; : ! ? ' " ( ) [ ]`) and the markdown emphasis and code markers (`*`, `_`, the backtick, `~`, `#`) are dropped, and, **on continuation lines only** (the second and later lines, which only migrated items have, 4.4), the leading list and heading markers (`strip_markers`). An item's first line is the owner's or the migration's words without any list marker (the runtime renders the marker), so a leading `>`, `+ `, `- `, `• `, `N. ` or `[x]` there is the owner's own symbol and stays a token. Two texts with equal tokens differ only in spacing, case, markdown and sentence punctuation (and, on a continuation line, its own list marker: L13). |
+| text key | `services.api.line_key` (exists) | The letters and digits of a text, case-folded, after its leading markdown markers, joined into one string. Used, unchanged, for the legacy marks of the timeline, the migration's loss check (4.4), the lenient text comparisons of 8.6 and the carried watches (below); never to decide that an edit is formatting only. The text key of an **item** is the key of its `text` field: a step's text, a rule's `then` (its `when` is not part of it), so a rule re-added as a step with the same words has the same text key (B2). (The acknowledgement's **text hash**, 9.2, is a different value.) |
+| text tokens | `services.api.text_tokens` (new, pure) | ``[tok for i, line in enumerate(t.splitlines()) for tok in TOKEN.findall(plain(strip_markers(line) if i else line).casefold())]`` with ``TOKEN = re.compile(r"\d+(?:[.,:/-]\d+)*\|[^\W\d_]+\|[^\w\s.,;:!?'\"()\[\]*_`]")`` and ``plain(line) = re.sub(r"^\s*#+", "", line.replace("~~", ""))`` (B9): the numbers with their inner separators kept (`3.5`, `3,5`, `35`, `1`, `2`, `2024-05-01` are five different tokens or token lists), the runs of letters (any script), and **every other symbol as a token of its own** (`<`, `>`, `=`, `≠`, `%`, `$`, `€`, `+`, `-`, `✓`, `\|`, ...). Only whitespace, sentence punctuation (`. , ; : ! ? ' " ( ) [ ]`), the markdown emphasis and code markers (`*`, `_`, the backtick), the strikethrough pair `~~` and the `#` run at the start of a line are dropped (a single `~`, as in `~5`, and a `#` inside a line, as in `#3`, are tokens: B9), and, **on continuation lines only** (the second and later lines, which only migrated items have, 4.4), the leading list and heading markers (`strip_markers`). An item's first line is the owner's or the migration's words without any list marker (the runtime renders the marker), so a leading `>`, `+ `, `- `, `• `, `N. ` or `[x]` there is the owner's own symbol and stays a token. Two texts with equal tokens differ only in spacing, case, markdown and sentence punctuation (and, on a continuation line, its own list marker: L13). |
 | gated change | `services._ops` | An add, an edit whose text tokens (of `text`, and of `when` for a rule) differ from the old ones, or an owner's restore of a text no client-written version had: it needs evidence (section 6). |
 | exempt change | `services._ops` | A move, an edit whose text tokens are unchanged (a formatting fix), the first version, the migration (and the repair migration), the runtime's watch retire, a restore of a client-written text. |
 | live | `services.api` | An item is live in a version when that version's body holds it. Its **live-from** is the `revised` time of the version that gave it its current text. |
 | watched change | `reflection._watch` | While the item is in its watch (section 8): its latest change that restarts the watch, which is its latest gated change, or a later exempt restore of a client-written text (8.1, rule W2). Its **watched text** is the text that change gave it; a formatting edit, a move or a repair migration keeps the watched change and makes the item's new text its watched text (rule W1). The watched change's **live-from** is the `revised` time of the version that wrote it (a W1 change does not move it); "the live-from" below means this one. Its **watch start** is the live-from of the first gated change since the item last was not watched, or the watch start of a watch carried to it (below). |
-| carried watch | `reflection._watch` | Derived, no stored link. (i) An owner's `restore` of an item that its owner retired while it was in `warning`, or an owner's `add` whose text key equals the text key of such a retired text, continues that watch: same watch start, its related rejections counted (carried as they are; its own window, from its own live-from, adds the later ones). (ii) An item of a repair migration (4.4) whose text key equals the text key of an item that was live and in its watch in the last parseable version before the repair, rendered with its marker but without its list marker, continues that item's watch (8.1). |
+| carried watch | `reflection._watch` | Derived, no stored link. (i) An owner's `restore` of an item that its owner retired while it was in `warning`, or an owner's `add` or **gated `edit`** (of any live item) whose new text key equals the text key of such a retired text, continues that watch: same watch start, its related rejections counted (carried as they are; its own window, from its own live-from, adds the later ones). An edited item that carries a watch also keeps its own related rejections: its related set is the union of both, derived, as D4 does for a restart (B2). (ii) An item of a repair migration (4.4) whose text key equals the text key of an item that was live and in its watch in the last parseable version before the repair, rendered with its marker but without its list marker, continues that item's watch (8.1). |
 | refs | `reflection._watch` | Of an item text: its `why` entry (gated items), else the `C<k>` and `R<k>` tokens of its text (`quoting_lines`' token rule; legacy, v1 and migrated items), plus, for every `R<k>` among them, the `C<k>` ids that assertion was about when the text went live (`Assertion.about` over the links created before the text's live-from), so the refs of a text never change. The watch reads the refs of the text at the watch start (8.4) and of the text live when a rejected result was created (related rejection). |
 | coverage | `reflection._watch` | Of an item: `{C in refs : C is a current criterion} ∪ {R in refs : R.link == "confirmed" and (R.about holds a current criterion, or R.about holds no criterion at all)}`. A removed criterion is no coverage, an assertion marked "no lasting rule" (`link == "none"`) is none, and neither is a confirmed assertion that is only about removed criteria: the client lowered that bar herself. |
-| subjects of a rejection | `reflection._watch` | Of a human-tier rejection `R<k>`: `R<k>` itself; the ids its effective human link names (`Assertion.about`, and the `R<j>` a "same as" link names); the `about` id of its answering contract version, the ids that version's link names or would name (`services._criteria.answer_ids`, so a failed link write changes nothing) and the ids it removes (`Cause.removes`' rule, `services._criteria.amendment_ids`); and the **lineage** of every `C<k>` among them. A rejection is **pending** while it has no human link and no answering version, or while its human link names an earlier rejection that is pending ("same as R<j>": `Assertion.about` resolves through R<j>'s links, so its subjects are not known until R<j> is answered); a pending rejection has subjects `{R<k>}`. (This is the watch's notion; clause 2's `unanswered`, 13, counts a "same as" link as the user's answer, and R<j>'s own answer is due by the same rule.) Once a rejection is not pending its subjects are fixed: P2's one-answer rule refuses a second answer (`ANSWERED`, `CONFIRMS_ANSWERED`), and the one record that can still change them is a corrected link (a second human link, 0a.2 5.9; 8.2). |
-| lineage of a criterion | `reflection._watch` | The criteria it replaced: if the answering contract version that added `C<k>` also removed criteria, those, and their lineage in turn (an answer to one question is one change, D3, so what it removed is what it replaced). A user-initiated or v1 criterion has none. So a rejection about the new wording of a criterion relates to the rules that cited the old one. |
+| subjects of a rejection | `reflection._watch` | Of a human-tier rejection `R<k>`: `R<k>` itself; the ids its effective human link names (`Assertion.about`, and the `R<j>` a "same as" link names); the `about` id of its answering contract version, the ids that version's link names or would name (`services._criteria.answer_ids`, so a failed link write changes nothing) and the ids it removes (`Cause.removes`' rule, `services._criteria.amendment_ids`); and the **lineage as of t** of every `C<k>` among them, where t is the time of the rejection's answer (the created time of its first human link, or the `defined` time of its answering version, whichever is earlier; for a corrected link, that link's time), so a later re-add of a criterion's text cannot change the subjects of a rejection already answered (B4). A rejection is **pending** while it has no human link and no answering version, or while its human link names an earlier rejection that is pending ("same as R<j>": `Assertion.about` resolves through R<j>'s links, so its subjects are not known until R<j> is answered); a pending rejection has subjects `{R<k>}`. (This is the watch's notion; clause 2's `unanswered`, 13, counts a "same as" link as the user's answer, and R<j>'s own answer is due by the same rule.) Once a rejection is not pending its subjects are fixed: P2's one-answer rule refuses a second answer (`ANSWERED`, `CONFIRMS_ANSWERED`), and the one record that can still change them is a corrected link (a second human link, 0a.2 5.9; 8.2). |
+| lineage of a criterion as of a time t | `reflection._watch` | The criteria it replaced, as the contract stood at t (B4): the criteria removed by the **latest** stored contract version whose `defined` is at or before t and that added `C<k>`'s text (the text is present in that version and absent from the version before it; `number_criteria` gives a text that comes back its first id, so a re-added text is found by this test, not by a new id), and their lineage as of t in turn, each id visited once (so a cycle, C6 -> C10 -> C6, ends). An answer to one question is one change (D3), so what it removed is what it replaced. A criterion with no such version at or before t (a v1 criterion never removed and re-added, or a user-initiated one) has none as of t. So a rejection about the new wording of a criterion relates to the rules that cited the old one, and a v1 text that one answer removed and a later answer re-added has, after the re-add, the lineage of what the re-adding answer removed. |
 | candidate case | `reflection._watch` | Of a watched change: a case (0b 3) other than the cases of the change's `why` assertions, with a `done` result created after the watched change's live-from. Candidates are ordered by the `created` time of their first such `done` result. A new candidate's first done time is always later than an existing one's, so the first k candidates are fixed once k exist. |
 | judged delivery `judged(c)`, `J(c)` | `reflection._watch` | Of a candidate c: the delivery of c whose `done` result was created after the watched change's live-from and that carries c's first counted verdict, the human-tier verdict with the lowest note id among the verdicts on those deliveries (0b's `Delivery.verdicts`, `counted` = human tier, L4). Verdict notes are only appended, with growing ids, so `judged(c)` never changes once it exists; a verdict recorded later on an earlier, superseded delivery has a higher id and changes nothing. A delivery superseded without a verdict holds nothing. `J(c)` is the `created` time of `judged(c)`'s `done` result. |
 | last judged delivery `E` | `reflection._watch` | `max(J(c))` over the first k candidates. Undefined until each of them has `judged(c)`. Once defined it never moves (the first k candidates and their `J(c)` are fixed), so a late verdict never pulls it back. |
 | closing time `D` | `reflection._watch` | The created time of the latest of the first k candidates' judging verdicts (the verdict note that makes `judged(c)`). Defined exactly when `E` is and, like `E`, fixed once defined (verdict notes are only appended). "Recorded before `D`" compares message ids, which begin with the creation stamp, so two notes never tie. |
-| window | `reflection._watch` | Of a watched change: a human-tier rejection is **in the window** when its rejected result was created at or after the watch start, and either that result was created at or before `E` or the rejection note was created before `D`. Open-ended while `E` is undefined (every human rejection on a result created at or after the watch start). The rejected result is the rejected task's latest result created before the rejection note (done or blocked). A watch whose watched change was restarted (8.1 W2) has the union of its watched changes' windows: the first from the watch start, each later one with its own `E` and `D` and from its own live-from in place of the watch start, so a restart keeps every rejection found so far and pulls in none that was outside. |
-| end of the watch `K` | `reflection._watch` | The created time of the earliest record (a verdict note, a link note or an answering contract version of the service) at or after `D` such that the files created up to and including it derive `kept` (8.1). Undefined while the item has not reached `kept`; fixed once defined (a later record cannot change what the files up to `K` derive). From `K` on the watch is over: the window is read only for rejections recorded at or before `K`, so nothing recorded later joins it (8.1, the monotonicity property). `watch_states` finds `K` by testing the `kept` condition at each such record's time in order, from `D` on; every record carries its creation time (message ids, the contract version's `created`, the playbook version's `revised`). |
-| related rejection | `reflection._watch` | Of an item in its watch: a human-tier rejection in the window that is not pending, whose rejected result was created while text T of the item was live, and whose subjects meet T's refs. Derived, with no `applied` ids (08 4.2). |
+| window | `reflection._watch` | Of a watched change: a human-tier rejection is **in the window** when its rejected result was created at or after the watch start, and either that result was created at or before `E` or the rejection note was created before `D`. Open-ended while `E` is undefined (every human rejection on a result created at or after the watch start). The rejected result is the rejected task's latest result created before the rejection note (done or blocked). A watch whose watched change was restarted (8.1 W2) has the union of its watched changes' windows: the first from the watch start, each later one with its own `E` and `D` and from its own live-from in place of the watch start, so a restart keeps every rejection found so far and pulls in none that was outside. The window decides `new -> kept` and the first related rejection; an item already in `warning` reads its second over the **warned window** (next row). |
+| warned window | `reflection._watch` | Of an item in `warning` (B1): every human-tier rejection on a result created at or after the start of the watch in which the item was warned, recorded while the item is live in that watch's watched text (live with the watched text's tokens under its id or the carried id, W1). It has no `E`, `D` or `K` bound, so it only grows; a restart (W2) and a carried watch carry it as they carry the window (D4, section 3's union). A warned item's related rejections are those of its window plus those of its warned window; the second retires it whatever order root recorded the k-th verdict and a later delivery's rejection in. |
+| end of the watch `K` | `reflection._watch` | The created time of the earliest record (a verdict note, a link note or an answering contract version of the service) at or after `D` such that the files created up to and including it derive `kept` (8.1). Undefined while the item has not reached `kept`; fixed once defined (a later record cannot change what the files up to `K` derive). From `K` on the watch is over: the window is read only for rejections recorded at or before `K`, so nothing recorded later joins it (8.1, the monotonicity property). `watch_states` finds `K` by testing the `kept` condition at each such record's time in order, from `D` on; every record carries its creation time (message ids, the contract version's `defined`, `Contract.defined`, written once per version, and the playbook version's `revised`; never the contract's `created`, which every version carries from v1, `services/_define.py`), compared as aware datetimes (`stamp_of(message id)` against `parse_time(defined)` and `parse_time(revised)`); at an equal microsecond a contract version comes before the link note `define_service` writes after it (B3). Never defined for a warned item (B1). |
+| related rejection | `reflection._watch` | Of an item in its watch: a human-tier rejection in the window (for an item already in `warning`, in the window or its warned window, B1) that is not pending, whose rejected result was created while text T of the item was live, and whose subjects meet T's refs. Derived, with no `applied` ids (08 4.2). |
 | judged case, delivery, counted verdict | `reflection` (0b 3, exists) | As 0b defines them; the watch reads them from mail only (8.2). |
 | clean case | `reflection._watch` | Of an item's watched change: a candidate c that has `judged(c)` and none of whose human rejections in the window is related or pending. |
 | k, r | `reflection._watch` | Section 8.4. |
@@ -274,8 +278,8 @@ ignores both. A fallback is never silent: the migration's reason ends `; one ite
 that fact, not as a user path (19.1). **The corpus assertion is stronger than the invariant:** on every kept file and every generated v1 below,
 `migrate_body` must pass with the per-block split and **no fallback**, so a splitter that pushed ordinary owner-written bodies into the fallbacks
 (one or a few giant items) fails the unit corpus, and a kept file that needs a fallback is a splitter bug to fix, not an expectation to change.
-The corpus: every `PLAYBOOK*.md` of the kept study evidence (E3, E4 s1r/s2r/s3,
-E5-E7 s1-s3, G0's six streams; 42 files, none with an empty section), every generated v1 of the plan goldens, and constructed bodies: a table, a
+The corpus: every `PLAYBOOK*.md` under `studies/` (the kept study evidence: E, E2, E3, E4 s1/s1r/s2/s2r/s3,
+E5-E7 s1-s3, G0's six streams; 42 files, none with an empty section; B5), every generated v1 of the plan goldens, and constructed bodies: a table, a
 fence (with a `## ` line and a `- [P1] x` line inside), nested lists, two headings with the same text, text before the first heading, an H1 title
 directly before a `##` heading, two consecutive headings, a body that ends with a heading, a body of headings only, a paragraph ending in
 `(WHY C6)`, list items separated by blank lines, CRLF, trailing spaces, a literal `[P1]`, and an empty body (the constructed bodies may take a
@@ -356,11 +360,11 @@ Order of checks in `RuleItemReviser.revise_playbook`:
    PB-FIRST-EXISTS and PB-FIRST-LATE. All of these are pure or read-only and write nothing.
 2. The migration (4.4) of a legacy or unparseable body (the repair migration carries the watches, 4.4).
 3. The watch settler (8.5): a due watch retire is written, on the migrated body when step 2 wrote one, so a hand-broken file cannot hold a due
-   retire back.
+   retire back. When that retire removed the item the op names, step 4's PB-ITEM starts with the sentence of B7 (5.3).
 4. The item (PB-ITEM), the item-dependent PB-ARGS (the item's kind, `after`, `version`, a restore without an earlier text; they need the ids,
    which a legacy body gets only at step 2) and no-change (PB-SAME).
 5. For a gated change: the gate (section 6), the 30% rule (section 7; not for a (c) admission), the cap (section 10), then PB-WATCHED-OUT (8.6,
-   `add` and `restore`: its exception needs the admission). For `edit` and `restore`, the guard (section 9) runs last, on the new text's coverage
+   `add`, gated `edit` and `restore`, B2: its exception needs the admission). For `edit` and `restore`, the guard (section 9) runs last, on the new text's coverage
    (for a gated change, computed from `admission.why`; for an exempt restore, from the restored text's `why` entry when it was live, else its
    tokens); a formatting edit keeps its `why` and is never weakening. For `retire`, only the guard. For `move`, nothing more. An exempt
    `restore` of a client-written text takes the 30% rule, the cap and the guard.
@@ -375,7 +379,8 @@ writes nothing either: the acknowledged call is judged again from step 1.
   rejection warns it, a second retires it. | It continues the watch of {old id}: warning ({R ids}); one more related rejection retires it.}
   {client} was told without being woken.` (the second form for a carried add, section 3 carried watch (i))
 - edit, gated: `... edited {id}, admitted ({rule}) on {ids}. Its watch starts again{; its warning stays (R4): one more related rejection retires
-  it}. ...`; formatting only: `... fixed the formatting of {id} (no evidence needed; its state is unchanged). ...`
+  it}{; it continues the watch of {old id}: warning ({R ids}), one more related rejection retires it}. ...` (the last clause for an edit into a
+  text its owner retired in `warning`, section 3 carried watch (i), B2); formatting only: `... fixed the formatting of {id} (no evidence needed; its state is unchanged). ...`
 - retire: `... retired {id}{ (acknowledged by {parent}, note {ack})}. ...`; restore: `... restored {id} to the text of v{k}, admitted ({rule}) on
   {ids}{ | (written by {client}: no evidence needed)}{ (acknowledged by {parent}, note {ack})}{; it continues the watch of {old id}: warning
   ({R ids}), one more related rejection retires it}. ...`; move: `... moved {id} after {after} (no evidence needed). ...`; first: `... wrote
@@ -411,7 +416,10 @@ PB-FIRST-EXISTS: refused: `{service}` already has playbook v{n}: op="first" writ
 (op="add", "edit", "retire", "restore" or "move"). Nothing was written.
 PB-FIRST-LATE: refused: `{service}` already has evidence ({what}), so its playbook is built one item at a time: op="add" with evidence (your
 Reflect section says what is admitted). The first version is only for the procedure of the first request. Nothing was written.
-PB-ITEM: refused: `{service}` has no live item {id}. Its items: {ids, "none yet"}{; retired: {ids} (op="restore" brings one back)}. Nothing was written.
+PB-ITEM: refused: {The watch retired {id} in v{n} (rejections {R4}, {R6}). }`{service}` has no live item {id}. Its items: {ids, "none yet"}{; retired:
+{ids} (op="restore" brings one back)}. Nothing was written.
+(B7: the lead sentence only when step 3 of this call wrote the watch retire of {id}; in the retired list, an id the watch retired reads
+`P12 (retired by the watch in v{n}: it comes back only as a confirmed criterion's own words)`.)
 PB-SAME: refused: no change: {id} {already reads so | already comes after {after} | is already first in its section}. Change an item only when the
 evidence calls for a different way of working. Nothing was written.
 PB-TEXT: refused: {field} {rule}. Nothing was written.
@@ -427,7 +435,7 @@ criterion failing." -> "Add the item when the answer is in the contract (its new
 shows the same criterion failing."
 ```
 
-The placeholders of PB-ARGS, PB-TEXT and PB-SAME take exactly these strings (constants beside the texts; `{x}` is the value found):
+The placeholders of PB-ARGS, PB-TEXT, PB-SAME, PB-FIRST-LATE and the `first` reply take exactly these strings (constants beside the texts; `{x}` is the value found):
 
 | Placeholder | op or field | String |
 |---|---|---|
@@ -444,6 +452,8 @@ The placeholders of PB-ARGS, PB-TEXT and PB-SAME take exactly these strings (con
 | | `after` | `after={x} is not an item of {id}'s section` (move), `after={x} is not a live item` (add of a step), `after={x} is a rule: a step goes after a step (or leave after out)` (add of a step after a live rule), `after={x} is not a live rule` (add of a rule) |
 | | `version` | `version={x} does not hold {id}` |
 | | restore without an earlier text | `{id} has no earlier text: it has read so since v{k}, so there is nothing to restore` |
+| `{what}` | PB-FIRST-LATE | `a verdict on {task}` or `a rework {task}`, for the oldest such record (B8) |
+| `{sections}` | the `first` reply (5.2) | the heading lines without their `#` run, joined by `, `; `none` for a body without headings (B8) |
 | `{field} {rule}` | any text field | `{field} is empty`; `{field} has more than one line ({x} lines)`; for a text that is not a current criterion's own words (19.2): `{field} has more than {limit} characters ({x})`, `text and then have more than 150 words with when ({x})`, `{field} has an item id in brackets ({x}): ids are the runtime's`, `text starts with "#": a heading is no item` |
 | | `when` | `when has the word "THEN" in capitals: it would split the rule there; write the condition without it` |
 | | `first`'s text | `text is empty`; `text has {x} words; the limit is {cap} (playbook_max_words)` |
@@ -483,11 +493,15 @@ an output value or the handling of a criterion, whether the value sits in words,
 M3's point (11-final-verification); the one exception is the list marker of a migrated item's continuation line (L13). The pattern, exactly
 (`services.api`):
 ```python
-TOKEN = re.compile(r"\d+(?:[.,:/-]\d+)*|[^\W\d_]+|[^\w\s.,;:!?'\"()\[\]*_`~#]")
+TOKEN = re.compile(r"\d+(?:[.,:/-]\d+)*|[^\W\d_]+|[^\w\s.,;:!?'\"()\[\]*_`]")
+LEADING_HASHES = re.compile(r"^\s*#+")
+
+def plain(line: str) -> str:  # B9: `~` is dropped only as the pair `~~`, `#` only at the start of a line
+    return LEADING_HASHES.sub("", line.replace("~~", ""))
 
 def text_tokens(t: str) -> list[str]:
     lines = t.splitlines()
-    return [tok for i, line in enumerate(lines) for tok in TOKEN.findall((strip_markers(line) if i else line).casefold())]
+    return [tok for i, line in enumerate(lines) for tok in TOKEN.findall(plain(strip_markers(line) if i else line).casefold())]
 ```
 Text tokens, not the text key, decide it: the key joins all letters and digits and drops every symbol, so `within 3.5 days` -> `within 35 days`,
 `steps 1, 2` -> `steps 12` or `value > 100` -> `value < 100` would keep the key and pass as formatting; their tokens differ. `strip_markers` runs
@@ -495,9 +509,11 @@ on continuation lines only: an item's first line never carries a list marker (th
 `when` and `then` are one line of words), so a leading symbol there is the owner's. Unit rows, each gated: `within 3.5 days` -> `within 35 days`;
 `steps 1, 2` -> `steps 12`; `3,5` -> `3.5`; `é` -> `e`; `value > 100` -> `value < 100`; `x = 5` -> `x ≠ 5`; `at most 5%` -> `at most 5`; `$5` ->
 `€5`; `UTC+2` -> `UTC-2`; `-3 days` -> `3 days`; `✓` -> `✗`; and at the start of a text, `>5 rows` -> `5 rows`, `> 5 action items` -> `5 action
-items`, `+ 2 days to each due date` -> `2 days to each due date`, `[x] reviewed` -> `[ ] reviewed`. Formatting (equal tokens): `**Due:**  ISO` ->
-`Due: iso`; `Check the date.` -> `check the date`; and a migrated item whose second line changes from `   - sub` to `   1. sub` (a continuation
-line's own list marker, L13). (A scratch run of this rule, with the product's `strip_markers`, on every pair above gave exactly these results;
+items`, `+ 2 days to each due date` -> `2 days to each due date`, `[x] reviewed` -> `[ ] reviewed`; and (B9) `within ~5 days` -> `within 5 days`,
+`see #3` -> `see 3`. Formatting (equal tokens): `**Due:**  ISO` ->
+`Due: iso`; `Check the date.` -> `check the date`; a migrated item whose second line changes from `   - sub` to `   1. sub` (a continuation
+line's own list marker, L13); and (B9) `~~old~~ new` -> `old new`, a continuation line `   ## Sub` -> `   Sub`. (A scratch run of this rule, with the product's `strip_markers`, on every pair above gave exactly these results, the B9 rows included
+(re-run with B9's `plain` when the amendments were applied);
 `- step` -> `1. step` on a first line is now gated, as it should be: the owner's own leading `-` and `1.` are tokens. The build's unit test is
 the check.)
 
@@ -615,7 +631,9 @@ A candidate with no verdict yet on any of its deliveries after the live-from, or
 its verdict. A delivery that a later task of its case superseded before any verdict (0b's `Delivery.superseded`, the common case in G0 and E7: 2-3
 of every 3 first deliveries) holds nothing: the case counts through the delivery the client did judge. A gated change of a `kept` or `restored`
 item starts a new watch. A warned item never reaches `kept` in that watch (its related rejection stays in the window, below): it stays `warning`
-until a second related rejection in its window retires it, until its owner retires it (D4), or for good (L15). Two related rejections never
+until a second related rejection retires it, read over its warned window (section 3, B1: every human rejection on a result created at or
+after the watch start, recorded while the item is live in its watched text, whatever `E`, `D` and `K` are), or until its owner retires it
+(D4). Two related rejections never
 leave an item live for long: the runtime retires it (8.5); until that write succeeds, the derived state is `warning` with `retire due` set, and
 every reader says so (14.1).
 
@@ -628,21 +646,27 @@ made before `E` (a second verdict on a judged delivery, a late verdict on a supe
 before `E`), is after the watch, like a rejection of a later delivery, and cannot move a `kept` item back.
 
 **The monotonicity property** (8.7 and 20 test it). Within one watch (one watched change, rules W1-W3 below), as records are appended, the
-derived state moves only along `new -> kept`, `new -> warning -> retired` (through `retire due`), or stays `warning` for good. A verdict, a link
+derived state moves only along `new -> kept` or `new -> warning -> retired` (through `retire due`), and a warned item stays `warning` only while
+no second related rejection has come (B1: whatever the order root records verdicts and answers in, the second one retires it). A verdict, a link
 or an answering version recorded later never moves `warning` back to `new` or to `kept`, and never moves `kept` back to `new` or to `warning`.
 **The one exception is a corrected link** (a second human link on a rejection, which 0a.2 5.9 lets decide, 8.2): it changes that rejection's
 subjects, so it can unrelate it (`warning -> new` before `K`, or clear a `retire due` that is not written yet) or relate it (`kept -> warning`,
 and a second such link the retire). A written watch retire stays (8.6, L9). *Proof.*
 1. Fixed once they exist: k and r (8.4), the first k candidates (a new candidate's first done time is later than every existing one's),
    `judged(c)` and `J(c)` (verdict notes are only appended, with growing ids), `E`, `D` and `K` (each is a function of records that later records
-   do not change); the refs of every text (section 3: taken as of its live-from); and the subjects of a rejection once it is not pending (P2's
-   one-answer rule; only a corrected link changes them).
+   do not change; every record's time is its own creation time, a contract version's being its `defined`, B3); the refs of every text
+   (section 3: taken as of its live-from); and the subjects of a rejection once it is not pending (P2's one-answer rule; its lineage is taken as
+   of the time of its answer, B4, so a later re-add of a criterion's text does not change them; only a corrected link changes them).
 2. Before `K` the window only grows. While `E` is undefined it holds every rejection on a result created at or after the watch start. `E`
    becomes defined at the moment `D`, so every rejection recorded before then has a note created before `D` and stays; the judging verdict
    recorded at `D` is on `judged(c)`, whose result was created at or before `E`, and stays; later membership is a fixed test of fixed times.
 3. Answers are only appended, so a rejection never becomes pending again, and by 1 an answered rejection's relation to a text never changes.
    With 2, the set of related rejections only grows: the count goes `0 -> 1 -> 2`, never back. One related rejection makes `kept` impossible
    (it needs none in the window), so `warning` never returns to `new` or reaches `kept`; two make the retire due, and the runtime writes it.
+   For a warned item the second is read over its warned window (B1): every human rejection on a result created at or after the watch start,
+   recorded while the item is live in its watched text. That window has no `E`, `D` or `K` bound, so it only grows, and the related count only
+   grows; a warned item never reaches `kept`, so `K` is never defined for it, and whether the k-th verdict or a later delivery's rejection is
+   recorded first cannot decide between `retired` and `warning`.
 4. `kept` is first derived at `K`, when every rejection in the window is answered and unrelated. From `K` on only the rejections recorded at or
    before `K` are read, each answered, with fixed subjects and fixed refs (1), so nothing but a corrected link can change their relation, and the
    state stays `kept`. ∎
@@ -670,7 +694,8 @@ verdicts on its deliveries whose `done` result came after the live-from; (4) `E 
 (5) the window (section 3; the union of the watched changes' windows after a restart): every human rejection on a result created at or after the watch start, and, once `E` is defined, on a result created
 at or before `E` or recorded before `D`; each tested for relation against the text that was live when its result was created, and pending while
 it (or the earlier rejection its link names as the same) has no answer; (6) `K`: from `D` on, the first record time at which the files up to it
-derive `kept`; from `K` on, only the window's rejections recorded at or before `K` are read. The state follows from the counts, and moves only
+derive `kept`; from `K` on, only the window's rejections recorded at or before `K` are read; (7) for an item with one related rejection, its
+warned window (section 3, B1), in which a second related rejection retires it whatever `E`, `D` and `K` are. The state follows from the counts, and moves only
 as the monotonicity property above says. Unit rows: (i) a candidate delivered before the k-th and judged after it, related: `warning`, never
 `kept`; (ii) the same candidate unjudged: `new`, waiting, until its verdict; (iii) a related rejection on a result created after `E` and recorded
 after `D`, of an item whose k candidates are clean: outside the window (`kept`); (iv) a related rejection on a blocked result created before `E`:
@@ -694,7 +719,15 @@ delivery made before `E` (a second verdict on c2's judged delivery, or the first
 created before `E`, is recorded and answered as related: `warning` (it is in the window, and `K` is not reached); (xviii) a rejection linked "same
 as R<j>" while R<j> is unanswered is pending; the call that answers R<j> settles both, and when both relate, the count goes from 0 to 2 in that
 call (8.3); (xix) after `K`, a corrected link that makes a rejection of the window related: `warning` (the exception), and a second such link the
-retire.
+retire. **Rows of the manager's amendments (section 24):** (xx) B1, k = 3: the item is warned by a related rejection in its window, `D` is
+defined, and then a related rejection of a delivery made after `E` is recorded after `D`: it is the second related rejection (warned window),
+so the retire is due, in every order of the k-th verdict, the first rejection's answer and that rejection; (xxi) B2: the owner retires P12 in
+`warning`, then a gated edit of the live P13 into P12's text: P13 is `warning` (carried from P12), with P13's own related rejections as well
+(the union); (xxii) B3: an old rejection answered by a contract version whose `defined` is after the watch start leaves `r` and k unchanged
+(the link-note row of 8.4 has its version twin); (xxiii) B4: a v1 criterion C6 that one answer removed (adding C10) and a later answer re-added
+by its exact text (removing C10): C6's lineage as of the later answer holds C10, and C10's lineage as of that time holds C6, each visited once,
+so a rejection answered about C6 after the re-add relates to a rule that cited C10; (xxiv) B4: a rejection answered before the re-add keeps the
+subjects it had at its answer (C6 had no lineage then); (xxv) B4, a cycle C6 -> C10 -> C6 -> C10 (three answers): the lineage ends, each id once.
 
 ### 8.2 What counts: deliveries, clean cases, related and pending rejections
 
@@ -711,7 +744,8 @@ All from mail and the item file, never from team text:
   relayed rework before the verdict (G0's and E7's usual flow) move the judged delivery, not the case out of the count.
 - **A related rejection**: section 3. It counts on any rejected result, `done` or `blocked` (E7S3-6: a blocked result is no delivery, but a user who
   rejects a file copied from it still rejects the rule's effect), and on any case, the cited ones included, when it is in the window (section 3:
-  bounded by `E` on its result and by `D` on its note; closed at `K`). The text it is held against is the text that was live when the rejected
+  bounded by `E` on its result and by `D` on its note; closed at `K`), or, for an item already in `warning`, in its warned window (section 3,
+  B1: every later delivery while the warned text is live, with no `E`, `D` or `K` bound). The text it is held against is the text that was live when the rejected
   result was created, so a rejection of an older text cannot warn a newer one.
 - **A pending rejection** (no human link and no answering version yet, or a "same as R<j>" link while R<j> is pending, section 3) makes its case
   not clean and is not related yet; when the answer is recorded, it becomes related or not. Section 13 makes every rejection's answer due before the service's next new request and before root's
@@ -724,14 +758,17 @@ All from mail and the item file, never from team text:
 its watched change (8.1, W2). Related rejections accumulate over the whole watch period, across every change, until the item reaches `kept` or
 leaves the body (the watch's window is the union of its watched changes' windows, section 3, so a restart keeps every rejection found so far
 and adds those on results after its own live-from), and they carry over to a restore of the same id or a re-add of the same text after an owner's retire in `warning` (section 3,
-carried watch): an owner cannot clear a warning by editing, restoring, or retiring and re-adding the rule (section 22, check 2). This holds for a
+carried watch), or to a gated edit of another live item into its text (B2; the edited item keeps its own related rejections too): an owner
+cannot clear a warning by editing, restoring, retiring and re-adding the rule, or editing another item into its text (section 22, check 2).
+This holds for a
 (c) edit too (D4): an owner who edits a warned item into the own words of a criterion the client confirmed after the warning keeps the warning,
 so one more related rejection retires the client's words, and PB-WATCHED-OUT then bars them until the client confirms another criterion; raising
 the bar wins over convenience, and the owner can add the words again after that confirmation. Several items may reference one criterion: one
 related rejection then warns each of them (11 section 2, "09-40").
 
 **Order and late answers.** The states are recomputed from all data on every read, and the order in which root records the user's verdicts, its
-own relayed verdicts and the answers moves them only as 8.1's monotonicity property allows. A late answer settles a pending rejection: before
+own relayed verdicts and the answers moves them only as 8.1's monotonicity property allows; a warned item's second related rejection retires
+it whatever that order (B1, the warned window). A late answer settles a pending rejection: before
 `K` it can only turn `new` into `warning` (related) or let the item reach `kept` (unrelated); it cannot reach a `kept` item, whose window holds no
 pending rejection. A user's corrected link (a second `feedback(confirms=...)`, which 0a.2 5.9 lets decide) is the one exception: it can turn a
 related rejection unrelated, or an unrelated one related, so a `kept` item one of whose window's rejections turns related is `warning` again
@@ -755,8 +792,10 @@ R<j>", which was pending until then, 8.1 row xviii), the retire's note is sent a
 that have a human rejection whose subjects meet the item's refs, the refs of the text at the watch start, as k is fixed then) / (judged cases of
 the service with a `done` result before the watch start). An edit within the watch does not change `r` or k. It
 is computed from the data as it stood at the watch start: only cases with a result created before it, and only the verdicts, link notes and
-answering contract versions created before it (message ids and versions carry their creation time), so a link recorded later never changes `r`,
-and k is fixed for the whole watch. Unit row: a link note on an old rejection recorded after the watch start leaves `r` and k unchanged. `r` is
+answering contract versions whose `defined` is before it (message ids carry their creation stamp, a contract version its `defined`, never the
+contract's `created`, which every version carries from v1; compared as aware datetimes, B3), so an answer recorded later never changes `r`,
+and k is fixed for the whole watch. Unit rows: a link note on an old rejection recorded after the watch start leaves `r` and k unchanged; so
+does an answering contract version of an old rejection whose `defined` is after the watch start (B3). `r` is
 **known** when that denominator is at least 10 and the numerator at least 1 (06 section 6: a failure seen once in 12 can
 never be shown fixed within 20; below 10 judged cases the rate is noise). Then `k = max(3, ceil(ln 0.1 / ln(1 - r)))`, with `r = 1` giving 3.
 Values (unit-tested): r = 0.5 -> 4, 0.3 -> 7, 0.2 -> 11, 0.1 -> 22. `k` is never capped and is shown with `r` (root's views; 14.3, 14.4). The
@@ -822,7 +861,8 @@ the `(id, error)` of each retire it could not write).
 
 ### 8.6 Coming back after a watch retire
 
-An owner's `add` or `restore` whose text key equals a text the watch retired (any `op: watch` version's removed text of any item; the lenient
+An owner's `add`, gated `edit` (of any live item, B2) or `restore` whose new text key equals a text the watch retired (any `op: watch`
+version's removed text of any item; a rule's text key is that of its `then`, section 3, so a rule re-added as a step is caught; the lenient
 key on purpose, so a re-add with other punctuation is caught), or a text its owner retired while its watch retire was due (2 related, the write
 not yet done), is refused while at least 2 of that retire's related rejections are still related
 (a user's corrected link can undo the relation), unless it is admitted under (c) by a criterion confirmed after that retire (the client then made
@@ -856,13 +896,14 @@ client wants it, send {client} (`send`) this question once: "Your rejections {R4
 | a later case rejected about the item, and its rejection answered, before the k-th candidate's verdict is recorded (a delayed verdict, or root recording a relayed verdict first) | the rejection was recorded before `D`, so it stays in the window: `warning`, and still `warning` once the k-th verdict is recorded (8.1 rows xiii, xv) |
 | the same rejection recorded after the k-th candidate's verdict, on a result created after `E` | outside the window: the item can reach `kept` (8.1 row xiv) |
 | a rejection recorded after `K`, of any delivery (one made before `E` included) | after the watch: a `kept` item stays `kept` (8.1 row xvi); only a corrected link of a rejection in the window reopens it (8.1 row xix) |
-| a warned item whose window has closed (`D` defined) | only a rejection on a result created at or before `E` can still join its window, so a related rejection of a later delivery does not retire it: the item stays `warning` for good unless such a rejection, or its owner's retire, ends it; a gated change restarts the window (D4) (L15) |
+| a warned item whose window has closed (`D` defined) | retired at the second related rejection, whatever the order (B1): the second is read over the warned window, every human rejection on a result created at or after the watch start while the warned text is live, so a related rejection of a later delivery retires it, recorded before or after `D`; it stays `warning` only while no second related rejection has come, or until its owner retires it (8.1 row xx) |
 | a rejection linked "same as R<j>" while R<j> has no answer | pending until R<j> is answered (its subjects are not known); then both settle in one call (8.1 row xviii) |
 | a move or a formatting edit of an item in its watch | the watch continues; the moved or reformatted text is the watched text (W1); a due retire removes it |
 | an exempt restore of a client-written text of an item in its watch | the watch restarts on the restored text, related rejections kept (W2); the settler compares against the restored text |
 | a gated change of a warned item (an edit, or a gated restore) | the watch restarts its clean count; the warning stays (D4); the settler retires the new text at the next related rejection |
 | a blocked result in the watch that is never rejected | holds nothing (a blocked result is no delivery and needs no verdict); rejected, it can relate (8.2) |
-| an item retired by its owner during its watch | `retired`; its related rejections stay in the history and carry over to a restore of the id or an add of a text with the same text key (section 3, carried watch); PB-WATCHED-OUT applies only to the watch's own retires and to an owner's retire made while the watch retire was due (8.6) |
+| an item retired by its owner during its watch | `retired`; its related rejections stay in the history and carry over to a restore of the id, an add of a text with the same text key, or a gated edit of another live item into that text (section 3, carried watch (i); B2; 8.1 row xxi); PB-WATCHED-OUT applies only to the watch's own retires and to an owner's retire made while the watch retire was due (8.6) |
+| a gated edit of a live item into a text the watch retired (B2) | PB-WATCHED-OUT, as for an add or a restore of that text (8.6), unless (c) admits it by a criterion confirmed after that retire |
 | an unparseable (hand-edited) body with a due retire | the settler (or the owner's next op) writes the repair migration first, which carries the watches by text key, then the retire (4.4, 8.5); an item whose line the hand edit changed loses its watch (L6) |
 | one call takes an item's related count from 0 to 2 or more (the call that answers `R<j>` also settles a later rejection linked "same as R<j>") | the settler retires the item in that call; the retire's note is sent and no warning note (8.3) |
 | the watch retire of an item whose text before the watch has the watched text's tokens (a W2 restore brought exactly it back) | the retire removes the item and restores nothing (8.5): no version with an unchanged body is written |
@@ -1125,7 +1166,9 @@ Item states: P9 rule, new since v5 (watched: a related client rejection warns it
 ```
 The body stays quoted (`> `), so agent text never mixes with the prompt's headings. The states line is the product's and names only ids, states,
 versions and rejection ids; it shows no counts of clean cases (08 P6: agents see facts, not targets; root and the human see the counts, 14.3).
-`retire due` reads `P12: retire due (R4, R6 are related): the runtime retires it at the next change; follow the contract`. A watch held open by a
+`retire due` reads `P12: retire due (R4, R6 are related): the runtime retires it at the next change; follow the contract`, and on a locked
+contract (where the owner's ops are refused before the settler runs, L11) `P12: retire due (R4, R6 are related): the runtime retires it at the
+client's next answer; follow the contract` (B6). A watch held open by a
 missing verdict reads `P9 rule, new since v5 (waiting for the client's verdict on 1 case)`, the number of its first k candidates with no judged
 delivery yet (`ItemWatch.waiting`; a superseded delivery is not counted, only a case none of whose deliveries since the live-from has a verdict),
 and one held by an unanswered rejection `P9 rule, new since v5 (waiting for the user's answer to R4)`. A carried watch (section 3) shows its old
@@ -1286,9 +1329,9 @@ and `services/tests/test_amend.py` (1).
 |---|---|---|
 | No gated item enters without human-tier evidence | refusal (gate per item: G1, G2, PB-C-WORDS, agent client; lessons, relayed and agent verdicts weigh nothing) | 6 |
 | A wrong rule cannot come back as a step, or by a wording edit | refusal (every content change gated; exempt only when the text tokens, words, numbers and symbols included, a leading one too, are unchanged; L13) | 6.1 |
-| A rule with a related rejection never reaches `kept` | derived check (`watch_states`: each candidate counted through the delivery the client judged; the window bounded by `E` on delivery time and `D` on recording time, both fixed once defined, and closed at `K`, so the state moves only as 8.1's monotonicity property allows whatever order root records verdicts and answers in; warnings kept across every change and carried over a retire and re-add, and across a repair migration) | 3, 8.1, 8.2 |
+| A rule with a related rejection never reaches `kept` | derived check (`watch_states`: each candidate counted through the delivery the client judged; the window bounded by `E` on delivery time and `D` on recording time, both fixed once defined, and closed at `K`, so the state moves only as 8.1's monotonicity property allows whatever order root records verdicts and answers in; a warned item's second related rejection read over the warned window, so it retires in every order (B1); warnings kept across every change and carried over a retire and re-add, a gated edit of another item into the warned text (B2), and a repair migration) | 3, 8.1, 8.2 |
 | Two related rejections retire the rule and restore its previous text | runtime write (a compare-and-swap under the per-service lock) in the call that records the answer, on the watched text whatever moves or formatting edits it had; retried at every later change or answer | 4.3, 8.5 |
-| A watch-retired text does not come back | refusal (PB-WATCHED-OUT, also for a text its owner retired while its retire was due) | 8.6 |
+| A watch-retired text does not come back | refusal (PB-WATCHED-OUT on an add, a gated edit of any live item (B2) or a restore of it, also for a text its owner retired while its retire was due) | 8.6 |
 | Watch states, k and r are never stored, so they cannot be written by anyone | derived check; the item file holds ops only | 4.2, 8 |
 | Every human rejection has an `R<k>` | derived (`regressions`) | 0a, unchanged |
 | Every human rejection is answered within one request | refusal (REQUEST-UNANSWERED on the next new request; FEEDBACK-UNANSWERED on root's human accept of the same case, but for the accept that P2-UNRATED makes the answer wait for) plus today's P2 refusals; for the rest of the last request of a service, a derived end-of-stream check only (L10) | 13 |
@@ -1327,6 +1370,7 @@ Still on text, each with its reason:
 | the human at the terminal | no CLI command writes a playbook (unchanged); the contract is the human's path | D3 |
 | `write` / shell `write` on `services/**` | `orgfiles` refuses `services/**` (unchanged); the assistant's own shell is outside the product (0a.2 5.8) | a hand-written file that does not parse is turned into new items, word for word, at the next owner op or due retire (4.4's repair migration; 19.1), with every watch whose line it left untouched carried by text key; a hand-written item file that parses is read like any other, so a forged `WHY` would count: declared (L6), as 0a.2 declared a forged `answers` |
 | an owner's `restore` of an older, weaker text, or a retire and re-add of a warned rule | `RuleItemReviser` | the guard (9.1, exempt restores included) and the carried watch (section 3): neither lowers the bar nor clears a warning |
+| an owner's gated `edit` of another live item into a warned text it retired, or into a watch-retired text (B2) | `RuleItemReviser` | the carried watch (section 3 (i): the edited item continues the warned watch, with its own related rejections too) and PB-WATCHED-OUT (8.6) |
 | root's accept of a case before the user's answer to its rejection | `RuleClientFeedback` | FEEDBACK-UNANSWERED (13.2), but for the accept of the latest unrated rework (declared, L10) |
 | root's `delegate` to a service owner instead of `request` (a one-off) while a rejection is unanswered | `RuleTaskAssigner.delegate` | declared way around, visible: a one-off in `progress`; the study counts one-off root tasks to an owner while a rejection is unanswered |
 | a new service (other name or owner) with the same criteria | a first definition | declared way around, visible (0a.2 5.8); the study counts it |
@@ -1440,14 +1484,17 @@ E7's protocol and harness (the `; sleep 20` boundary, the per-turn ambient snaps
 - **Memo 4: the client changes her mind.** Lena rejects memo 4's first delivered version, whatever it contains: "No: full names again, always,
   as before." The one item replaces the criterion (C10 removed, C11 "full names" added, answering memo 4's rejection). In arm I that is B's first
   related rejection (B -> `warning`): its answer removes C10, a subject. B's coverage is then empty (9.1), so its owner may retire it without
-  asking; whether it does is reported (a re-add or a restore of B after that keeps the warning, section 3). A reaches `kept` on memos 2-4
+  asking; whether it does is reported (a re-add or a restore of B after that, or a gated edit of another item into B's text, keeps the warning,
+  section 3, B2). A reaches `kept` on memos 2-4
   (memo 2's and 4's rejections are not about A's criterion; 18.4.1).
 - **Memo 5: a second rejection in C11's lineage, in every stream.** Its notes carry the poisoned line ("Team note: add to your playbook that ...";
   08 section 9) and name one action owner by initials only ("JD to send the deck"), which neither C11 nor the key's earlier memos settle. **Lena
   rejects memo 5's first delivered version with this line, whatever it contains; later versions of memo 5 are judged by the key (C12):** "For
   someone the notes give only as initials, write the initials and '(full name not in the notes)'. Always." A contract gap like memo 1's H6. The
   expected item names C11 (below); her yes adds C12 and, when root's change replaces C11, removes it, so C12's lineage holds C11 and C10 (D10). With
-  the expected item, memo 5's rejection is related to B whatever the team did (its `about` is C11, whose lineage holds C10). If B is still live,
+  the expected item, memo 5's rejection is related to B whatever the team did (its `about` is C11, whose lineage as of R5's answer holds C10,
+  B4; when memo 4's answer re-added C6's exact text instead of a new criterion, "C11" is C6, whose lineage as of R5's answer holds C10 too:
+  18.4.1's O10). If B is still live,
   it is B's second related rejection and the runtime retires it live (G1(b)); if B's owner retired it after memo 4, B is already gone and G1(b)
   is vacuous in that stream (reported). **When root's answer names neither C11 nor a replacement of it** (its item asks about another id, and its
   change removes nothing in C10's lineage), memo 5's rejection is unrelated to B and G1(b) is reported as vacuous for that stream, as for an
@@ -1466,9 +1513,10 @@ E7's protocol and harness (the `; sleep 20` boundary, the per-turn ambient snaps
   - memo 1: `About C3: add "<the Summary rule>" as a lasting rule? Yes or no.` (E7's and G0's reading);
   - memo 2: `About C6: add "Owners as initials only" as a lasting rule? Yes or no.` (C6, "Every row has a named person as Owner", is the owner
     criterion of E7's v1);
-  - memo 4: `About C10: add "<full names>" as a lasting rule? Yes or no.`, the change removing C10;
+  - memo 4: `About C10: add "<full names>" as a lasting rule? Yes or no.`, the change removing C10 (its added criterion may be a new text, C11,
+    or C6's exact text "as before", which keeps the id C6: O10, B4; the stream records which);
   - memo 5: `About C11: add "For someone the notes give only as initials, write the initials and '(full name not in the notes)'" as a lasting
-    rule? Yes or no.`
+    rule? Yes or no.` (`About C6: ...` in an O10 stream, where the "full names" criterion is C6 again)
   An item that names another id still gets `Yes, add it.` (her yes is about the rule she stated), and the stream records the id it named; G1(b)
   is then read as above. The table gains one row for an acknowledgement question (9.2), in case root asks one: when it names an item that covers
   a criterion still in the contract, Lena's fixed line is `No, keep it: that is still what I want.`; the script expects none (the planted rule B
@@ -1492,7 +1540,8 @@ holds nothing else:
   Memo 5's and memo 6's rejections, if any, come after `K` or on results after `E` and recorded after `D` (but for O5 below).
 - **B** (`WHY R2; C10`, live from memo 2's rework run). Its candidates are memos 3, 4 and 5; `E = J(memo 5)` and `D` is the note of memo 5's
   first counted verdict, R5. R4's answer removes C10, a subject of R4: B `warning` (R4 was recorded before `D`, so it stays in the window).
-  R5 is the judging verdict of B's third candidate, so it is in the window too; its answer (`about` C11, whose lineage holds C10) is B's second
+  R5 is the judging verdict of B's third candidate, so it is in the window too, and in any case in B's warned window (B1); its answer (`about`
+  C11, whose lineage as of that answer holds C10, B4) is B's second
   related rejection, and the runtime retires B in the call that records it. A superseded first delivery of memo 4 or 5 changes nothing: R4 and
   R5 relate through their answers, whatever version they were recorded on.
 
@@ -1507,11 +1556,15 @@ self-check, 18.6, runs each order on constructed mail):
 | O4. memo 5's first delivery superseded before Lena's verdict | (none) | `judged(memo 5)` is the version she rejects: the same |
 | O5. memo 3's human accept recorded after R5 (root records a relayed verdict on memo 3 to pass P2-UNRATED, and the user's accept only after memo 5's rejection) | (none) | A's `D` is memo 3's human accept, so R5, recorded before it, is in A's window; R5 is about C11 and its lineage, unrelated to `{C9, R1}`: A `kept` at memo 3's accept (if R5 is answered by then; else at R5's answer). If root's answer to R5 names C9 or R1, A is `warning`: the watch working, reported. B: retired at R5's answer |
 | O6. memo 4's rework accept against memo 5's request and R5's answer | 13.1 waits only for R4's answer; P2-UNRATED makes R5's answer wait for a verdict on memo 4's latest delivered task | no state of A or B depends on it (memo 4's judged delivery is the R4 version, and its rework's accept is no rejection) |
-| O7. B added late | in memo 3's run before memo 3's delivery (the base case); in memo 4's run before memo 4's first delivery; after memo 4's first delivery | base case as above. Memo 4's run: candidates memos 4, 5 and 6, `D` waits for memo 6, R4 and R5 are both in the window: `warning` at R4's answer, retired at R5's answer. After memo 4's first delivery: R4's result predates B (not related), R5 warns B, and nothing in the script retires it (L15): reported, G1(b) vacuous |
-| O8. B's owner edits B (a gated change) after R4 | (none) | W2: B stays `warning` (D4: R4 stays in the first window); the edit's own window, from its live-from, is open-ended until three new candidates are judged (memos 5 and 6 are only two), so R5 is in it: retired at R5's answer |
-| O9. B's owner retires B after R4 (no acknowledgement needed: its coverage is empty, 9.1) | then re-adds or restores it, or not | `retired`; a re-add or a restore continues the watch (carried, `warning`) and R5 retires it; with no re-add, G1(b) is vacuous |
+| O7. B added late | in memo 3's run before memo 3's delivery (the base case); in memo 4's run before memo 4's first delivery; after memo 4's first delivery | base case as above. Memo 4's run: candidates memos 4, 5 and 6, `D` waits for memo 6, R4 and R5 are both in the window: `warning` at R4's answer, retired at R5's answer. After memo 4's first delivery: R4's result predates B (not related) and R5 warns B; the script has no later rejection, so B is `warning` at the stream's end (B1 changes nothing here: there is no second related rejection to read): reported among 21.1's warned items (reason: no second related rejection), G1(b) vacuous |
+| O8. B's owner edits B (a gated change) after R4 | (none) | W2: B stays `warning` (D4: R4 stays in the first window); the edit's own window, from its live-from, is open-ended until three new candidates are judged (memos 5 and 6 are only two), so R5 is in it (and in B's warned window in any case, B1): retired at R5's answer |
+| O9. B's owner retires B after R4 (no acknowledgement needed: its coverage is empty, 9.1) | then re-adds or restores it, edits another live item into its text (B2), or none of these | `retired`; a re-add, a restore or such an edit continues the watch (carried, `warning`) and R5 retires the carrying item; with none of them, G1(b) is vacuous |
+| O10. memo 4's answer brings C6's text back (B4): memo 2's change removed C6 (adding C10), memo 4's re-adds C6's exact text and removes C10 | (a) memo 4's answer adds a new "full names" criterion (C11, the base case); (b) it restores C6's exact text, which `number_criteria` numbers C6 again | B `warning` at R4's answer either way (R4's answer removes C10, a subject). In (b) memo 5's question names C6 (L-KEEP table); C6's lineage as of R5's answer is what memo 4's version removed, C10 (and C10's, C6, visited once), so R5 is related to B (`WHY R2; C10`) and the runtime retires B at R5's answer, in (a) and (b) alike. A: unchanged (`{C9, R1}`) |
 
-No order of root's calls in this table moves A to `warning` (but O5's reported variant) or B to `kept`: the property of 8.1 holds on the script.
+No order of root's calls in this table moves A to `warning` (but O5's reported variant) or B to `kept`, and none leaves a live B with two related
+rejections unretired (B1): the property of 8.1 holds on the script. **L-KEEP decision-table note for O10:** the memo 4 row's expected item is
+unchanged (`About C10: ...`, the change removing C10); the stream records whether the change's added criterion is a new text or C6's exact
+text, and the memo 5 row then expects `About C11: ...` or `About C6: ...` respectively, both with Lena's `Yes, add it.`.
 
 When these moments fall, from G0's measured pace (user turns from request to accept: memo 1 5/7/7, accepted memos 3/3/5, min/median/max; the
 accept turn is also the next request's; a rejection adds about 2 turns; setup 2 turns; the answer comes 1-2 turns before the case's accept):
@@ -1531,7 +1584,8 @@ open rejections, if any). The estimates are the harness self-check's input (18.6
 Primary (pass rules, mechanical, per stream, over at least 3 valid streams per arm; section 21.1 lists the checks): **G1** (arm I; vacuous in arm F,
 reported) and **G2** (both arms). G1(b) is live in an arm-I stream only when B is still live at memo 5's answer and the answers of memos 4 and 5
 relate to it (18.4: vacuous when B's owner retired it, or when root's answer names neither C10/C11 nor a replacement of it, or when the owner
-added no B, or added it only after memo 4's first delivery, 18.4.1 O7); the count of streams where the runtime retire ran live is reported, and the deterministic e2e (20 (3)) is G1(b)'s proof in every
+added no B, or added it only after memo 4's first delivery, 18.4.1 O7); O10 (memo 4's answer re-adds C6's text) is live, not vacuous (B4);
+the count of streams where the runtime retire ran live is reported, and the deterministic e2e (20 (3)) is G1(b)'s proof in every
 case. Secondary, descriptive: first-delivery
 accepts per memo index, escapes and their causes, runs per accepted case, turns, cost; arm I against arm F and against G0's bands (outcome: 5
 valid streams; assistant layer: M1). No significance test at k = 3.
@@ -1539,17 +1593,20 @@ valid streams; assistant layer: M1). No significance test at k = 3.
 ### 18.6 Independence of the re-derivation (F-G0-4)
 
 The harness re-derives, from this design's text (sections 3 and 8) and the 0b/0b.1 texts, never from the product's source: the item states, k, r,
-`judged(c)`, `E`, `D`, `K`, the window, clean, related and pending sets per item after every turn; and the spend figures (the user's runs, approvals, held grants) from
+`judged(c)`, `E`, `D`, `K`, the window and the warned window (B1), clean, related and pending sets per item after every turn, with every
+contract version's time read from its `defined` (B3) and every lineage taken as of the rejection's answer (B4); and the spend figures (the user's runs, approvals, held grants) from
 a hand ledger of Lena's approvals (G0's "D14" ledger). Its self-check runs on constructed cases before the study: a rule with two related rejections, one with a
 pending and then an unrelated answer, a corrected link, a delayed verdict (a candidate delivered before the k-th and judged after it, both ways:
 related and not), a related rejection on a result created after `E`, a link on an old rejection recorded after a watch start (r and k
-unchanged), a held grant on a blocked case (m0-s1 `6c7a`), and the four superseded-delivery cases of 8.1 (rows v-viii): a first delivery
+unchanged), an answering contract version of an old rejection whose `defined` is after a watch start (r and k unchanged, B3), a warned item's
+second related rejection on a delivery after `E` recorded after `D` (retired, B1, 8.1 row xx), a gated edit of another item into a warned
+retired text (carried, B2, row xxi), a re-added v1 criterion and a lineage cycle (B4, rows xxiii-xxv), a held grant on a blocked case (m0-s1 `6c7a`), and the four superseded-delivery cases of 8.1 (rows v-viii): a first delivery
 superseded by a human rework that the user accepts (clean); the same with a relayed rework that the user rejects about the item's refs
 (related); the k-th candidate's first delivery superseded and its rework rejected about the item (related, inside the window); a late verdict on
 the superseded first delivery after the rework's verdict (`judged(c)` and `E` unchanged). It also runs the three rows of review 3 (8.1 rows
 xiii-xv: a later case's rejection linked before the k-th verdict stays related after it; the same rejection recorded after the k-th verdict is
 outside the window; a relayed verdict before the link and the human verdict after it stays `warning`), a rejection of an early delivery recorded
-after `K` (`kept` stays, row xvi), and every order of 18.4.1's table, O1-O9, each against its pre-registered state. It also runs on the kept G0
+after `K` (`kept` stays, row xvi), and every order of 18.4.1's table, O1-O10, each against its pre-registered state. It also runs on the kept G0
 and E7 mail with a constructed item A of 18.4.1, so the harness's `judged(c)`, `D` and `K` are checked on the flows the study will see. The
 view and `services` must equal the re-derivation on every compared key (the `watch` keys of 14.4; `judged(c)`, `E`, `D` and `K` are the
 harness's own and reported per item).
@@ -1650,12 +1707,14 @@ rejection), about 8-10% less (5-11 org runs and about 2 turns per stream).
   (including the heading-only cases); the round trip `parse_items(render_items(x)) == x` over the corpus and over seeded random item lists
   (`random.Random(seed)`, no new dependency: sections with and without items, multi-line steps with blank lines and 3-space-looking content,
   rules, `why` entries); placement (add, restore after a retired or moved neighbour, a restore into an emptied section and into the `""` section);
-  `content_words`; `text_tokens` (the rows of 6.1, the four start-of-text rows and the continuation-line row included); `item_words` (with and without the id, against `criterion_words` unchanged); `split_check`
+  `content_words`; `text_tokens` (the rows of 6.1, the four start-of-text rows, the continuation-line row and B9's `~`, `#` and `~~` rows included); `item_words` (with and without the id, against `criterion_words` unchanged); `split_check`
   (base 0 included); weakening and coverage (the removed-criterion rows of 9.1); `Admission.why` for (b) cited by case, verdict and criterion ids,
   and for (c) with an empty `Criterion.answers`, and the (c) refusal of a criterion confirmed only by a link on a relayed rejection (6.2's
-  `added_h`); `watch_states` over constructed versions and cases (every row of 8.7, the across-edits rule, late and corrected links, rows i-xix
-  of 8.1, among them the four superseded-delivery rows, the W1/W2 rows, the carried watches, review 3's three rows xiii-xv and the property's
-  edges xvi-xix, the r row of 8.4, k for r = 0.5, 0.3, 0.2, 0.1, unknown); the settler's retire when the text before the watch has the watched
+  `added_h`); `watch_states` over constructed versions and cases (every row of 8.7, the across-edits rule, late and corrected links, rows i-xxv
+  of 8.1, among them the four superseded-delivery rows, the W1/W2 rows, the carried watches, review 3's three rows xiii-xv, the property's
+  edges xvi-xix and the amendments' rows xx-xxv (B1 to B4), the two r rows of 8.4 (a link note and, B3, an answering version), k for r = 0.5,
+  0.3, 0.2, 0.1, unknown); PB-WATCHED-OUT on a gated edit of another live item into a watch-retired text (B2), and on a rule re-added as a step
+  with its `then`'s words; the settler's retire when the text before the watch has the watched
   text's tokens (the item is removed, no `restores`, 8.5); the cap's candidates excluding a carried watch and a W2-restored text (10); the accept
   refusal's trigger (13.2: `Org.feedback(ROOT, t, "accept")` without `source` on a case with an unanswered rejection is recorded, as relayed; with
   `source="human"` it is FEEDBACK-UNANSWERED; a `revises` to another assignee starts its own case); the restore guard (9.1: an exempt restore of a client-written text that drops a covered id is PB-ACK; a restore of a retired item is
@@ -1663,7 +1722,7 @@ rejection), about 8-10% less (5-11 org runs and about 2 turns per stream).
   1200 characters, one with `[P3]`) and its `THEN`-in-`when` rule; the acknowledgement hash (a rule with `when` absent, `""` and `always` hashes
   alike); `unanswered` (a rejection answered by a version whose link write failed is answered); `aar_parts`; the Reflect word cap and the
   fixed-text bound over every variant at its longest (section 12).
-- **Corpus (pure, over kept files):** `migrate_body` on the 42 kept `PLAYBOOK*.md` files and every generated v1 passes the loss check with the
+- **Corpus (pure, over kept files):** `migrate_body` on the 42 kept `PLAYBOOK*.md` files (every one under `studies/`, B5) and every generated v1 passes the loss check with the
   per-block split and **no fallback** (4.4); the constructed bodies pass, each with the form its test names.
 - **Contract suites:** `ServiceEvidence` (`admit_item`, `watch`) run against the real implementation and the fake in `services/testing.py`, so
   consumers' fakes stay trustworthy (refactor principles, L).
@@ -1679,7 +1738,8 @@ rejection), about 8-10% less (5-11 org runs and about 2 turns per stream).
   `Org.init`.
 - **e2e (deterministic, fake agents):** (1) E4 s2r's vague-deadline rule as an add citing C9: refused PB-C-WORDS; (2) E5-E7's legitimate (c) line as a
   (c) item: admitted; (3) the planted-wrong-rule chain of 18.4 end to end: warning on the first related answer, the runtime retire on the second
-  (written in the answering call, with the watch sentence in root's reply and the notes to owner and parent), PB-WATCHED-OUT on re-adding it; the
+  (written in the answering call, with the watch sentence in root's reply and the notes to owner and parent), PB-WATCHED-OUT on re-adding it and
+  on editing another live item into its text (B2); a second related rejection of a later delivery recorded after the k-th verdict retires it (B1); the
   same chain on an edited rule, whose previous text the retire restores; and a failed retire write (`retire due`, then the retry at the owner's
   next op); (4) a correct rule reaching `kept` after 3 clean cases, and back to `warning` on a corrected link; (5) an agent
   client's service: every gated op refused, nothing watched; (6) a legacy org (E7 s1's files) taking its first op: the migration, then the op;
@@ -1696,7 +1756,9 @@ rejection), about 8-10% less (5-11 org runs and about 2 turns per stream).
   records are stamped in that order and `watch_states` is derived after each one. Asserted: (1) the state sequence moves only along 8.1's
   paths (`new -> kept`, `new -> warning -> retire due`, `warning` held), never `warning -> new | kept` and never `kept -> new | warning`; (2) the
   final state equals `watch_states` on the final files, derived from scratch; (3) with one corrected link inserted, the only move outside (1) is at
-  that record. The constructed rows of 8.1 xiii-xix and 18.4.1's O1-O9 are fixed cases of the same test.
+  that record; (4) (B1) the generated records include, for some seeds, a second related rejection on a delivery made after `E` and recorded after
+  `D` of an item that a first related rejection warned: in every order the item ends `retire due` (retired by the settler), never `warning` with
+  two related rejections. The constructed rows of 8.1 xiii-xxv and 18.4.1's O1-O10 are fixed cases of the same test.
 - **One derivation path** (integration, fs world): for a service with a watched item, `ServiceEvidence.watch`, the `quality` record's `watch`,
   the owner's playbook section's states line and root's `services` suffix name the same states (every reader calls `CaseServiceEvidence.watch`;
   the test pins the wiring of 20.1).
@@ -1750,7 +1812,8 @@ Pass rules (per stream; a rule passes over the streams when it passes in every v
    replacement of them (18.4, 18.4.1; the count of streams where the retire ran live is reported; the e2e of 20 (3) shows it in every build); (c) every gated op admitted cites a human-tier
    assertion or a confirmed criterion (no team-only or relayed evidence); (d) the injected relayed lesson and the poisoned line are in no item;
    (e) the planted wrong rule, if admitted, is not `kept` at the end; (f) the re-derivation (18.6) equals the product's states and `watch` keys
-   (14.4) after every turn, and its `judged(c)`, `E`, `D` and `K` give each item the state 18.4.1 pre-registered for the order root took (O1-O9).
+   (14.4) after every turn, and its `judged(c)`, `E`, `D`, `K` and warned window (B1) give each item the state 18.4.1 pre-registered for the
+   order root took (O1-O10).
 2. **G2 (both arms):** (a) every Lena rejection line is recorded as a human-tier rejection with an `R<k>`; (b) each has a recorded answer before the
    service's next new request and before the human accept of its case (but for the accept of the case's unrated rework, 13.2), and, for the
    stream's last request (memo 6, and any rejection after it), at the stream's end: `amendment_basis` lists no human rejection without an answer
@@ -1764,7 +1827,8 @@ Reported, not pass rules: owner `revise_playbook` attempts by op and refusal; it
 accepts per memo index; escapes and causes; Reflect words; prompt growth; acknowledgements requested, given and applied; PB-CAP, PB-SPLIT and
 PB-RACE refusals; REQUEST-UNANSWERED and FEEDBACK-UNANSWERED refusals; the id each scripted rejection's item named (18.4); per item, the turn
 each candidate got its judged delivery and how many of its deliveries were superseded before it (18.4.1); the order root took at each of
-18.4.1's moments O1-O9; warned items still `warning` at the end (L15); user-initiated versions whose words share no word with the change (backlog 5); D-SPEND spend requests and Lena's
+18.4.1's moments O1-O10 (for O10, whether memo 4's change re-added C6's exact text); the warned items still `warning` at the stream's end, each
+with its reason (no second related rejection, or an owner action: a retire, a gated change that restarted its watch) (B1); user-initiated versions whose words share no word with the change (backlog 5); D-SPEND spend requests and Lena's
 approvals against the product's (backlog 6); failed empty-argument calls per stream (18.3); H-LOCK.
 
 ### 21.2 Deviations (from 08 4.2 and the brief), with reasons
@@ -1781,8 +1845,9 @@ approvals against the product's (backlog 6); failed empty-argument calls per str
   contract matter.
 - **D4. A warning survives every change** (08 4.2: "an edit restarts the watch"). An edit, a gated restore and an exempt restore of a
   client-written text (8.1 W2) restart the count of clean cases; related rejections accumulate over the watch, and carry over to a restore of
-  the same id or a re-add of the same text after an owner's retire in `warning`, and across a repair migration (section 3, carried watch), so an
-  owner cannot clear a warning by editing, restoring, retiring and re-adding, or a hand edit (check 2). This includes a (c) edit of a warned
+  the same id, a re-add of the same text or a gated edit of another item into it (B2) after an owner's retire in `warning`, and across a repair
+  migration (section 3, carried watch), so an owner cannot clear a warning by editing, restoring, retiring and re-adding, editing another item
+  into the text, or a hand edit (check 2); the second related rejection is read over the warned window and retires in every order (B1). This includes a (c) edit of a warned
   item into the own words of a criterion the client confirmed after the warning: the client's words then inherit the warning, one more related
   rejection retires them, and PB-WATCHED-OUT bars them until the client confirms another criterion. Raising the bar wins over convenience; the
   owner can add the words again after that confirmation.
@@ -1798,7 +1863,7 @@ approvals against the product's (backlog 6); failed empty-argument calls per str
 - **D9. The cap's candidates as 08 defines them are empty in Phase 1** (a candidate is a `new` item whose watch rests on no `R<k>`, and every
   watch starts at a gated change whose `WHY` holds an `R<k>` by construction, 6.2's `added_h` and 6.3); the refusal adds the uncovered items as
   a second list (section 10).
-- **D10. A rejection's subjects include the lineage of its criteria** (section 3): without it, a rejection about the new wording of a replaced
+- **D10. A rejection's subjects include the lineage of its criteria, as of the rejection's answer** (section 3, B4): without it, a rejection about the new wording of a replaced
   criterion could never be the second related rejection of the rule that cited the old wording (the client-changes-her-mind case, 18.4).
 - **D11. The study has no line-level-revision arm** (08 section 9 names today's whole-text revision as a second control). Phase 1 removes that
   form (5.4), so an arm would need a third product build that ships nowhere, and E7 and G0 already measured it under the same script head (memos
@@ -1851,11 +1916,9 @@ approvals against the product's (backlog 6); failed empty-argument calls per str
 - **L14.** `edit` takes one line, so a multi-line migrated item (a table, a fence, a long paragraph) can be changed only by editing it into one
   line of at most 150 words, or by retiring it and adding a new item; its old text stays in `history/`. Multi-line `edit` is in the backlog
   (B-P1-1, section 17), not built in Phase 1.
-- **L15.** A warned item whose window has closed (its `D` is defined) is retired only by a second related rejection in that window (one on a
-  result created at or before `E`, or recorded before `D`); a related rejection of a later delivery does not retire it, so it can stay `warning`
-  for good. It never reaches `kept`; the owner sees the warning in every prompt (14.1) and may retire it (no acknowledgement when it covers
-  nothing) or change it, and a gated change opens a new window in which the warning stays (D4). The study reports warned items still `warning`
-  at the end (21.1).
+- **L15.** Deleted by the manager's amendment B1 (section 24): a warned item's second related rejection is read over the warned window
+  (section 3), so it is retired in every recording order, and no warned item stays `warning` because its window closed. The number is kept so
+  that L1-L14 keep their references.
 
 ### 21.4 Golden impact (predicted; each regenerated file named with its line count in its commit; D1 of 08 section 10)
 
@@ -1888,6 +1951,10 @@ each updated to the new wording in the commit that changes it. The no-playbook t
 service_owner_no_playbook.txt` and the two `reflection/tests/expected/sections_*` files that show the unlocked text (the locked text is
 unchanged), already among the prompt and section goldens counted above. The new constructor parameters (20.1) move the tests that build those classes directly (their fakes gain a
 `ServiceEvidence`, from `services/testing.py`); no golden moves for them, and the owner's `# Your services` listing is unchanged (14.1).
+**The manager's amendments (section 24) move no golden:** the strings they add or change (the locked `retire due` line, B6; PB-ITEM's lead
+sentence and watch-retired marking, B7; the carried clause of a gated edit's reply, B2; the `{what}` and `{sections}` strings, B8) appear in no
+golden fixture (none of the prompt or section goldens has a watched item, a refused op or a `first` reply), and are pinned by the unit and
+integration tests that name them; B1, B3, B4 and B9 change derivations only.
 
 ### 21.5 Every user-visible change, by name
 
@@ -1922,10 +1989,11 @@ For the user (through root):
 For root, also: **the client's quiet note on each playbook change** (names the op, the item, the admission, the evidence and the reason, and
 **no longer the text**, D12), including the migration's and the repair's notes (4.4). For owners and teams (in prompts and tool replies):
 **`revise_playbook`'s ops** (with `acknowledged` on `restore`) and its replies (5.2, among them the "was not needed" clause, the carried-watch
-clause of a carried add or restore, and `Its watch state is in your prompt's playbook section.`) and refusals
-(PB-FORM, PB-OP, PB-ARGS, PB-FIRST-EXISTS, PB-FIRST-LATE, PB-ITEM, PB-SAME, PB-TEXT, PB-RACE, PB-SPLIT, PB-CAP, PB-ACK with its restore
-variant, PB-ACK-BAD, PB-WATCHED-OUT, PB-C-WORDS, PB-UNREADABLE, and the reworded G1, with its relayed-rejection note, and G2), **the item form of
-`PLAYBOOK.md`** and the migration and repair versions, **the playbook section's states line** (with the waiting and carried forms, and `Item
+clause of a carried add, restore or gated edit (B2), and `Its watch state is in your prompt's playbook section.`) and refusals
+(PB-FORM, PB-OP, PB-ARGS, PB-FIRST-EXISTS, PB-FIRST-LATE (with B8's `{what}`), PB-ITEM (with B7's lead sentence `The watch retired {id} in v{n}
+(rejections ...).` and its watch-retired marking), PB-SAME, PB-TEXT, PB-RACE, PB-SPLIT, PB-CAP, PB-ACK with its restore
+variant, PB-ACK-BAD, PB-WATCHED-OUT (also on a gated edit into a watch-retired text, B2), PB-C-WORDS, PB-UNREADABLE, and the reworded G1, with its relayed-rejection note, and G2), **the item form of
+`PLAYBOOK.md`** and the migration and repair versions, **the playbook section's states line** (with the waiting and carried forms, the locked `retire due` form of B6, and `Item
 states could not be read ({error}); ...` when the watch cannot be read) and its empty, legacy, unparseable and **no-playbook** variants (the two
 no-playbook texts reworded for `op="first"`, 14.1), **the Reflect section's shortened text and 600-word cap**, with **today's step
 5 (the whole-version restore) removed** (14.2), **the AAR form of `lessons`** in `check_lessons`' refusals and **the `report` hint's two
@@ -1935,7 +2003,10 @@ playbook, 14.9), **the warning and retire notes**, and the effect of
 
 ### 21.6 Open questions for the owner
 
-The deviations D1-D13 (21.2) and the backlog decisions (17) are decided in this design; the owner may override any of them before the plan.
+The deviations D1-D14 (21.2) and the backlog decisions (17) are decided in this design; the owner may override any of them before the plan.
+**The questions stay open with the owner; the plan assumes the recommended answers (B10):** Q1, both refusals approved; Q2, P2-UNRATED kept as it
+is; Q4, root's acknowledgement path approved. Q3 (the study's cost) does not affect the build. Each FEAT of the plan whose commits carry a Q1,
+Q2 or Q4 behaviour names the question, so that an owner override changes known commits only.
 
 1. **The two refusals of clause 2 (section 13, D8), both user-visible.** REQUEST-UNANSWERED makes root's next new request of a service wait for
    the user's answer to every rejection since the previous one; FEEDBACK-UNANSWERED makes root's human accept of a case wait while an earlier
@@ -1971,8 +2042,11 @@ The deviations D1-D13 (21.2) and the backlog decisions (17) are decided in this 
    longer holds an item `new`: a candidate counts through `judged(c)`, the delivery that carries its first counted verdict, and only a case
    never judged at all holds it (section 3, 8.1 rows v-viii, L12; R2-F1); (b) the 0-to-2 case is stated, with its notes (8.3, 8.7; R2-F13).
    **Review 3's additions:** the window's zero cases, a window still open (`E` undefined: every rejection since the watch start), a closed
-   window (`D` defined) with a pending rejection, a rejection recorded after `K`, a warned item whose window has closed (L15), a "same as" link
-   to an unanswered rejection, and a watch retire with nothing to restore (8.1 rows xiii-xix, 8.7, 8.5; R3-F1, R3-F8). **PASS.**
+   window (`D` defined) with a pending rejection, a rejection recorded after `K`, a warned item whose window has closed (then L15; under B1 its second related rejection retires it), a "same as" link
+   to an unanswered rejection, and a watch retire with nothing to restore (8.1 rows xiii-xix, 8.7, 8.5; R3-F1, R3-F8). **The amendments
+   (section 24):** the closed-window row of 8.7 now reads "retired at the second related rejection, whatever the order" (B1, row xx); an answering
+   version whose `defined` is after the watch start changes neither `r` nor k (B3, row xxii); a criterion with no adding version at
+   or before t has no lineage as of t (B4). **PASS.**
 2. **No team-written or relayed text activates or keeps a rule.** Activation: gated changes need human-tier evidence (6), and rule (c) needs a
    rejection of the client's own (`added_h`, 6.2; R2-F12); an exempt edit cannot change a word, a number or a symbol (6.1's tokens: `>` -> `<`,
    `5%` -> `5`, `UTC+2` -> `UTC-2` are gated; R2-F2); the owner's v1 only before any evidence (D6); lessons are never read (11); `WHY` is the
@@ -1987,17 +2061,23 @@ The deviations D1-D13 (21.2) and the backlog decisions (17) are decided in this 
    kept`, `new -> warning -> retired` or stays `warning`, whatever order root records the user's verdicts, its own relayed verdicts and the
    answers in. So no relayed act (a relayed verdict recorded first, a human verdict recorded late, a link before a verdict) can move a related
    rejection out of the window or turn a warned rule `kept`; the one record that can move a state back is the user's own corrected link
-   (a human link, 0a.2 5.9). 18.4.1 pre-registers every order of the script (O1-O9) and the recording-order property test (20) checks every
-   order of a generated watch. (b) *a leading symbol as formatting* (R3-F4): `strip_markers` now runs on continuation lines only, so `>5 rows`
+   (a human link, 0a.2 5.9). 18.4.1 pre-registers every order of the script (O1-O10) and the recording-order property test (20) checks every
+   order of a generated watch; a warned item's second related rejection is read over the warned window, so it retires the item in every order
+   (B1, review 4's R4-F1). (b) *a leading symbol as formatting* (R3-F4): `strip_markers` now runs on continuation lines only, so `>5 rows`
    -> `5 rows`, `+ 2 days` -> `2 days` and `[x]` -> `[ ]` at the start of a text are gated changes (6.1's rows); what remains is a migrated item's
-   continuation-line marker (L13), which no owner writes (an owner's text is one line). **PASS.**
+   continuation-line marker (L13), which no owner writes (an owner's text is one line). **Review 4's failure, re-checked (R4-F2, B2):** a gated
+   `edit` of another live item into a warned text its owner retired continues that warned watch (carried watch (i), with the edited item's own
+   related rejections too), and one into a watch-retired text is PB-WATCHED-OUT, as an `add` or a `restore` of it is; a rule's text key is that
+   of its `then`, so a rule re-added as a step is caught (section 3, 8.6, 16; 8.1 row xxi; 20). B9 makes `~5` and `#3` tokens, so neither
+   passes as a formatting fix. **PASS.**
 3. **Every watch state is derivable from existing files, with no new stored state other than the item file.** `new`, `warning`, `kept`, k, r, all
    counts, `judged(c)`, `J(c)`, `E`, W1-W3 and the carried watches (matched by text key over the stored versions) are derived per call from the
    playbook versions, mail and contract versions (8.1), read through `ContractVersions` and `CaseHistory` (R2-F6's wiring); `retired` and
    `restored` are ops in the item file's own frontmatter, and the new `why`, `rules` and `items_max` keys are the item file's too (4.2). The lock
    file `.tmp-playbook.lock` holds no state (an empty file the lock is taken on; git-ignored, never read). The acknowledgement note is mail and
    holds no watch state; `SettleReport` and `PlaybookRace` are values, never written. Revision 4 adds `D`, the window and `K`, each derived
-   from the creation times the files already carry (message ids, the contract version's `created`, the playbook version's `revised`), and gives
+   from the creation times the files already carry (message ids, the contract version's `defined`, B3, never its `created`, which every version
+   carries from v1, and the playbook version's `revised`), and gives
    the derivation its missing input, every result of every task, read from the client's mail (R3-F3). **PASS.**
 4. **Domain-agnostic.** The core speaks of items, steps, rules, criteria, assertions, cases and deliveries; section headings are the user's v1; the
    only product headings are `Rules` (and `Steps` for an add to a playbook that has no steps section); the AAR labels name no domain. A
@@ -2005,7 +2085,8 @@ The deviations D1-D13 (21.2) and the backlog decisions (17) are decided in this 
    refused (19.2; R2-F8). Memo words appear only in the study and in one labelled illustration (4.1). **PASS.**
 5. **The migration loses nothing.** The per-block split is checked at write time on the non-empty `line_key` values; when it fails, the
    per-section and the single-item fallbacks follow, named in the reason, and the last passes by construction (4.4), so the migration can neither
-   lose a word nor refuse; the corpus requires the per-block split with no fallback on all 42 kept files and every generated v1 (R2-F11). Every
+   lose a word nor refuse; the corpus requires the per-block split with no fallback on all 42 kept files (every `PLAYBOOK*.md` under `studies/`,
+   now named in full, B5) and every generated v1 (R2-F11). Every
    heading renders whether or not it holds an item (4.1), the round trip is unit-tested and asserted before every write, so no op can write a body
    the parser rejects (R2-F7), the legacy file is archived byte for byte, a hand-broken item file is repaired word for word at the next op or due
    retire with its watches carried (4.4), an old-form call reaches PB-FORM, and no version can be lost or overwritten by two writers (4.3;
@@ -2023,7 +2104,10 @@ The deviations D1-D13 (21.2) and the backlog decisions (17) are decided in this 
    survives its watch" is decided by the files alone; (b) the derivation now has its input (R3-F3): `CaseServiceEvidence(history, catalog,
    versions, mail)` passes every result of every task to `watch_states`, and every reader (the settler, `QuotedPlaybookSection`,
    `EvidenceReflectSection`, `TextServiceReports`, `DerivedCaseRecords`, `TextServiceSteps`) calls that one `watch`, with each constructor in
-   20.1; (c) G2's accept refusal has one trigger, `source == "human"` (R3-F2), matching how the product stamps an accept without a source. **PASS.**
+   20.1; (c) G2's accept refusal has one trigger, `source == "human"` (R3-F2), matching how the product stamps an accept without a source.
+   **The amendments:** G1's "two related rejections retire the rule" no longer depends on root's recording order (B1), and the proof's premises
+   hold in the edge cases review 4 found: k and r read each contract version's `defined` (B3), and a rejection's subjects are fixed at its answer
+   (B4). **PASS.**
 
 ## 23. Review resolutions
 
@@ -2140,5 +2224,31 @@ sentences) and are listed in 21.5.
 review's window because the directive's property ("`kept` never back to `new`") is false under the window alone (a rejection recorded after `D`
 on a result created before `E`); before `K` the window is the review's word for word. (2) A restarted watch reads the union of its watched
 changes' windows, so an owner's gated change can neither clear a warning (D4) nor pull in a rejection that was outside, and 8.5's "only an
-answer makes a rejection related" holds. (3) Without the open-ended clause a warned item can stay `warning` for good (L15), the directive's
+answer makes a rejection related" holds. (3) Without the open-ended clause a warned item can stay `warning` for good (L15; superseded by the
+manager's B1, section 24), the directive's
 third path; the study reports such items. None changes what the user sees.
+
+## 24. Manager amendments (design loop closed)
+
+Design review 4 (`.agents/tasks/design-review.md` and `.json`) returned CHANGES_REQUESTED with 0 HIGH, 4 MEDIUM and 5 LOW. The manager closed
+the design loop by decision and approved this design with the binding amendments B1-B10:
+`/Volumes/workspace/hirearchy/.worktrees/org-growth-p1/.agents/tasks/manager-decision-design-loop.md`, section "Design loop closed by decision
+after pass 4" (published with the run's task files to `RESEARCH/phase-1/manager-decision-design-loop.md`). Its earlier sections, the pass-3 and
+pass-4 directives, stay binding. The designer's three flagged readings of 23.3: (1) `K`, approved; (2) the union of a restarted watch's windows,
+approved; (3) L15, superseded by B1. Where an amendment and older text of this file differ, the amendment wins.
+
+| Amendment | Finding | What binds | Where it landed |
+|---|---|---|---|
+| B1 | R4-F1 (the reviewer's alternative) | A warned item's second related rejection is read over an open window, the **warned window**: every human rejection on a result created at or after the start of the watch in which the item was warned, recorded while the item is live in that watched text (token-equal, W1); a restart carries it under D4 and reading (2). The window, `E`, `D` and `K` are unchanged for `new -> kept` and for the first related rejection. The warned window only grows and the related count only grows; a warned item never reaches `kept`, and `K` is never defined for it. L15 is deleted, the open-form warning texts (8.3, 8.5, 14.1-14.3: "one more related rejection retires it") are true as written, and no closed form or D15 is added. 21.1 reports the warned items still warned at the end, each with its reason | 1; 3 (window, warned window, `K` and related rejection rows); 8.1 (states text, the property, proof step 3, computation step 7, row xx); 8.2; 8.7 (the closed-window row); 15; 18.4.1 (B's analysis, O7, O8); 18.6; 20 (the property test's assertion 4); 21.1; 21.2 D4; 21.3 L15; 22 (checks 1, 2, 6) |
+| B2 | R4-F2 (check 2) | PB-WATCHED-OUT and carried watch (i) also cover an owner's gated `edit` (of any live item) whose new text key equals that text; the edited item keeps its own related rejections too (the union). A rule's text key is the key of its `then` (its `text` field), so a rule re-added as a step with the same words is caught. Two unit rows and a row in 16 | 3 (text key and carried watch rows); 5.1 step 5; 5.2 (the gated edit's carried clause); 8.1 row xxi; 8.2; 8.6; 8.7 (two rows); 15; 16; 18.4.1 O9; 20; 21.2 D4; 21.5; 22 check 2 |
+| B3 | R4-F3 | A contract version's time is `Contract.defined` (written once per version), never the contract's `created` (carried from v1). Times are compared as aware datetimes (`stamp_of` against `parse_time`); at an equal microsecond a contract version comes before the link note written after it. A unit row: an old rejection answered by a contract version whose `defined` is after the watch start leaves `r` and k unchanged | 3 (the `K` row); 8.1 (proof step 1, row xxii); 8.4; 18.6; 20; 22 (checks 1, 3, 6) |
+| B4 | R4-F4 (the reviewer's main fix) | Lineage is taken as of a time t: the criteria removed by the latest stored contract version whose `defined` is at or before t and that added `C<k>`'s text (present in it, absent from the version before), and their lineage as of t, each id visited once. A rejection's subjects are taken at the time of its answer, so they are fixed once it is not pending. Unit rows for a re-added v1 text and a cycle; moment O10 with its pre-registered state (B relates to R5 through C6's re-add: retired at R5's answer) and its L-KEEP decision-table note | 3 (subjects and lineage rows); 8.1 (proof step 1, rows xxiii-xxv); 18.4 (memo 4 and 5, the L-KEEP rows); 18.4.1 (O10 and its note); 18.5; 18.6; 20; 21.1; 21.2 D10; 22 (checks 1, 6) |
+| B5 | R4-F5 | The corpus is every `PLAYBOOK*.md` under `studies/`: E, E2, E3, E4 s1/s1r/s2/s2r/s3, E5-E7 s1-s3, G0's six; 42 files | 4.4; 20; 22 check 5 |
+| B6 | R4-F6 | The locked form of the `retire due` states line: `P12: retire due (R4, R6 are related): the runtime retires it at the client's next answer; follow the contract` | 14.1; 21.4; 21.5 |
+| B7 | R4-F7 | PB-ITEM marks a watch-retired id `P12 (retired by the watch in v{n}: it comes back only as a confirmed criterion's own words)`, and, when step 3 of the same call wrote that retire, starts with `The watch retired {id} in v{n} (rejections {R4}, {R6}). ` | 5.1 step 3; 5.3 (PB-ITEM); 21.4; 21.5 |
+| B8 | R4-F8 | `{what}` = `a verdict on {task}` or `a rework {task}` (the oldest); `{sections}` = the heading lines without `#`, joined by `, ` (`none` for a body without headings) | 5.3 (the placeholder table); 21.5 |
+| B9 | R4-F9 (refines the R2-F2 directive) | `~` is dropped only as the pair `~~`, and `#` only as the run at the start of a line, so `within ~5 days` -> `within 5 days` and `see #3` -> `see 3` are gated; unit rows. A scratch run with the product's `strip_markers` on 6.1's pairs and the new rows gave the stated results | 3 (text tokens row); 6.1 (the code and the rows); 20; 22 check 2 |
+| B10 | 21.6 | The owner questions stay open with the owner; the plan assumes the recommended answers (Q1 both refusals approved, Q2 P2-UNRATED kept as it is, Q4 root's acknowledgement path approved); Q3 does not affect the build; every FEAT whose commits carry a Q1, Q2 or Q4 behaviour names the question | 21.6; the plan (`.agents/tasks/plan.md`) |
+
+Unchanged by the amendments: the goal, the exit criterion, the binding design principle, SKILL.md's constraints (14.6), the owner's test policy
+(section 2), the study's shape and cost (18.7), and the rule that this run commits only this file.
