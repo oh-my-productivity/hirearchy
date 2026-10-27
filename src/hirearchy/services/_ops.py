@@ -14,7 +14,10 @@ from ..agents import AgentDirectory
 from ..delivery import MessageDelivery
 from ..kernel import NAME_RE, ROOT, OrgError, clip_line, parent, split_frontmatter
 from ..mail import MailboxReader
-from ._items import RULES_HEADING, RUNTIME_MIGRATION, PlacementError, canonical_why, checked_body, item_extra, migrate_body, place_add, place_restore
+from ._items import (
+    RULES_HEADING, RUNTIME_MIGRATION, SPLITTERS, PlacementError, Splitter, canonical_why, checked_body, item_extra, migrate_body, place_add, place_restore,
+    renumbered,
+)
 from ._protocols import PlaybookRevisions, PlaybookTexts, PlaybookWriter
 from .api import (
     REASON_MAX, Admission, Contract, Criterion, ItemWatch, PlaybookChange, PlaybookItem, PlaybookRace, PlaybookSection, ServiceCatalog, ServiceEvidence,
@@ -235,7 +238,8 @@ class _Book:
     sections: tuple[PlaybookSection, ...]
     items_max: int
     migrated: int | None = None
-    note: str = ""
+    note: str = ""  # what follows "Playbook v{n} is " in the note of an op that was written after a migration
+    alone: str = ""  # the note of a migration whose op was then refused
     reply: str = ""
 
 
@@ -296,8 +300,9 @@ class RuleItemReviser(PlaybookRevisions):
 
     def __init__(
         self, agents: AgentDirectory, catalog: ServiceCatalog, texts: PlaybookTexts, playbooks: PlaybookWriter, delivery: MessageDelivery,
-        evidence: ServiceEvidence, mail: MailboxReader,
+        evidence: ServiceEvidence, mail: MailboxReader, *, splitters: Sequence[Splitter] = SPLITTERS,
     ) -> None:
+        self._splitters = splitters
         self._agents = agents
         self._catalog = catalog
         self._texts = texts
@@ -342,8 +347,7 @@ class RuleItemReviser(PlaybookRevisions):
             return self._change(call, book)
         except OrgError:
             if book.migrated is not None:  # the migration stays written: the client is told of it on its own
-                said = book.note[0].upper() + book.note[1:]
-                self._delivery.notify(client, f"playbook of {service}: v{book.migrated} (items)", f"{said} Nothing else changed.", wake=False)
+                self._delivery.notify(client, f"playbook of {service}: v{book.migrated} (items)", f"{book.alone} Nothing else changed.", wake=False)
             raise
 
     # ------------------------------------------------------------------------------------------------------ step 1: the arguments
@@ -480,27 +484,43 @@ class RuleItemReviser(PlaybookRevisions):
 
     def _migrated(self, call: _Call, current: Playbook) -> _Book:
         """The playbook as the op judges it: its items, or the items of a free-text playbook, which are written first as the next version (the
-        migration changes no word, so it stays written when the op is refused)."""
+        migration changes no word, so it stays written when the op is refused). A file in item form that no longer parses (a hand edit of
+        ``services/**``) is treated like a free text: its words become new items with ids after the highest one used, so no id is reused and the
+        old ids read retired; the watches of the lines that were left alone are carried by the watch, by text key."""
         version = current.version
         if not version:
             return _Book(0, (), (), 0)
         if current.items is not None:
             return _Book(version, current.items, current.sections, current.items_max)
-        migration = migrate_body(current.body)
-        count = len(migration.items)
-        reason = f"the free-text v{version} as {count} items (no change of words)" + migration.reason
-        extra = item_extra(migration.items, count, "migrate", admitted="migrate")
-        body = checked_body(migration.items, migration.sections, extra)
+        repair = bool(current.parse_error)
+        migration = migrate_body(current.body, splitters=self._splitters)
+        items, sections = renumbered(migration.items, migration.sections, current.items_max) if repair else (migration.items, migration.sections)
+        count = len(items)
+        top = current.items_max + count if repair else count
+        span = f"P{items[0].id[1:]}-{items[-1].id}" if count else "no items"
+        if repair:
+            named = f" {span}" if count else ""
+            reason = (
+                f"v{version} was changed outside revise_playbook and is not in item form ({current.parse_error}); its text as {count} items{named} "
+                "(no change of words)" + migration.reason
+            )
+        else:
+            reason = f"the free-text v{version} as {count} items (no change of words)" + migration.reason
+        extra = item_extra(items, top, "migrate", admitted="migrate")
+        body = checked_body(items, sections, extra)
         try:
             self._playbooks.write(call.actor, call.service, version + 1, body, RUNTIME_MIGRATION, reason, version, extra)
         except PlaybookRace as race:
             raise OrgError(PB_RACE.format(service=call.service, n=race.current)) from race
-        span = f"P1-P{count}" if count else "no items"
-        return _Book(
-            version + 1, migration.items, migration.sections, count, version + 1,
-            f"the free text of v{version} as {count} items ({span}), no change of words{migration.reason}.",
-            f"playbook v{version + 1} is the free-text v{version} as {count} items ({span}, no change of words{migration.reason}). ",
-        )
+        if repair:
+            note = f"v{version}, which was changed outside revise_playbook ({current.parse_error}), as {count} new items ({span}), no change of words{migration.reason}."
+            alone = f"v{version} was changed outside revise_playbook and is not in item form ({current.parse_error}); its text as {count} items ({span}), no change of words{migration.reason}."
+            reply = f"playbook v{version + 1} is v{version}, which was changed outside revise_playbook, as {count} new items ({span}, no change of words{migration.reason}). "
+        else:
+            note = f"the free text of v{version} as {count} items ({span}), no change of words{migration.reason}."
+            alone = f"The free text of v{version} as {count} items ({span}), no change of words{migration.reason}."
+            reply = f"playbook v{version + 1} is the free-text v{version} as {count} items ({span}, no change of words{migration.reason}). "
+        return _Book(version + 1, items, sections, top, version + 1, note, alone, reply)
 
     # ------------------------------------------------------------------------------------------------------ steps 4 to 6: the item, the gate, the write
 

@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+from testkit.services_world import svc  # noqa: F401  (a fixture: the wired application with ceo offering weekly-brief)
 
 from hirearchy.kernel import Message, OrgError, split_frontmatter
 from hirearchy.services import Admission, ItemWatch, PlaybookChange, PlaybookItem, PlaybookRace, ServiceCommands, normalize_evidence, playbook_reply
@@ -482,6 +483,111 @@ def test_an_empty_legacy_body_migrates_to_no_items(w: ServicesWorld) -> None:
     change = revise(w, "add", ("R1",), kind="step", text="First.")
     assert (change.migrated, change.item, change.version) == (2, "P1", 3)
     assert meta_of(w, HISTORY.format(2))[0]["reason"] == "the free-text v1 as 0 items (no change of words)"
+
+
+# ============================================================================================== the repair of a hand-broken item file (4.4)
+
+BROKEN = "## Steps\n1. [P1] Search.\n2. [P2] Write.\nhand-written words"
+PARSE_ERROR = "line 4: not a heading, an item (`<n>. [P<k>] ` or `- [P<k>] `) or a line indented by 3 spaces under one"
+
+
+def test_a_hand_broken_item_file_is_repaired_word_for_word(w: ServicesWorld) -> None:
+    define(w)
+    owner_wrote(w, 1, BROKEN, 2)
+    assert w.catalog.read_playbook("ceo", SERVICE).parse_error == PARSE_ERROR
+    change = revise(w, "add", ("R1",), kind="step", text="Publish.")
+    repaired, body = meta_of(w, HISTORY.format(2))
+    assert (change.version, change.migrated, change.item) == (3, 2, "P5")  # new ids start at items_max + 1; none is reused
+    assert (repaired["op"], repaired["admitted"], repaired["by"], repaired["items_max"], repaired["rules"], repaired["why"]) == (
+        "migrate", "migrate", "runtime (migration)", 4, [], {},
+    )
+    assert repaired["reason"] == (
+        f"v1 was changed outside revise_playbook and is not in item form ({PARSE_ERROR}); its text as 2 items P3-P4 (no change of words)"
+    )
+    assert body == "## Steps\n1. [P3] [P1] Search.\n2. [P4] [P2] Write.\n   hand-written words"  # every word of the file, the old markers as words
+    assert meta_of(w, HISTORY.format(1))[1] == BROKEN  # the file as it was, byte for byte
+    assert playbook_reply(SERVICE, change).startswith(
+        "playbook v2 is v1, which was changed outside revise_playbook, as 2 new items (P3-P4, no change of words). playbook of weekly-brief is now v3: added P5 (step)"
+    )
+    note = [m.body for m in w.d.inbox("root")][-1]
+    assert note.startswith(f"Playbook v2 is v1, which was changed outside revise_playbook ({PARSE_ERROR}), as 2 new items (P3-P4), no change of words.\n")
+    assert [e.fields["by"] for e in w.events.events if e.kind == "service.revise"] == ["runtime (migration)", "ceo"]
+
+
+def test_the_old_ids_read_retired_and_the_new_items_are_kept(w: ServicesWorld) -> None:
+    define(w)
+    owner_wrote(w, 1, BROKEN, 2)
+    revise(w, "add", ("R1",), kind="step", text="Publish.")
+    found = w.catalog.read_playbook("ceo", SERVICE)
+    assert found.parse_error == "" and found.items is not None and [i.id for i in found.items] == ["P3", "P4", "P5"] and found.items_max == 5
+    assert refusal(w, "edit", ("R1",), item="P1", text="x") == (
+        "refused: `weekly-brief` has no live item P1. Its items: P3, P4, P5; retired: P1, P2 (op=\"restore\" brings one back). Nothing was written."
+    )
+    assert all(i.why == () for i in found.items[:2])  # a repaired item has no WHY: it was never gated
+
+
+def test_a_refused_op_leaves_the_repair_written_with_its_own_note(refusing: ServicesWorld) -> None:
+    w = refusing
+    define(w)
+    owner_wrote(w, 1, BROKEN, 2)
+    assert refusal(w, "add", ("R1",), kind="step", text="x") == "refused by the stand-in for the gate"
+    assert w.catalog.read_playbook("ceo", SERVICE).version == 2
+    (note,) = w.d.inbox("root")
+    assert note.title == "playbook of weekly-brief: v2 (items)"
+    assert note.body == f"v1 was changed outside revise_playbook and is not in item form ({PARSE_ERROR}); its text as 2 items (P3-P4), no change of words. Nothing else changed."
+
+
+def test_the_repair_keeps_the_fallbacks_of_4_4(tmp_path: Path) -> None:
+    from hirearchy.services._items import FALLBACK_SECTIONS, split_sections, split_whole
+    from hirearchy.services._ops import RuleItemReviser
+    from hirearchy.services._texts import CappedPlaybookTexts, EventedPlaybookWriter
+    from hirearchy.dispatch.testing import PostedDelivery
+
+    w = populated(fs_world(tmp_path))
+    define(w)
+    owner_wrote(w, 1, BROKEN, 2)
+
+    def lossy(body: str) -> Any:  # a per-block split that drops every line: the loss check refuses it and the next split is tried
+        return (), ()
+
+    reviser = RuleItemReviser(
+        w.d.agents, w.catalog, CappedPlaybookTexts(w.d.settings), EventedPlaybookWriter(w.store, w.d.clock, w.events), PostedDelivery(w.d.post),
+        AdmittingServiceEvidence(), w.d.mail, splitters=(lossy, split_sections, split_whole),
+    )
+    change = reviser.revise_playbook("ceo", SERVICE, "add", "why", ["R1"], kind="step", text="Publish.")
+    repaired, body = meta_of(w, HISTORY.format(2))
+    assert repaired["reason"].endswith(f"its text as 1 items P3-P3 (no change of words){FALLBACK_SECTIONS}")
+    assert change.migration == (
+        f"playbook v2 is v1, which was changed outside revise_playbook, as 1 new items (P3-P3, no change of words{FALLBACK_SECTIONS}). "
+    )
+    assert body == "## Steps\n- [P3] 1. [P1] Search.\n   2. [P2] Write.\n   hand-written words"  # one item for the section, its lines verbatim
+
+
+def test_a_warned_rule_whose_line_was_untouched_stays_warning_after_the_repair(svc: Any) -> None:
+    """Carried watch (ii): a hand edit of the file must not clear a warning. The real gate and the real watch, through the application."""
+    from testkit.services_world import confirmed_amendment, deliver
+    from testkit.services_world import request as ask
+
+    org = svc
+    week = "Names the week it covers"
+    c3 = confirmed_amendment(org, week)  # type: ignore[no-untyped-call]  # R1 is answered and C3 is the user's
+    org.revise_playbook("ceo", SERVICE, "add", "the client's rule", [c3], kind="rule", then=week)  # (c): P1, WHY R1; C3
+    task = ask(org, "again")  # type: ignore[no-untyped-call]
+    deliver(org, "ceo", task)  # type: ignore[no-untyped-call]
+    no = org.feedback("root", task.id, "reject", "No week.", source="human")
+    org.feedback("root", task.id, "reject", "Yes, C3.", source="human", criterion=["C3"], confirms=no.id)
+    org.revise_playbook("ceo", SERVICE, "edit", "format it", [], item="P1", then=week.upper())  # exempt (the same tokens): v2 holds the rule, and it is parseable
+    before = {i.id: i for i in org.runtime.service_evidence.watch("ceo", SERVICE)}
+    assert (before["P1"].state, before["P1"].related) == ("warning", ("R2",))
+    path = org.dir("ceo") / "services" / SERVICE / "PLAYBOOK.md"
+    path.write_text(path.read_text(encoding="utf-8") + "\nhand-written words\n", encoding="utf-8")  # a hand edit that leaves the rule's line alone
+    assert org.runtime.service_catalog.read_playbook("ceo", SERVICE).parse_error
+    with pytest.raises(OrgError, match="has no live item P9"):
+        org.revise_playbook("ceo", SERVICE, "edit", "after the hand edit", [c3], item="P9", text="x")  # refused, but the repair is written first
+    after = {i.id: i for i in org.runtime.service_evidence.watch("ceo", SERVICE)}
+    assert after["P1"].state == "retired"  # the old id is no longer live
+    repaired = after["P2"]  # the rule's line, now the words of a step
+    assert (repaired.state, repaired.carried, repaired.related, repaired.watch_start) == ("warning", "P1", ("R2",), before["P1"].watch_start)
 
 
 # ============================================================================================== the frontmatter, the write and the note

@@ -371,6 +371,13 @@ def split_check(body: str, items: Sequence[PlaybookItem], sections: Sequence[Pla
     return keys(body.splitlines()) == keys(rendered)
 
 
+def renumbered(items: Sequence[PlaybookItem], sections: Sequence[PlaybookSection], offset: int) -> Split:
+    """The items ``P1..Pm`` of a migration as ``P<offset+1>..P<offset+m>`` (the repair of a file that no longer parses gives new ids, 4.4); the sections
+    follow."""
+    new = {i.id: f"P{offset + n}" for n, i in enumerate(items, start=1)}
+    return tuple(replace(i, id=new[i.id]) for i in items), tuple(replace(s, ids=tuple(new[x] for x in s.ids)) for s in sections)
+
+
 SPLITTERS: tuple[Splitter, ...] = (split_blocks, split_sections, split_whole)
 _REASONS = ("", FALLBACK_SECTIONS, FALLBACK_WHOLE)
 
