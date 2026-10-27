@@ -18,7 +18,7 @@ from ._items import RULES_HEADING, RUNTIME_MIGRATION, PlacementError, canonical_
 from ._protocols import PlaybookRevisions, PlaybookTexts, PlaybookWriter
 from .api import (
     REASON_MAX, Admission, Contract, Criterion, ItemWatch, PlaybookChange, PlaybookItem, PlaybookRace, PlaybookSection, ServiceCatalog, ServiceEvidence,
-    Playbook, item_words, normalize_evidence, text_tokens,
+    Playbook, content_words, item_words, normalize_evidence, text_tokens,
 )
 
 # ----------------------------------------------------------------------------------------------------------------------- the 30% rule (7)
@@ -252,6 +252,11 @@ def _rebuilt_in_order(items: Sequence[PlaybookItem], sections: Sequence[Playbook
     """The items in the order of the sections (the body order), each carrying the heading of its section."""
     by_id = {i.id: i for i in items}
     return tuple(replace(by_id[i], section=s.heading) for s in sections for i in s.ids), tuple(sections)
+
+
+def _headings(sections: Sequence[PlaybookSection]) -> list[str]:
+    """The heading lines of the sections (the text before the first heading has none)."""
+    return [s.heading for s in sections if s.heading]
 
 
 def _after(after: str | None) -> str:
@@ -544,6 +549,7 @@ class RuleItemReviser(PlaybookRevisions):
             raise self._args_error(call, str(error)) from error
         admission = self._evidence.admit_item(call.actor, call.service, call.ids, call.reason, kind=call.kind, text=text, when=when)
         items = tuple(replace(i, why=canonical_why(admission.why)) if i.id == new.id else i for i in items)
+        self._limits(call, book, items, sections, admission)
         path = self._write(call, book, items, sections, book.items_max + 1, admission, item=new.id)
         change = PlaybookChange(
             book.version + 1, "add", new.id, call.kind, admission, None, len(items), client=call.client,
@@ -569,6 +575,8 @@ class RuleItemReviser(PlaybookRevisions):
             admission = self._evidence.admit_item(call.actor, call.service, call.ids, call.reason, kind=old.kind, text=text, when=when or None)
             new = replace(old, text=text, when=when, why=canonical_why(admission.why))
         items = tuple(new if i.id == old.id else i for i in book.items)
+        if not formatting:
+            self._limits(call, book, items, book.sections, admission)
         path = self._write(call, book, items, book.sections, book.items_max, admission, item=old.id)
         change = PlaybookChange(book.version + 1, "edit", old.id, old.kind, admission, None, len(items), formatting=formatting, client=call.client)
         what = f"fixed the formatting of {old.id}" if formatting else f"edited {old.id}"
@@ -618,20 +626,17 @@ class RuleItemReviser(PlaybookRevisions):
         else:
             layout = next(p.sections for p in versions if p.version == source)
             items, sections = place_restore(book.items, book.sections, restored, layout)
+        self._limits(call, book, items, sections, admission)
         path = self._write(call, book, items, sections, book.items_max, admission, item=call.item, restores=source)
         change = PlaybookChange(
             book.version + 1, "restore", call.item, old.kind, admission, None, len(items), restored_from=source, client=call.client,
         )
         return self._told(call, book, path, change, f"restored {call.item} to the text of v{source}", _item_line(restored))
 
-    @staticmethod
-    def _written_by(versions: Sequence[Playbook], held: Mapping[int, PlaybookItem], source: int) -> str:
+    def _written_by(self, versions: Sequence[Playbook], held: Mapping[int, PlaybookItem], source: int) -> str:
         """Who wrote the text the item had in version ``source``: the author of the first version of the unbroken run that holds exactly that text
         (the version before it, when that one is the migration: the migration changed no word)."""
-        text = (held[source].text, held[source].when)
-        start = source
-        while start - 1 in held and (held[start - 1].text, held[start - 1].when) == text:
-            start -= 1
+        start = self._run_start(held, source)
         by = {p.version: p.by for p in versions}
         return by.get(start - 1, "") if by.get(start) == RUNTIME_MIGRATION else by.get(start, "")
 
@@ -655,6 +660,46 @@ class RuleItemReviser(PlaybookRevisions):
         path = self._write(call, book, items, sections, book.items_max, admission, item=old.id)
         change = PlaybookChange(book.version + 1, "move", old.id, old.kind, admission, None, len(items), client=call.client, after=call.after)
         return self._told(call, book, path, change, f"moved {old.id} after {call.after}", "")
+
+    def _limits(
+        self, call: _Call, book: _Book, items: Sequence[PlaybookItem], sections: Sequence[PlaybookSection], admission: Admission,
+    ) -> None:
+        """Step 5 after the gate (design 7, 10): the 30% rule (not for a (c) admission: a criterion's words cannot be split), then the cap, counted
+        in content words so that the markers never push a playbook over."""
+        if admission.rule != "c":
+            split_check(content_tokens(book.items, _headings(book.sections)), content_tokens(items, _headings(sections)))
+        words = content_words(items, _headings(sections))
+        cap = self._texts.cap()
+        if words > cap:
+            raise OrgError(self._cap_error(call, book, words, cap))
+
+    def _cap_error(self, call: _Call, book: _Book, words: int, cap: int) -> str:
+        """PB-CAP with its two lists (10): the new items whose watch rests on no regression assertion, and the oldest items that cover nothing. The
+        watch is read once; an unreadable watch only shortens the lists (every item then counts as uncovered, since the version that gave it its text)."""
+        versions = self._read(call.service, lambda: self._catalog.playbook_versions(call.actor, call.service))
+        try:
+            watches = {w.id: w for w in self._evidence.watch(call.actor, call.service)}
+        except (OrgError, OSError):
+            watches = {}
+        held = {i.id: {p.version: x for p in versions if p.items is not None for x in p.items if x.id == i.id} for i in book.items}
+        for i in book.items:  # an item the watch does not know: the version that gave it its current text
+            watches.setdefault(i.id, ItemWatch(i.id, i.kind, "kept", self._run_start(held[i.id], max(held[i.id], default=book.version))))
+        by_version = {p.version: p for p in versions}
+        started = {
+            i.id: by_version[watches[i.id].text_version].why[i.id] for i in book.items
+            if watches[i.id].text_version in by_version and i.id in by_version[watches[i.id].text_version].why
+        }
+        candidates, uncovered = cap_lists(book.items, watches, started, book.version)
+        return cap_refusal(words, cap, candidates, uncovered, call.client)
+
+    @staticmethod
+    def _run_start(held: Mapping[int, PlaybookItem], source: int) -> int:
+        """The first version of the unbroken run, ending at ``source``, in which the item has exactly the text it has in ``source``."""
+        text = (held[source].text, held[source].when) if source in held else None
+        start = source
+        while text is not None and start - 1 in held and (held[start - 1].text, held[start - 1].when) == text:
+            start -= 1
+        return start
 
     def _write(
         self, call: _Call, book: _Book, items: Sequence[PlaybookItem], sections: Sequence[PlaybookSection], items_max: int, admission: Admission, *,

@@ -4,15 +4,16 @@ word for word, the migration of a free-text playbook, the replies and the client
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
 
 import pytest
 
 from hirearchy.kernel import Message, OrgError, split_frontmatter
-from hirearchy.services import PlaybookChange, PlaybookItem, PlaybookRace, ServiceCommands, playbook_reply
+from hirearchy.services import Admission, ItemWatch, PlaybookChange, PlaybookItem, PlaybookRace, ServiceCommands, normalize_evidence, playbook_reply
 from hirearchy.services._items import checked_body
-from hirearchy.services.testing import RefusingServiceEvidence, ServicesWorld, fs_world, memory_world
+from hirearchy.services.testing import AdmittingServiceEvidence, RefusingServiceEvidence, ServicesWorld, fs_world, memory_world
 
 from ._support import STEPS, answer, define, populated, request
 
@@ -189,7 +190,8 @@ def test_then_in_capitals_in_when_is_refused(w: ServicesWorld) -> None:
     assert revise(w, "add", ("R1",), kind="rule", when="a date then b, thence c", then="do it").item == "P1"  # lower case and other words are fine
 
 
-def test_a_criterions_own_words_are_exempt_from_the_keyword_bracket_and_length_rules(w: ServicesWorld) -> None:
+def test_a_criterions_own_words_are_exempt_from_the_keyword_bracket_and_length_rules(tmp_path: Path) -> None:
+    w = populated(fs_world(tmp_path, CAdmitting()))  # a criterion's words are admitted by rule (c), which the 30% rule does not split
     long = "Every claim ends with a bracketed reference like [P1]. " + "It names its source in full. " * 45
     define(w, acceptance=["At most 600 words", long.strip(), "# Heading first"])
     assert len(long.strip()) > 1200
@@ -746,6 +748,137 @@ def test_an_unneeded_acknowledged_is_ignored_for_a_restore_too(w: ServicesWorld)
     ack = "20261024T000000000001-root-ab12"
     change = revise(w, "restore", ("R1",), item="P2", acknowledged=ack)
     assert change.ack_ignored == ack and "(acknowledged=" + ack + " was not needed for this change and is not recorded.)" in playbook_reply(SERVICE, change)
+
+
+# ============================================================================================== the 30% rule (7) and the cap (10)
+
+
+def words(n: int, tag: str = "") -> str:
+    """``n`` distinct words made of letters only (a number or a symbol would be a token of its own)."""
+    return " ".join(f"{tag}{chr(97 + i // 26)}{chr(97 + i % 26)}" for i in range(n))
+
+
+class CAdmitting(AdmittingServiceEvidence):
+    """A gate that admits every item by rule (c): the words of a confirmed criterion are not split by the 30% rule (7)."""
+
+    def admit_item(self, owner: str, service: str, evidence: Sequence[str], reason: str, *, kind: str, text: str, when: str | None) -> Admission:
+        return Admission("c", normalize_evidence(evidence), "cites C3", why=("R1", "C3"))
+
+
+def big(w: ServicesWorld, n: int = 100) -> ServicesWorld:
+    """The service is defined and its owner has written v1: one step of ``n`` words (``n + 1`` tokens with the heading)."""
+    define(w)
+    revise(w, "first", text=f"## Steps\n1. {words(n)}")
+    return w
+
+
+def test_a_gated_add_edit_or_restore_above_the_limit_is_pb_split(w: ServicesWorld) -> None:
+    big(w)  # base 101: the limit is the floor of 50
+    revise(w, "add", ("R1",), kind="step", text=words(50, "n"))  # exactly 50 words touched: allowed
+    assert w.catalog.read_playbook("ceo", SERVICE).version == 2
+    message = refusal(w, "add", ("R1",), kind="step", text=words(61, "m"))  # base 151: still the floor
+    assert message == (
+        "refused: this change touches 61 of the playbook's 151 words, more than about 30% (50): make it as smaller changes (one item, or part of an "
+        "item, per call), each with its own reason and evidence, so each one is judged and watched on its own. Nothing was written."
+    )
+    old = words(100).split()
+    swapped = " ".join([*old[:50], *words(50, "z").split()])  # 50 words gone and 50 new: 100 touched
+    assert refusal(w, "edit", ("R1",), item="P1", text=swapped).startswith("refused: this change touches 100 of the playbook's 151 words")
+    revise(w, "edit", ("R1",), item="P1", text=" ".join([*old[:97], "xxx", "yyy", "zzz"]))  # six words touched: allowed
+    assert w.catalog.read_playbook("ceo", SERVICE).version == 3
+
+
+def test_a_gated_restore_and_an_exempt_restore_of_the_clients_text_take_the_rule_too(refusing: ServicesWorld) -> None:
+    w = refusing
+    define(w, playbook=f"## Steps\n1. {words(100)}")  # root's v1: base 101
+    owner_wrote(w, 2, f"## Steps\n1. [P1] {words(100, 'o')}", 1)  # the owner's text
+    owner_wrote(w, 3, f"## Steps\n1. [P1] {words(100, 'p')}", 1)
+    assert refusal(w, "restore", item="P1", version=1).startswith("refused: this change touches 200 of the playbook's 101 words, more than about 30% (50)")
+    assert refusal(w, "restore", item="P1", version=2) == "refused by the stand-in for the gate"  # the gate comes before the split
+
+
+def test_a_c_admission_takes_no_split_check(tmp_path: Path) -> None:
+    w = populated(fs_world(tmp_path, CAdmitting()))
+    big(w)
+    change = revise(w, "add", ("C3",), kind="step", text=words(120, "c"))  # 120 words touched, over the floor of 50: a criterion's words cannot be split
+    assert change.admission.rule == "c" and change.version == 2
+
+
+def test_formatting_fixes_retires_and_moves_take_no_split_check(refusing: ServicesWorld) -> None:
+    w = refusing
+    define(w, playbook=f"## Steps\n1. {words(100)}\n2. {words(100, 'q')}")
+    revise(w, "move", item="P2", after="start")
+    revise(w, "edit", item="P1", text=words(100).upper())  # the same tokens
+    revise(w, "retire", item="P2")  # 100 words gone
+    assert w.catalog.read_playbook("ceo", SERVICE).version == 4
+
+
+def test_an_add_over_playbook_max_words_is_pb_cap_with_its_lists(w: ServicesWorld) -> None:
+    big(w, 30)  # content words: the heading's two and 30
+    w.d.configure("---\nmission: test\nplaybook_max_words: 41\n---\nrules\n")
+    revise(w, "add", ("R1",), kind="step", text=words(9, "a"))  # 41 words: at the cap
+    assert refusal(w, "add", ("R1",), kind="step", text="one two") == (
+        "refused: the playbook would have 43 words; the limit is 41 (playbook_max_words). Retire an item first. "
+        "Items that cover no criterion or assertion (no acknowledgement needed): P1 (since v1), P2 (since v2). "
+        'Or shorten an item (op="edit"). Nothing was written.'
+    )
+    assert w.catalog.read_playbook("ceo", SERVICE).version == 2
+
+
+def test_the_cap_names_new_items_whose_watch_rests_on_no_regression_assertion(tmp_path: Path) -> None:
+    watch = (ItemWatch("P1", "step", "kept", 1, coverage=("C1",)), ItemWatch("P2", "step", "new", 1, coverage=("C2",)), ItemWatch("P3", "step", "kept", 1))
+    w = populated(fs_world(tmp_path, AdmittingServiceEvidence(watch=watch)))
+    define(w)
+    owner_wrote(w, 1, "## Steps\n1. [P1] one\n2. [P2] two (WHY C2)\n3. [P3] three", 3, why={"P2": ["C2"]})  # P2's watch rests on C2 alone: no R id
+    w.d.configure("---\nmission: test\nplaybook_max_words: 5\n---\nrules\n")
+    assert refusal(w, "add", ("R1",), kind="step", text="four five") == (
+        "refused: the playbook would have 7 words; the limit is 5 (playbook_max_words). Retire an item first. "
+        "Candidates, oldest first (new items whose watch rests on no regression assertion): P2 (since v1; cites C2: retiring it needs root's acknowledgement). "
+        "Items that cover no criterion or assertion (no acknowledgement needed): P3 (since v1). "
+        'Or shorten an item (op="edit"). Nothing was written.'
+    )
+
+
+def test_a_playbook_over_the_cap_where_every_item_covers_something_says_retire_one_yourself(tmp_path: Path) -> None:
+    watch = (ItemWatch("P1", "step", "kept", 1, coverage=("C1",)),)
+    w = populated(fs_world(tmp_path, AdmittingServiceEvidence(watch=watch)))
+    define(w)
+    revise(w, "first", text="## Steps\n1. one two three")
+    w.d.configure("---\nmission: test\nplaybook_max_words: 5\n---\nrules\n")
+    assert refusal(w, "add", ("R1",), kind="step", text="four") == (
+        "refused: the playbook would have 6 words; the limit is 5 (playbook_max_words). Retire an item first. Every item covers a criterion or an "
+        "assertion: retire one yourself (it needs root's acknowledgement), or shorten one. Nothing was written."
+    )
+
+
+def test_a_playbook_over_the_cap_still_takes_retires_moves_and_formatting_fixes(w: ServicesWorld) -> None:
+    seeded(w)  # content words: the heading's two, "Search.", "Write." and "Check every claim." = 7
+    w.d.configure("---\nmission: test\nplaybook_max_words: 3\n---\nrules\n")
+    revise(w, "move", item="P3", after="start")
+    revise(w, "edit", item="P2", text="WRITE.")
+    assert refusal(w, "add", ("R1",), kind="step", text="more").startswith("refused: the playbook would have 8 words; the limit is 3")
+    assert refusal(w, "edit", ("R1",), item="P1", text="Search all of it twice.").startswith("refused: the playbook would have 11 words; the limit is 3")
+    revise(w, "retire", item="P1")
+    assert w.catalog.read_playbook("ceo", SERVICE).version == 4
+
+
+def test_the_cap_counts_content_words_not_markers(w: ServicesWorld) -> None:
+    define(w)
+    revise(w, "add", ("R1",), kind="rule", when="a b", then="c d")  # content: the heading's two, then 2 and when 2 = 6; the body has twice as many words
+    assert len(w.catalog.read_playbook("ceo", SERVICE).body.split()) == 12
+    w.d.configure("---\nmission: test\nplaybook_max_words: 8\n---\nrules\n")
+    revise(w, "add", ("R1",), kind="rule", then="e f")  # 6 + 2 (an `always` when counts none) = 8: at the cap
+    assert refusal(w, "add", ("R1",), kind="rule", then="g").startswith("refused: the playbook would have 9 words; the limit is 8")
+
+
+def test_a_legacy_playbook_over_the_cap_migrates_first_and_still_takes_a_retire(w: ServicesWorld) -> None:
+    define(w)
+    legacy(w, "## Steps\n1. " + words(30) + "\n2. " + words(30, "z"))
+    w.d.configure("---\nmission: test\nplaybook_max_words: 10\n---\nrules\n")
+    assert refusal(w, "add", ("R1",), kind="step", text="more").startswith("refused: the playbook would have 63 words; the limit is 10")
+    assert w.catalog.read_playbook("ceo", SERVICE).version == 2  # the migration stays written
+    revise(w, "retire", item="P2")
+    assert w.catalog.read_playbook("ceo", SERVICE).version == 3
 
 
 # ============================================================================================== the replies of 5.2
