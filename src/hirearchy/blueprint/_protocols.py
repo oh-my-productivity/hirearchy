@@ -174,7 +174,7 @@ class Charters(Protocol):
 @runtime_checkable
 class PlaybookWriting(Protocol):
     def default_playbook(self, owner: Agent, agents: Sequence[Agent], service: Mapping[str, object], budget: int) -> str:
-        """Playbook v1 of a service when the blueprint gives none: the lead's procedure for this team, as steps, a budget plan and pitfalls."""
+        """Playbook v1 of a service when the blueprint gives none: the lead's procedure for this team, as steps and a budget plan."""
         ...
 
 

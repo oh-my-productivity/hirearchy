@@ -592,11 +592,11 @@ def test_the_applied_service_works_end_to_end_with_request_and_feedback(svc_bp, 
 
 
 # --------------------------------------------------------------------------------- playbook and charter
-def test_the_generated_playbook_has_the_three_sections_in_order(svc_bp):
+def test_the_generated_playbook_has_the_two_sections_in_order(svc_bp):
     agents = bpm._resolve(svc_bp, None, [Path("/")], [])
     text = bpm.default_playbook(agents[0], agents, svc_bp["services"][0], 22)
-    assert [m.group(0) for m in re.finditer(r"^## .*$", text, re.M)] == ["## Steps", "## Budget plan", "## Pitfalls"]
-    assert text.rstrip().endswith("## Pitfalls\nnone yet: add them from lessons and feedback")
+    assert [m.group(0) for m in re.finditer(r"^## .*$", text, re.M)] == ["## Steps", "## Budget plan"]
+    assert text.rstrip().endswith("Unspent runs return to your parent with your final report.") and "Pitfalls" not in text
 
 
 def test_the_generated_playbook_carries_the_teams_procedure(svc_bp):
@@ -611,8 +611,8 @@ def test_the_generated_playbook_carries_the_teams_procedure(svc_bp):
     assert "AUTHOR of the failing file" in steps and "revises=<that author's task id>" in steps  # author-routed rework
     assert "revises=<the checker's task id>" in steps and "One rework and one re-check" in steps
     assert "EVERY criterion of the request" in steps and "coverage line verbatim" in steps  # the final check
-    assert "`lessons`" in steps and "what to change in this playbook" in steps  # report with lessons
-    budget = text.split("## Budget plan")[1].split("## Pitfalls")[0]
+    assert "`lessons` as an after-action review: Expected / Happened / Caught at / Cause / Prevent" in steps  # report with lessons, in the AAR form
+    budget = text.split("## Budget plan")[1]
     assert "- researcher: 4 runs (3 work + 1 rework or re-check)" in budget
     assert "- writer: 3 runs (2 work + 1 rework or re-check)" in budget
     assert "- factcheck: 3 runs (2 work + 1 rework or re-check)" in budget

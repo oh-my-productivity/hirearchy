@@ -94,3 +94,14 @@ def test_plan_and_manager_charter_say_unspent_budget_returns_automatically(base,
     charter = (empty_org.root / "lead" / "AGENT.md").read_text()
     assert "return to your parent automatically" in charter
     assert "returns to you with its final" in charter  # from the manager template
+
+
+def test_the_details_label_reads_generated_from_the_team_steps_budget_plan(base, roots):
+    base["services"] = [{
+        "name": "my-service", "offered_by": "lead", "description": "A brief.", "acceptance": ["At most 600 words"],
+        "deliverable": {"description": "one markdown file", "format": "markdown", "max_words": 600},
+        "inputs": [{"name": "topic", "description": "subject", "required": True}], "budget": 10,
+    }]
+    details = bpm.render_plan(base, allowed_roots=roots)
+    assert "  playbook v1: generated from the team (steps, budget plan):" in details
+    assert "pitfalls" not in details.lower()

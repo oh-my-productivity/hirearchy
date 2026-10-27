@@ -137,7 +137,7 @@ class TextPlanDetails(PlanDetailing):
                       "  acceptance (the contract, travels with every request):"]
                 L += [f"    {i}. {c}" for i, c in enumerate(svc_criteria(sv), 1)] or ["    (none)"]
                 pb = sv.get("playbook")
-                L.append("  playbook v1: " + (f"given in the blueprint ({len(pb.split())} words)" if isinstance(pb, str) and pb.strip() else "generated from the team (steps, budget plan, pitfalls):"))
+                L.append("  playbook v1: " + (f"given in the blueprint ({len(pb.split())} words)" if isinstance(pb, str) and pb.strip() else "generated from the team (steps, budget plan):"))
                 if not (isinstance(pb, str) and pb.strip()) and agents:
                     L += ["    " + ln for ln in self._playbooks.default_playbook(agents[0], agents, sv, svc_budgets.get(name, 0)).splitlines()]
             L.append(self._words.reflection_line(agents[0].name if agents else "lead"))

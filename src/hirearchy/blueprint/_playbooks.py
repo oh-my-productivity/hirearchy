@@ -55,7 +55,8 @@ class StepsPlaybookWriter(PlaybookWriting):
                      + (", and paste the checker's final coverage line verbatim." if checkers else "."))
         steps.append("Report: `done` only if every criterion is met (else `blocked` with the deviation and a recommended decision). Name the deliverable's path"
                      + (f" (the assistant copies it to {path})" if path else "")
-                     + " and pass `lessons`: 1-3 lines for the next request - what worked, what to change in this playbook, and the evidence (runs used, rework, review findings).")
+                     + " and pass `lessons` as an after-action review: Expected / Happened / Caught at / Cause / Prevent (the system cause, not a person), "
+                     "or Near miss when nothing went wrong.")
         budget_lines = [f"Request budget: {budget} runs (the contract's). Hand down no more than this up front, each with `budget=` set explicitly:"]
         for k in kids:
             e = est[k.addr]
@@ -66,6 +67,5 @@ class StepsPlaybookWriter(PlaybookWriting):
                             + (f" and {keeps - own} of slack" if keeps - own > 0 else "") + ".")
         budget_lines.append("Unspent runs return to your parent with your final report.")
         text = ("## Steps\n" + "\n".join(f"{i}. {x}" for i, x in enumerate(steps, 1))
-                + "\n\n## Budget plan\n" + "\n".join(budget_lines)
-                + "\n\n## Pitfalls\nnone yet: add them from lessons and feedback")
+                + "\n\n## Budget plan\n" + "\n".join(budget_lines))
         return text

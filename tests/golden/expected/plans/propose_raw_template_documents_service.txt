@@ -91,7 +91,7 @@ Services (1), offered by lead and defined by root (the contract: only root can c
     2. At most 1500 words as counted by read.
     3. Every statement is traceable to a named input file, and gaps or conflicts between files are listed in a final section titled "Open questions".
     4. The reviewer's report shows every criterion met (criteria met: n of m with n = m), and the writer applied every required change.
-  playbook v1: generated from the team (steps, budget plan, pitfalls):
+  playbook v1: generated from the team (steps, budget plan):
     ## Steps
     1. Read the request in your prompt: its inputs, every acceptance criterion and the deliverable. The criteria come from the contract and can only be met, never changed; copy the relevant ones verbatim into every task you delegate.
     2. Delegate to `reader` (Reader of the user's files) with `budget=3`: its part of the request, with the criteria it must meet.
@@ -99,7 +99,7 @@ Services (1), offered by lead and defined by root (the contract: only root can c
     4. When the work exists, delegate to `reviewer` (Independent Reviewer) with `budget=2` to check the final file independently against every criterion. It reports findings and required changes to you and never edits the author's file.
     5. If a check fails: send the required changes, quoted verbatim, to the AUTHOR of the failing file (`delegate(to=<author>, revises=<that author's task id>, budget=1)`; for the deliverable usually `writer`), then have the checker re-check that same file (`delegate(to=<checker>, revises=<the checker's task id>)`). One rework and one re-check; if it still fails, report `blocked` with options and the checker's final line instead of starting another cycle.
     6. Read the final artifact yourself and check it against EVERY criterion of the request, quoting counts from your own `read` output, and paste the checker's final coverage line verbatim.
-    7. Report: `done` only if every criterion is met (else `blocked` with the deviation and a recommended decision). Name the deliverable's path (the assistant copies it to <CWD>/deliverables/<name>) and pass `lessons`: 1-3 lines for the next request - what worked, what to change in this playbook, and the evidence (runs used, rework, review findings).
+    7. Report: `done` only if every criterion is met (else `blocked` with the deviation and a recommended decision). Name the deliverable's path (the assistant copies it to <CWD>/deliverables/<name>) and pass `lessons` as an after-action review: Expected / Happened / Caught at / Cause / Prevent (the system cause, not a person), or Near miss when nothing went wrong.
     
     ## Budget plan
     Request budget: 22 runs (the contract's). Hand down no more than this up front, each with `budget=` set explicitly:
@@ -108,9 +108,6 @@ Services (1), offered by lead and defined by root (the contract: only root can c
     - reviewer: 2 runs (1 work + 1 rework or re-check)
     - you (lead): keep 14 runs: your own 7 (plan, process each result, final check, report, one rework cycle) and 7 of slack.
     Unspent runs return to your parent with your final report.
-    
-    ## Pitfalls
-    none yet: add them from lessons and feedback
 After each request the lead records lessons; before the next one it reviews them with your feedback and may improve how the team works (its playbook). It cannot change these checks: only you can, through me.
 No first task: nothing runs until you ask for a request (request(service, inputs), then start()).
 

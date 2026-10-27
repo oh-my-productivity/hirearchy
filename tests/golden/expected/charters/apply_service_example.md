@@ -293,7 +293,7 @@ version: 1
 revised: '2026-01-15T09:01:00.000000+00:00'
 by: root
 reason: initial playbook
-items_max: 13
+items_max: 12
 rules: []
 why: {}
 op: first
@@ -305,7 +305,7 @@ op: first
 4. [P4] When the work exists, delegate to `factcheck` (Independent Fact-Checker) with `budget=3` to check the final file independently against every criterion. It reports findings and required changes to you and never edits the author's file.
 5. [P5] If a check fails: send the required changes, quoted verbatim, to the AUTHOR of the failing file (`delegate(to=<author>, revises=<that author's task id>, budget=1)`; for the deliverable usually `writer`), then have the checker re-check that same file (`delegate(to=<checker>, revises=<the checker's task id>)`). One rework and one re-check; if it still fails, report `blocked` with options and the checker's final line instead of starting another cycle.
 6. [P6] Read the final artifact yourself and check it against EVERY criterion of the request, quoting counts from your own `read` output, and paste the checker's final coverage line verbatim.
-7. [P7] Report: `done` only if every criterion is met (else `blocked` with the deviation and a recommended decision). Name the deliverable's path (the assistant copies it to ~/deliverables/weekly-briefs) and pass `lessons`: 1-3 lines for the next request - what worked, what to change in this playbook, and the evidence (runs used, rework, review findings).
+7. [P7] Report: `done` only if every criterion is met (else `blocked` with the deviation and a recommended decision). Name the deliverable's path (the assistant copies it to ~/deliverables/weekly-briefs) and pass `lessons` as an after-action review: Expected / Happened / Caught at / Cause / Prevent (the system cause, not a person), or Near miss when nothing went wrong.
 
 ## Budget plan
 - [P8] Request budget: 24 runs (the contract's). Hand down no more than this up front, each with `budget=` set explicitly:
@@ -314,6 +314,3 @@ op: first
 - [P11] factcheck: 3 runs (2 work + 1 rework or re-check)
 - [P12] you (lead): keep 14 runs: your own 7 (plan, process each result, final check, report, one rework cycle) and 7 of slack.
    Unspent runs return to your parent with your final report.
-
-## Pitfalls
-- [P13] none yet: add them from lessons and feedback
