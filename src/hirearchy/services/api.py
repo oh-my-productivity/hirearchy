@@ -376,6 +376,17 @@ class Playbook:
     path: Path | None = None
     evidence: list[str] = field(default_factory=list)  # the ids the owner cited for this version ([] for a legacy file or an exempt version)
     admitted: str = ""  # which rule admitted it: b | c | first | restore ("" for a legacy file; a version the client wrote has none)
+    # Item format (design 4.2): a file whose frontmatter has `items_max`. A legacy file keeps the defaults, with `items` None.
+    items: tuple[PlaybookItem, ...] | None = None  # the live items in body order; None for a legacy body and for one that does not parse
+    sections: tuple[PlaybookSection, ...] = ()  # the sections in body order
+    items_max: int = 0  # the highest item number ever used
+    rules: tuple[str, ...] = ()  # the ids of the live rule items, in body order
+    why: dict[str, tuple[str, ...]] = field(default_factory=dict)  # the WHY ids of every live gated item
+    op: str = ""  # first | migrate | add | edit | retire | restore | move | watch
+    item: str = ""  # the id the op changed
+    related: tuple[str, ...] = ()  # the R ids a watch retire rests on
+    acknowledged: str = ""  # the id of the parent's acknowledgement note
+    parse_error: str = ""  # why an item-format body did not parse ("line {n}: {why}"); "" otherwise
 
 
 @runtime_checkable

@@ -8,6 +8,7 @@ from pathlib import Path
 import pytest
 
 from hirearchy.kernel import JsonObject
+from hirearchy.services import PlaybookItem, PlaybookSection
 from hirearchy.services._parse import as_int, as_time, contract_of, playbook_of
 
 
@@ -114,3 +115,52 @@ def test_the_evidence_and_the_rule_that_admitted_a_playbook_are_read() -> None:
     pb = playbook_of({"version": 3, "evidence": ["R1", 2, " C3 ", ""], "admitted": "b", "restores": 1}, "Steps.", None)
     assert (pb.evidence, pb.admitted) == (["R1", "2", "C3"], "b")
     assert playbook_of({"evidence": "R1", "admitted": None}, "", None).evidence == []  # a damaged file reads as no evidence
+
+
+ITEM_BODY = (
+    "## Steps\n1. [P1] Read the request.\n2. [P12] Compare every date. (WHY R2, R3; C6)\n\n## Rules\n"
+    "- [P13] WHEN a date is relative THEN convert it. WHY R2, R3; C6"
+)
+ITEM_META: JsonObject = {
+    "version": 4, "revised": "2026-01-02T00:00:00+00:00", "by": "ceo", "reason": "why", "evidence": ["R2", "R3", "C6"], "admitted": "b",
+    "items_max": 13, "rules": ["P13"], "why": {"P12": ["R2", "R3", "C6"], "P13": ["R2", "R3", "C6"]}, "op": "add", "item": "P13",
+    "related": ["R4"], "acknowledged": "20261018T100000000012-root-0004",
+}
+
+
+def test_playbook_of_fills_items_sections_and_the_item_keys() -> None:
+    pb = playbook_of(ITEM_META, "\n" + ITEM_BODY + "\n", None)
+    assert pb.parse_error == "" and pb.version == 4 and pb.body == ITEM_BODY
+    assert pb.items == (
+        PlaybookItem("P1", "step", "## Steps", "Read the request."),
+        PlaybookItem("P12", "step", "## Steps", "Compare every date.", "", ("R2", "R3", "C6")),
+        PlaybookItem("P13", "rule", "## Rules", "convert it.", "a date is relative", ("R2", "R3", "C6")),
+    )
+    assert pb.sections == (PlaybookSection("## Steps", True, ("P1", "P12")), PlaybookSection("## Rules", False, ("P13",)))
+    assert (pb.items_max, pb.rules, pb.op, pb.item, pb.related, pb.acknowledged) == (
+        13, ("P13",), "add", "P13", ("R4",), "20261018T100000000012-root-0004",
+    )
+    assert pb.why == {"P12": ("R2", "R3", "C6"), "P13": ("R2", "R3", "C6")}
+    assert pb.evidence == ["R2", "R3", "C6"] and pb.admitted == "b"
+
+
+def test_a_body_without_items_max_is_legacy_with_items_none() -> None:
+    pb = playbook_of({"version": 2}, "## Steps\n1. [P1] words that look like an item", None)
+    assert pb.items is None and pb.sections == () and pb.parse_error == ""
+    assert (pb.items_max, pb.rules, pb.why, pb.op, pb.item, pb.related, pb.acknowledged) == (0, (), {}, "", "", (), "")
+    assert pb.body == "## Steps\n1. [P1] words that look like an item"
+
+
+def test_an_item_file_without_items_is_not_legacy() -> None:
+    pb = playbook_of({"version": 3, "items_max": 2, "rules": [], "why": {}, "op": "retire", "item": "P2"}, "## Steps", None)
+    assert (pb.items, pb.parse_error, pb.items_max) == ((), "", 2)
+    assert playbook_of({"version": 3, "items_max": 0}, "", None).items == ()
+
+
+def test_an_item_body_that_does_not_parse_fills_parse_error_and_never_raises() -> None:
+    pb = playbook_of({**ITEM_META, "items_max": 2}, "## Steps\n1. [P1] fine\nstray line", None)
+    assert pb.items is None and pb.sections == () and pb.parse_error.startswith("line 3: ")
+    assert pb.items_max == 2 and pb.version == 4 and pb.body == "## Steps\n1. [P1] fine\nstray line"  # the other fields are still read
+    odd = playbook_of({"version": 1, "items_max": "x", "rules": "P1", "why": ["R1"], "related": 5, "op": None}, "## Steps\n- [P1] a", None)
+    assert odd.parse_error == "" and odd.items_max == 0 and odd.rules == () and odd.why == {} and odd.related == () and odd.op == ""
+    assert [i.id for i in odd.items or ()] == ["P1"]

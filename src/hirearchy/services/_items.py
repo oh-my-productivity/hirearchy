@@ -79,12 +79,14 @@ def render_items(items: Sequence[PlaybookItem], sections: Sequence[PlaybookSecti
     return "\n".join(out)
 
 
-def _meta_rules(meta: Mapping[str, object]) -> tuple[str, ...]:
+def rules_of(meta: Mapping[str, object]) -> tuple[str, ...]:
+    """The ids of the live rule items in a frontmatter (``rules``); none for a value that is no list."""
     value = meta.get("rules")
     return tuple(str(i).strip().upper() for i in value) if isinstance(value, list) else ()
 
 
-def _meta_why(meta: Mapping[str, object]) -> dict[str, tuple[str, ...]]:
+def why_of(meta: Mapping[str, object]) -> dict[str, tuple[str, ...]]:
+    """The ``why`` map of a frontmatter: the canonical ``WHY`` ids of every gated item; empty for a value that is no map."""
     value = meta.get("why")
     if not isinstance(value, dict):
         return {}
@@ -104,8 +106,8 @@ class _Draft:
 def parse_items(body: str, meta: JsonObject) -> ItemsParse:
     """The items and sections of an item-format ``body`` (pure; ``meta`` is the frontmatter: ``rules`` and ``why`` matter). A body that does not
     parse gives ``ItemsParse.error`` instead of items, never an exception; the grammar is design 4.1's."""
-    rules = _meta_rules(meta)
-    why = _meta_why(meta)
+    rules = rules_of(meta)
+    why = why_of(meta)
     headings: list[str] = []
     firsts: list[bool | None] = []  # per section: whether its first item was numbered (None: it holds none)
     drafts: list[_Draft] = []

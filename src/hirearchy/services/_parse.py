@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import SupportsInt, cast
 
 from ..kernel import JsonObject, parse_time
+from ._items import parse_items, rules_of, why_of
 from .api import Contract, Playbook
 
 
@@ -70,11 +71,17 @@ def merged_versions(kind: str, files: Iterable[tuple[JsonObject, str]]) -> list[
 
 
 def playbook_of(meta: JsonObject, body: str, path: Path | None) -> Playbook:
-    """The playbook a ``PLAYBOOK.md`` describes."""
+    """The playbook a ``PLAYBOOK.md`` describes. A frontmatter with ``items_max`` is item format: its body is parsed into items, and one that does
+    not parse gives ``parse_error`` instead (never an exception); any other playbook is legacy (``items`` None)."""
+    text = body.strip()
+    parsed = parse_items(text, meta) if "items_max" in meta else None
     return Playbook(
         version=as_int(meta.get("version")), revised=as_time(meta.get("revised")), by=str(meta.get("by") or ""),
-        reason=str(meta.get("reason") or ""), body=body.strip(), path=path, evidence=_ids(meta.get("evidence")),
+        reason=str(meta.get("reason") or ""), body=text, path=path, evidence=_ids(meta.get("evidence")),
         admitted=str(meta.get("admitted") or ""),
+        items=parsed.items if parsed is not None and not parsed.error else None, sections=parsed.sections if parsed is not None else (),
+        items_max=as_int(meta.get("items_max")), rules=rules_of(meta), why=why_of(meta), op=_text(meta.get("op")), item=_text(meta.get("item")),
+        related=tuple(_ids(meta.get("related"))), acknowledged=_text(meta.get("acknowledged")), parse_error=parsed.error if parsed is not None else "",
     )
 
 

@@ -153,3 +153,21 @@ def test_playbook_versions_are_oldest_first(w: ServicesWorld) -> None:
     found = w.catalog.playbook_versions("ceo", "weekly-brief")
     assert [(p.version, p.reason) for p in found] == [(1, "first"), (2, "second")]
     assert found[0].body == STEPS and found[1].body.endswith("4. Publish.")
+
+
+def test_read_playbook_of_an_item_file_gives_its_items(w: ServicesWorld) -> None:
+    define(w)
+    meta = {
+        "service": "weekly-brief", "version": 1, "revised": "2026-01-02T00:00:00+00:00", "by": "ceo", "reason": "first", "op": "first",
+        "admitted": "first", "items_max": 2, "rules": [], "why": {},
+    }
+    w.store.write_playbook("ceo", "weekly-brief", 1, meta, "## Steps\n1. [P1] Search.\n2. [P2] Write.", None)
+    pb = w.catalog.read_playbook("ceo", "weekly-brief")
+    assert pb.parse_error == "" and pb.items is not None and [(i.id, i.kind, i.text, i.section) for i in pb.items] == [
+        ("P1", "step", "Search.", "## Steps"), ("P2", "step", "Write.", "## Steps"),
+    ]
+    assert pb.sections[0].heading == "## Steps" and pb.sections[0].numbered and pb.items_max == 2 and pb.op == "first"
+    assert [p.items is not None for p in w.catalog.playbook_versions("ceo", "weekly-brief")] == [True]
+    w.store.write_playbook("ceo", "weekly-brief", 2, {**meta, "version": 2}, "## Steps\n1. [P1] Search.\nstray", 1)
+    broken = w.catalog.read_playbook("ceo", "weekly-brief")
+    assert broken.items is None and broken.parse_error.startswith("line 3: ") and broken.version == 2  # read_playbook never raises
