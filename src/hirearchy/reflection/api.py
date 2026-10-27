@@ -765,12 +765,14 @@ class CaseHistory(Protocol):
 
 @runtime_checkable
 class ReflectionDigest(Protocol):
-    def reflection_digest(self, owner: str, service: str) -> str | None:
+    def reflection_digest(self, owner: str, service: str, words: int | None = None) -> str | None:
         """Evidence since the current playbook was revised, as a compact markdown block; None when there is none.
 
         New evidence = a case that finished, or feedback that was given, after the playbook's ``revised`` time (without a playbook: any finished
         case or feedback). The block lists the most recent cases with new evidence (at most 6: state, runs used of the budget given, reworks, the
-        client's verdict and note, lessons - each clipped), then one line of statistics per playbook version. About 3000 characters at most."""
+        client's verdict and note, the owner's view of the lessons - each clipped), then one line of statistics per playbook version. About 3000
+        characters at most. With ``words``, at most that many words (``str.split``): the oldest cases are dropped first (at least one stays), then
+        the remaining case line is clipped and ends with ``… (more: services)``."""
         ...
 
 

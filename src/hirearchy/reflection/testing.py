@@ -273,7 +273,7 @@ def _world(s: ServicesWorld, runs: RunsHarness, folders: DeliverableFolder, char
     evidence = CaseServiceEvidence(history, s.catalog, s.store, d.mail)
     sections = OwnerPromptSections(
         s.catalog, OwnedServicesListing(s.catalog, history, paths), digest, d.mail, rejections, QuotedPlaybookSection(s.catalog, d.settings, paths, evidence),
-        EvidenceReflectSection(s.catalog, d.settings, paths, history),
+        EvidenceReflectSection(s.catalog, d.settings, paths, history, evidence),
         RegressionListSection(s.catalog, history),
     )
 

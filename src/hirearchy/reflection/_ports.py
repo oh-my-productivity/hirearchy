@@ -6,7 +6,7 @@ passes them. The last four are the parts the sections of the run prompt are made
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
@@ -109,9 +109,10 @@ class PlaybookSection(Protocol):
 
 @runtime_checkable
 class ReflectSection(Protocol):
-    def section(self, addr: str, contract: Contract, digest: str, *, rejected: str = "", new_request: bool = True) -> str:
-        """What to reflect on before the work starts, with the digest of the evidence. ``rejected``: the tier of the rejection that brings the
-        section (``human``, ``relayed`` or ``agent``), ``""`` when there is none."""
+    def section(self, addr: str, contract: Contract, digest: Callable[[int], str], *, rejected: str = "", new_request: bool = True) -> str:
+        """What to reflect on before the work starts, in at most 600 words with the digest of the evidence: ``digest(words)`` is the digest within
+        ``words`` words, and the section asks for what its fixed text leaves. ``rejected``: the tier of the rejection that brings the section
+        (``human``, ``relayed`` or ``agent``), ``""`` when there is none."""
         ...
 
 

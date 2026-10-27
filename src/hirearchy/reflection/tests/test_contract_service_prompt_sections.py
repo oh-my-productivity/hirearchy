@@ -71,7 +71,7 @@ def test_a_first_request_with_no_evidence_asks_for_no_reflection(w: ReflectionWo
 def test_a_rework_in_the_batch_is_not_a_new_request(w: ReflectionWorld) -> None:
     _stories.rejection_and_rework(w)
     text = w.sections.prompt_sections("ceo", batch(w))
-    assert "then handle the rework." in text and "Then handle the rework following the playbook." in text and "new playbook" in text
+    assert "before you plan the rework." in text and "Then handle the rework following the playbook." in text and "Before working on" not in text
 
 
 def test_a_rejection_of_another_owners_service_is_not_ours(w: ReflectionWorld) -> None:
@@ -107,10 +107,11 @@ def test_the_headings_of_a_playbook_do_not_mix_with_those_of_the_prompt(w: Refle
 
 
 def test_the_longest_playbook_is_read_from_the_settings(w: ReflectionWorld) -> None:
-    _stories.history_then_new_request(w)
-    assert "(at most 1000 words)" in w.sections.prompt_sections("ceo", batch(w))
+    _stories.second_playbook_and_new_request(w)
+    assert "words)\n> ## Steps" in w.sections.prompt_sections("ceo", batch(w))
+    assert "; 8 of 1000 words)" in w.sections.prompt_sections("ceo", batch(w))
     w.s.d.configure("---\nmission: test\nplaybook_max_words: 250\n---\nrules\n")
-    assert "(at most 250 words)" in w.sections.prompt_sections("ceo", batch(w))
+    assert "; 8 of 250 words)" in w.sections.prompt_sections("ceo", batch(w))
 
 
 def test_the_implementations_agree_that_nobody_owns_anything(sections: ServicePromptSections) -> None:

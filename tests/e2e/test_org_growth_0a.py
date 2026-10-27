@@ -214,7 +214,7 @@ def test_4_a_human_reject_names_its_criterion_and_reaches_the_owners_prompt(tmp_
     assert "# Regression list: meeting-memo (the client's rejections, verbatim)" in lead_prompt
     assert f'- R1, case {ids["A1"]}, verdict {n1}, about C6: "{FRIDAY}"' in lead_prompt
     assert "# Reflect before you start: meeting-memo" in lead_prompt
-    assert "The client rejected a delivery: check the delivery against its words" in lead_prompt
+    assert "The client rejected a delivery: check it against their words" in lead_prompt
     assert all("Regression list" not in p for addr, p in w.prompts if addr in ("lead/writer", "lead/reviewer"))
 
 
@@ -265,7 +265,7 @@ def test_7_an_amendment_admits_a_revision_only_once_the_client_confirmed_it(tmp_
     ids["B2"] = request(w)  # the owner's next prompt names what rule (c) admits now
     deliver(w, ids["B2"])
     b2_prompt = next(p for addr, p in w.prompts if addr == "lead" and ids["B2"] in p)
-    assert "amendment the client confirmed (now C7: a revision citing it may add its words)" in b2_prompt
+    assert "a criterion the client confirmed (now C7 (an item may be the own words of it))" in b2_prompt
     assert "not confirmed yet" not in b2_prompt.split("# Reflect before you start")[1].split("# New messages")[0]
     assert playbook_meta(w.org, "lead", SERVICE)[0]["version"] == 1  # nothing was revised yet
     assert "now v2" in revise(w, added, "C7 was added by the client", ["C7"])  # admitted after B2's delivery: the criterion's own words

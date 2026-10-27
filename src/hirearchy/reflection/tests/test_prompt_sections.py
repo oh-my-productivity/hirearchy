@@ -26,7 +26,7 @@ def test_a_rejection_with_its_rework_request_brings_the_reflect_section(svc):
     assert HUMAN_LEAD.replace("the request", "the rework").replace("plan the request", "plan the rework") in section.splitlines()
     assert "Before working on the new request" not in section
     assert "When a lesson of yours conflicts with the client's own feedback (not a relayed verdict), the client is right: apply the feedback "\
-           "in this rework, and change the playbook only as step 3 says (say so in the reason)." in section
+           "in this rework." in section
     assert section.rstrip().endswith("Then handle the rework following the playbook.")
     assert prompt.count("# Reflect before you start") == 1
     assert prompt.index("# Reflect before") < prompt.index("# New messages")
@@ -59,7 +59,7 @@ def test_a_reject_with_a_new_request_keeps_the_new_request_wording(svc):
     svc.feedback(ROOT, first.id, "reject", "Too long.", source="human")
     request(svc, "chips")
     section = reflect_section(svc.run_prompt("ceo", svc.begin_run("ceo")))
-    assert "The client rejected a delivery: check the delivery against its words" in section and "then handle the request." in section
+    assert "The client rejected a delivery: check it against their words" in section and "or a criterion link." in section
     assert section.rstrip().endswith("Then handle the request following the playbook.")
 
 
@@ -68,7 +68,7 @@ def test_the_client_wins_step_is_in_every_reflect_section(svc):
     deliver(svc, "ceo", first)
     request(svc, "chips")
     section = reflect_section(svc.run_prompt("ceo", svc.begin_run("ceo")))
-    assert "the client is right: apply the feedback in this request, and change the playbook only as step 3 says (say so in the reason)" in section
+    assert "the client is right: apply the feedback in this request." in section
     assert [line[:2] for line in section.splitlines() if line[:1].isdigit()][:2] == ["1.", "2."]
 
 
@@ -79,8 +79,8 @@ def test_a_locked_service_reflects_on_a_rejection_without_revising(svc):
     svc.feedback(ROOT, first.id, "reject", "Too long.", source="human")
     svc.request(ROOT, "locked-brief", {"topic": "ai"}, revises=first.id, budget=3)
     section = svc.run_prompt("ceo", svc.begin_run("ceo")).split("# Reflect before you start: locked-brief")[1].split("# New messages")[0]
-    assert "The client rejected a delivery. The contract is locked, so you cannot revise the playbook" in section
-    assert "call `revise_playbook" not in section and "the client is right: follow the feedback" in section
+    assert "The client rejected a delivery. The contract is locked, so you cannot change the playbook" in section
+    assert "change one item with `revise_playbook`" not in section and "the client is right: follow the feedback" in section
 
 
 def test_a_playbook_revised_after_the_rejection_leaves_no_reflect_section(svc):
@@ -189,16 +189,16 @@ def test_the_reflect_section_comes_before_a_new_request_when_there_is_evidence(s
     assert "# Reflect before you start: weekly-brief" in prompt
     section = prompt.split("# Reflect before you start: weekly-brief")[1].split("# New messages")[0]
     assert "Evidence so far (there is no playbook yet):" in section and "No week-over-week changes." in section
-    assert "revise_playbook(service, content, reason, evidence)" in section and "at most 1000 words" in section
+    assert "change one item with `revise_playbook` (its description gives the ops)" in section and "whole new playbook" not in section
     assert "A rejection or a failure is enough to look into on its own" in section and "never lower it" in section
-    assert "restore" not in section  # nothing earlier to restore at v0
+    assert "restore" not in section
     assert section.rstrip().endswith("Then handle the request following the playbook.")
     assert [line[:2] for line in section.splitlines() if line[:1].isdigit()] == ["1.", "2.", "3.", "4.", "5."]
     assert prompt.index("# Reflect before") < prompt.index("# New messages") < prompt.index(new.id, prompt.index("# New messages"))
     org.end_run("ceo", ok=True)
 
 
-def test_the_reflect_section_offers_restoring_an_older_version_from_v2_on(svc):
+def test_the_reflect_section_no_longer_offers_restoring_a_whole_version_from_v2_on(svc):
     org = svc
     org.revise_playbook("ceo", "weekly-brief", "first", "first", [], text="Steps one.")
     c3 = confirmed_amendment(org, "Every claim names its source")  # the user's amendment and their yes: the evidence of v2
@@ -208,8 +208,8 @@ def test_the_reflect_section_offers_restoring_an_older_version_from_v2_on(svc):
     deliver(org, "ceo", first)
     request(org, "again")
     section = org.run_prompt("ceo", org.begin_run("ceo")).split("# Reflect before you start")[1].split("# New messages")[0]
-    assert "Evidence since v2:" in section and "restore that one" in section
-    assert "ceo/services/weekly-brief/history/PLAYBOOK.v<k>.md" in section
+    assert "Evidence since v2:" in section and "restore that one" not in section  # op="restore" is per item (14.2)
+    assert "history/PLAYBOOK.v<k>.md" not in section and [x[:2] for x in section.splitlines() if x[:1].isdigit()] == ["1.", "2.", "3.", "4.", "5."]
 
 
 def test_no_reflect_section_for_rework_old_evidence_or_a_locked_playbook_edit_step(svc):
@@ -251,26 +251,19 @@ def test_step_3_for_a_human_client_names_evidence_and_the_refusal_question(svc):
     deliver(org, "ceo", first, lessons="Thin on sources.")
     request(org, "chips")
     section = reflect_section(org.run_prompt("ceo", org.begin_run("ceo")))
-    assert step_3(section) == (
-        "3. If a change to how the team works would prevent it, call `revise_playbook(service, content, reason, evidence)` with the whole new "
-        "playbook (at most 1000 words): concrete steps (who does what, in which order, which check), not slogans. Name the cases in the reason, "
-        "and list in `evidence` what it rests on: regression assertions (R<k>), criteria (C<k>), verdict or case ids. It is admitted only when "
-        "the same criterion or assertion failed in 2 different cases the client rejected (then every line it adds or changes carries that id, "
-        'e.g. "[C6]"), or when it cites a criterion your parent added to the contract by an amendment the client confirmed (none yet): then it '
-        'may add only that criterion\'s own words, one line each, "- C<k>: <its text>". A link note id counts as its criterion. Your lessons and '
-        "relayed verdicts (the assistant's own reading) are not evidence. If it is refused, nothing is "
-        "written: send your parent the refusal's question once and go on with the playbook as it is. The new version applies to this request."
-    )
+    assert step_3(section) == STEP_3
 
 
-def test_step_3_says_lines_carry_their_id_or_are_the_criterions_words(svc):
+def test_step_3_says_what_a_rule_needs_what_is_watched_and_what_needs_the_parents_acknowledgement(svc):
     first = request(svc, "ai")
     deliver(svc, "ceo", first, lessons="Thin on sources.")
     request(svc, "chips")
     step = step_3(reflect_section(svc.run_prompt("ceo", svc.begin_run("ceo"))))
-    assert 'failed in 2 different cases the client rejected (then every line it adds or changes carries that id, e.g. "[C6]"), or when' in step
-    assert 'then it may add only that criterion\'s own words, one line each, "- C<k>: <its text>". A link note id counts as its criterion. ' in step
-    assert "Your lessons and relayed verdicts (the assistant's own reading) are not evidence. If it is refused" in step
+    assert "A rule, or a step that changes a check, an output or how a criterion is handled, needs evidence in `evidence`: the same criterion or " \
+           "assertion failed in 2 different cases the client rejected, or the item is the own words of a criterion the client confirmed (" in step
+    assert "Lessons and relayed verdicts are not evidence. An admitted item is watched: a related client rejection warns it, a second retires it." in step
+    assert "Retiring or weakening an item that covers a criterion needs your parent's acknowledgement." in step  # Q4 (B10)
+    assert "whole new playbook" not in step and "[C6]" not in step and "- C<k>" not in step
 
 
 def step_3_after(org):
@@ -282,48 +275,48 @@ def step_3_after(org):
     return step_3(reflect_section(org.run_prompt("ceo", org.begin_run("ceo"))))
 
 
-CLAUSE = "contract by an amendment the client confirmed ("
+CLAUSE = "a criterion the client confirmed ("
 
 
 def test_step_3_names_the_confirmed_amendments(svc):
     org = svc
-    assert f"{CLAUSE}none yet):" in step_3_after(org)  # no amendment at all
-    assert "are not confirmed" not in step_3_after(org) and "is not confirmed" not in step_3_after(org)
+    assert f"{CLAUSE}none yet)" in step_3_after(org)  # no amendment at all
+    assert "not confirmed yet" not in step_3_after(org)
 
 
 def test_step_3_names_one_confirmed_amendment(svc):
     org = svc
     c3 = confirmed_amendment(org, "Every claim names its source")
-    assert f"{CLAUSE}now {c3}: a revision citing it may add its words):" in step_3_after(org)
+    assert f"{CLAUSE}now {c3} (an item may be the own words of it))" in step_3_after(org)
 
 
 def test_step_3_names_several_confirmed_amendments(svc):
     org = svc
     c3 = confirmed_amendment(org, "Every claim names its source", topic="one")
     c4 = confirmed_amendment(org, "Every figure names its date", topic="two")
-    assert f"{CLAUSE}now {c3}, {c4}: a revision citing one of them may add its words):" in step_3_after(org)
+    assert f"{CLAUSE}now {c3}, {c4} (an item may be the own words of one))" in step_3_after(org)
 
 
 def test_step_3_says_which_amendments_are_not_confirmed_yet(svc):
     org = svc
     amend_legacy(org, add_acceptance=["Quote the source"])  # an amendment nobody confirmed: C3
-    assert f"{CLAUSE}none yet; C3 is not confirmed yet):" in step_3_after(org)
+    assert f"{CLAUSE}none yet; C3 not confirmed yet)" in step_3_after(org)
     c4 = confirmed_amendment(org, "Every claim names its source")
     amend_legacy(org, add_acceptance=["Quote the date"])
-    assert f"{CLAUSE}now {c4}: a revision citing it may add its words; C3, C5 are not confirmed yet):" in step_3_after(org)
+    assert f"{CLAUSE}now {c4} (an item may be the own words of it); C3, C5 not confirmed yet)" in step_3_after(org)
 
 
-def test_eligible_ids_say_may_add_its_words(svc):
+def test_eligible_ids_say_an_item_may_be_the_own_words(svc):
     """One id, several, none yet, and the unconfirmed ones appended (``_eligible``)."""
     org = svc
-    assert f"{CLAUSE}none yet):" in step_3_after(org)
+    assert f"{CLAUSE}none yet)" in step_3_after(org)
     c3 = confirmed_amendment(org, "Every claim names its source", topic="one")
-    assert f"{CLAUSE}now {c3}: a revision citing it may add its words):" in step_3_after(org)
+    assert f"{CLAUSE}now {c3} (an item may be the own words of it))" in step_3_after(org)
     c4 = confirmed_amendment(org, "Every figure names its date", topic="two")
-    assert f"{CLAUSE}now {c3}, {c4}: a revision citing one of them may add its words):" in step_3_after(org)
+    assert f"{CLAUSE}now {c3}, {c4} (an item may be the own words of one))" in step_3_after(org)
     amend_legacy(org, add_acceptance=["Quote the source"])  # C5: nobody confirmed it
     amend_legacy(org, add_acceptance=["Quote the date"])  # C6
-    assert f"{CLAUSE}now {c3}, {c4}: a revision citing one of them may add its words; C5, C6 are not confirmed yet):" in step_3_after(org)
+    assert f"{CLAUSE}now {c3}, {c4} (an item may be the own words of one); C5, C6 not confirmed yet)" in step_3_after(org)
 
 
 def test_eligible_names_user_initiated_ids_as_never_admitted(svc):
@@ -331,20 +324,20 @@ def test_eligible_names_user_initiated_ids_as_never_admitted(svc):
     org = svc
     v1 = ["At most 600 words", "Every factual claim has a source URL"]
     write_version(org, 2, [*v1, "One page"], initiated="user", words="Keep it to one page.")  # C3
-    assert f"{CLAUSE}none yet; C3 is user-initiated (rule (c) never admits it)):" in step_3_after(org)
+    assert f"{CLAUSE}none yet; C3 user-initiated (never rule (c)))" in step_3_after(org)
     write_version(org, 3, [*v1, "One page", "Names its week"], initiated="user", words="Name the week.")  # C4
-    assert f"{CLAUSE}none yet; C3, C4 are user-initiated (rule (c) never admits them)):" in step_3_after(org)
+    assert f"{CLAUSE}none yet; C3, C4 user-initiated (never rule (c)))" in step_3_after(org)
     amend_legacy(org, add_acceptance=["Quote the source"])  # C5: an amendment nobody confirmed
-    assert f"{CLAUSE}none yet; C5 is not confirmed yet; C3, C4 are user-initiated (rule (c) never admits them)):" in step_3_after(org)
+    assert f"{CLAUSE}none yet; C5 not confirmed yet; C3, C4 user-initiated (never rule (c)))" in step_3_after(org)
     c6 = confirmed_amendment(org, "Every figure names its date")
-    assert f"{CLAUSE}now {c6}: a revision citing it may add its words; C5 is not confirmed yet; C3, C4 are user-initiated (rule (c) never admits them)):" in step_3_after(org)
+    assert f"{CLAUSE}now {c6} (an item may be the own words of it); C5 not confirmed yet; C3, C4 user-initiated (never rule (c)))" in step_3_after(org)
 
 
 def test_step_3_leaves_out_a_removed_amendment(svc):
     org = svc
     amend_legacy(org, add_acceptance=["Quote the source"])
     amend_legacy(org, remove_acceptance=["Quote the source"])
-    assert f"{CLAUSE}none yet):" in step_3_after(org)
+    assert f"{CLAUSE}none yet)" in step_3_after(org)
 
 
 def test_the_reject_preamble_speaks_of_rules_without_client_evidence(svc):
@@ -354,8 +347,8 @@ def test_the_reject_preamble_speaks_of_rules_without_client_evidence(svc):
     org.feedback(ROOT, first.id, "reject", "Too long.", source="human")
     request(org, "chips")
     section = reflect_section(org.run_prompt("ceo", org.begin_run("ceo")))
-    assert "A rule without the client's evidence (step 3) is a reason to look, not to change how the team works" in section
-    assert "Revise the playbook when step 3 admits it, then handle the request." in section
+    assert "Without the client's evidence (step 3) a rejection is a reason to look, not to change an item" in section
+    assert "Revise the playbook when step 3 admits it" not in section and "A rule without the client's evidence" not in section
     assert "One rejection is a reason to look" not in section and "Revise the playbook only as step 3 says" not in section
 
 
@@ -368,32 +361,14 @@ def test_step_3_for_an_agent_client_says_nothing_can_admit(svc):
     org.request("ceo", "eng-brief", {"topic": "y"}, budget=3)
     section = reflect_section_of(org.run_prompt(ENG, org.begin_run(ENG)), "eng-brief")
     assert step_3(section) == (
-        "3. Your client is an agent, so nothing in this service's history can admit a playbook revision (only the first version, or restoring a "
-        "version your parent wrote): apply the evidence when you plan this request, and if you think the playbook must change, send your parent "
-        "(`send`) what you would change and why."
+        "3. Your client is an agent, so nothing can admit a change (only the first version): apply the evidence when you plan this request, and if "
+        "you think the playbook must change, send your parent (`send`) what you would change and why."
     )
     assert "evidence" not in step_3(section).replace("evidence when", "")
 
 
 def reflect_section_of(prompt, service):
     return prompt.split(f"# Reflect before you start: {service}")[1].split("# New messages")[0]
-
-
-def test_the_restore_step_says_which_restore_needs_evidence(svc):
-    org = svc
-    org.revise_playbook("ceo", "weekly-brief", "first", "first", [], text="Steps one.")
-    c3 = confirmed_amendment(org, "Every claim names its source")
-    org.revise_playbook("ceo", "weekly-brief", "add", "second", [c3], kind="step", text="Every claim names its source")
-    time.sleep(0.002)
-    first = request(org)
-    deliver(org, "ceo", first)
-    request(org, "again")
-    section = reflect_section(org.run_prompt("ceo", org.begin_run("ceo")))
-    restore = next(line for line in section.splitlines() if "restore that one" in line)
-    assert restore == (
-        "5. If the current version did worse than an earlier one, restore that one (read ceo/services/weekly-brief/history/PLAYBOOK.v<k>.md): "
-        "revise_playbook with its text unchanged; a version your parent wrote needs evidence=[], any other needs evidence like a revision."
-    )
 
 
 def test_no_playbook_texts_ask_for_the_steps_followed_only(svc):
@@ -564,10 +539,9 @@ def test_the_regression_line_marks_a_removed_criterion(svc):
 
 # ------------------------------------------------------------------------------------------ the tier-aware Reflect texts
 HUMAN_LEAD = (
-    "The client rejected a delivery: check the delivery against its words, the regression list and the contract before you plan the request. "
-    "A rule without the client's evidence (step 3) is a reason to look, not to change how the team works: your parent asks the client whether "
-    "it is a lasting requirement, and the answer reaches you as a contract change or a criterion link. Revise the playbook when step 3 admits "
-    "it, then handle the request."
+    "The client rejected a delivery: check it against their words, the regression list and the contract before you plan the request. Without the "
+    "client's evidence (step 3) a rejection is a reason to look, not to change an item: your parent asks the client whether it is a lasting "
+    "requirement, and the answer reaches you as a contract change or a criterion link."
 )
 RELAYED_LEAD = (
     "A relayed rejection arrived (the assistant's own reading, not the client's words): apply what it asks in this request where the contract "
@@ -577,10 +551,10 @@ AGENT_LEAD = (
     "Your client, an agent, rejected a delivery (its verdict is a hypothesis): apply what it asks in this request where the contract allows "
     "it; it is not the client's evidence, so it cannot change the playbook (step 3). Then handle the request."
 )
-LOCKED_END = ". The contract is locked, so you cannot revise the playbook: apply what the feedback shows, then handle the request."
+LOCKED_END = ". The contract is locked, so you cannot change the playbook: apply what the feedback shows, then handle the request."
 UNLOCKED_RAISE_BAR = (
     "The playbook may raise the bar, never lower it: the acceptance criteria come from the contract and travel with every request. Your parent "
-    "asks the client whether a rejection is a lasting requirement: send nothing about it yourself beyond a refused revision's question (step 3)."
+    "asks the client whether a rejection is a lasting requirement: send nothing about it yourself beyond a refused change's question (step 3)."
 )
 LOCKED_RAISE_BAR = (
     "The playbook may raise the bar, never lower it: the acceptance criteria come from the contract and travel with every request. Your parent "
@@ -657,7 +631,7 @@ def test_step_2_unlocked_and_locked_texts(svc):
     unlocked = rejected_then_new(svc)
     assert (
         "2. When a lesson of yours conflicts with the client's own feedback (not a relayed verdict), the client is right: apply the feedback in "
-        "this request, and change the playbook only as step 3 says (say so in the reason)."
+        "this request."
     ) in unlocked.splitlines()
     locked = agent_client_section(svc, locked=True)
     assert (
@@ -931,3 +905,198 @@ def test_a_failed_watch_read_says_item_states_could_not_be_read(pw):
 def test_a_locked_playbook_keeps_its_head_and_its_no_playbook_text(pw):
     text = section_of(pw, kept("P1", "P2", "P3"), locked=True)
     assert text.splitlines()[0] == "# Playbook: weekly-brief (v1, locked by your parent)"
+
+
+# ------------------------------------------------------------------------------------------ 14.2 and 12: the Reflect section, one item at a time, in at most 600 words
+from hirearchy.reflection import _sections  # noqa: E402
+from hirearchy.reflection._sections import EvidenceReflectSection  # noqa: E402
+
+INTRO = "Your playbook is how your team delivers this service; you own it and change it one item at a time. Evidence since v1:"
+LEAD_HUMAN = (
+    "The client rejected a delivery: check it against their words, the regression list and the contract before you plan the request. Without the "
+    "client's evidence (step 3) a rejection is a reason to look, not to change an item: your parent asks the client whether it is a lasting "
+    "requirement, and the answer reaches you as a contract change or a criterion link."
+)
+STEP_1 = (
+    "1. Look for what repeats, and for anything the client rejected (the regression list). A rejection or a failure is enough to look into on "
+    "its own; a single slow case is not."
+)
+STEP_2 = (
+    "2. When a lesson of yours conflicts with the client's own feedback (not a relayed verdict), the client is right: apply the feedback in this request."
+)
+STEP_3 = (
+    "3. If a change to how the team works would prevent it, change one item with `revise_playbook` (its description gives the ops). A rule, or a "
+    "step that changes a check, an output or how a criterion is handled, needs evidence in `evidence`: the same criterion or assertion failed in 2 "
+    "different cases the client rejected, or the item is the own words of a criterion the client confirmed (none yet). Lessons and relayed verdicts "
+    "are not evidence. An admitted item is watched: a related client rejection warns it, a second retires it. Retiring or weakening an item that "
+    "covers a criterion needs your parent's acknowledgement. If a change is refused, nothing is written: send your parent its question once and go on."
+)
+STEP_4 = (
+    "4. The playbook may raise the bar, never lower it: the acceptance criteria come from the contract and travel with every request. Your parent "
+    "asks the client whether a rejection is a lasting requirement: send nothing about it yourself beyond a refused change's question (step 3)."
+)
+STEP_5 = "5. If nothing needs to change, change nothing. Then handle the request following the playbook."
+
+
+def test_the_reflect_text_word_for_word_for_a_human_unlocked_client(svc):
+    svc.revise_playbook("ceo", "weekly-brief", "first", "one", [], text="## Steps\n1. Search.\n2. Write.")
+    time.sleep(0.002)
+    first = request(svc, "ai")
+    deliver(svc, "ceo", first, lessons="Thin on sources.")
+    svc.feedback(ROOT, first.id, "reject", "Too long.", source="human")
+    request(svc, "chips")
+    section = reflect_section(svc.run_prompt("ceo", svc.begin_run("ceo")))
+    lines = section.strip().splitlines()
+    assert lines[0] == INTRO and lines[1].startswith("Cases with new evidence")
+    assert lines[-6:] == [LEAD_HUMAN, STEP_1, STEP_2, STEP_3, STEP_4, STEP_5]
+    assert "Warning:" not in section
+
+
+def reflect_for(w, *, locked=False, agent=False, rejected="", new_request=True, watch=(), digest="", eligible=None):
+    """The Reflect section over a stand-in watch for ``ceo``'s ``weekly-brief`` (or the agent client's ``eng-brief``), with ``digest`` as its text."""
+    name, owner = ("eng-brief", "ceo/eng") if agent else (sup.SERVICE, "ceo")
+    contract = w.s.catalog.read_contract(owner, name)
+    if locked:
+        contract = dataclasses.replace(contract, locked=True)
+    evidence = AdmittingServiceEvidence(watch=watch)
+    reflect = EvidenceReflectSection(w.s.catalog, w.s.d.settings, w.paths, w.history, evidence)
+    return reflect.section(owner, contract, lambda words: digest, rejected=rejected, new_request=new_request)
+
+
+@pytest.fixture
+def rw(tmp_path):
+    """A world with both services the Reflect section is built for: ``ceo``'s ``weekly-brief`` (client: the user) and ``ceo/eng``'s ``eng-brief``
+    (client: ``ceo``, an agent), each with 7 criteria of every kind ``{eligible}`` lists and enough ids to need its ``+n more``."""
+    w = sup.populated(fs_world(tmp_path))
+    sup.define(w)
+    w.s.d.post(sup_message_grant())
+    sup.define(w, owner="ceo/eng", name="eng-brief", actor="ceo")
+    return w
+
+
+def sup_message_grant():
+    from hirearchy.kernel import Message
+
+    return Message(sender="root", to="ceo", type="note", body="runs for you", title="grant", budget=20)
+
+
+def warning(*ids):
+    return [ItemWatch(f"P{n}", "step", "warning", 1, related=(f"R{n}",)) for n in ids]
+
+
+def test_the_warning_line_lists_at_most_5_items_then_n_more(rw):
+    one = reflect_for(rw, watch=warning(12), rejected="human")
+    assert "\nWarning: P12 (R12) has one related rejection; a second retires it.\n" in one
+    two = reflect_for(rw, watch=warning(12, 13), rejected="human")
+    assert "\nWarning: P12 (R12), P13 (R13) each have one related rejection; a second retires it.\n" in two
+    five = reflect_for(rw, watch=warning(1, 2, 3, 4, 5))
+    assert "\nWarning: P1 (R1), P2 (R2), P3 (R3), P4 (R4), P5 (R5) each have one related rejection; a second retires it.\n" in five
+    seven = reflect_for(rw, watch=warning(1, 2, 3, 4, 5, 6, 7))
+    assert "\nWarning: P1 (R1), P2 (R2), P3 (R3), P4 (R4), P5 (R5), +2 more each have one related rejection; a second retires it.\n" in seven
+    assert "Warning:" not in reflect_for(rw, watch=[ItemWatch("P1", "step", "new", 1), ItemWatch("P2", "step", "kept", 1)])
+    due = [ItemWatch("P1", "step", "warning", 1, related=("R1", "R2"), retire_due=True)]
+    assert "Warning:" not in reflect_for(rw, watch=due)  # two related rejections: not "one related rejection"
+    assert reflect_for(rw, watch=warning(3)).index("Warning:") < reflect_for(rw, watch=warning(3)).index("1. Look for")
+
+
+def test_the_warning_line_is_left_out_when_the_watch_cannot_be_read(rw):
+    class Unreadable(AdmittingServiceEvidence):
+        def watch(self, owner, service):
+            raise OrgError("the mailbox of root cannot be read")
+
+    contract = rw.s.catalog.read_contract("ceo", sup.SERVICE)
+    text = EvidenceReflectSection(rw.s.catalog, rw.s.d.settings, rw.paths, rw.history, Unreadable()).section("ceo", contract, lambda words: "D")
+    assert "Warning:" not in text and "3. If a change" in text
+
+
+def words_of(text):
+    return len(text.split())
+
+
+def longest_eligible(w):
+    """Six criteria of every kind ``{eligible}`` lists, so that each of its three lists is cut at 5 ids and ends with ``+1 more``: C3-C8 added by an
+    amendment the client confirmed, C9-C14 added by amendments nobody confirmed, C15-C20 the user's own."""
+    def criteria_text(extra):
+        meta, _ = w.s.store.read_contract("ceo", sup.SERVICE)
+        return [*meta["acceptance"], *extra]
+
+    for n in range(6):  # confirmed: the amendment, then a case the client rejected and the user's yes on it
+        sup.amend_legacy(w, add_acceptance=[f"Confirmed rule {n}"])
+        added = next(c.id for c in reversed(w.s.catalog.criteria("ceo", sup.SERVICE)) if c.text == f"Confirmed rule {n}" and c.current)
+        task = sup.ask(w, f"confirmed {n}")
+        sup.deliver(w, task)
+        no = sup.note_on(w, task, verdict="reject", source="human", body=f"Missing: {n}")
+        sup.note_on(w, task, reply_to=no.id, source="human", criterion=added)
+    for n in range(6):
+        sup.amend_legacy(w, add_acceptance=[f"Unconfirmed rule {n}"])
+    meta, body = w.s.store.read_contract("ceo", sup.SERVICE)
+    version = int(meta["version"]) + 1
+    w.s.store.write_contract(
+        "ceo", sup.SERVICE,
+        {**meta, "version": version, "acceptance": criteria_text([f"The user's own rule {n}" for n in range(6)]), "defined_by": "root",
+         "defined": w.s.d.clock.now().isoformat(timespec="microseconds"), "initiated": "user", "words": "Add these."},
+        body, version - 1,
+    )
+    return w.evidence
+
+
+def test_the_fixed_text_is_at_most_400_words_in_every_variant_at_its_longest(rw):
+    from itertools import product
+
+    longest_eligible(rw)
+    contract = rw.s.catalog.read_contract("ceo", sup.SERVICE)
+    clause = EvidenceReflectSection(rw.s.catalog, rw.s.d.settings, rw.paths, rw.history, AdmittingServiceEvidence())._eligible("ceo", contract.name)
+    assert clause.count("+1 more") == 3 and clause.startswith("now C3, C4, C5, C6, C7, +1 more (an item may be the own words of one); C9")
+    watch = warning(10, 11, 12, 13, 14, 15, 16)
+    longest = checked = 0
+    for locked, agent, rejected, new, warned in product((False, True), (False, True), ("", "human", "relayed", "agent"), (True, False), (False, True)):
+        text = reflect_for(rw, locked=locked, agent=agent, rejected=rejected, new_request=new, watch=watch if warned else ())
+        n = words_of(text)
+        longest = max(longest, n)
+        checked += 1
+        assert n <= _sections.REFLECT_FIXED_WORDS, (locked, agent, rejected, new, warned, n)
+    assert checked == 64 and _sections.REFLECT_FIXED_WORDS == 400 and _sections.REFLECT_WORDS == 600
+    assert longest > 350  # the bound is measured on the real texts at their longest, not on empty ones
+
+
+def test_each_id_list_of_the_fixed_text_is_cut_at_5_ids():
+    assert _sections.eligible_clause([], [], []) == "none yet"
+    assert _sections.eligible_clause(["C3"], [], []) == "now C3 (an item may be the own words of it)"
+    assert _sections.eligible_clause(["C3", "C4"], ["C5"], ["C6", "C7"]) == (
+        "now C3, C4 (an item may be the own words of one); C5 not confirmed yet; C6, C7 user-initiated (never rule (c))"
+    )
+    assert _sections.eligible_clause([], ["C5"], []) == "none yet; C5 not confirmed yet"
+    ids = [f"C{n}" for n in range(3, 15)]
+    assert _sections.eligible_clause(ids, [], []) == "now C3, C4, C5, C6, C7, +7 more (an item may be the own words of one)"
+
+
+def test_the_whole_section_is_at_most_600_words(tmp_path):
+    w = sup.populated(fs_world(tmp_path))
+    story = wordy_cases(w)
+    sup.ask(w, "open")
+    text = w.sections.prompt_sections("ceo", w.s.d.inbox("ceo"))
+    section = text.split("# Reflect before you start: weekly-brief")[1].split("\n# ")[0]
+    assert words_of(section) <= _sections.REFLECT_WORDS
+    assert len(story.asks) == 8 and "- case " in section  # the digest keeps at least one case
+
+
+def wordy_cases(w):
+    """Eight delivered cases whose lessons are about 60 words each: the digest alone would run to about 450 words."""
+    from . import _stories
+
+    sup.define(w)
+    story = _stories.Story()
+    for i in range(8):
+        task = sup.ask(w, f"topic {i}")
+        story.asks.append(task)
+        story.results.append(sup.deliver(w, task, runs=1, lessons=" ".join(f"w{i}x{k}" for k in range(60))))
+        w.s.d.clock.advance(1)
+    return story
+
+
+def test_todays_step_5_whole_version_restore_is_gone(rw):
+    sup.first_playbook(rw, sup.STEPS)
+    sup.add_step(rw, "More.")
+    text = reflect_for(rw)
+    assert "restore" not in text and "history/PLAYBOOK.v<k>.md" not in text
+    assert [x[:2] for x in text.splitlines() if x[:1].isdigit()] == ["1.", "2.", "3.", "4.", "5."]

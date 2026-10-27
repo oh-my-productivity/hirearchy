@@ -133,3 +133,28 @@ def test_at_most_six_cases_are_shown_and_the_text_stays_within_its_limit(w: Refl
 
 def test_the_implementations_agree_on_an_empty_service(digest: ReflectionDigest) -> None:
     assert digest.reflection_digest("ceo", SERVICE) is None
+
+
+def test_with_words_the_digest_drops_the_oldest_cases_then_clips_and_says_more_services(w: ReflectionWorld) -> None:
+    define(w)
+    for i in range(8):  # eight cases whose lessons are about 60 words each
+        deliver(w, ask(w, f"topic {i}"), runs=1, lessons=" ".join(f"w{i}x{k}" for k in range(60)))
+        w.s.d.clock.advance(1)
+    full = w.digest.reflection_digest("ceo", SERVICE)
+    assert full is not None and len(full.split()) > 300
+    assert w.digest.reflection_digest("ceo", SERVICE, words=None) == full and w.digest.reflection_digest("ceo", SERVICE, words=10000) == full
+    case_lines = [x for x in full.splitlines() if x.startswith("- case ")]
+    capped = w.digest.reflection_digest("ceo", SERVICE, words=200)
+    assert capped is not None and len(capped.split()) <= 200
+    kept = [x for x in capped.splitlines() if x.startswith("- case ")]
+    assert 1 <= len(kept) < len(case_lines) and kept == case_lines[: len(kept)]  # the oldest go first; the newest stay, newest first
+    assert "By playbook version:" in capped and "(more: services)" not in capped  # dropping whole cases was enough
+    tiny = w.digest.reflection_digest("ceo", SERVICE, words=40)
+    assert tiny is not None and len(tiny.split()) <= 40
+    (line,) = [x for x in tiny.splitlines() if x.startswith("- case ")]
+    assert line.endswith("… (more: services)") and line.startswith(case_lines[0][:60]) and "By playbook version:" in tiny
+
+
+def test_a_digest_with_words_is_none_when_there_is_no_evidence(w: ReflectionWorld) -> None:
+    define(w)
+    assert w.digest.reflection_digest("ceo", SERVICE, words=200) is None

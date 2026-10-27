@@ -18,6 +18,7 @@ CLIP_LESSON = 220
 CLIP_NOTE = 160
 CLIP_PART = 60  # characters of one part of an after-action review in the digest
 MAX_VERDICTS = 4  # verdicts of one case shown in a digest line
+MORE = "… (more: services)"  # what a clipped digest ends with: `services` lists the rest
 
 
 def verdict_chain(c: Case, assertions: Mapping[str, str] | None = None) -> str:
@@ -116,7 +117,7 @@ class DigestBuilder(ReflectionDigest):
         self._catalog = catalog
         self._history = history
 
-    def reflection_digest(self, owner: str, service: str) -> str | None:
+    def reflection_digest(self, owner: str, service: str, words: int | None = None) -> str | None:
         pb = self._catalog.read_playbook(owner, service)
         items = self._history.cases(owner, service)
         since = pb.revised if pb.version else None
@@ -129,7 +130,32 @@ class DigestBuilder(ReflectionDigest):
         per_version = [f"- v{v}: {s.line()}" for v, s in stats_by_version(items).items()]
         while True:
             lines = [case_line(c, ids) for c in shown]
-            text = "Cases with new evidence (most recent first):\n" + "\n".join(lines) + "\nBy playbook version:\n" + "\n".join(per_version)
-            if len(text) <= DIGEST_CHARS or len(shown) == 1:
-                return text if len(text) <= DIGEST_CHARS else text[: DIGEST_CHARS - 1].rstrip() + "…"
-            shown = shown[:-1]
+            text = self._text(lines, per_version)
+            if (len(text) <= DIGEST_CHARS and (words is None or len(text.split()) <= words)) or len(shown) == 1:
+                break
+            shown = shown[:-1]  # the oldest of the shown cases goes first
+        if len(text) > DIGEST_CHARS:
+            text = text[: DIGEST_CHARS - 1].rstrip() + "…"
+        if words is not None and len(text.split()) > words:
+            text = self._text([self._clipped(lines[0], words - len(self._text([""], per_version).split()))], per_version)
+            if len(text.split()) > words:  # the other lines alone are too long for the room: cut the whole block
+                text = _cut(text, words)
+        return text
+
+    @staticmethod
+    def _text(lines: list[str], per_version: list[str]) -> str:
+        return "Cases with new evidence (most recent first):\n" + "\n".join(lines) + "\nBy playbook version:\n" + "\n".join(per_version)
+
+    @staticmethod
+    def _clipped(line: str, room: int) -> str:
+        """``line`` cut to ``room`` words, ending with ``MORE`` (at least the first word stays)."""
+        keep = max(room - len(MORE.split()), 1)
+        found = line.split()
+        return line if len(found) <= room else " ".join(found[:keep]) + " " + MORE
+
+
+def _cut(text: str, words: int) -> str:
+    """``text`` cut after the words that fit, ending with ``MORE`` (the last resort when even one case line and the statistics are too long)."""
+    marks = list(re.finditer(r"\S+", text))
+    keep = max(words - len(MORE.split()), 1)
+    return text[: marks[keep - 1].end()] + " " + MORE
