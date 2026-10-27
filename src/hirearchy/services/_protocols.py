@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Protocol, runtime_checkable
 
 from ..kernel import Message
-from .api import Contract, Criterion, JudgedBase, PlaybookChange
+from .api import Contract, Criterion, ItemWatch, JudgedBase, PlaybookChange
 
 
 @runtime_checkable
@@ -147,6 +147,26 @@ class PlaybookRevisions(Protocol):
         acknowledged: str | None = None, content: str | None = None,
     ) -> PlaybookChange:
         """Change one item of a playbook (see ``ServiceCommands.revise_playbook``)."""
+        ...
+
+
+@dataclass(frozen=True)
+class SettleReport:
+    """What one settlement did (design 8.5): the ids it retired, the ids it warned, and the ``(id, error)`` of each retire (or note) it could not
+    write (``""`` for the id when the watch itself could not be read)."""
+
+    retired: tuple[str, ...] = ()
+    warned: tuple[str, ...] = ()
+    failed: tuple[tuple[str, str], ...] = ()
+
+
+@runtime_checkable
+class WatchSettlement(Protocol):
+    def settle(self, owner: str, service: str, before: Sequence[ItemWatch] | None, *, strict: bool = False) -> SettleReport:
+        """Retire what the watch says is due, in ``owner``'s ``service``: for every item with two related rejections, write the next playbook version
+        without its watched text, the text before the watch back in its place when there is one, and tell the owner and the client (8.3). ``before`` is
+        the watch as it stood before the write that may have changed it (None: not known, so no warning note is sent). A failed write is recorded in
+        the report and never raised; with ``strict`` (the owner's op) a write that fails raises (``PlaybookRace`` against a concurrent writer)."""
         ...
 
 

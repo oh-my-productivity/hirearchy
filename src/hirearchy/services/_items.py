@@ -393,6 +393,57 @@ def migrate_body(body: str, *, splitters: Sequence[Splitter] = SPLITTERS) -> Mig
     raise AssertionError("the migration of the playbook lost a line")
 
 
+@dataclass(frozen=True)
+class Repair:
+    """A body that no longer parses (a hand edit of ``services/**``) as new step items (4.4): ids after the highest one used, so no id is reused and the
+    old ids read retired. ``top`` is the new ``items_max``, ``span`` names the new ids and ``reason`` is the version's reason."""
+
+    items: tuple[PlaybookItem, ...]
+    sections: tuple[PlaybookSection, ...]
+    top: int
+    count: int
+    span: str
+    reason: str
+    note: str  # what follows "Playbook v{n} is " in the client's note of an owner op written after the repair
+    alone: str  # the client's note of a repair whose owner op was then refused
+    reply: str  # the start of the owner's reply to an op written after the repair
+
+
+def repair_of(migration: Migration, version: int, items_max: int, error: str) -> Repair:
+    """The repair of version ``version``, whose body ``migration`` split and which failed to parse with ``error``, when ``items_max`` ids were used."""
+    items, sections = renumbered(migration.items, migration.sections, items_max)
+    count = len(items)
+    span = f"P{items[0].id[1:]}-{items[-1].id}" if count else "no items"
+    named = f" {span}" if count else ""
+    reason = (
+        f"v{version} was changed outside revise_playbook and is not in item form ({error}); its text as {count} items{named} "
+        "(no change of words)" + migration.reason
+    )
+    note = f"v{version}, which was changed outside revise_playbook ({error}), as {count} new items ({span}), no change of words{migration.reason}."
+    alone = f"v{version} was changed outside revise_playbook and is not in item form ({error}); its text as {count} items ({span}), no change of words{migration.reason}."
+    reply = f"playbook v{version + 1} is v{version}, which was changed outside revise_playbook, as {count} new items ({span}, no change of words{migration.reason}). "
+    return Repair(items, sections, items_max + count, count, span, reason, note, alone, reply)
+
+
+def and_ids(ids: Sequence[str]) -> str:
+    """``R4``, ``R4 and R6``, ``R4, R5 and R6``."""
+    return ids[0] if len(ids) == 1 else ", ".join(ids[:-1]) + " and " + ids[-1]
+
+
+def without(
+    items: Sequence[PlaybookItem], sections: Sequence[PlaybookSection], gone: PlaybookItem,
+) -> tuple[tuple[PlaybookItem, ...], tuple[PlaybookSection, ...]]:
+    """The items and sections without ``gone``, in the two normal forms of 4.1: the text before the first heading is in the body only while it
+    holds a live item, and the rules section only while a rule is live (a heading of the owner's own that is left with no item stays)."""
+    kept = tuple(i for i in items if i.id != gone.id)
+    out = [replace(s, ids=tuple(i for i in s.ids if i != gone.id)) for s in sections]
+    if out and out[0].heading == "" and not out[0].ids and gone.section == "":
+        out.pop(0)
+    if gone.kind == "rule" and not any(i.kind == "rule" for i in kept) and out and out[-1].heading.rstrip() == RULES_HEADING and not out[-1].ids:
+        out.pop()
+    return kept, tuple(out)
+
+
 # ----------------------------------------------------------------------------------------------------------------------- placement (4.1)
 
 

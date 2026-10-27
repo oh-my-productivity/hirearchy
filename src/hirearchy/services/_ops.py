@@ -15,8 +15,8 @@ from ..delivery import MessageDelivery
 from ..kernel import NAME_RE, ROOT, OrgError, clip_line, parent, split_frontmatter, stamp_of
 from ..mail import MailboxReader
 from ._items import (
-    RULES_HEADING, RUNTIME_MIGRATION, SPLITTERS, PlacementError, Splitter, canonical_why, checked_body, item_extra, migrate_body, place_add, place_restore,
-    renumbered,
+    RUNTIME_MIGRATION, SPLITTERS, PlacementError, Splitter, and_ids, canonical_why, checked_body, item_extra, migrate_body, place_add, place_restore,
+    repair_of, without,
 )
 from ._protocols import PlaybookRevisions, PlaybookTexts, PlaybookWriter
 from .api import (
@@ -267,11 +267,6 @@ def _rebuilt_in_order(items: Sequence[PlaybookItem], sections: Sequence[Playbook
     return tuple(replace(by_id[i], section=s.heading) for s in sections for i in s.ids), tuple(sections)
 
 
-def _and(ids: Sequence[str]) -> str:
-    """``R4``, ``R4 and R6``, ``R4, R5 and R6``."""
-    return ids[0] if len(ids) == 1 else ", ".join(ids[:-1]) + " and " + ids[-1]
-
-
 def _headings(sections: Sequence[PlaybookSection]) -> list[str]:
     """The heading lines of the sections (the text before the first heading has none)."""
     return [s.heading for s in sections if s.heading]
@@ -291,20 +286,6 @@ def _item_line(item: PlaybookItem) -> str:
     """An item's words on one line (the note to an agent client)."""
     words = item.text if item.kind == "step" else f"WHEN {item.when} THEN {item.text}"
     return clip_line(words, LINE_CLIP)
-
-
-def _without(
-    items: Sequence[PlaybookItem], sections: Sequence[PlaybookSection], gone: PlaybookItem,
-) -> tuple[tuple[PlaybookItem, ...], tuple[PlaybookSection, ...]]:
-    """The items and sections without ``gone``, in the two normal forms of 4.1: the text before the first heading is in the body only while it
-    holds a live item, and the rules section only while a rule is live (a heading of the owner's own that is left with no item stays)."""
-    kept = tuple(i for i in items if i.id != gone.id)
-    out = [replace(s, ids=tuple(i for i in s.ids if i != gone.id)) for s in sections]
-    if out and out[0].heading == "" and not out[0].ids and gone.section == "":
-        out.pop(0)
-    if gone.kind == "rule" and not any(i.kind == "rule" for i in kept) and out and out[-1].heading.rstrip() == RULES_HEADING and not out[-1].ids:
-        out.pop()
-    return kept, tuple(out)
 
 
 class RuleItemReviser(PlaybookRevisions):
@@ -506,34 +487,25 @@ class RuleItemReviser(PlaybookRevisions):
             return _Book(0, (), (), 0)
         if current.items is not None:
             return _Book(version, current.items, current.sections, current.items_max)
-        repair = bool(current.parse_error)
         migration = migrate_body(current.body, splitters=self._splitters)
-        items, sections = renumbered(migration.items, migration.sections, current.items_max) if repair else (migration.items, migration.sections)
-        count = len(items)
-        top = current.items_max + count if repair else count
-        span = f"P{items[0].id[1:]}-{items[-1].id}" if count else "no items"
-        if repair:
-            named = f" {span}" if count else ""
-            reason = (
-                f"v{version} was changed outside revise_playbook and is not in item form ({current.parse_error}); its text as {count} items{named} "
-                "(no change of words)" + migration.reason
-            )
+        if current.parse_error:
+            fix = repair_of(migration, version, current.items_max, current.parse_error)
+            items, sections, top, reason = fix.items, fix.sections, fix.top, fix.reason
+            note, alone, reply = fix.note, fix.alone, fix.reply
         else:
+            items, sections = migration.items, migration.sections
+            count = top = len(items)
+            span = f"P{items[0].id[1:]}-{items[-1].id}" if count else "no items"
             reason = f"the free-text v{version} as {count} items (no change of words)" + migration.reason
+            note = f"the free text of v{version} as {count} items ({span}), no change of words{migration.reason}."
+            alone = f"The free text of v{version} as {count} items ({span}), no change of words{migration.reason}."
+            reply = f"playbook v{version + 1} is the free-text v{version} as {count} items ({span}, no change of words{migration.reason}). "
         extra = item_extra(items, top, "migrate", admitted="migrate")
         body = checked_body(items, sections, extra)
         try:
             self._playbooks.write(call.actor, call.service, version + 1, body, RUNTIME_MIGRATION, reason, version, extra)
         except PlaybookRace as race:
             raise OrgError(PB_RACE.format(service=call.service, n=race.current)) from race
-        if repair:
-            note = f"v{version}, which was changed outside revise_playbook ({current.parse_error}), as {count} new items ({span}), no change of words{migration.reason}."
-            alone = f"v{version} was changed outside revise_playbook and is not in item form ({current.parse_error}); its text as {count} items ({span}), no change of words{migration.reason}."
-            reply = f"playbook v{version + 1} is v{version}, which was changed outside revise_playbook, as {count} new items ({span}, no change of words{migration.reason}). "
-        else:
-            note = f"the free text of v{version} as {count} items ({span}), no change of words{migration.reason}."
-            alone = f"The free text of v{version} as {count} items ({span}), no change of words{migration.reason}."
-            reply = f"playbook v{version + 1} is the free-text v{version} as {count} items ({span}, no change of words{migration.reason}). "
         return _Book(version + 1, items, sections, top, version + 1, note, alone, reply)
 
     # ------------------------------------------------------------------------------------------------------ steps 4 to 6: the item, the gate, the write
@@ -622,7 +594,7 @@ class RuleItemReviser(PlaybookRevisions):
         return self._told(call, book, path, change, what, _item_line(new))
 
     def _retire(self, call: _Call, book: _Book, old: PlaybookItem) -> PlaybookChange:
-        items, sections = _without(book.items, book.sections, old)
+        items, sections = without(book.items, book.sections, old)
         admission = Admission("exempt", (), EXEMPT)
         path = self._write(call, book, items, sections, book.items_max, admission, item=old.id)
         change = PlaybookChange(book.version + 1, "retire", old.id, old.kind, admission, None, len(items), client=call.client)
@@ -729,7 +701,7 @@ class RuleItemReviser(PlaybookRevisions):
             if confirmed is not None and v.revised is not None and confirmed > v.revised:
                 continue
             raise OrgError(PB_WATCHED_OUT.format(
-                id=gone.id, how=THE_WATCH if v.op == "watch" else YOU_WHILE_DUE, n=v.version, rejections=_and(still),
+                id=gone.id, how=THE_WATCH if v.op == "watch" else YOU_WHILE_DUE, n=v.version, rejections=and_ids(still),
                 ids=", ".join(gone.why or ()) or "nothing", client=call.client, service=call.service, first=clip_line(gone.text, WATCH_TEXT_CLIP),
             ))
 
