@@ -6,13 +6,17 @@ files, and the product's own services read it. A missing evidence file fails the
 expectation is never edited to match the product.
 """
 
+import json
 import os
 import shutil
 import subprocess
 
+from pathlib import Path
+
 import pytest
+from testkit.e2e_world import build_server
 from testkit.e7_replay import materialize
-from testkit.services_world import confirmed_amendment, deliver, request, svc  # noqa: F401  (svc is a fixture)
+from testkit.services_world import call, confirmed_amendment, deliver, fails, playbook_meta, request, svc  # noqa: F401  (svc is a fixture)
 
 from hirearchy.core import ROOT, Org
 from hirearchy.kernel import OrgError
@@ -127,3 +131,249 @@ def test_every_reader_names_the_same_watch_states(svc):
     quality = rt.quality_report.quality_data("weekly-brief")["services"][0]["watch"]
     assert [(e["item"], e["state"], e["related"]) for e in quality if e["item"] == "P4"] == [("P4", "warning", ["R2"])]
     assert "playbook watch: P4 warning (R2; the next related rejection retires it)" in rt.quality_report.quality_text("weekly-brief")
+
+
+# ============================================================================================ the exit criterion end to end (design 18.4, 20 e2e (3), 21.1)
+WEEK = "weekly-brief"
+INITIALS = "Owners as initials only"  # the planted wrong rule's words: the client confirms them as C3, then changes her mind (18.4, memos 2 and 4)
+FULL_NAMES = "Full names"  # what her answer to the next rejection adds (C4)
+WARNED = "Rejection R2 is related to playbook item P4 of weekly-brief: P4 is in warning now (ceo was told); one more related rejection retires it."
+RETIRED = "The watch retired P4 of weekly-brief (playbook v3) because rejections R2 and R3 are related to it; ceo was told."
+
+
+def planted(org):
+    """ceo's v1 and the planted wrong rule B (P4): the own words of C3, which the client confirmed (rule (c)); its watch starts ``new``. Returns C3."""
+    org.revise_playbook("ceo", WEEK, "first", "first draft", [], text=STEPS)
+    c3 = confirmed_amendment(org, INITIALS)
+    added = org.revise_playbook("ceo", WEEK, "add", "the client's rule", [c3], kind="rule", then=INITIALS)
+    assert (added.version, added.item, added.admission.rule) == (2, "P4", "c")
+    return c3
+
+
+def delivered(org, topic):
+    """A new request of the service, delivered by its owner; returns the task."""
+    task = request(org, topic)
+    deliver(org, "ceo", task)
+    return task
+
+
+def related(org, server, task, c3, note="No."):
+    """The client rejects ``task`` and answers the one question: it is about ``c3``. Returns the reply of the answering call."""
+    no = org.feedback(ROOT, task.id, "reject", note, source="human")
+    return call(server, "feedback", task_id=task.id, verdict="reject", note="Yes, it is about that.", source="human", criterion=[c3], confirms=no.id)
+
+
+def retired_by_the_chain(org, server, c3):
+    """The planted rule's two related rejections: R2 warns it (the answering call's reply says so), R3's answer is ``define_service(answers=...)`` that adds
+    C4 and the runtime retires P4 in that call. Returns the two replies."""
+    warned = related(org, server, delivered(org, "again"), c3)
+    third = delivered(org, "again and again")
+    no = org.feedback(ROOT, third.id, "reject", "Full names again.", source="human")
+    retired = call(server, "define_service", owner="ceo", name=WEEK, add_acceptance=[FULL_NAMES], answers=no.id, about=c3, words="Yes, add it.")
+    return warned, retired
+
+
+def events_of(org, kind):
+    """The events of ``kind`` the organization recorded, oldest first, as the files hold them (the fields flat, with ``actor``)."""
+    found = [json.loads(line) for f in (org.root / ".runtime" / "events").glob("*/*.jsonl") for line in f.read_text(encoding="utf-8").splitlines()]
+    return [{**e, **e.get("fields", {})} for e in sorted(found, key=lambda e: (e["ts"], e["seq"])) if e["kind"] == kind]
+
+
+def playbook_of(org):
+    return org.runtime.service_catalog.read_playbook("ceo", WEEK)
+
+
+def notes_titled(org, addr, title):
+    return [m for m in org.received(addr) if m.title == title]
+
+
+def test_the_planted_rule_is_warned_at_the_first_related_answer_and_retired_in_the_second_answering_call(svc):
+    """G1(a)+(b), design 20 e2e (3), 18.4: the planted rule B is `new`; the first related answer warns it (the reply says so, the owner is told quietly);
+    the second answering call retires it before it returns (the reply says so, the owner and the parent are told), with nothing left to restore."""
+    server = build_server(svc, ROOT)
+    c3 = planted(svc)
+    rt = svc.runtime
+    (new,) = [w for w in rt.service_evidence.watch("ceo", WEEK) if w.id == "P4"]
+    assert (new.state, new.related, new.retire_due) == ("new", (), False)
+    warned = related(svc, server, delivered(svc, "again"), c3)
+    assert warned.endswith("\n" + WARNED)
+    (warning,) = [w for w in rt.service_evidence.watch("ceo", WEEK) if w.id == "P4"]
+    assert (warning.state, warning.related, warning.retire_due) == ("warning", ("R2",), False)
+    assert playbook_of(svc).version == 2  # a warning writes no version
+    (to_owner,) = notes_titled(svc, "ceo", "playbook item P4 of weekly-brief: warning")
+    assert not notes_titled(svc, ROOT, "playbook item P4 of weekly-brief: warning")  # the warning is the owner's alone
+    assert to_owner.wake is False and "One more related rejection retires P4." in to_owner.body and "R2 (case " in to_owner.body
+    third = delivered(svc, "again and again")
+    no = svc.feedback(ROOT, third.id, "reject", "Full names again.", source="human")
+    reply = call(server, "define_service", owner="ceo", name=WEEK, add_acceptance=[FULL_NAMES], answers=no.id, about=c3, words="Yes, add it.")
+    assert reply.endswith("\n" + RETIRED)
+    after = playbook_of(svc)
+    assert after.version == 3 and INITIALS not in after.body and [i.id for i in after.items] == ["P1", "P2", "P3"]  # written in the answering call
+    meta, _ = playbook_meta(svc)
+    assert (meta["op"], meta["admitted"], meta["by"], meta["item"], meta["related"]) == ("watch", "watch", "runtime (watch)", "P4", ["R2", "R3"])
+    assert "restores" not in meta  # the rule had no text before its watch: it is removed
+    (event,) = [e for e in events_of(svc, "service.revise") if e["version"] == 3]
+    assert (event["actor"], event["admitted"], event["by"]) == ("runtime", "watch", "runtime (watch)")
+    title = "playbook of weekly-brief: the watch retired P4"
+    for addr in ("ceo", ROOT):  # the owner and the parent (root is the client and the owner's parent)
+        (told,) = notes_titled(svc, addr, title)
+        assert told.wake is False and INITIALS not in told.body  # ids only, never the item's words
+        assert told.body == (
+            "Rejections R2 and R3 are about R1, C3, which P4 cited, so the runtime retired it (playbook v3). "
+            "The client's verdicts decide this; no acknowledgement is needed."
+        )
+    (gone,) = [w for w in rt.service_evidence.watch("ceo", WEEK) if w.id == "P4"]
+    assert (gone.state, gone.related, gone.retire_due) == ("retired", ("R2", "R3"), False)
+
+
+def accepted(org, topic):
+    """A new request delivered and accepted by the client herself (a human verdict): a judged case, clean for every item."""
+    task = delivered(org, topic)
+    org.feedback(ROOT, task.id, "accept", "That is right.", source="human")
+    return task
+
+
+def watched(org, item="P4"):
+    (found,) = [w for w in org.runtime.service_evidence.watch("ceo", WEEK) if w.id == item]
+    return found
+
+
+def test_a_second_related_rejection_of_a_later_delivery_recorded_after_the_kth_verdict_retires_it(svc):
+    """B1, design 8.1 (row xx), 20 e2e (3): k = 3. The rule is warned by a related rejection of its second case; the third case's verdict (the k-th) is
+    recorded; then a rejection of a delivery made AFTER it, and recorded after it, is answered as related. That rejection is outside the rule's first window
+    (its result is after E, its note after D) and the rule never reaches `kept`, yet it is the second related rejection of a warned rule (the warned
+    window), so the runtime retires it in the answering call."""
+    server = build_server(svc, ROOT)
+    c3 = planted(svc)
+    accepted(svc, "one")
+    assert "P4 is in warning now" in related(svc, server, delivered(svc, "two"), c3)
+    accepted(svc, "three")  # the k-th judged case: E and D are defined, and the rule is not clean
+    held = watched(svc)
+    assert (held.state, held.related, held.waiting, held.retire_due) == ("warning", ("R2",), 0, False)
+    fourth = delivered(svc, "four")  # delivered after the k-th verdict
+    no = svc.feedback(ROOT, fourth.id, "reject", "Full names again.", source="human")
+    assert (watched(svc).state, watched(svc).related) == ("warning", ("R2",))  # a rejection nobody has answered yet relates to nothing
+    answer = call(server, "feedback", task_id=fourth.id, verdict="reject", note="Yes, about that.", source="human", criterion=[c3], confirms=no.id)
+    assert answer.endswith("\nThe watch retired P4 of weekly-brief (playbook v3) because rejections R2 and R3 are related to it; ceo was told.")
+    assert playbook_of(svc).version == 3 and INITIALS not in playbook_of(svc).body
+    assert (watched(svc).state, watched(svc).related) == ("retired", ("R2", "R3"))
+    assert not [w for w in svc.runtime.service_evidence.watch("ceo", WEEK) if w.state == "kept" and w.id == "P4"]
+
+
+def test_re_adding_it_or_editing_another_item_into_it_is_pb_watched_out(svc):
+    """B2, design 8.6, 20 e2e (3): once the watch retired the planted rule, its text cannot come back as a rule, as a step with the same words, or as another
+    live item edited into them, while the client's two rejections stand: PB-WATCHED-OUT names the item, the version, the rejections and the one question for
+    the client; nothing is written. A circuit that is open is the owner's to use only with a criterion the client confirms afterwards (rule (c))."""
+    server = build_server(svc, ROOT)
+    c3 = planted(svc)
+    retired_by_the_chain(svc, server, c3)
+    assert playbook_of(svc).version == 3
+    start = (
+        "refused: this text is P4's text that the watch retired in v3, because the client rejected R2 and R3 on what it cited (R1, C3). It comes back only as "
+        "the own words of a criterion the client confirms after that (rule (c)). Nothing was written. If you think the client wants it, send root (`send`) "
+        'this question once: "Your rejections R2 and R3 retired this from how we deliver weekly-brief: Owners as initials only. Do you want it back from '
+        'now on? If yes, please add it to the contract as a criterion."'
+    )
+    owner = build_server(svc, "ceo")
+    attempts = (
+        dict(op="add", kind="rule", then=INITIALS, evidence=[c3]),  # the same rule again
+        dict(op="add", kind="step", text=INITIALS, evidence=[c3]),  # as a step (the rule's key is that of its `then`)
+        dict(op="add", kind="rule", when="always", then=INITIALS, evidence=["R1", "R2"]),  # as a rule with a WHEN, on other evidence
+        dict(op="edit", item="P3", text=INITIALS, evidence=[c3]),  # another live item edited into its words (B2)
+    )
+    for given in attempts:
+        assert start in fails(owner, "revise_playbook", service=WEEK, reason="the client wants it", **given), given
+        assert playbook_of(svc).version == 3 and "Check every claim." in playbook_of(svc).body  # a refusal writes nothing
+    gone = watched(svc)
+    assert (gone.state, gone.related) == ("retired", ("R2", "R3"))
+    assert not [w for w in svc.runtime.service_evidence.watch("ceo", WEEK) if w.id == "P3" and w.state == "warning"]  # the refused edit carried nothing
+
+
+def test_the_same_chain_on_an_edited_rule_restores_its_previous_text(svc):
+    """G1(b), design 8.5, 20 e2e (3): a client-written step (v1's P3) is edited into the planted rule's words (a gated change, rule (c)); two related
+    rejections retire that text, and the runtime puts the text P3 had before its watch back in its place (`restores`: 1), in the answering call."""
+    server = build_server(svc, ROOT)
+    svc.revise_playbook("ceo", WEEK, "first", "first draft", [], text=STEPS)
+    c3 = confirmed_amendment(svc, INITIALS)
+    edited = svc.revise_playbook("ceo", WEEK, "edit", "the client's rule", [c3], item="P3", text=INITIALS)
+    assert (edited.version, edited.item, edited.admission.rule) == (2, "P3", "c")
+    assert INITIALS in playbook_of(svc).body and "Check every claim." not in playbook_of(svc).body
+    assert watched(svc, "P3").state == "new"
+    warned = related(svc, server, delivered(svc, "again"), c3)
+    assert warned.endswith("P3 is in warning now (ceo was told); one more related rejection retires it.")
+    note = notes_titled(svc, "ceo", "playbook item P3 of weekly-brief: warning")[0].body
+    assert "One more related rejection retires P3 and restores the text of v1." in note
+    third = delivered(svc, "again and again")
+    no = svc.feedback(ROOT, third.id, "reject", "Full names again.", source="human")
+    reply = call(server, "define_service", owner="ceo", name=WEEK, add_acceptance=[FULL_NAMES], answers=no.id, about=c3, words="Yes, add it.")
+    assert reply.endswith(
+        "\nThe watch retired P3 of weekly-brief (playbook v3) because rejections R2 and R3 are related to it, and restored the text of v1; ceo was told."
+    )
+    after = playbook_of(svc)
+    assert after.version == 3 and after.body == f"## Steps\n1. [P1] Search.\n2. [P2] Write.\n3. [P3] Check every claim."
+    meta, _ = playbook_meta(svc)
+    assert (meta["op"], meta["item"], meta["restores"], meta["related"]) == ("watch", "P3", 1, ["R2", "R3"])
+    back = watched(svc, "P3")
+    assert (back.state, back.related) == ("restored", ("R2", "R3"))  # live with a text the watch brought back
+
+
+def test_a_failed_retire_write_reads_retire_due_and_is_retried_at_the_owners_next_op(svc):
+    """Design 8.5 (Failure), 8.1, 20 e2e (3): the answer is the client's record and stays written when the runtime cannot write the retire. The reply says the
+    watch could not retire the rule yet; every reader says `retire due`; nothing was written to the playbook. The owner's next op retries the due retire first
+    (step 3 of 5.1), then does its own change, so the rule is gone before the move is."""
+    server = build_server(svc, ROOT)
+    c3 = planted(svc)
+    related(svc, server, delivered(svc, "again"), c3)
+    history = svc.dir("ceo") / "services" / WEEK / "history"
+    (history / "PLAYBOOK.v2.md").mkdir(parents=True)  # the archive name of v2 is taken by a directory: the retire's write fails with an OSError
+    third = delivered(svc, "again and again")
+    no = svc.feedback(ROOT, third.id, "reject", "Full names again.", source="human")
+    reply = call(server, "define_service", owner="ceo", name=WEEK, add_acceptance=[FULL_NAMES], answers=no.id, about=c3, words="Yes, add it.")
+    assert reply.endswith(
+        "\nThe watch could not retire P4 of weekly-brief yet (retire due: R2 and R3 are related); it retries at the owner's next change of the playbook or "
+        "the next recorded answer."
+    )
+    assert playbook_of(svc).version == 2 and INITIALS in playbook_of(svc).body  # nothing written
+    due = watched(svc)
+    assert (due.state, due.related, due.retire_due) == ("warning", ("R2", "R3"), True)
+    assert not notes_titled(svc, "ceo", "playbook of weekly-brief: the watch retired P4") and not notes_titled(svc, ROOT, "playbook of weekly-brief: the watch retired P4")
+    assert "contract v2 -> v3" in reply and svc.runtime.service_catalog.criteria("ceo", WEEK)[-1].text == FULL_NAMES  # the answering version stays
+    listed = next(x for x in svc.runtime.service_reports.services_text(ROOT).splitlines() if x.startswith("  playbook v"))
+    assert "P4 warning (R2, R3; retire due)" in listed
+    (history / "PLAYBOOK.v2.md").rmdir()  # the cause is gone
+    moved = svc.revise_playbook("ceo", WEEK, "move", "read the sources first", [], item="P3", after="start")
+    assert moved.version == 4  # v3 is the runtime's retire, v4 the owner's move
+    meta3 = [m for _, m in svc.runtime.service_store.playbook_history("ceo", WEEK)][2]
+    assert (meta3["version"], meta3["op"], meta3["by"], meta3["item"], meta3["related"]) == (3, "watch", "runtime (watch)", "P4", ["R2", "R3"])
+    after = playbook_of(svc)
+    assert after.version == 4 and INITIALS not in after.body and [i.id for i in after.items] == ["P3", "P1", "P2"]
+    for addr in ("ceo", ROOT):  # the notes follow the retire that was written
+        assert len(notes_titled(svc, addr, "playbook of weekly-brief: the watch retired P4")) == 1
+    assert watched(svc).retire_due is False and watched(svc).state == "retired"
+
+
+def test_g2b_end_of_stream_check_lists_no_unanswered_human_rejection(svc):
+    """G2(b), design 13, 21.1: every human rejection has its `R<k>` and, within one request, the user's answer. While one waits, `amendment_basis` lists it
+    (the study's end-of-stream check) and the next request of the service is refused (REQUEST-UNANSWERED, nothing sent); once it is answered, by a link or by
+    an answering contract version alike, the check lists nothing and the request goes through."""
+    server = build_server(svc, ROOT)
+    c3 = planted(svc)
+
+    def unanswered():
+        return [r.assertion for r in svc.runtime.service_evidence.amendment_basis("ceo", WEEK).rejections if not r.answered]
+
+    assert unanswered() == []  # R1 (the amendment's own) is answered by the version that added C3 and its link
+    first = delivered(svc, "two")
+    no = svc.feedback(ROOT, first.id, "reject", "Owners again.", source="human")
+    assert unanswered() == ["R2"]  # the end-of-stream check lists it
+    sent = len(svc.sent(ROOT))
+    assert "refused: rejection R2 " in fails(server, "request", service=WEEK, inputs={"topic": "three"}) and len(svc.sent(ROOT)) == sent
+    call(server, "feedback", task_id=first.id, verdict="reject", note="No lasting rule.", source="human", criterion=["none"], confirms=no.id)  # a link answers it
+    assert unanswered() == []
+    second = delivered(svc, "three")
+    no = svc.feedback(ROOT, second.id, "reject", "Full names.", source="human")
+    assert unanswered() == ["R3"]
+    call(server, "define_service", owner="ceo", name=WEEK, add_acceptance=[FULL_NAMES], answers=no.id, about=c3, words="Yes, add it.")  # a version answers it
+    assert unanswered() == []
+    assert [r.assertion for r in svc.runtime.service_evidence.amendment_basis("ceo", WEEK).rejections] == ["R1", "R2", "R3"]  # each has its R<k>
+    assert request(svc, "four").type == "task"  # nothing is due: the request is sent
