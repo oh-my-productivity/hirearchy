@@ -587,7 +587,7 @@ def test_the_applied_service_works_end_to_end_with_request_and_feedback(svc_bp, 
     msg = empty_org.request(ROOT, "weekly-brief", {"topic": "ai chips"})
     assert msg.budget == 22 and msg.playbook == 1 and msg.contract == 1
     prompt_org = empty_org.run_prompt("lead", empty_org.begin_run("lead"))
-    assert "# Your services" in prompt_org and "# Playbook: weekly-brief (v1, yours to improve)" in prompt_org
+    assert "# Your services" in prompt_org and "# Playbook: weekly-brief (v1, yours to improve one item at a time;" in prompt_org
     assert "> ## Steps" in prompt_org
 
 

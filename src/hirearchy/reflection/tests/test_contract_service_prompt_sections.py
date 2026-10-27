@@ -59,7 +59,7 @@ def test_the_playbook_is_shown_only_for_a_service_with_an_open_request(w: Reflec
     define(w, playbook=STEPS)
     assert "# Playbook:" not in w.sections.prompt_sections("ceo", [])
     ask(w)
-    assert "# Playbook: weekly-brief (v1, yours to improve)\n> ## Steps" in w.sections.prompt_sections("ceo", [])
+    assert "# Playbook: weekly-brief (v1, yours to improve one item at a time; 7 of 1000 words)\n> ## Steps" in w.sections.prompt_sections("ceo", [])
 
 
 def test_a_first_request_with_no_evidence_asks_for_no_reflection(w: ReflectionWorld) -> None:
@@ -95,6 +95,7 @@ def test_a_playbook_over_the_limit_is_cut_and_says_where_the_rest_is(w: Reflecti
     text = w.sections.prompt_sections("ceo", batch(w))
     assert text.rstrip().endswith(
         '> [... playbook cut: 107 more characters. Read the rest with read(path="ceo/services/weekly-brief/PLAYBOOK.md").]'  # 100 and the item marker "- [P1] "
+        "\nItem states: all items kept."  # the states line follows the quoted, cut body
     )
 
 

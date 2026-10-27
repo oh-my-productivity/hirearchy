@@ -138,7 +138,7 @@ def test_the_playbook_is_shown_only_with_an_open_service_task(org):
     org.end_run("ceo", ok=True)
     task = request(org)
     prompt = org.run_prompt("ceo", org.begin_run("ceo"))
-    assert "# Playbook: weekly-brief (v1, yours to improve)" in prompt
+    assert "# Playbook: weekly-brief (v1, yours to improve one item at a time; 8 of 1000 words)" in prompt
     assert "> ## Steps\n> 1. [P1] Search the web.\n> 2. [P2] Write the brief." in prompt
     org.end_run("ceo", ok=True)
     deliver(org, "ceo", task)
@@ -150,7 +150,7 @@ def test_a_service_without_a_playbook_says_how_to_start_one(svc):
     request(org)
     prompt = org.run_prompt("ceo", org.begin_run("ceo"))
     assert "# Playbook: weekly-brief (v0, yours to improve)" in prompt
-    assert "No playbook yet: plan as usual; when you report this request, write v1 with revise_playbook" in prompt
+    assert 'No playbook yet: plan as usual; when you report this request, write v1 with revise_playbook(op="first", text=...)' in prompt
     assert "# Reflect" not in prompt  # no evidence yet
 
 
@@ -163,8 +163,9 @@ def test_v0_playbook_section_agrees_with_the_reflect_section(svc):
     playbook = prompt.split("# Playbook: weekly-brief")[1].split("\n# ")[0]
     assert "# Reflect before you start: weekly-brief" in prompt
     assert (
-        "No playbook yet: write v1 now from how the team works (Reflect before you start shows the evidence; rules from lessons or relayed "
-        "verdicts are not steps), then follow it (the first version needs no evidence: evidence=[])."
+        'No playbook yet: write v1 now from how the team works with revise_playbook(op="first", text=...) (Reflect before you start shows the '
+        "evidence; rules from lessons or relayed verdicts are not steps), then follow it. The first version needs no evidence and is allowed only "
+        "until the client's first verdict or rework; after that, add items one at a time (op=\"add\") with the client's evidence."
     ) in playbook
     assert "when you report this request" not in prompt  # the other text would contradict the reflect section
     assert prompt.index("# Playbook: weekly-brief") < prompt.index("# Reflect before you start")  # "below" is true
@@ -400,8 +401,9 @@ def test_no_playbook_texts_ask_for_the_steps_followed_only(svc):
     request(org)
     plain = org.run_prompt("ceo", org.begin_run("ceo"))
     assert (
-        "No playbook yet: plan as usual; when you report this request, write v1 with revise_playbook: the steps your team followed, nothing more "
-        "(the first version needs no evidence: evidence=[])."
+        'No playbook yet: plan as usual; when you report this request, write v1 with revise_playbook(op="first", text=...): the steps your team '
+        "followed, nothing more (no evidence needed, and only until the client's first verdict or rework; after that, op=\"add\" with the "
+        "client's evidence)."
     ) in plain
     org.end_run("ceo", ok=True)
     locked = "No playbook yet, and the contract is locked: plan as usual."
@@ -729,3 +731,203 @@ def test_a_rejection_in_the_batch_with_a_blocked_request_held_gives_playbook_reg
     order = [prompt.index(h) for h in ("# Playbook: weekly-brief", "# Regression list: weekly-brief", "# Reflect before you start: weekly-brief")]
     assert order == sorted(order) and prompt.count("# Playbook: weekly-brief") == 1
     org.end_run("ceo", ok=True)
+
+
+# ------------------------------------------------------------------------------------------ 14.1: the items and their watch states
+# These tests build ``QuotedPlaybookSection`` over a ``ReflectionWorld`` (the services, the mail and the settings of one organization) with a stand-in
+# for the watch, so that each state is one value of ``ItemWatch`` and not a story of verdicts (the stories are FEAT-010's).
+import dataclasses  # noqa: E402
+from pathlib import Path  # noqa: E402
+
+import pytest  # noqa: E402
+
+from hirearchy.kernel import OrgError  # noqa: E402
+from hirearchy.reflection._sections import QuotedPlaybookSection  # noqa: E402
+from hirearchy.reflection.testing import ReflectionWorld, fs_world  # noqa: E402
+from hirearchy.services import AmendmentBasis, ItemWatch, Rejection  # noqa: E402
+from hirearchy.services.testing import AdmittingServiceEvidence  # noqa: E402
+
+from . import _support as sup  # noqa: E402
+
+STATES = "Item states: "
+
+
+@pytest.fixture
+def pw(tmp_path: Path) -> ReflectionWorld:
+    """A world where ``ceo`` owns ``weekly-brief`` with playbook v1 (``first``: P1-P3, steps under ``## Steps``)."""
+    w = sup.populated(fs_world(tmp_path))
+    sup.define(w)
+    sup.first_playbook(w, sup.STEPS)
+    return w
+
+
+def kept(*ids, kind="step", version=1):
+    return [ItemWatch(i, kind, "kept", version) for i in ids]
+
+
+def section_of(w, watch, *, basis=None, locked=False, evidence=None, reflecting=False):
+    """The playbook section for ``ceo``'s ``weekly-brief`` over a stand-in watch (``evidence`` replaces the stand-in)."""
+    evidence = evidence or AdmittingServiceEvidence(basis=basis, watch=watch)
+    contract = w.s.catalog.read_contract("ceo", sup.SERVICE)
+    if locked:
+        contract = dataclasses.replace(contract, locked=True)
+    return QuotedPlaybookSection(w.s.catalog, w.s.d.settings, w.paths, evidence).section("ceo", contract, reflecting=reflecting)
+
+
+def states_line(text):
+    lines = [x for x in text.splitlines() if x.startswith(STATES) or x.startswith("Playbook v") or x.startswith("Item states")]
+    assert len(lines) == 1, text
+    return lines[0]
+
+
+def test_the_states_line_names_ids_states_versions_and_rejections_only(pw):
+    pw.s.commands.revise_playbook("ceo", sup.SERVICE, "add", "a rule", ["R1"], kind="rule", when="the date is missing", then="ask for it")
+    watch = [*kept("P1", "P2", "P3"), ItemWatch("P4", "rule", "new", 2, k=3, clean=2, r=(0, 4))]
+    text = section_of(pw, watch)
+    head, *_ = text.splitlines()
+    assert head == "# Playbook: weekly-brief (v2, yours to improve one item at a time; 16 of 1000 words)"
+    assert "> ## Rules\n> - [P4] WHEN the date is missing THEN ask for it WHY R1" in text
+    assert states_line(text) == (
+        "Item states: P4 rule, new since v2 (watched: a related client rejection warns it, a second retires it). All other items: kept."
+    )
+    assert "clean" not in text and "2 of 3" not in text and " k " not in text  # agents see facts, not targets (08 P6)
+
+
+def test_all_items_kept_is_one_short_line(pw):
+    assert states_line(section_of(pw, kept("P1", "P2", "P3"))) == "Item states: all items kept."
+
+
+def test_a_warning_names_its_rejection_its_case_and_the_text_it_restores(pw):
+    pw.s.commands.revise_playbook("ceo", sup.SERVICE, "edit", "tighter", ["R1"], item="P2", text="Write it twice.")
+    started = pw.s.catalog.read_playbook("ceo", sup.SERVICE).revised
+    basis = AmendmentBasis((Rejection("n1", "R1", "t1", "x", (), "no", "", case="c-ask0"),), ())
+    watch = [*kept("P1", "P3"), ItemWatch("P2", "step", "warning", 2, watch_start=started, related=("R1",))]
+    assert states_line(section_of(pw, watch, basis=basis)) == (
+        "Item states: P2 step, warning: rejection R1 (case c-ask0) is related; one more retires it and restores the text of v1. "
+        "All other items: kept."
+    )
+
+
+def test_a_warning_without_an_earlier_text_does_not_promise_a_restore(pw):
+    pw.s.commands.revise_playbook("ceo", sup.SERVICE, "add", "one more", ["R1"], kind="step", text="Send it.")
+    started = pw.s.catalog.read_playbook("ceo", sup.SERVICE).revised
+    basis = AmendmentBasis((Rejection("n1", "R1", "t1", "x", (), "no", "", case="c-ask0"),), ())
+    watch = [*kept("P1", "P2", "P3"), ItemWatch("P4", "step", "warning", 2, watch_start=started, related=("R1",))]
+    assert states_line(section_of(pw, watch, basis=basis)) == (
+        "Item states: P4 step, warning: rejection R1 (case c-ask0) is related; one more retires it. All other items: kept."
+    )
+
+
+def test_waiting_for_the_clients_verdict_and_for_the_users_answer(pw):
+    pw.s.commands.revise_playbook("ceo", sup.SERVICE, "add", "a rule", ["R1"], kind="rule", when="the date is missing", then="ask for it")
+    one = [*kept("P1", "P2", "P3"), ItemWatch("P4", "rule", "new", 2, waiting=1)]
+    assert "P4 rule, new since v2 (waiting for the client's verdict on 1 case)." in section_of(pw, one)
+    two = [*kept("P1", "P2", "P3"), ItemWatch("P4", "rule", "new", 2, waiting=2)]
+    assert "P4 rule, new since v2 (waiting for the client's verdict on 2 cases)." in section_of(pw, two)
+    answer = [*kept("P1", "P2", "P3"), ItemWatch("P4", "rule", "new", 2, pending=("R4",))]
+    assert "P4 rule, new since v2 (waiting for the user's answer to R4)." in section_of(pw, answer)
+    both = [*kept("P1", "P2", "P3"), ItemWatch("P4", "rule", "new", 2, waiting=1, pending=("R4", "R5"))]
+    assert "(waiting for the client's verdict on 1 case; waiting for the user's answer to R4, R5)." in section_of(pw, both)
+
+
+def test_retire_due_and_its_locked_form(pw):
+    watch = [*kept("P1", "P3"), ItemWatch("P2", "step", "warning", 1, related=("R4", "R6"), retire_due=True)]
+    assert states_line(section_of(pw, watch)) == (
+        "Item states: P2: retire due (R4, R6 are related): the runtime retires it at the next change; follow the contract. All other items: kept."
+    )
+    assert states_line(section_of(pw, watch, locked=True)) == (
+        "Item states: P2: retire due (R4, R6 are related): the runtime retires it at the client's next answer; follow the contract. "
+        "All other items: kept."
+    )
+
+
+def test_a_carried_watch_shows_its_old_id(pw):
+    watch = [*kept("P1", "P2"), ItemWatch("P3", "step", "warning", 1, related=("R4",), carried="P9")]
+    assert states_line(section_of(pw, watch)) == (
+        "Item states: P3 step, warning (carried from P9): rejection R4 is related; one more retires it. All other items: kept."
+    )
+    new = [*kept("P1", "P2"), ItemWatch("P3", "step", "new", 1, carried="P9")]
+    assert (
+        "P3 step, new since v1 (carried from P9; watched: a related client rejection warns it, a second retires it)." in section_of(pw, new)
+    )
+
+
+def test_a_restored_text_is_named_as_such(pw):
+    watch = [*kept("P1", "P3"), ItemWatch("P2", "step", "restored", 3, restores=1)]
+    assert states_line(section_of(pw, watch)) == "Item states: P2 step, restored (the watch put back the text of v1). All other items: kept."
+
+
+def test_every_item_listed_leaves_no_other_items_sentence(pw):
+    watch = [ItemWatch(i, "step", "new", 1) for i in ("P1", "P2", "P3")]
+    line = states_line(section_of(pw, watch))
+    assert line.startswith("Item states: P1 step, new since v1 (") and line.endswith("retires it).") and "All other" not in line
+
+
+def test_a_legacy_playbook_shows_its_future_ids(tmp_path):
+    w = sup.populated(fs_world(tmp_path))
+    sup.define(w)
+    sup.legacy_playbook(w, "## Steps\n1. Search.\n2. Write.\n")
+    sup.ask(w)
+    text = w.sections.prompt_sections("ceo", [])
+    playbook = text.split("# Playbook: weekly-brief")[1]
+    assert playbook.startswith(" (v1, yours to improve one item at a time; 6 of 1000 words)\n> ## Steps\n> 1. [P1] Search.\n> 2. [P2] Write.\n")
+    assert "\nItems get these ids when you first change one.\nItem states: all items kept." in playbook
+
+
+def test_an_empty_item_list(pw):
+    pw.s.commands.revise_playbook("ceo", sup.SERVICE, "retire", "no longer", [], item="P1")
+    pw.s.commands.revise_playbook("ceo", sup.SERVICE, "retire", "no longer", [], item="P2")
+    pw.s.commands.revise_playbook("ceo", sup.SERVICE, "retire", "no longer", [], item="P3")
+    sup.ask(pw)
+    playbook = pw.sections.prompt_sections("ceo", []).split("# Playbook: weekly-brief")[1]
+    assert "\n> ## Steps\nPlaybook v4 has no items: add one (op=\"add\")." in playbook
+
+
+def test_an_unparseable_file_quotes_the_raw_body_with_its_line(pw):
+    meta, _ = pw.s.store.read_playbook("ceo", sup.SERVICE)
+    pw.s.store.write_playbook("ceo", sup.SERVICE, 2, {**meta, "version": 2}, "## Steps\nnot an item line\n", 1)
+    reason = pw.s.catalog.read_playbook("ceo", sup.SERVICE).parse_error
+    assert reason.startswith("line ")
+    sup.ask(pw)
+    playbook = pw.sections.prompt_sections("ceo", []).split("# Playbook: weekly-brief")[1]
+    assert "\n> ## Steps\n> not an item line\n" in playbook
+    assert (
+        f"Playbook v2 is not in item form ({reason}): your next change first turns its text into new items (no change of words)." in playbook
+    )
+
+
+def test_the_two_no_playbook_texts_for_op_first(svc):
+    org = svc
+    request(org)
+    plain = org.run_prompt("ceo", org.begin_run("ceo"))
+    assert (
+        'No playbook yet: plan as usual; when you report this request, write v1 with revise_playbook(op="first", text=...): the steps your team '
+        "followed, nothing more (no evidence needed, and only until the client's first verdict or rework; after that, op=\"add\" with the "
+        "client's evidence)."
+    ) in plain
+    org.end_run("ceo", ok=True)
+    first = request(org, "ai")
+    deliver(org, "ceo", first, lessons="Thin on sources.")
+    request(org, "chips")
+    reflecting = org.run_prompt("ceo", org.begin_run("ceo"))
+    assert (
+        'No playbook yet: write v1 now from how the team works with revise_playbook(op="first", text=...) (Reflect before you start shows the '
+        "evidence; rules from lessons or relayed verdicts are not steps), then follow it. The first version needs no evidence and is allowed "
+        "only until the client's first verdict or rework; after that, add items one at a time (op=\"add\") with the client's evidence."
+    ) in reflecting
+    assert "evidence=[]" not in plain + reflecting
+
+
+def test_a_failed_watch_read_says_item_states_could_not_be_read(pw):
+    class Unreadable(AdmittingServiceEvidence):
+        def watch(self, owner, service):
+            raise OrgError("the mailbox of root cannot be read")
+
+    text = section_of(pw, [], evidence=Unreadable())
+    assert "> 1. [P1] Search." in text  # the body is still quoted
+    assert states_line(text) == "Item states could not be read (the mailbox of root cannot be read); follow the contract where an item differs from it."
+
+
+def test_a_locked_playbook_keeps_its_head_and_its_no_playbook_text(pw):
+    text = section_of(pw, kept("P1", "P2", "P3"), locked=True)
+    assert text.splitlines()[0] == "# Playbook: weekly-brief (v1, locked by your parent)"

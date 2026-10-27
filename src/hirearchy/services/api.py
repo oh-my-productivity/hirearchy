@@ -85,9 +85,11 @@ __all__ = [
     "playbook_reply",
     "playbook_word_cap",
     "quoting_lines",
+    "render_items",
     "repeats_rejection",
     "text_tokens",
     "version_in_force",
+    "watch_restores",
 ]
 
 INPUT_RE = re.compile(r"[a-z][a-z0-9_]{0,31}\Z")
@@ -772,6 +774,7 @@ class CaseAllowance(Protocol):
 # Pure rules re-exported from their modules; they import the types above, so these imports come last.
 from ._acknowledge import acknowledge_reply  # noqa: E402
 from ._criteria import amendment_ids, version_in_force  # noqa: E402
-from ._items import migrate_body  # noqa: E402
+from ._items import migrate_body, render_items  # noqa: E402
 from ._parse import contract_of  # noqa: E402
 from ._reply import playbook_reply  # noqa: E402
+from ._watch import watch_restores  # noqa: E402

@@ -15,7 +15,7 @@ from ._ops import item_tokens
 from ._protocols import PlaybookWriter, SettleReport, WatchSettlement
 from .api import ItemWatch, Playbook, PlaybookItem, ServiceCatalog, ServiceEvidence
 
-__all__ = ["RuleWatchSettler", "SettleReport", "watch_before"]  # SettleReport is defined beside the Protocol it answers (_protocols), as 8.5 names it here
+__all__ = ["RuleWatchSettler", "SettleReport", "watch_before", "watch_restores"]  # SettleReport is defined beside the Protocol it answers (_protocols), as 8.5 names it here
 
 WARNING_TITLE = "playbook item {id} of {service}: warning"
 WARNING_BODY = (  # to the owner, on the first related rejection (8.3)
@@ -52,6 +52,14 @@ def watch_before(evidence: ServiceEvidence, owner: str, service: str) -> tuple[I
         return evidence.watch(owner, service)
     except (OrgError, OSError):
         return None
+
+
+def watch_restores(versions: Sequence[Playbook], w: ItemWatch) -> int:
+    """The version whose text a watch retire of ``w`` would bring back (pure): 0 when the item has no earlier text, so the retire only removes it.
+    The warning note (8.3) and the owner's states line (14.1) say it with the settler's own rule."""
+    watched = RuleWatchSettler._watched(versions, w)
+    previous = RuleWatchSettler._before(versions, w, watched) if watched is not None else None
+    return previous[0] if previous else 0
 
 
 class RuleWatchSettler(WatchSettlement):

@@ -85,6 +85,7 @@ def _sections(b: Builder) -> ServicePromptSections:
     catalog, history, paths = b.get(ServiceCatalog), b.get(CaseHistory), OrgServicePaths(b.get(OrgLayout))
     return OwnerPromptSections(
         catalog, OwnedServicesListing(catalog, history, paths), b.get(ReflectionDigest), b.get(MailboxReader),
-        MailRejectedServices(b.get(MailboxReader)), QuotedPlaybookSection(catalog, paths), EvidenceReflectSection(catalog, b.get(OrgSettings), paths, history),
+        MailRejectedServices(b.get(MailboxReader)), QuotedPlaybookSection(catalog, b.get(OrgSettings), paths, b.get(ServiceEvidence)),
+        EvidenceReflectSection(catalog, b.get(OrgSettings), paths, history),
         RegressionListSection(catalog, history),
     )

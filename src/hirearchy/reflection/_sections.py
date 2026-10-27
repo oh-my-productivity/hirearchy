@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 
-from ..kernel import RENDER_BODY_CHARS, ROOT, Message, clip_line, latest_results, parent, verdict_tier
+from ..kernel import RENDER_BODY_CHARS, ROOT, Message, OrgError, clip_line, latest_results, parent, verdict_tier
 from ..mail import MailboxReader, still_open
-from ..services import Contract, ServiceCatalog, confirmed_amendments, playbook_word_cap
+from ..services import (
+    Contract, ItemWatch, Playbook, ServiceCatalog, ServiceEvidence, confirmed_amendments, content_words, migrate_body, playbook_word_cap, render_items,
+    watch_restores,
+)
 from ._ports import ConfigSource, PlaybookSection, RegressionSection, RejectedServices, ReflectSection, ServicePaths, ServicesListing
 from ._reports import marked
 from .api import Assertion, CaseHistory, ReflectionDigest, ServicePromptSections, confirmed_criteria, regressions
@@ -46,31 +49,124 @@ class MailRejectedServices(RejectedServices):
         return tiers
 
 
-class QuotedPlaybookSection(PlaybookSection):
-    """The playbook of a service with an open request, quoted; or what to do while there is none."""
+NO_PLAYBOOK_LOCKED = "No playbook yet, and the contract is locked: plan as usual."
+NO_PLAYBOOK_REFLECTING = (  # the prompt carries a "Reflect before you start" section (14.1)
+    'No playbook yet: write v1 now from how the team works with revise_playbook(op="first", text=...) (Reflect before you start shows the '
+    "evidence; rules from lessons or relayed verdicts are not steps), then follow it. The first version needs no evidence and is allowed only until "
+    "the client's first verdict or rework; after that, add items one at a time (op=\"add\") with the client's evidence."
+)
+NO_PLAYBOOK_PLAIN = (
+    "No playbook yet: plan as usual; when you report this request, write v1 with revise_playbook(op=\"first\", text=...): the steps your team "
+    "followed, nothing more (no evidence needed, and only until the client's first verdict or rework; after that, op=\"add\" with the client's evidence)."
+)
+PLAYBOOK_HEAD = "# Playbook: {service} (v{n}, {who})"
+PLAYBOOK_ITEMS = "yours to improve one item at a time; {words} of {cap} words"
+LEGACY_IDS = "Items get these ids when you first change one."  # a free-text playbook, shown as it would migrate
+STATES = "Item states: "
+STATES_KEPT = "Item states: all items kept."
+STATES_OTHERS = " All other items: kept."
+NO_ITEMS = 'Playbook v{n} has no items: add one (op="add").'
+NOT_ITEMS = "Playbook v{n} is not in item form ({reason}): your next change first turns its text into new items (no change of words)."
+STATES_UNREAD = "Item states could not be read ({error}); follow the contract where an item differs from it."
+STATE_NEW = "{id} {kind}, new since v{n} ({parts})"
+STATE_NEW_WATCHED = "watched: a related client rejection warns it, a second retires it"
+STATE_NEW_CARRIED = "carried from {old}"
+STATE_NEW_WAITING = "waiting for the client's verdict on {n} {cases}"
+STATE_NEW_PENDING = "waiting for the user's answer to {rejections}"
+STATE_WARNING = "{id} {kind}, warning: rejection {rejection} (case {case}) is related; one more retires it{restores}"
+STATE_WARNING_MANY = "{id} {kind}, warning: rejections {rejections} are related; one more retires it"
+STATE_WARNING_CARRIED = "{id} {kind}, warning (carried from {old}): rejection{s} {rejections} {verb} related; one more retires it"
+STATE_WARNING_RESTORES = " and restores the text of v{k}"
+STATE_RESTORED = "{id} {kind}, restored (the watch put back the text of v{k})"
+STATE_DUE = "{id}: retire due ({rejections} are related): the runtime retires it at {when}; follow the contract"
+DUE_UNLOCKED = "the next change"
+DUE_LOCKED = "the client's next answer"  # the owner's ops are refused first on a locked contract, so the settler runs at the client's answer (B6)
+CASE_UNKNOWN = "unknown"
 
-    def __init__(self, catalog: ServiceCatalog, paths: ServicePaths) -> None:
+
+class QuotedPlaybookSection(PlaybookSection):
+    """The playbook of a service with an open request, quoted, with the states of its watched items; or what to do while there is none."""
+
+    def __init__(self, catalog: ServiceCatalog, config: ConfigSource, paths: ServicePaths, evidence: ServiceEvidence) -> None:
         self._catalog = catalog
+        self._config = config
         self._paths = paths
+        self._evidence = evidence
 
     def section(self, addr: str, contract: Contract, *, reflecting: bool = False) -> str:
         c = contract
         pb = self._catalog.read_playbook(addr, c.name)
         who = "locked by your parent" if c.locked else "yours to improve"
-        head = f"# Playbook: {c.name} (v{pb.version}, {who})"
         if not pb.version:
+            head = PLAYBOOK_HEAD.format(service=c.name, n=0, who=who)
             if c.locked:
-                return f"{head}\nNo playbook yet, and the contract is locked: plan as usual."
-            if reflecting:
-                return (
-                    f"{head}\nNo playbook yet: write v1 now from how the team works (Reflect before you start shows the evidence; rules from "
-                    "lessons or relayed verdicts are not steps), then follow it (the first version needs no evidence: evidence=[])."
-                )
-            return (
-                f"{head}\nNo playbook yet: plan as usual; when you report this request, write v1 with revise_playbook: the steps your team "
-                "followed, nothing more (the first version needs no evidence: evidence=[])."
+                return f"{head}\n{NO_PLAYBOOK_LOCKED}"
+            return f"{head}\n{NO_PLAYBOOK_REFLECTING if reflecting else NO_PLAYBOOK_PLAIN}"
+        legacy = pb.items is None and not pb.parse_error
+        migrated = migrate_body(pb.body) if legacy else None
+        body = render_items(migrated.items, migrated.sections) if migrated is not None else pb.body
+        if not c.locked:
+            words = len(pb.body.split()) if pb.items is None else content_words(pb.items, [s.heading for s in pb.sections if s.heading])
+            who = PLAYBOOK_ITEMS.format(words=words, cap=playbook_word_cap(self._config.config()))
+        lines = [PLAYBOOK_HEAD.format(service=c.name, n=pb.version, who=who)]
+        if body.strip():
+            lines.append(_quoted(body, self._paths.rel(pb.path)))
+        if legacy:
+            lines += [LEGACY_IDS, STATES_KEPT]
+        elif pb.parse_error:
+            lines.append(NOT_ITEMS.format(n=pb.version, reason=pb.parse_error))
+        elif not pb.items:
+            lines.append(NO_ITEMS.format(n=pb.version))
+        else:
+            lines.append(self._states(addr, c, pb))
+        return "\n".join(lines)
+
+    def _states(self, addr: str, contract: Contract, pb: Playbook) -> str:
+        """The states line (14.1): ids, states, versions and rejection ids only, never a count of clean cases. One ``evidence.watch`` read."""
+        try:
+            watch = {w.id: w for w in self._evidence.watch(addr, contract.name)}
+            live = [i.id for i in pb.items or ()]
+            listed = [watch[i] for i in live if i in watch and (watch[i].state in ("new", "warning", "restored") or watch[i].retire_due)]
+            warned = [w for w in listed if w.state == "warning" and not w.retire_due and not w.carried and len(w.related) == 1]
+            cases = self._cases(addr, contract.name) if warned else {}
+            versions = self._catalog.playbook_versions(addr, contract.name) if warned else []
+            entries = [self._entry(w, contract.locked, cases, versions) for w in listed]
+        except (OrgError, OSError) as error:
+            return STATES_UNREAD.format(error=error)
+        if not entries:
+            return STATES_KEPT
+        return STATES + "; ".join(entries) + "." + (STATES_OTHERS if len(listed) < len(live) else "")
+
+    def _cases(self, addr: str, name: str) -> dict[str, str]:
+        """The case of every human rejection of the service, by its ``R<k>``."""
+        return {r.assertion: r.case or r.task or CASE_UNKNOWN for r in self._evidence.amendment_basis(addr, name).rejections}
+
+    @staticmethod
+    def _entry(w: ItemWatch, locked: bool, cases: Mapping[str, str], versions: Sequence[Playbook]) -> str:
+        if w.retire_due:
+            return STATE_DUE.format(id=w.id, rejections=", ".join(w.related), when=DUE_LOCKED if locked else DUE_UNLOCKED)
+        if w.state == "restored":
+            return STATE_RESTORED.format(id=w.id, kind=w.kind, k=w.restores)
+        if w.state == "new":
+            parts = [STATE_NEW_CARRIED.format(old=w.carried)] if w.carried else []
+            held = [
+                *([STATE_NEW_WAITING.format(n=w.waiting, cases="case" if w.waiting == 1 else "cases")] if w.waiting else []),
+                *([STATE_NEW_PENDING.format(rejections=", ".join(w.pending))] if w.pending else []),
+            ]
+            parts += held or [STATE_NEW_WATCHED]
+            return STATE_NEW.format(id=w.id, kind=w.kind, n=w.text_version, parts="; ".join(parts))
+        if w.carried:
+            many = len(w.related) != 1
+            return STATE_WARNING_CARRIED.format(
+                id=w.id, kind=w.kind, old=w.carried, s="s" if many else "", rejections=", ".join(w.related), verb="are" if many else "is",
             )
-        return f"{head}\n{_quoted(pb.body, self._paths.rel(pb.path))}"
+        if len(w.related) != 1:
+            return STATE_WARNING_MANY.format(id=w.id, kind=w.kind, rejections=", ".join(w.related))
+        k = watch_restores(versions, w)
+        return STATE_WARNING.format(
+            id=w.id, kind=w.kind, rejection=w.related[0], case=cases.get(w.related[0], CASE_UNKNOWN),
+            restores=STATE_WARNING_RESTORES.format(k=k) if k else "",
+        )
 
 
 class RegressionListSection(RegressionSection):

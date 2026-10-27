@@ -270,8 +270,9 @@ def _world(s: ServicesWorld, runs: RunsHarness, folders: DeliverableFolder, char
     history = DerivedCaseHistory(s.catalog, d.agents, d.mail, s.hints, StorePlaybookTimelines(s.store), LogRunCounter(runs.reader, d.mail), charters)
     digest = DigestBuilder(s.catalog, history)
     rejections = MailRejectedServices(d.mail)
+    evidence = CaseServiceEvidence(history, s.catalog, s.store, d.mail)
     sections = OwnerPromptSections(
-        s.catalog, OwnedServicesListing(s.catalog, history, paths), digest, d.mail, rejections, QuotedPlaybookSection(s.catalog, paths),
+        s.catalog, OwnedServicesListing(s.catalog, history, paths), digest, d.mail, rejections, QuotedPlaybookSection(s.catalog, d.settings, paths, evidence),
         EvidenceReflectSection(s.catalog, d.settings, paths, history),
         RegressionListSection(s.catalog, history),
     )
@@ -281,7 +282,6 @@ def _world(s: ServicesWorld, runs: RunsHarness, folders: DeliverableFolder, char
         runs.put_log(addr, f"{d.clock.now():{STAMP_FORMAT}}.log", "# run\n")
 
     checks = FolderDeliverableChecks(s.catalog, history, d.mail, folders, FixedCheckedVersions(), HashBlobIds(), d.clock)
-    evidence = CaseServiceEvidence(history, s.catalog, s.store, d.mail)
     return ReflectionWorld(
         history=history, digest=digest, reports=TextServiceReports(d.agents, s.catalog, history, paths), sections=sections,
         steps=TextServiceSteps(d.agents, s.catalog, history, d.mail, evidence), rejections=rejections, evidence=evidence, paths=paths, s=s, runs=runs.reader, use_run=use_run,

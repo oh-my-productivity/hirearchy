@@ -312,3 +312,22 @@ def test_the_round_trip_is_asserted_before_the_write(tmp_path: Path) -> None:
     parsed = parse_items(body, extra)
     assert parsed.error == "" and [i.id for i in parsed.items] == ["P1", "P2", "P3"] and parsed.items[2].text == "Cite every claim."
     assert split_frontmatter(w.text(PLAYBOOK) or "")[1].strip() == body.strip()
+
+
+# ============================================================================================== the restore a retire would make, for the owner's states line (14.1)
+def test_watch_restores_names_the_version_a_retire_would_bring_back(tmp_path: Path) -> None:
+    from hirearchy.services import watch_restores
+
+    w = seeded(tmp_path)
+    watch = ItemWatch("P3", "rule", "warning", 2, JAN2, related=("R4",))
+    assert watch_restores(w.catalog.playbook_versions("ceo", SERVICE), watch) == 1  # the text before the watch is v1's
+
+
+def test_watch_restores_is_zero_for_an_item_with_no_earlier_text(tmp_path: Path) -> None:
+    from hirearchy.services import watch_restores
+
+    w = seeded(tmp_path)
+    versions_ = w.catalog.playbook_versions("ceo", SERVICE)
+    assert watch_restores(versions_, ItemWatch("P3", "rule", "warning", 1, datetime(2026, 1, 1, tzinfo=timezone.utc), related=("R4",))) == 0  # watch starts at v1
+    assert watch_restores(versions_, ItemWatch("P9", "step", "warning", 2, JAN2, related=("R4",))) == 0  # an id no version holds
+    assert watch_restores(versions_, ItemWatch("P3", "rule", "warning", 2, None, related=("R4",))) == 0  # never watched
