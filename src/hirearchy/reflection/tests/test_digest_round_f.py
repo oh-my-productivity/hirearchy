@@ -51,4 +51,4 @@ def test_the_digest_shows_the_latest_lessons_first_and_earlier_ones_after(svc):
     deliver(svc, rework, lessons="Two items were missed: add a pre-read step.")
     digest = svc.runtime.reflection_digest.reflection_digest("ceo", "brief")
     line = next(x for x in digest.splitlines() if x.startswith("- case "))
-    assert line.index('lessons: "Two items were missed') < line.index('earlier: "Ran cleanly; no changes needed.')
+    assert line.index('owner\'s view: "Two items were missed') < line.index('earlier: "Ran cleanly; no changes needed.')

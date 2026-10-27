@@ -17,7 +17,7 @@ Each line is something the client rejected. Check every delivery of this service
 # Reflect before you start: weekly-brief
 Your playbook is how your team delivers this service; you own it and improve it. Evidence since v1:
 Cases with new evidence (most recent first):
-- case {ask1} "weekly-brief: chips": open, playbook v1, 2 of 13 runs, 1 rework(s); client feedback: reject R1 "Add dates."; lessons: "L2."
+- case {ask1} "weekly-brief: chips": open, playbook v1, 2 of 13 runs, 1 rework(s); client feedback: reject R1 "Add dates."; owner's view: "L2."
 By playbook version:
 - v0: 1 request(s): 1 done, 0 failed, 0 open; 0 reworked; avg 1 runs; no feedback
 - v1: 1 request(s): 0 done, 0 failed, 1 open; 1 reworked; feedback 0 accept, 1 reject

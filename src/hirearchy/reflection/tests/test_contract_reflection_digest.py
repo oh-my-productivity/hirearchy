@@ -103,7 +103,7 @@ def test_the_latest_lessons_come_first_and_the_earlier_ones_after(w: ReflectionW
     digest = w.digest.reflection_digest("ceo", SERVICE)
     assert digest is not None
     line = next(x for x in digest.splitlines() if x.startswith("- case "))
-    assert line.index('lessons: "Two items were missed') < line.index('earlier: "Ran cleanly; no changes needed.')
+    assert line.index('owner\'s view: "Two items were missed') < line.index('earlier: "Ran cleanly; no changes needed.')
 
 
 def test_a_bare_accept_has_no_quotes_and_a_clean_case_has_no_mark(w: ReflectionWorld) -> None:
@@ -112,7 +112,7 @@ def test_a_bare_accept_has_no_quotes_and_a_clean_case_has_no_mark(w: ReflectionW
     deliver(w, task, lessons="Fine.")
     rate(w, task, "accept")
     digest = w.digest.reflection_digest("ceo", SERVICE)
-    assert digest is not None and "; client feedback: accept; lessons: " in digest and "written after" not in digest
+    assert digest is not None and "; client feedback: accept; owner's view: near miss: none recorded" in digest and "written after" not in digest
     assert "feedback 1 accept, 0 reject" in digest and "after a reject" not in digest
 
 

@@ -404,7 +404,7 @@ def test_s2r_the_wrong_rule_is_refused_and_the_human_rework_needs_a_base(tmp_pat
     batch = [w.org.find_received("lead", a9fd), w.org.find_received("lead", t342a)]
     assert all(batch)
     sections = w.org.runtime.service_prompt_sections.prompt_sections("lead", batch)
-    assert 'lessons (from a relayed rework, not the client\'s): "Rework needed' in sections
+    assert 'owner\'s view (from a relayed rework, not the client\'s): "Rework needed' in sections
     # (5) the user's yes, recorded with the answer
     c31 = tool_call(S2R, 31)
     assert "Recorded as the user's answer to R1" in call(w.root, "define_service", **c31, answers=a9fd, about="C3", words="Yes, add it.")

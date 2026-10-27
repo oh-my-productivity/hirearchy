@@ -14,7 +14,7 @@ Item states: P4 step, new since v2 (waiting for the client's verdict on 1 case).
 # Reflect before you start: weekly-brief
 Your playbook is how your team delivers this service; you own it and improve it. Evidence since v2:
 Cases with new evidence (most recent first):
-- case {ask2} "weekly-brief: bio": done, playbook v2, 1 of 10 runs; lessons: "Lesson about bio."
+- case {ask2} "weekly-brief: bio": done, playbook v2, 1 of 10 runs; owner's view: "Lesson about bio."
 By playbook version:
 - v0: 1 request(s): 1 done, 0 failed, 0 open; 0 reworked; avg 1 runs; no feedback
 - v1: 1 request(s): 1 done, 0 failed, 0 open; 0 reworked; avg 1 runs; no feedback

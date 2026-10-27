@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import re
 from collections.abc import Mapping
+from dataclasses import dataclass
 from datetime import datetime
 from typing import cast
 
@@ -14,6 +16,7 @@ DIGEST_CASES = 6  # cases with new evidence shown in the digest
 DIGEST_CHARS = 3000  # soft limit of the whole digest
 CLIP_LESSON = 220
 CLIP_NOTE = 160
+CLIP_PART = 60  # characters of one part of an after-action review in the digest
 MAX_VERDICTS = 4  # verdicts of one case shown in a digest line
 
 
@@ -36,8 +39,50 @@ def verdict_chain(c: Case, assertions: Mapping[str, str] | None = None) -> str:
     return " -> ".join(parts)
 
 
+@dataclass(frozen=True)
+class AarParts:
+    """The parts of an after-action review a team wrote in its ``lessons`` (design 11); a part the text does not have is ``""``."""
+
+    expected: str = ""
+    happened: str = ""
+    caught_at: str = ""
+    cause: str = ""
+    prevent: str = ""
+    near_miss: str = ""
+
+
+_FIELDS = {"expected": "expected", "happened": "happened", "caught at": "caught_at", "cause": "cause", "prevent": "prevent", "near miss": "near_miss"}
+_SHOWN = (("Expected", "expected"), ("Happened", "happened"), ("Caught at", "caught_at"), ("Cause", "cause"), ("Prevent", "prevent"), ("Near miss", "near_miss"))
+_LABEL = re.compile(r"(?:^|(?<=[.;\n]))[ \t]*(expected|happened|caught\s+at|cause|prevent|near\s+miss)[ \t]*:[ \t]*", re.IGNORECASE)
+NO_NEAR_MISS = "none recorded"
+
+
+def aar_parts(text: str) -> AarParts | None:
+    """The labelled parts of ``text``, or None when it has no label (pure). A label (``Expected:``, ``Happened:``, ``Caught at:``, ``Cause:``,
+    ``Prevent:``, ``Near miss:``) counts at the start of the text or after a sentence end (``.``, ``;``, a newline), in any case; a part runs to the next
+    label. The first part with a label wins when a label repeats."""
+    found = list(_LABEL.finditer(text))
+    if not found:
+        return None
+    values: dict[str, str] = {}
+    for m, following in zip(found, [*found[1:], None]):
+        part = " ".join(text[m.end() : following.start() if following else len(text)].split()).rstrip(" .;")
+        values.setdefault(_FIELDS[" ".join(m.group(1).lower().split())], part)
+    return AarParts(**values)
+
+
+def _owners_view(lesson: str, accepted: bool) -> str:
+    """A case's latest lesson as the owner's view (design 11): the labelled parts, each clipped to ``CLIP_PART`` and the whole to ``CLIP_LESSON``;
+    for an accepted case its near miss; the lesson quoted when it has no label."""
+    parts = aar_parts(lesson)
+    if accepted:
+        return f"near miss: {clip_line(parts.near_miss, CLIP_PART) if parts and parts.near_miss else NO_NEAR_MISS}"
+    shown = [f"{label} {clip_line(getattr(parts, name), CLIP_PART)}" for label, name in _SHOWN if parts and getattr(parts, name)]
+    return clip_line(" | ".join(shown), CLIP_LESSON) if shown else f'"{clip_line(lesson, CLIP_LESSON)}"'
+
+
 def case_line(c: Case, assertions: Mapping[str, str] | None = None) -> str:
-    """One case in one line: state, playbook, runs, reworks, the client's verdicts, then the lessons (the latest first)."""
+    """One case in one line: state, playbook, runs, reworks, the client's verdicts, then the owner's view of the lessons (the latest first)."""
     bits = [f'case {c.id} "{clip_line(c.title, 40)}": {c.state}', f"playbook v{c.used}", f"{c.runs} of {c.budget} runs"]
     if c.reworks:
         bits.append(f"{c.reworks} rework(s)" + (f", {c.relayed_reworks} relayed" if c.relayed_reworks else ""))
@@ -56,8 +101,9 @@ def case_line(c: Case, assertions: Mapping[str, str] | None = None) -> str:
         marks = [*(["from a relayed rework, not the client's"] if sources[-1] == "relayed" else []),
                  *(["written after the reject: check it against her words"] if after else [])]
         mark = f" ({'; '.join(marks)})" if marks else ""
-        line += f'; lessons{mark}: "{clip_line(latest, CLIP_LESSON)}"'
-        room = CLIP_LESSON - len(latest)
+        view = _owners_view(latest, bool(c.verdicts) and c.verdicts[-1].verdict == "accept")
+        line += f"; owner's view{mark}: {view}"
+        room = CLIP_LESSON - (len(view) - 2 if view.startswith('"') else len(view))  # the quotes of a quoted lesson are not its words
         if earlier and room > 40:
             line += f'; earlier: "{clip_line(earlier, room)}"'
     return "- " + line

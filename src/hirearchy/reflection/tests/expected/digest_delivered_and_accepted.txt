@@ -1,4 +1,4 @@
 Cases with new evidence (most recent first):
-- case {ask0} "weekly-brief: ai": done, playbook v0, 2 of 10 runs; client feedback: accept "good"; lessons: "Search first. Two runs."
+- case {ask0} "weekly-brief: ai": done, playbook v0, 2 of 10 runs; client feedback: accept "good"; owner's view: near miss: none recorded
 By playbook version:
 - v0: 1 request(s): 1 done, 0 failed, 0 open; 0 reworked; avg 2 runs; feedback 1 accept, 0 reject

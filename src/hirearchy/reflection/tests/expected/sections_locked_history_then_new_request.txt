@@ -9,7 +9,7 @@ No playbook yet, and the contract is locked: plan as usual.
 # Reflect before you start: weekly-brief
 Your playbook is how your team delivers this service. The contract is locked by your parent, so you may not revise the playbook. Evidence so far (there is no playbook yet):
 Cases with new evidence (most recent first):
-- case {ask0} "weekly-brief: ai": done, playbook v0, 1 of 10 runs; lessons: "L."
+- case {ask0} "weekly-brief: ai": done, playbook v0, 1 of 10 runs; owner's view: "L."
 By playbook version:
 - v0: 2 request(s): 1 done, 0 failed, 1 open; 0 reworked; avg 1 runs; no feedback
 Before working on the new request:

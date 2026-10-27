@@ -9,7 +9,7 @@ import pytest
 
 from hirearchy.kernel import Message
 from hirearchy.reflection import Case, Verdict
-from hirearchy.reflection._digest import CLIP_LESSON, CLIP_NOTE, DIGEST_CASES, DIGEST_CHARS, MAX_VERDICTS, case_line, verdict_chain
+from hirearchy.reflection._digest import CLIP_LESSON, CLIP_NOTE, DIGEST_CASES, DIGEST_CHARS, MAX_VERDICTS, AarParts, aar_parts, case_line, verdict_chain
 from hirearchy.reflection.testing import ReflectionWorld, fs_world, memory_world
 
 from ._support import SERVICE, ask, define, deliver, populated
@@ -120,35 +120,35 @@ def test_the_case_line_names_the_assertions_it_is_given() -> None:
 
 
 def test_the_verdicts_come_before_the_lessons() -> None:
-    line = case_line(case(verdicts=[verdict("accept", "good")], lessons=["Search first."]))
-    assert line.endswith('; client feedback: accept "good"; lessons: "Search first."')
+    line = case_line(case(verdicts=[verdict("reject", "too long")], lessons=["Search first."]))
+    assert line.endswith('; client feedback: reject "too long"; owner\'s view: "Search first."')
 
 
 def test_lessons_written_after_the_first_reject_are_marked() -> None:
     reject = verdict("reject", "no", 1)
     line = case_line(case(verdicts=[reject], lessons=["Fixed it."], lesson_ids=["99999999T000000000000-ceo-0000"]))
-    assert 'lessons (written after the reject: check it against her words): "Fixed it."' in line
+    assert 'owner\'s view (written after the reject: check it against her words): "Fixed it."' in line
 
 
 def test_lessons_written_before_the_reject_are_not_marked() -> None:
     reject = verdict("reject", "no", 1)
     line = case_line(case(verdicts=[reject], lessons=["Fine."], lesson_ids=["00000000T000000000000-ceo-0000"]))
-    assert "written after" not in line and 'lessons: "Fine."' in line
+    assert "written after" not in line and 'owner\'s view: "Fine."' in line
 
 
 def test_the_earlier_lessons_follow_the_latest_where_there_is_room() -> None:
     line = case_line(case(lessons=["first lesson", "second lesson", "latest lesson"]))
-    assert line.endswith('lessons: "latest lesson"; earlier: "first lesson / second lesson"')
+    assert line.endswith('owner\'s view: "latest lesson"; earlier: "first lesson / second lesson"')
 
 
 def test_the_latest_lesson_is_clipped_at_220_and_leaves_no_room_for_the_earlier_ones() -> None:
     line = case_line(case(lessons=["old lesson", "x" * 400]))
-    assert line.endswith(f'lessons: "{"x" * 219}…"') and "earlier:" not in line
+    assert line.endswith(f'owner\'s view: "{"x" * 219}…"') and "earlier:" not in line
 
 
 def test_earlier_lessons_are_clipped_to_the_room_left() -> None:
     line = case_line(case(lessons=["e" * 300, "l" * 100]))
-    assert line.endswith(f'lessons: "{"l" * 100}"; earlier: "{"e" * 119}…"')
+    assert line.endswith(f'owner\'s view: "{"l" * 100}"; earlier: "{"e" * 119}…"')
 
 
 def test_a_single_lesson_has_no_earlier_part() -> None:
@@ -182,21 +182,112 @@ RELAYED = "from a relayed rework, not the client's"
 
 def test_the_latest_lesson_of_a_relayed_rework_is_marked() -> None:
     line = case_line(case(lessons=["first", "second"], lesson_ids=["r1", "r2"], lesson_sources=["", "relayed"]))
-    assert f'; lessons ({RELAYED}): "second"' in line
+    assert f'; owner\'s view ({RELAYED}): "second"' in line
 
 
 def test_both_marks_are_joined_when_written_after_the_reject() -> None:
     reject = verdict("reject", "too long", 1)
     line = case_line(case(verdicts=[reject], lessons=["x"], lesson_ids=["20260101T000009000000-ceo-0001"], lesson_sources=["relayed"]))
-    assert f'; lessons ({RELAYED}; written after the reject: check it against her words): "x"' in line
+    assert f'; owner\'s view ({RELAYED}; written after the reject: check it against her words): "x"' in line
 
 
 def test_earlier_relayed_lessons_are_prefixed() -> None:
     line = case_line(case(lessons=["a", "b", "c"], lesson_ids=["r1", "r2", "r3"], lesson_sources=["relayed", "human", "relayed"]))
-    assert '; earlier: "(relayed) a / b"' in line and f'lessons ({RELAYED}): "c"' in line
+    assert '; earlier: "(relayed) a / b"' in line and f'owner\'s view ({RELAYED}): "c"' in line
 
 
 def test_human_and_unsourced_lessons_are_unmarked() -> None:
     for sources in (["", "human"], ["human", "human"], []):
         line = case_line(case(lessons=["a", "b"], lesson_ids=["r1", "r2"], lesson_sources=sources))
-        assert "relayed" not in line and '; lessons: "b"; earlier: "a"' in line
+        assert "relayed" not in line and '; owner\'s view: "b"; earlier: "a"' in line
+
+
+# ------------------------------------------------------------------------------ lessons as after-action reviews, the owner's view (design 11)
+
+FULL = "Expected: C6. Happened: the date was missing. Caught at: the check step. Cause: no step reads the date. Prevent: add a date check."
+
+
+def test_aar_parts_reads_the_five_labels_case_insensitively_after_a_sentence_end() -> None:
+    assert aar_parts(FULL) == AarParts("C6", "the date was missing", "the check step", "no step reads the date", "add a date check", "")
+    assert aar_parts("expected: C6; HAPPENED: late\nCAUGHT AT: review\n cause: input. prevent: a check.") == AarParts(
+        "C6", "late", "review", "input", "a check", ""
+    )
+    assert aar_parts("Near miss: the link almost broke.") == AarParts(near_miss="the link almost broke")
+    assert aar_parts("The cause: unknown. Expected: C1") == AarParts(expected="C1") and aar_parts("Why it happened: x") is None  # not at a sentence start
+    assert aar_parts("Clean run; no issues.") is None and aar_parts("") is None
+    assert aar_parts("Prevent regressions. Cause analysis later.") is None  # a label needs its colon
+
+
+def test_a_part_runs_to_the_next_label_and_the_first_of_a_repeated_label_wins() -> None:
+    parts = aar_parts("Expected: C6 and C7. Cause: a hand-off; Cause: another. Prevent: a check.")
+    assert parts == AarParts(expected="C6 and C7", cause="a hand-off", prevent="a check")
+
+
+def test_a_lesson_with_labels_reads_owners_view_as_parts() -> None:
+    assert case_line(case(lessons=[FULL])).endswith(
+        "; owner's view: Expected C6 | Happened the date was missing | Caught at the check step | Cause no step reads the date | Prevent add a date check"
+    )
+
+
+def test_a_lesson_without_labels_reads_owners_view_quoted() -> None:
+    assert case_line(case(lessons=["Search first."])).endswith('; owner\'s view: "Search first."')
+    assert "lessons" not in case_line(case(lessons=["Search first."]))
+
+
+def test_an_accepted_case_shows_its_near_miss_or_none_recorded() -> None:
+    accept = verdict("accept", "good", 1)
+    assert case_line(case(verdicts=[accept], lessons=["Near miss: the date was nearly wrong. Prevent: x."])).endswith("; owner's view: near miss: the date was nearly wrong")
+    assert case_line(case(verdicts=[accept], lessons=["Search first."])).endswith("; owner's view: near miss: none recorded")
+    assert case_line(case(verdicts=[accept], lessons=[FULL])).endswith("; owner's view: near miss: none recorded")  # a failure review of an accepted case
+    assert case_line(case(verdicts=[accept], lessons=["Near miss: none."])).endswith("; owner's view: near miss: none")
+    reject_then_accept = [verdict("reject", "no", 1), verdict("accept", "now fine", 2)]
+    assert "near miss: none recorded" in case_line(case(verdicts=reject_then_accept, lessons=["Search first."]))
+    assert "near miss" not in case_line(case(verdicts=[verdict("reject", "no", 1)], lessons=["Near miss: x."]))  # a rejected case shows its review
+    assert "owner's view" not in case_line(case(verdicts=[accept]))  # no lesson, no view
+
+
+def test_the_relayed_and_after_reject_marks_stay_inside_the_tag() -> None:
+    reject = verdict("reject", "too long", 1)
+    both = case_line(case(verdicts=[reject], lessons=[FULL], lesson_ids=["20260101T000009000000-ceo-0001"], lesson_sources=["relayed"]))
+    assert f"; owner's view ({RELAYED}; written after the reject: check it against her words): Expected C6 | Happened " in both
+    assert case_line(case(lessons=["a", "b"], lesson_ids=["r1", "r2"], lesson_sources=["", "relayed"])).count(f"owner's view ({RELAYED}): ") == 1
+    accepted = [verdict("reject", "no", 1), verdict("accept", "ok", 2)]
+    line = case_line(case(verdicts=accepted, lessons=["x"], lesson_ids=["20260101T000009000000-ceo-0001"], lesson_sources=["relayed"]))
+    assert f"; owner's view ({RELAYED}; written after the reject: check it against her words): near miss: none recorded" in line
+
+
+def test_each_part_is_clipped_to_60_and_the_line_to_220() -> None:
+    long = "w" * 100
+    line = case_line(case(lessons=[f"Expected: {long}. Happened: short."]))
+    assert line.endswith(f"; owner's view: Expected {'w' * 59}… | Happened short")
+    five = case_line(case(lessons=[f"Expected: {long}. Happened: {long}. Caught at: {long}. Cause: {long}. Prevent: {long}."]))
+    view = five.split("; owner's view: ")[1]
+    assert len(view) == CLIP_LESSON and view.endswith("…") and view.startswith(f"Expected {'w' * 59}… | Happened ")
+    near = case_line(case(verdicts=[verdict("accept", "ok", 1)], lessons=[f"Near miss: {long}."]))
+    assert near.endswith(f"near miss: {'w' * 59}…")
+
+
+def test_the_earlier_lessons_follow_an_after_action_view_where_there_is_room() -> None:
+    line = case_line(case(lessons=["first lesson", "Expected: C1. Prevent: a check."]))
+    assert line.endswith('; owner\'s view: Expected C1 | Prevent a check; earlier: "first lesson"')
+
+
+def test_an_admission_and_a_watch_are_equal_with_and_without_a_lesson(tmp_path: Path) -> None:
+    """The gate and the watch read no lesson text (design 11, "never evidence"): the same story with any lessons gives the same answers."""
+    from ._support import note_on
+
+    def run(lessons: str, where: Path) -> tuple[tuple[str, tuple[str, ...], tuple[str, ...]], object]:
+        where.mkdir()
+        world = populated(fs_world(where))
+        define(world)
+        for topic in ("a", "b"):  # criterion C2 failed in two cases the client rejected (rule (b))
+            task = ask(world, topic)
+            deliver(world, task, lessons=lessons)
+            no = note_on(world, task, verdict="reject", source="human", body="No source.")
+            note_on(world, task, reply_to=no.id, source="human", criterion="C2")
+        admitted = world.evidence.admit_item("ceo", SERVICE, ["C2"], "why", kind="step", text="Cite every claim.", when=None)
+        return (admitted.rule, admitted.evidence, tuple(sorted(admitted.why))), world.evidence.watch("ceo", SERVICE)
+
+    plain = run("Clean run; no issues.", tmp_path / "plain")
+    review = run(FULL, tmp_path / "review")
+    assert plain == review and plain[0][0] == "b"

@@ -13,7 +13,7 @@ Each line is something the client rejected. Check every delivery of this service
 # Reflect before you start: weekly-brief
 Your playbook is how your team delivers this service; you own it and improve it. Evidence so far (there is no playbook yet):
 Cases with new evidence (most recent first):
-- case {ask0} "weekly-brief: ai": done, playbook v0, 5 of 16 runs, 1 rework(s); client feedback: reject R1 "Sam's 'before Friday' needs a date." -> accept "this version is right"; lessons (written after the reject: check it against her words): "Applied the date rule."; earlier: "Clean run; no issues."
+- case {ask0} "weekly-brief: ai": done, playbook v0, 5 of 16 runs, 1 rework(s); client feedback: reject R1 "Sam's 'before Friday' needs a date." -> accept "this version is right"; owner's view (written after the reject: check it against her words): near miss: none recorded; earlier: "Clean run; no issues."
 By playbook version:
 - v0: 2 request(s): 1 done, 0 failed, 1 open; 1 reworked; avg 5 runs; feedback 1 accept (1 after a reject), 0 reject
 The client rejected a delivery: check the delivery against its words, the regression list and the contract before you plan the request. A rule without the client's evidence (step 3) is a reason to look, not to change how the team works: your parent asks the client whether it is a lasting requirement, and the answer reaches you as a contract change or a criterion link. Revise the playbook when step 3 admits it, then handle the request.
