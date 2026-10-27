@@ -272,6 +272,7 @@ class ServiceTools(ToolGroup):
         delivery the user judged, this is refused until you say which version the user's corrections apply to:
         "delivered" (the lead restores the version they judged, then applies their corrections) or "latest" (your
         relayed changes stay; tell the user).
+        A new request waits until every rejection since the previous one has the user's answer; the refusal gives the question.
         Returns the task id; the result comes back like any result, then rate it with `feedback`.
         """
             msg = self._commands().request(me, service, inputs, title=title, note=note, extra_acceptance=extra_acceptance,

@@ -92,6 +92,7 @@ def test_root_feedback_reply_names_message_and_source(svc):
     assert "Next, before define_service: " not in reply and "Only after their yes call define_service" not in reply
     assert f'task_id="{first.id}", verdict="reject", confirms="{no.id}"' in reply  # the step names the call that records the user's no
     assert (no.source, no.criterion) == ("human", "C1")
+    call(server, "feedback", task_id=first.id, verdict="reject", note="No, as it is.", source="human", criterion=["none"], confirms=no.id)  # the user's answer
     second = request(svc, "chips")
     deliver(svc, "ceo", second)
     reply = call(server, "feedback", task_id=second.id, verdict="accept")
@@ -404,15 +405,18 @@ def test_define_request_report_reject_reflect_revise_and_compare_versions(org):
     assert "feedback reject recorded" in out
     assert "needs a note" in fails(root, "feedback", task_id=task.id, verdict="reject")
 
+    # the user's yes comes before the next request (clause 2: a new request waits for it)
+    rejection = max(m.id for m in org.sent(ROOT) if m.feedback)
+    assert "has no recorded answer yet" in fails(root, "request", service="weekly-brief", inputs={"topic": "chips"})
+    call(root, "define_service", owner="ceo", name="weekly-brief", add_acceptance=["Shows the changes since last week"],  # C3: the evidence of v2
+         answers=rejection, about="C1", words="Yes, add it.")  # Rule A: the user's yes, and the product writes the link
+
     # the next request: the prompt shows the rejection before the new message
     second = org.request(ROOT, "weekly-brief", {"topic": "chips"})
     prompt = org.run_prompt("ceo", work(org, "ceo", 1))
     section = prompt.split("# Reflect before you start: weekly-brief")[1].split("# New messages")[0]
     assert "Evidence since v1:" in section and "Missing week-over-week changes." in section
     assert "Used 2 runs; no checks." in section
-    rejection = max(m.id for m in org.sent(ROOT) if m.feedback)
-    call(root, "define_service", owner="ceo", name="weekly-brief", add_acceptance=["Shows the changes since last week"],  # C3: the evidence of v2
-         answers=rejection, about="C1", words="Yes, add it.")  # Rule A: the user's yes, and the product writes the link
     out = call(ceo, "revise_playbook", service="weekly-brief",
                content="## Steps\n1. Search.\n- C3: Shows the changes since last week", reason=f"case {task.id} rejected: no changes", evidence=["C3"])
     assert "playbook of `weekly-brief` is now v2" in out
@@ -446,3 +450,23 @@ def test_a_locked_service_reports_without_the_revision_hint(org):
     out = call(ceo, "report", task_id=task.id, status="done", summary="Delivered.", lessons="Fine.")
     assert out.startswith("reported done") and "revise_playbook" not in out
     assert "locked by root" in fails(ceo, "revise_playbook", service="weekly-brief", content="x", reason="r", evidence=[])
+
+
+# ----------------------------------------------------------------------------------------- clause 2: a new request waits for the answers (design 13.1, 14.5)
+def test_root_request_meets_request_unanswered_through_mcp(svc):
+    server = build_server(svc, ROOT)
+    first = request(svc, "ai")
+    deliver(svc, "ceo", first)
+    no = svc.feedback(ROOT, first.id, "reject", "Too long.", source="human")
+    sent = len(svc.sent(ROOT))
+    text = fails(server, "request", service=WEEKDAY, inputs={"topic": "next"})
+    assert f"refused: rejection R1 (message {no.id}) on task {first.id} of `weekly-brief` has no recorded answer yet, so the next request of `weekly-brief` waits" in text
+    assert text.endswith("A rework of that case (revises=) is not held. Nothing was sent.")
+    assert len(svc.sent(ROOT)) == sent
+    assert "requested service `weekly-brief`" in call(server, "request", service=WEEKDAY, inputs={"topic": "ai"}, revises=first.id, source="human")  # a rework is not held
+
+
+def test_root_request_docstring_says_a_new_request_waits_for_the_answers(svc):
+    text = " ".join(described(svc, ROOT)["request"].description.split())
+    assert "A new request waits until every rejection since the previous one has the user's answer; the refusal gives the question." in text
+    assert "answer" not in " ".join(described(svc, "ceo")["request"].description.split())  # the agents' tool is what it was

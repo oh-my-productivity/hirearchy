@@ -4,7 +4,8 @@
 import time
 
 from testkit.reach.hirearchy.core import ROOT
-from testkit.services_world import confirmed_amendment, deliver, request, svc, work
+from testkit.services_world import confirmed_amendment, deliver, svc, work
+from testkit.services_world import request_unheld as request  # a new request that clause 2 would hold: these tests are about other rules
 
 WEEKDAY = "weekly-brief"
 

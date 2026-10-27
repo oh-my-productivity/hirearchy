@@ -173,3 +173,20 @@ def test_feedback_help_names_the_one_off_task(org, capsys):
     with pytest.raises(SystemExit):
         cli(org, "feedback", "--help")
     assert "task_id the service request, rework or one-off task the verdict is on" in " ".join(capsys.readouterr().out.split())
+
+
+def test_hirearchy_request_meets_request_unanswered(svc, capsys):
+    """Clause 2 (design 13.1): the CLI's new request waits for the user's answer to a rejection since the previous one; a rework does not."""
+    first = request(svc)
+    deliver(svc, "ceo", first)
+    cli(svc, "feedback", first.id, "reject", "--note", "Too long.")
+    verdict = [m for m in svc.sent(ROOT) if m.feedback][-1]
+    capsys.readouterr()
+    sent = len(svc.sent(ROOT))
+    with pytest.raises(SystemExit):
+        cli(svc, "request", "weekly-brief", "--input", "topic=next")
+    err = capsys.readouterr().err
+    assert f"rejection R1 (message {verdict.id}) on task {first.id} of `weekly-brief` has no recorded answer yet, so the next request of `weekly-brief` waits" in err
+    assert "CLI: hirearchy define-service ... --answers, --about, --words" in err and len(svc.sent(ROOT)) == sent
+    cli(svc, "request", "weekly-brief", "--input", "topic=ai", "--revises", first.id)  # a rework is not held
+    assert len(svc.sent(ROOT)) == sent + 1

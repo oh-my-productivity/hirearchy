@@ -1,0 +1,44 @@
+# mypy: ignore-errors
+"""Phase 1, end to end: the itemized playbook and clause 2's two refusals (design 13, 20 e2e).
+
+No scheduler, no LLM, no network: ``testkit.e7_replay.materialize`` rebuilds the organization an E7 stream had at one moment from the raw evidence
+files, and the product's own services read it. A missing evidence file fails the test, never skips it. This module grows with the Phase 1 FEATs; an
+expectation is never edited to match the product.
+"""
+
+import pytest
+from testkit.e7_replay import materialize
+
+from hirearchy.core import ROOT, Org
+from hirearchy.kernel import OrgError
+
+SERVICE = "weekly-meeting-memo"
+S1_MEMO_1 = "20261025T070423629042-root-5efc"  # E7 s1: the first memo's case
+S1_REWORK = "20261025T070822368798-root-5e3e"  # the user's rework of it, which Lena rejected
+S1_REJECTION = "20261025T071537817238-root-905b"  # her human rejection of that rework (R1), about C2
+S1_ANSWER = "20261025T071714388062-root-6096"  # the human link that answers it (C9), written 3 minutes later; the next memo came after it
+
+
+@pytest.fixture(autouse=True)
+def clean_env(monkeypatch, tmp_path):
+    for var in ("ORG_ROOT", "ORG_AGENT", "ORG_REQUIRE_AGENT"):
+        monkeypatch.delenv(var, raising=False)
+    monkeypatch.setenv("HIREARCHY_WORKSPACE_ROOTS", str(tmp_path))
+
+
+def test_e7_flow_the_next_memo_requested_before_the_answer_is_request_unanswered(tmp_path):
+    """Scenario 7 (design 20 e2e (7); Q1): E7 s1 at Lena's rejection 905b of the rework of memo 1. Asking for the next memo now is refused, naming the
+    rejection, its case's task and the one question; at the human link 6096 (what E7 did) the same request is sent. Nothing is sent by the refusal."""
+    waiting = Org(materialize("s1", S1_REJECTION[:21], tmp_path / "waiting"))
+    sent = len(waiting.sent(ROOT))
+    with pytest.raises(OrgError) as refusal:
+        waiting.request(ROOT, SERVICE, {"notes_file": "2026-10-12.md"})
+    assert str(refusal.value).startswith(
+        f"refused: rejection R1 (message {S1_REJECTION}) on task {S1_REWORK} of `{SERVICE}` has no recorded answer yet, so the next request of "
+        f"`{SERVICE}` waits: every rejection gets the user's answer within one request. Ask the user the one question first: "
+        'About C2: add "<the rule, in their words>" as a lasting rule? Yes or no. On yes: '
+    )
+    assert len(waiting.sent(ROOT)) == sent
+    answered = Org(materialize("s1", S1_ANSWER[:21], tmp_path / "answered"))
+    memo = answered.request(ROOT, SERVICE, {"notes_file": "2026-10-12.md"})
+    assert (memo.type, memo.service, memo.revises) == ("task", SERVICE, None)

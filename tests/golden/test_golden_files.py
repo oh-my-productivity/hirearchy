@@ -4,6 +4,7 @@ from pathlib import Path
 
 from golden_support import check
 from scenarios import BRIEF, PLAYBOOK, company, deliver_service, dirs, write_artifact
+from testkit.services_world import request_unheld
 
 from hirearchy.app import wiring
 from hirearchy.core import ROOT, Org
@@ -159,7 +160,7 @@ def test_service_and_playbook_files(tmp_path, clock, norm):
     deliver_service(org, "ceo", first, clock, lessons="Cite while drafting.")
     no1 = org.feedback(ROOT, first.id, "reject", "Too long.", source="human")
     clock.tick()
-    second = org.request(ROOT, "weekly-brief", {"topic": "chips"})  # the same criterion fails in a second case: evidence of the revision
+    second = request_unheld(org, "chips")  # the same criterion fails in a second case: evidence of the revision
     clock.tick()
     deliver_service(org, "ceo", second, clock, lessons="Cite while drafting.")
     no2 = org.feedback(ROOT, second.id, "reject", "Still too long.", source="human")

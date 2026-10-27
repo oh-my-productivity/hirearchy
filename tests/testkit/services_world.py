@@ -10,6 +10,7 @@ import pytest
 
 from hirearchy.app.wire_cli import run_cli as main
 from hirearchy.core import ROOT, split_frontmatter
+from hirearchy.services.testing import unheld_requests
 
 
 ENG = "ceo/eng"
@@ -49,6 +50,18 @@ def deliver(org, owner, task, status="done", lessons="Worked; no change needed."
 
 def request(org, topic="ai", **kw):
     return org.request(ROOT, "weekly-brief", {"topic": topic}, **kw)
+
+
+def request_unheld(org, topic="ai", name="weekly-brief", **kw):
+    """Root's new request of ``name`` that clause 2 (REQUEST-UNANSWERED) does not hold: judged against a record with no rejection, over the organization's
+    own ports. For the tests of another rule that need a rejection with no answer and a new request in the same story; the tests of clause 2 use
+    ``request``."""
+    rt = org.runtime
+    requester = unheld_requests(
+        rt.agents, rt.service_catalog, rt.mailbox, rt.message_sender, rt.judged_versions, rt.case_allowance, rt.service_store,
+    )
+    given = {"title": "", "note": "", "extra_acceptance": None, "budget": None, "revises": None, "source": None, "base": None, **kw}
+    return requester.request(ROOT, name, {"topic": topic}, **given)
 
 
 def confirmed_amendment(org, criterion, topic="confirm", owner="ceo", name="weekly-brief"):

@@ -23,7 +23,8 @@ def test_the_services_listing_shows_criteria_by_id(svc):
 def reject(svc, words, topic="ai", **kw):
     """The user rejects a delivery (their own judgement); returns the request and the verdict note. A ``criterion`` is the user's yes: it is
     recorded as a ``confirms`` link after the verdict."""
-    from testkit.services_world import deliver, request
+    from testkit.services_world import deliver
+    from testkit.services_world import request_unheld as request  # a new request that clause 2 would hold: these tests are about other rules
 
     task = request(svc, topic)
     deliver(svc, "ceo", task, lessons="L.")
@@ -59,7 +60,8 @@ def test_the_services_listing_lists_every_assertion_clipped_to_160(svc):
 
 
 def test_the_services_listing_says_what_each_assertion_is_about(svc):
-    from testkit.services_world import deliver, request
+    from testkit.services_world import deliver
+    from testkit.services_world import request_unheld as request  # a new request that clause 2 would hold: this test is about the listing
 
     a, one = reject(svc, "One.", criterion=["C1", "C2"])
     b, two = reject(svc, "Two.", "b", criterion=["none"])
@@ -121,11 +123,12 @@ def test_case_total_warns_on_spend_not_on_runs_handed_down(svc):
     first = request(svc, "ai")  # the contract hands down 10
     deliver(svc, "ceo", first, runs=3)
     svc.feedback(ROOT_ADDR, first.id, "reject", "Too long.", source="human")
+    from testkit.services_world import request_unheld  # a new request that clause 2 would hold: this test is about the case total
     rework = svc.request(ROOT_ADDR, "weekly-brief", {"topic": "ai"}, revises=first.id, budget=8, source="human")  # 18 handed down: past the contract's 10
     deliver(svc, "ceo", rework, runs=4)  # but 7 runs used
     done = svc.runtime.service_reports.case_total(rework)
     assert done == "case total: 7 runs used of 18 handed down (contract: 10 per request)"
-    over = request(svc, "other")
+    over = request_unheld(svc, "other")
     deliver(svc, "ceo", over, runs=11)  # more used than the contract allows
     assert svc.runtime.service_reports.case_total(over) == (
         "case total: 11 runs used of 10 handed down (contract: 10 per request). "

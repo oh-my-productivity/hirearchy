@@ -9,9 +9,13 @@ from ..agents import AgentDirectory
 from ..dispatch import MessageSender
 from ..kernel import ROOT, TITLE_MAX, Message, OrgError, clip_line
 from ..mail import MailboxReader
+from ._criteria import unanswered
 from ._lines import criteria_lines
 from ._protocols import RequestBodies, ServiceRequests
-from .api import BASE_DELIVERED_HEADING, BASE_LATEST_HEADING, JUDGED_BYTES, CaseAllowance, Contract, Criterion, JudgedBase, JudgedVersions, ServiceCatalog, criteria_of
+from .api import (
+    BASE_DELIVERED_HEADING, BASE_LATEST_HEADING, JUDGED_BYTES, CaseAllowance, Contract, Criterion, JudgedBase, JudgedVersions, ServiceCatalog,
+    ServiceEvidence, ServiceStore, criteria_of,
+)
 
 BASES = ("delivered", "latest")
 BASE_VALUE = 'refused: base must be "delivered" or "latest": {base}. Nothing was sent.'  # P4-BASE-VALUE
@@ -24,6 +28,19 @@ NEEDS_BASE = (  # P4-NEEDS-BASE
     "changed {paths}. Say which version the user's corrections apply to: base=\"delivered\" (the lead restores the version they judged{commit}, "
     "then applies their corrections) or base=\"latest\" (the relayed changes stay; tell the user) (CLI: --base delivered or --base latest). "
     "Nothing was sent."
+)
+REQUEST_UNANSWERED = (  # REQUEST-UNANSWERED (clause 2, design 13.1): {more} is "" or " (and {k} more: {R ids})"
+    "refused: rejection {assertion} (message {note}) on task {task} of `{service}` has no recorded answer yet{more}, so the next request of "
+    "`{service}` waits: every rejection gets the user's answer within one request. Ask the user the one question first: {question}. On yes: "
+    'define_service(owner="{owner}", name="{service}", ..., answers="{note}", about=<the id you asked about>, words=<their answer, verbatim>) '
+    "(CLI: hirearchy define-service ... --answers, --about, --words). "
+    'On no, a one-off or "as it is": feedback(task_id="{task}", verdict="reject", confirms="{note}", criterion=["none"], '
+    '["R<j>"] or ["C<k>"], source="human", note=<their answer, verbatim>) '
+    "(CLI: hirearchy feedback <task> reject --confirms ... --criterion ... --source human --note ...). "
+    "A rework of that case (revises=) is not held. Nothing was sent."
+)
+REQUEST_UNREADABLE = (  # REQUEST-UNREADABLE (design 13.1)
+    "refused: the record of `{name}` cannot be read ({error}), so the request was not sent. Try again; if it persists, tell the user."
 )
 _GOAL = {
     "delivered": "The client's corrections apply to the version they judged: see \"## Base\" at the end of this task.",
@@ -103,7 +120,7 @@ class RuleServiceRequester(ServiceRequests):
 
     def __init__(
         self, agents: AgentDirectory, catalog: ServiceCatalog, mail: MailboxReader, bodies: RequestBodies, sender: MessageSender,
-        judged: JudgedVersions, allowance: CaseAllowance,
+        judged: JudgedVersions, allowance: CaseAllowance, evidence: ServiceEvidence, store: ServiceStore,
     ) -> None:
         self._agents = agents
         self._catalog = catalog
@@ -112,6 +129,8 @@ class RuleServiceRequester(ServiceRequests):
         self._sender = sender
         self._judged = judged
         self._allowance = allowance
+        self._evidence = evidence
+        self._store = store
 
     def request(
         self, actor: str, service: str, inputs: Mapping[str, object] | None, *, title: str, note: str,
@@ -146,6 +165,8 @@ class RuleServiceRequester(ServiceRequests):
                 f"revises must be the id of an earlier request for `{service}` that you sent to {contract.owner}: {revises}"
             )
         judged = self._base(actor, contract.owner, service, revises, source, base)
+        if actor == ROOT and not revises:
+            self._answered_first(contract.owner, service)
         if budget is None:
             budget = self._default_budget(actor, contract, revises, source)
         extra = criteria_lines(extra_acceptance, "extra_acceptance", required=False)
@@ -158,6 +179,26 @@ class RuleServiceRequester(ServiceRequests):
             actor, contract.owner, body, type="task", title=title.strip(), budget=int(budget), revises=revises or None,
             source=source, service=service, contract=contract.version, playbook=self._catalog.read_playbook(contract.owner, service).version,
         )
+
+    def _answered_first(self, owner: str, service: str) -> None:
+        """Clause 2 (design 13.1): root's new request (not a rework) waits while a human rejection recorded since the service's previous new request
+        has no recorded answer (``unanswered``), so that every rejection gets the user's answer within one request. Nothing is due before a first
+        new request. The oldest is named, then the others. A record that cannot be read refuses too: a skipped check would let the rejection pass."""
+        try:
+            previous = max(
+                (m.id for m in self._mail.sent(ROOT) if m.type == "task" and m.service == service and m.to == owner and not m.revises), default=None,
+            )
+            if previous is None:
+                return
+            waiting = [r for r in unanswered(self._evidence.amendment_basis(owner, service), self._store, owner, service) if r.note > previous]
+        except (OrgError, OSError) as error:
+            raise OrgError(REQUEST_UNREADABLE.format(name=service, error=error)) from error
+        if waiting:
+            oldest, others = waiting[0], waiting[1:]
+            more = f" (and {len(others)} more: {', '.join(r.assertion for r in others)})" if others else ""
+            raise OrgError(REQUEST_UNANSWERED.format(
+                assertion=oldest.assertion, note=oldest.note, task=oldest.task, service=service, more=more, question=oldest.question.removesuffix("."), owner=owner,
+            ))
 
     def _default_budget(self, actor: str, contract: Contract, revises: str | None, source: str | None) -> int:
         """The budget of a request that names none: the contract's, except for root's rework the user asked for, which gets what is left of the runs

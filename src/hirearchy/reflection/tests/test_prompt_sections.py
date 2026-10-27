@@ -4,7 +4,8 @@
 import time
 
 from testkit.reach.hirearchy.core import ROOT
-from testkit.services_world import ENG, amend_legacy, confirmed_amendment, define, deliver, request, svc, work, write_version
+from testkit.services_world import ENG, amend_legacy, confirmed_amendment, define, deliver, request_unheld, svc, work, write_version
+from testkit.services_world import request_unheld as request  # a new request that clause 2 would hold: these tests are about other rules
 
 WEEKDAY = "weekly-brief"
 
@@ -631,7 +632,7 @@ def test_the_locked_lead_keeps_its_text_with_the_new_subject(svc):
     first = svc.request(ROOT, "locked-brief", {"topic": "ai"})
     deliver(svc, "ceo", first)
     svc.feedback(ROOT, first.id, "reject", "Too long.", source="human")
-    svc.request(ROOT, "locked-brief", {"topic": "again"})
+    request_unheld(svc, "again", name="locked-brief")
     lines = reflect_section_of(svc.run_prompt("ceo", svc.begin_run("ceo")), "locked-brief").splitlines()
     assert "The client rejected a delivery" + LOCKED_END in lines
     svc.end_run("ceo", ok=True)
@@ -672,7 +673,7 @@ def test_raise_bar_for_a_human_client_locked_says_do_not_send_it_yourself(svc):
     first = svc.request(ROOT, "locked-brief", {"topic": "ai"})
     deliver(svc, "ceo", first)
     svc.feedback(ROOT, first.id, "reject", "Too long.", source="human")
-    svc.request(ROOT, "locked-brief", {"topic": "again"})
+    request_unheld(svc, "again", name="locked-brief")
     section = reflect_section_of(svc.run_prompt("ceo", svc.begin_run("ceo")), "locked-brief")
     assert LOCKED_RAISE_BAR in section and "send nothing about it yourself" not in section
 

@@ -69,9 +69,17 @@ def build(factory: Any, tmp_path: Path, **kw: Any) -> tuple[ServicesWorld, Basis
     return w, basis
 
 
+def ask_after(w: ServicesWorld, basis: Basis, topic: str = "ai") -> Message:
+    """A request that clause 2 lets through (design 13.1): a fresh one, or, while a rejection of the record has no answer, a rework of that rejection's
+    task (a rework is never held). These tests are about the definer and the retirement, which need rejections that stay unanswered."""
+    waiting = [r for r in basis.rejections if not r.answered]
+    return ask(w, topic, revises=waiting[0].task, source="human") if waiting else ask(w, topic)
+
+
 def reject(w: ServicesWorld, basis: Basis, words: str = NOTE, topic: str = "ai") -> Rejection:
-    """The user rejects a fresh delivery; the world's record then lists the rejection (unanswered)."""
-    task = ask(w, topic)
+    """The user rejects a fresh delivery (a rework of the first unanswered rejection's task, after one); the world's record then lists the rejection
+    (unanswered)."""
+    task = ask_after(w, basis, topic)
     answer(w, task)
     note = w.commands.feedback("root", task.id, "reject", words, source="human")
     found = Rejection(note.id, f"R{len(basis.rejections) + 1}", task.id, task.title, tuple(x.assertion for x in basis.rejections), words, "")
@@ -187,7 +195,7 @@ def test_answers_that_is_not_a_human_rejection_of_this_service_is_refused(factor
     )
     assert refusal(w, add_acceptance=[RULE], answers="20261018T100000000012-root-0004", about="C1", words=YES) == none_yet
     first, second = reject(w, basis), reject(w, basis, "Another one entirely, please.", "b")
-    task = ask(w, "c")
+    task = ask_after(w, basis, "c")
     answer(w, task)
     accepted = w.commands.feedback("root", task.id, "accept", source="human")  # an accept is no rejection
     listed = f"R1 (message {first.note}), R2 (message {second.note})"

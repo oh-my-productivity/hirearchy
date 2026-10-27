@@ -12,14 +12,14 @@ import pytest
 
 from ._support import amend, answer, define
 from ._support import request as ask
-from .test_define_answers import NOTE, RULE, YES, Basis, build, factory, meta, refusal, reject, version  # noqa: F401  (factory is a fixture)
+from .test_define_answers import NOTE, RULE, YES, Basis, ask_after, build, factory, meta, refusal, reject, version  # noqa: F401  (factory is a fixture)
 
 WORDS_ALONE = "Add the rule, please."
 
 
 def delivered(w: Any, basis: Basis, topic: str = "ai") -> str:
     """A delivery nobody has rated yet: the record says so."""
-    task = ask(w, topic)
+    task = ask_after(w, basis, topic)
     answer(w, task)
     basis.unrated = (*basis.unrated, task.id)
     return task.id

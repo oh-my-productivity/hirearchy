@@ -13,15 +13,16 @@ from dataclasses import dataclass, replace
 from fnmatch import fnmatch
 from pathlib import Path
 
-from ..agents import RetiredArchive, RetiredTree
+from ..agents import AgentDirectory, RetiredArchive, RetiredTree
 from ..agents.testing import fs_agents
 from ..delivery import MessageDelivery
-from ..dispatch import ReworkContext
+from ..dispatch import MessageSender, ReworkContext
 from ..dispatch.testing import MEMORY_ROOT, DispatchWorld, PostedDelivery
 from ..dispatch.testing import fs_world as dispatch_fs_world
 from ..dispatch.testing import memory_world as dispatch_memory_world
 from ..kernel import ROOT, AtomicWriter, JsonObject, Message, OrgError, OrgPaths, join_frontmatter, norm, split_frontmatter
 from ..kernel.testing import ListEventSink, fs_atomic_writer
+from ..mail import MailboxReader
 from ._amend import ContractAmender
 from ._catalog import ContractServiceCatalog
 from ._commands import RuleServiceCommands
@@ -33,7 +34,7 @@ from ._normalizer import TextContractNormalizer
 from ._parse import FILE_SHAPE, as_int, merged_versions
 from ._places import OrgServicePlaces
 from ._playbook import RulePlaybookReviser
-from ._protocols import ContinuedServices, LinkNotes, RetiredService, ServiceFiles, ServicePlaces, ServiceRestorer
+from ._protocols import ContinuedServices, LinkNotes, RetiredService, ServiceFiles, ServicePlaces, ServiceRequests, ServiceRestorer
 from ._request import RuleServiceRequester, TextRequestBodies
 from ._retire import RuleServiceRetirement
 from ._rework import ServiceReworkContext
@@ -367,7 +368,9 @@ def _world(
         ),
         RuleServiceRetirement(d.agents, catalog, store, owners, notes, d.clock, events, gate),
         RulePlaybookReviser(d.agents, catalog, texts, playbooks, notes, gate),
-        RuleServiceRequester(d.agents, catalog, d.mail, TextRequestBodies(), d.sender, judged or NoJudgedVersions(), allowance or FixedAllowance({})),
+        RuleServiceRequester(
+            d.agents, catalog, d.mail, TextRequestBodies(), d.sender, judged or NoJudgedVersions(), allowance or FixedAllowance({}), gate, store,
+        ),
         RuleClientFeedback(d.agents, d.mail, d.sender, gate, store),
     )
     return ServicesWorld(
@@ -376,6 +379,23 @@ def _world(
         rework=ServiceReworkContext(d.mail, d.agents, catalog), places=places, d=d, events=events, text=harness.text, rels=harness.rels,
         continued=continued, put=harness.put, unreadable=harness.unreadable,
     )
+
+
+def unheld_requests(
+    agents: AgentDirectory, catalog: ServiceCatalog, mail: MailboxReader, sender: MessageSender, judged: JudgedVersions, allowance: CaseAllowance,
+    store: ServiceStore,
+) -> ServiceRequests:
+    """A requester over the given ports that judges a new request against the record of an organization with no rejection (the admitting stand-in):
+    clause 2's REQUEST-UNANSWERED does not hold it. For the tests of another rule, which need a rejection with no answer and a new request in the
+    same story (a prompt that shows both); the tests of REQUEST-UNANSWERED call the real commands."""
+    return RuleServiceRequester(agents, catalog, mail, TextRequestBodies(), sender, judged, allowance, AdmittingServiceEvidence(), store)
+
+
+def unheld_request(w: ServicesWorld, actor: str, service: str, inputs: Mapping[str, object] | None, **kw: object) -> Message:
+    """``actor``'s new request of ``service`` through the world's own ports, not held by clause 2 (see :func:`unheld_requests`)."""
+    requester = unheld_requests(w.d.agents, w.catalog, w.d.mail, w.d.sender, NoJudgedVersions(), FixedAllowance({}), w.store)
+    given: dict[str, object] = {"title": "", "note": "", "extra_acceptance": None, "budget": None, "revises": None, "source": None, "base": None, **kw}
+    return requester.request(actor, service, inputs, **given)  # type: ignore[arg-type]
 
 
 def fs_world(

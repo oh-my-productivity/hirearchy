@@ -209,7 +209,8 @@ def reject_deliveries(org, clock, n):
         clock.at(20 + i)
         task = request(org, budget=5)
         deliver(org, "ceo", task)
-        org.feedback(ROOT, task.id, "reject", "not what I asked", source="human")
+        no = org.feedback(ROOT, task.id, "reject", "not what I asked", source="human")
+        org.feedback(ROOT, task.id, "reject", "No: a one-off.", source="human", criterion=["none"], confirms=no.id)  # the user's answer: the next request waits for it
 
 
 def test_low_quality_needs_a_minimum_sample(org, clock):

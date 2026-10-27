@@ -59,6 +59,8 @@ def _commands(b: Builder) -> ServiceCommands:
         ),
         RuleServiceRetirement(agents, catalog, store, owners, delivery, clock, events, b.get(ServiceEvidence)),
         RulePlaybookReviser(agents, catalog, texts, playbooks, delivery, b.get(ServiceEvidence)),
-        RuleServiceRequester(agents, catalog, mail, TextRequestBodies(), sender, b.get(JudgedVersions), b.get(CaseAllowance)),
+        RuleServiceRequester(
+            agents, catalog, mail, TextRequestBodies(), sender, b.get(JudgedVersions), b.get(CaseAllowance), b.get(ServiceEvidence), store,
+        ),
         RuleClientFeedback(agents, mail, sender, b.get(ServiceEvidence), store),
     )

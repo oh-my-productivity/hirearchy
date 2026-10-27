@@ -333,3 +333,157 @@ def test_the_refusals_of_revises_and_base_still_come_before_the_default_is_compu
     with pytest.raises(KernelOrgError, match="base goes only with a rework the user asked for"):
         w.commands.request("root", "weekly-brief", {"topic": "ai"}, base="latest")
     assert allowance.asked == []
+
+
+# ------------------------------------------------------------------------------ REQUEST-UNANSWERED: a new request waits for the answers (clause 2, design 13.1)
+from hirearchy.services import AmendmentBasis, Rejection  # noqa: E402
+from hirearchy.services.testing import AdmittingServiceEvidence  # noqa: E402
+
+OLD_NOTE = "20000101T000000000000-root-0001"  # recorded long before any request of the test
+NEW_NOTE = "29990101T000000000000-root-0001"  # recorded after every request of the test
+QUESTION = 'About <its id>: add "<the rule, in their words>" as a lasting rule? Yes or no.'
+
+
+class BasisEvidence(AdmittingServiceEvidence):
+    """The admitting stand-in whose record a test sets (``basis``) or makes unreadable (``error``)."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.basis = AmendmentBasis((), ())
+        self.error: Exception | None = None
+
+    def amendment_basis(self, owner: str, service: str) -> AmendmentBasis:
+        if self.error is not None:
+            raise self.error
+        return self.basis
+
+
+def held(note: str, assertion: str = "R1", task: str = "20260101T000000000001-root-0001", answered: str = "") -> Rejection:
+    return Rejection(note, assertion, task, "weekly-brief: ai", (), "Too long.", answered, QUESTION, task)
+
+
+@pytest.fixture(params=[fs_world, memory_world], ids=lambda f: f.__name__)
+def gated(request, tmp_path: Path):
+    """A services world whose requester asks a ``BasisEvidence`` (the record the test sets), the service defined."""
+    evidence = BasisEvidence()
+    w = sup.populated(request.param(tmp_path, evidence=evidence))
+    sup.define(w)
+    return w, evidence
+
+
+def unanswered_text(note: str, assertion: str, task: str, more: str = "", question: str = QUESTION) -> str:
+    """REQUEST-UNANSWERED (design 13.1), written out here word for word, for ``weekly-brief`` of ``ceo``."""
+    return (
+        f"refused: rejection {assertion} (message {note}) on task {task} of `weekly-brief` has no recorded answer yet{more}, so the next request of "
+        "`weekly-brief` waits: every rejection gets the user's answer within one request. "
+        f"Ask the user the one question first: {question.removesuffix('.')}. On yes: "  # the question ends with its own full stop: one is kept
+        'define_service(owner="ceo", name="weekly-brief", ..., answers="' + note + '", about=<the id you asked about>, words=<their answer, verbatim>) '
+        "(CLI: hirearchy define-service ... --answers, --about, --words). "
+        'On no, a one-off or "as it is": feedback(task_id="' + task + '", verdict="reject", confirms="' + note + '", criterion=["none"], '
+        '["R<j>"] or ["C<k>"], source="human", note=<their answer, verbatim>) '
+        "(CLI: hirearchy feedback <task> reject --confirms ... --criterion ... --source human --note ...). "
+        "A rework of that case (revises=) is not held. Nothing was sent."
+    )
+
+
+def rejected_first(org):
+    """The user rejects the delivery of the first request, and nobody has answered: returns (the request, the rejection note)."""
+    first = request(org)
+    deliver(org, "ceo", first)
+    return first, org.feedback(ROOT, first.id, "reject", "Too long.", source="human")
+
+
+def test_a_new_request_is_refused_while_a_human_rejection_since_the_previous_new_request_has_no_answer(svc):
+    first, no = rejected_first(svc)
+    sent = len(svc.sent(ROOT))
+    with pytest.raises(OrgError, match="^refused: rejection R1 .* has no recorded answer yet, so the next request of `weekly-brief` waits"):
+        request(svc, "next")
+    assert len(svc.sent(ROOT)) == sent  # nothing was sent
+    svc.feedback(ROOT, first.id, "reject", "No: a one-off.", source="human", confirms=no.id, criterion=["none"])  # the user's answer
+    assert request(svc, "next").type == "task"
+
+
+def test_the_refusal_is_request_unanswered_word_for_word(svc):
+    first, no = rejected_first(svc)
+    with pytest.raises(OrgError) as refusal:
+        request(svc, "next")
+    assert str(refusal.value) == unanswered_text(no.id, "R1", first.id)
+
+
+def test_several_unanswered_name_the_oldest_then_and_k_more(svc):
+    first, one = rejected_first(svc)
+    again = request(svc, revises=first.id, source="human")  # a rework is never held
+    deliver(svc, "ceo", again)
+    svc.feedback(ROOT, again.id, "reject", "Still too long.", source="human")
+    with pytest.raises(OrgError) as refusal:
+        request(svc, "next")
+    assert str(refusal.value) == unanswered_text(one.id, "R1", first.id, more=" (and 1 more: R2)")
+    three_task = request(svc, revises=again.id, source="human")
+    deliver(svc, "ceo", three_task)
+    svc.feedback(ROOT, three_task.id, "reject", "Again.", source="human")
+    with pytest.raises(OrgError, match=r"has no recorded answer yet \(and 2 more: R2, R3\), so the next request"):
+        request(svc, "next")
+
+
+def test_an_unreadable_record_refuses_with_request_unreadable(gated):
+    w, evidence = gated
+    ask_first(w)
+    evidence.error = KernelOrgError("a mailbox cannot be read")
+    sent = len(w.d.mail.sent("root"))
+    with pytest.raises(KernelOrgError) as refusal:
+        ask_first(w)
+    assert str(refusal.value) == (
+        "refused: the record of `weekly-brief` cannot be read (a mailbox cannot be read), so the request was not sent. "
+        "Try again; if it persists, tell the user."
+    )
+    assert len(w.d.mail.sent("root")) == sent
+    evidence.error = OSError("disk")
+    with pytest.raises(KernelOrgError, match=r"cannot be read \(disk\)"):
+        ask_first(w)
+
+
+# guards: they pin the edges of 13.1 and are green when written
+def test_a_rework_is_never_held(svc):
+    first, no = rejected_first(svc)
+    rework = request(svc, revises=first.id, source="human")
+    assert rework.revises == first.id
+    assert request(svc, revises=first.id).revises == first.id  # a relayed rework too
+
+
+def test_a_rejection_before_the_previous_new_request_is_not_due(gated):
+    w, evidence = gated
+    ask_first(w)
+    evidence.basis = AmendmentBasis((held(OLD_NOTE),), ())  # an older backlog: recorded before the previous new request
+    assert ask_first(w).type == "task"
+
+
+def test_no_earlier_new_request_means_nothing_is_due(gated):
+    w, evidence = gated
+    evidence.basis = AmendmentBasis((held(NEW_NOTE),), ())
+    assert ask_first(w).type == "task"  # the first new request of the service: nothing is due
+    first = w.d.mail.sent("root")[-1]
+    assert w.commands.request("root", "weekly-brief", {"topic": "ai"}, revises=first.id, source="human").revises == first.id
+
+
+def test_relayed_and_agent_rejections_hold_nothing(svc):
+    first = request(svc)
+    deliver(svc, "ceo", first)
+    svc.feedback(ROOT, first.id, "reject", "The assistant's reading.", source="relayed")
+    svc.feedback(ROOT, first.id, "reject", "Without a source.")
+    assert request(svc, "next").type == "task"  # relayed rejections are not assertions
+    define(svc, owner=ENG, actor="ceo", name="eng-brief", budget=4)
+    svc.delegate(ROOT, "ceo", "Project", "g", "c", budget=20)
+    inner = svc.request("ceo", "eng-brief", {"topic": "x"}, budget=3)
+    deliver(svc, ENG, inner)
+    svc.feedback("ceo", inner.id, "reject", "Not good.")
+    assert svc.request("ceo", "eng-brief", {"topic": "y"}, budget=3).type == "task"  # an agent client's rejection is agent tier
+
+
+def test_an_answer_by_human_link_or_by_answering_version_releases_the_request(svc):
+    first, no = rejected_first(svc)
+    svc.feedback(ROOT, first.id, "reject", "No: a one-off.", source="human", confirms=no.id, criterion=["none"])  # the user's "no": a human link
+    second = request(svc, "second")
+    deliver(svc, "ceo", second)
+    no2 = svc.feedback(ROOT, second.id, "reject", "Missing a source.", source="human")
+    svc.define_service(ROOT, "ceo", "weekly-brief", add_acceptance=["Always name a source"], answers=no2.id, about="C1", words="Yes, add it.")
+    assert request(svc, "third").type == "task"  # the answer is a contract version (and its link)

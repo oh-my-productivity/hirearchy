@@ -17,6 +17,7 @@ from types import SimpleNamespace
 from .clocks import clock_ports
 from .obs_fixtures import T0, Clock, EventLog, stamp
 from .scheduler import scheduler_is
+from .services_world import request_unheld
 
 from hirearchy.app import wiring
 from hirearchy.core import ROOT, Message, Org
@@ -180,7 +181,7 @@ def _build_demo(base: Path, clock: Clock) -> SimpleNamespace:
     clock.at(220)
     org.feedback(ROOT, c1b.id, "accept", "This is right.", source="human")
     clock.at(250)
-    c2 = org.request(ROOT, "market-brief", {"topic": "Heat pumps"}, title="Brief: heat pumps")
+    c2 = request_unheld(org, "Heat pumps", name="market-brief", title="Brief: heat pumps")  # clause 2 would hold it: c1's rejection has no answer (the demo keeps its history)
     clock.at(262)
     org.delegate("research", "research/crawler", "Crawl heat pump sources", "Crawl.", "10 URLs", budget=1)
     clock.at(263)

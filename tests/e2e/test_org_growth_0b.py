@@ -293,22 +293,24 @@ def test_the_views_counted_and_not_its_escapes_equal_healths_per_verifier(org):
     def ask(topic: str, **more):
         return org.request(ROOT, SERVICE, {"topic": topic}, **more)
 
+    # every new request comes before the first rejection: clause 2 holds a new request while a rejection has no answer (only reworks follow)
     miss, plain, gap, good = (ask(t) for t in ("miss", "plain", "gap", "good"))
     for task in (miss, plain, gap, good):
         signed_off(org, task, REVIEWER)
+    first = ask("relayed")
+    signed_off(org, first, "lead")
+    base = ask("carry")
+    signed_off(org, base, "lead", shared)
+
     reject(org, miss, "Too long.", criterion=["C1"])  # the user confirms C1, which the task carried: reviewer-miss
     reject(org, plain, "No: not right.")  # nothing a rule can read: untyped
     reject(org, gap, "Always lead with the date.")  # a lasting word: contract-gap
     org.feedback(ROOT, good.id, "accept", source="human")
 
-    first = ask("relayed")
-    signed_off(org, first, "lead")
     relayed = ask("relayed", revises=first.id)  # no source: the assistant's own reading
     signed_off(org, relayed, "lead")
     reject(org, relayed, "No: not it.")  # a relayed-error
 
-    base = ask("carry")
-    signed_off(org, base, "lead", shared)
     carried = ask("carry", revises=base.id)  # relayed
     signed_off(org, carried, "lead", shared)
     again = ask("carry", revises=carried.id, source="human", base="latest")  # the user's own rework, from the current version, delivers the same file

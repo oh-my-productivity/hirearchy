@@ -7,7 +7,8 @@ from datetime import datetime, timedelta
 import pytest
 
 from testkit.reach.hirearchy.core import ROOT
-from testkit.services_world import contract_meta, define, deliver, request, svc, work
+from testkit.services_world import contract_meta, define, deliver, svc, work
+from testkit.services_world import request_unheld as request  # a new request that clause 2 would hold: these tests are about other rules
 
 from hirearchy.kernel import RUNTIME, Message, run_credit_title
 import hirearchy.reflection as reflection
