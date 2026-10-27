@@ -23,6 +23,7 @@ from hirearchy.services import Admission, ServiceEvidence
 # The suite that every ``ServiceEvidence`` passes: the same functions, run against this package's implementation.
 from hirearchy.services.tests.test_contract_service_evidence import (  # noqa: F401  (imported to be collected here)
     test_admit_accepts_lines,
+    test_admit_item_returns_rule_b_or_c_with_a_why_or_raises_an_org_error,
     test_admit_returns_rule_b_or_c_or_raises_an_org_error,
     test_an_exempt_admit_returns_the_exemption_with_normalized_ids,
     test_a_basis_rejection_carries_its_case,
@@ -251,7 +252,7 @@ def test_rule_c_refuses_an_amendment_without_a_confirmation(w: ReflectionWorld, 
         "refused: none of this evidence is the client's own: C3 was added to the contract by an amendment (v2), but the client's yes to it is not "
         "recorded (not confirmed). "
     )
-    assert "(c) it cites a criterion root added to the contract by an amendment the client confirmed (none yet)." in message
+    assert "(c) it is the own words of a criterion root added to the contract by an amendment the client confirmed (none yet)." in message
 
 
 def test_a_user_initiated_amendment_is_never_rule_c_eligible(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
@@ -276,8 +277,8 @@ def test_c_refuses_a_v1_criterion_with_its_note(w: ReflectionWorld, evidence: Se
     reason = "Always give the sources first"
     assert refusal(evidence, ["C1"], reason) == (
         "refused: none of this evidence is the client's own: C1 is in the contract since v1, not added by an amendment, and failed in no case the "
-        "client rejected. A revision is admitted only when (b) the same criterion or regression assertion failed in 2 different cases the client "
-        "rejected, or (c) it cites a criterion root added to the contract by an amendment the client confirmed (none yet). Your team's lessons, relayed verdicts (the "
+        "client rejected. An item is admitted only when (b) the same criterion or regression assertion failed in 2 different cases the client "
+        "rejected, or (c) it is the own words of a criterion root added to the contract by an amendment the client confirmed (none yet). Your team's lessons, relayed verdicts (the "
         "assistant's own reading) and an agent client's verdicts weigh nothing. Nothing was written: follow the playbook and the contract.\n"
         "If you think the client wants this from now on, send root (`send`) this question once, and do not wait for an answer (it reaches you as a "
         "contract change or a criterion link): \"We would change how we deliver weekly-brief: Always give the sources first. Is that what you want "
@@ -287,9 +288,9 @@ def test_c_refuses_a_v1_criterion_with_its_note(w: ReflectionWorld, evidence: Se
 
 def test_no_evidence_at_all_is_a_g1_refusal_that_says_so(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
     assert refusal(evidence, []).startswith(
-        "refused: none of this evidence is the client's own: no evidence given. A revision is admitted only when (b) "
+        "refused: none of this evidence is the client's own: no evidence given. An item is admitted only when (b) "
     )
-    assert "(c) it cites a criterion root added to the contract by an amendment the client confirmed (none yet)." in refusal(evidence, [])
+    assert "(c) it is the own words of a criterion root added to the contract by an amendment the client confirmed (none yet)." in refusal(evidence, [])
 
 
 # ------------------------------------------------------------------------------ a link-note id is evidence (F-E4-7)
@@ -458,7 +459,7 @@ def test_a_cited_removed_criterion_adds_no_subject_and_says_so(w: ReflectionWorl
     amend(w, remove_acceptance=["Names the week it covers"])
     message = refusal(evidence, ["C3"])
     assert "C3 is no longer in the contract: cite a current criterion (see `services`)." in message
-    assert "(c) it cites a criterion root added to the contract by an amendment the client confirmed (none yet)." in message
+    assert "(c) it is the own words of a criterion root added to the contract by an amendment the client confirmed (none yet)." in message
 
 
 def test_two_rejections_linked_only_to_a_removed_criterion_do_not_admit(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
@@ -470,7 +471,7 @@ def test_two_rejections_linked_only_to_a_removed_criterion_do_not_admit(w: Refle
     assert "C3 is no longer in the contract" in refusal(evidence, ["C3"])
     message = refusal(evidence, ["R1", "R2"])
     assert message.startswith("refused: the client rejected this in one case only (")
-    assert 'a new one, or a clarification of an existing one?" Revise when the answer is in the contract' in message
+    assert 'a new one, or a clarification of an existing one?" Add the item when the answer is in the contract' in message
 
 
 # ------------------------------------------------------------------------------ ids that resolve to something else
@@ -530,7 +531,7 @@ def test_g2_asks_about_the_current_criteria_of_the_assertion_only(w: ReflectionW
     rejected(w, "Wrong week.", criterion="C2, C3")
     amend(w, remove_acceptance=["Names the week it covers"])
     message = refusal(evidence, ["R1"])
-    assert 'which criterion should say it: a new one, or a clarification of C2?" Revise when the answer is in the contract' in message
+    assert 'which criterion should say it: a new one, or a clarification of C2?" Add the item when the answer is in the contract' in message
     assert "C3" not in message.split("a new one, or a clarification of")[1]
 
 

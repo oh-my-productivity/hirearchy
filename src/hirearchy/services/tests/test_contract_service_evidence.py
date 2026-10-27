@@ -12,7 +12,7 @@ import pytest
 
 from hirearchy.kernel import OrgError
 from hirearchy.services import Admission, AmendmentBasis, ItemWatch, Rejection, ServiceEvidence
-from hirearchy.services.testing import IMPLEMENTATIONS, AdmittingServiceEvidence
+from hirearchy.services.testing import IMPLEMENTATIONS, AdmittingServiceEvidence, RefusingServiceEvidence
 
 from ._support import implementations
 
@@ -59,6 +59,18 @@ def test_admit_accepts_lines(evidence: ServiceEvidence) -> None:
     assert evidence.admit(OWNER, SERVICE, [], "why", exempt="first", lines=lines).lines == ()
 
 
+def test_admit_item_returns_rule_b_or_c_with_a_why_or_raises_an_org_error(evidence: ServiceEvidence) -> None:
+    """One item is judged (design 6.2): a gate that admits returns the rule, the normalized ids, a detail line and the ``why`` ids the runtime writes."""
+    for kind, text, when in (("step", "A new step", None), ("rule", "cite the source", "a claim has none")):
+        try:
+            got = evidence.admit_item(OWNER, SERVICE, ["c1"], "why", kind=kind, text=text, when=when)
+        except OrgError as refusal:
+            assert str(refusal)
+        else:
+            assert isinstance(got, Admission) and got.rule in ("b", "c") and got.evidence == ("C1",) and got.detail
+            assert isinstance(got.why, tuple) and got.why and all(isinstance(x, str) and x[:1] in "RC" for x in got.why)
+
+
 def test_links_returns_normalized_ids_or_raises(evidence: ServiceEvidence) -> None:
     try:
         got = evidence.links(OWNER, SERVICE, ["c2", "C1", "c2"])
@@ -103,6 +115,14 @@ def test_watch_gives_one_item_watch_per_item(evidence: ServiceEvidence) -> None:
     found = evidence.watch(OWNER, SERVICE)
     assert isinstance(found, tuple) and all(isinstance(i, ItemWatch) for i in found)
     assert [i.id for i in found] == sorted({i.id for i in found}, key=lambda x: int(x[1:]))
+
+
+def test_the_admitting_stand_in_admits_an_item_with_a_why_and_the_refusing_one_refuses_it() -> None:
+    got = AdmittingServiceEvidence().admit_item(OWNER, SERVICE, ["r2", "C1", "r2"], "why", kind="step", text="A new step", when=None)
+    assert (got.rule, got.evidence, got.why) == ("b", ("R2", "C1"), ("R2", "C1"))
+    assert AdmittingServiceEvidence().admit_item(OWNER, SERVICE, [], "why", kind="step", text="A new step", when=None).why == ("R1",)
+    with pytest.raises(OrgError, match="^no thanks$"):
+        RefusingServiceEvidence("no thanks").admit_item(OWNER, SERVICE, ["R1"], "why", kind="step", text="A new step", when=None)
 
 
 def test_the_stand_in_hands_back_the_watch_it_was_given() -> None:

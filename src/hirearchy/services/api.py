@@ -598,6 +598,7 @@ class Admission:
     evidence: tuple[str, ...]  # the normalized ids cited
     detail: str  # one line for the client's note, e.g. "C6 failed in 2 cases the client rejected: <id>, <id>"
     lines: tuple[tuple[str, str], ...] = ()  # (the id that admits it, the line) of every line the revision added or changed; () when none/exempt
+    why: tuple[str, ...] = ()  # the R and C ids the item rests on (design 6.3): the runtime writes them as its WHY; () for an exempt admission
 
 
 @dataclass(frozen=True)
@@ -640,6 +641,16 @@ class ServiceEvidence(Protocol):
         revision adds or changes (``changed_lines``): under rule (c) each must be the cited criterion's own words with its id, under rule (b) each
         must carry the id it rests on; the admission lists them with the id that admits each. ``OrgError`` with the client question when it is
         refused (an offending line included), or naming unknown ids."""
+        ...
+
+    def admit_item(
+        self, owner: str, service: str, evidence: Sequence[str], reason: str, *, kind: str, text: str, when: str | None,
+    ) -> Admission:
+        """Judge ONE playbook item of ``owner``'s service by rules (b) and (c) of the evidence gate (design 6.2): ``kind`` is ``step`` or ``rule``;
+        ``text`` is a step's words or a rule's THEN, ``when`` a rule's condition (None or ``always``: none). Rule (c): the item's words are the own
+        words of a criterion the client added by an amendment and confirmed on a rejection of its own; rule (b): the subjects it cites failed in 2
+        different cases the human client rejected. The admission's ``why`` holds the R and C ids the runtime writes as the item's WHY. ``OrgError``
+        with the client question when it is refused (PB-C-WORDS, G1, G2), or naming unknown ids."""
         ...
 
     def confirmed(self, owner: str, service: str) -> frozenset[str]:

@@ -11,17 +11,18 @@ from __future__ import annotations
 
 import re
 from collections.abc import Callable, Mapping, Sequence
+from dataclasses import dataclass
 
 from ..kernel import ROOT, Message, OrgError, clip_line, link_ids, parent, verdict_tier
 from ..mail import MailboxReader
 from ..services import (
     Admission, AmendmentBasis, Criterion, ItemWatch, Rejection, ServiceCatalog, ServiceEvidence, confirmed_amendments, contract_of, criterion_words,
-    line_key, normalize_evidence, normalize_links,
+    item_words, line_key, normalize_evidence, normalize_links,
 )
 from ._ports import ContractVersions
 from ._steps import question_for
 from ._watch import watch_states
-from .api import Assertion, CaseHistory, Verdict, confirmed_criteria, delivered_unrated, regressions
+from .api import Assertion, Case, CaseHistory, Verdict, confirmed_criteria, delivered_unrated, regressions
 
 REASON_CLIP = 200  # characters of the reason in the question of a refusal
 WORDS_CLIP = 300  # characters of the client's words in the question of a refusal
@@ -30,6 +31,19 @@ LINES_LISTED = 10  # offending lines a refusal quotes
 LINE_CLIP = 600  # characters of one quoted line
 RULE_TEXT_CLIP = 300  # characters of a criterion's text in "Write it as ..."
 QUESTION_LINE_CLIP = 160  # characters of the first offending line in the question
+PB_C_WORDS = (
+    "refused: {ids} {be} confirmed by the client, so an item citing {them} may be only {their} own words: this item is not.{sentences} "
+    "A different way of doing it needs a second case the client rejected on the same criterion (rule (b)). Nothing was written: change it again "
+    "with those words, or send {client} (`send`) this question once: "
+    '"We would add to how we deliver {service}: {first}. Is that what you want from now on? If yes, please add it to the contract as a criterion."'
+)
+PB_C_WORDS_TEXT = ' Write it as a step with text "{text}" (or a rule with then "{text}" and no when) to add {id}.'
+PB_C_WORDS_LONG = (
+    " Write it as a step whose text is {id}'s words exactly as `services` lists them (or a rule with those words as then and no when) to add {id}."
+)
+RELAYED_LINK = (
+    "{id} was confirmed only by a link on a relayed rejection (the assistant's own reading): rule (c) needs a rejection of the client's own"
+)
 LINES_REFUSED = (
     "refused: every line a revision adds or changes must rest on the evidence it cites, and {n} line(s) do not:\n"
     "{listing}\n"
@@ -101,6 +115,45 @@ class CaseServiceEvidence(ServiceEvidence):
     def admit(
         self, owner: str, service: str, evidence: Sequence[str], reason: str, *, exempt: str | None = None, lines: Sequence[str] = (),
     ) -> Admission:
+        st = self._stage(owner, service, evidence)
+        if exempt:
+            return Admission(exempt, st.ids, EXEMPTION)
+        _human_client(service, st.client)
+        added, qualifying, cases_of = _judged(st)
+        if added or qualifying:
+            return self._admitted(service, st.client, st.ids, added, qualifying, {a.id: a for a in st.found}, lines, cases_of)
+        raise OrgError(_nothing_admits(service, st, reason, cases_of, st.notes))
+
+    def admit_item(
+        self, owner: str, service: str, evidence: Sequence[str], reason: str, *, kind: str, text: str, when: str | None,
+    ) -> Admission:
+        st = self._stage(owner, service, evidence)
+        _human_client(service, st.client)
+        added, qualifying, cases_of = _judged(st)
+        added_h = [c for c in added if any(c.id in a.verdict.confirmed for a in st.found)]  # confirmed by a rejection of the client's own (6.2)
+        notes = [*st.notes, *(RELAYED_LINK.format(id=c.id) for c in added if c not in added_h)]
+        always = (when or "").strip().lower() in ("", "always")
+        own = item_words(text, added_h) if added_h and (kind == "step" or always) else None
+        if own is not None:
+            c = next(c for c in added_h if c.id == own)
+            detail = f"cites {c.id}, which {st.client} added to the contract (v{c.since}) and the client confirmed"
+            why = {c.id, *(a.id for a in st.found if c.id in a.verdict.confirmed or (c.answers and a.verdict.message.id == c.answers))}
+            return Admission("c", st.ids, detail, why=_by_number(why))
+        if qualifying:
+            failed = cases_of(qualifying[0])
+            detail = f"{qualifying[0]} failed in {len(failed)} cases the client rejected: {', '.join(failed)}"
+            wanted = set(qualifying)
+            why = {*qualifying, *(a.id for a in st.found if a.id in wanted or not wanted.isdisjoint(a.about))}
+            return Admission("b", st.ids, detail, why=_by_number(why))
+        if added_h:
+            item = text if kind == "step" else f"WHEN {(when or '').strip() or 'always'} THEN {text}"
+            raise OrgError(_c_words(service, st.client, added_h, item))
+        raise OrgError(_nothing_admits(service, st, reason, cases_of, notes))
+
+    def _stage(self, owner: str, service: str, evidence: Sequence[str]) -> _Stage:
+        """The evidence stage (design 6.2), the one every admission shares: resolve every cited id (criterion, assertion, verdict, case, result,
+        link note), refuse the unknown ones, and collect what the cited ids rest on: ``subjects``, the cases of the assertions they cite and, for
+        each id that weighs nothing, a note that says why."""
         ids = normalize_evidence(list(evidence))
         crit = {c.id: c for c in self._catalog.criteria(owner, service)}
         cases = self._history.cases(owner, service)
@@ -173,34 +226,7 @@ class CaseServiceEvidence(ServiceEvidence):
                 f"assertion ({', '.join(by_assertion) or 'none yet'}), or the id of a verdict or a case of this service: see the regression list "
                 "and the digest in your prompt. Nothing was written."
             )
-        if exempt:
-            return Admission(exempt, ids, EXEMPTION)
-        if client != ROOT:
-            raise OrgError(
-                f"refused: the client of `{service}` is {client}, an agent, so its verdicts are hypotheses and nothing in this service's history "
-                "can admit a revision (rules (b) and (c) need the human client). Nothing was written. Follow the playbook and the contract; if "
-                f"you think the playbook must change, send {client} (`send`) what you would change and why."
-            )
-
-        added = [c for c in eligible if c.id in subjects]
-        order = {c.id: i for i, c in enumerate(cases)}
-
-        def cases_of(x: str) -> list[str]:
-            return sorted({a.case for a in found if x == a.id or x in a.about}, key=order.__getitem__)
-
-        qualifying = [x for x in sorted(subjects) if len(cases_of(x)) >= 2]  # the subjects that failed in 2 different cases the client rejected
-        if added or qualifying:
-            return self._admitted(service, client, ids, added, qualifying, by_assertion, lines, cases_of)
-
-        single = [
-            a for a in found
-            if a.case in cited_cases or any(x in subjects and len(cases_of(x)) == 1 for x in (a.id, *a.about))
-        ]
-        where = ", ".join(c.id for c in eligible) or "none yet"
-        if single:
-            raise OrgError(_one_case(service, client, where, crit, max(single, key=lambda a: a.verdict.message.id)))
-        raise OrgError(_no_client_evidence(service, client, where, notes, reason))
-
+        return _Stage(ids, crit, cases, found, eligible, client, frozenset(subjects), frozenset(cited_cases), tuple(notes))
 
     @staticmethod
     def _admitted(
@@ -228,6 +254,73 @@ class CaseServiceEvidence(ServiceEvidence):
             return Admission("c", ids, detail, lines=tuple(admitted))
         failed = cases_of(qualifying[0])
         return Admission("b", ids, f"{qualifying[0]} failed in {len(failed)} cases the client rejected: {', '.join(failed)}", lines=tuple(admitted))
+
+
+@dataclass(frozen=True)
+class _Stage:
+    """What the evidence stage found (data only): the normalized ids, the criteria by id, the cases and their regression assertions, the confirmed
+    amendments (``eligible``), the client, what the cited ids rest on (``subjects``, ``cited_cases``) and the notes of the ids that weigh nothing."""
+
+    ids: tuple[str, ...]
+    crit: Mapping[str, Criterion]
+    cases: Sequence[Case]
+    found: Sequence[Assertion]
+    eligible: Sequence[Criterion]
+    client: str
+    subjects: frozenset[str]
+    cited_cases: frozenset[str]
+    notes: tuple[str, ...]
+
+
+def _human_client(service: str, client: str) -> None:
+    """G3: an agent client's verdicts are hypotheses, so nothing in the history of its service admits anything."""
+    if client != ROOT:
+        raise OrgError(
+            f"refused: the client of `{service}` is {client}, an agent, so its verdicts are hypotheses and nothing in this service's history "
+            "can admit a revision (rules (b) and (c) need the human client). Nothing was written. Follow the playbook and the contract; if "
+            f"you think the playbook must change, send {client} (`send`) what you would change and why."
+        )
+
+
+def _judged(st: _Stage) -> tuple[list[Criterion], list[str], Callable[[str], list[str]]]:
+    """``(added, qualifying, cases_of)``: the cited confirmed amendments, the subjects that failed in at least 2 different cases the human client
+    rejected, and the cases (by order, case heads) in which an id failed."""
+    added = [c for c in st.eligible if c.id in st.subjects]
+    order = {c.id: i for i, c in enumerate(st.cases)}
+
+    def cases_of(x: str) -> list[str]:
+        return sorted({a.case for a in st.found if x == a.id or x in a.about}, key=order.__getitem__)
+
+    return added, [x for x in sorted(st.subjects) if len(cases_of(x)) >= 2], cases_of
+
+
+def _nothing_admits(service: str, st: _Stage, reason: str, cases_of: Callable[[str], list[str]], notes: Sequence[str]) -> str:
+    """G2 when the client rejected the cited subject in one case only, else G1 (none of the evidence is the client's own)."""
+    single = [
+        a for a in st.found
+        if a.case in st.cited_cases or any(x in st.subjects and len(cases_of(x)) == 1 for x in (a.id, *a.about))
+    ]
+    where = ", ".join(c.id for c in st.eligible) or "none yet"
+    if single:
+        return _one_case(service, st.client, where, st.crit, max(single, key=lambda a: a.verdict.message.id))
+    return _no_client_evidence(service, st.client, where, notes, reason)
+
+
+def _by_number(ids: Sequence[str] | set[str]) -> tuple[str, ...]:
+    """Ids in the order a ``WHY`` lists them: the ``R`` ids by number, then the others by number."""
+    return tuple(sorted(ids, key=lambda i: (i[:1] != "R", i[:1], int(i[1:]) if i[1:].isdigit() else 0)))
+
+
+def _c_words(service: str, client: str, added: Sequence[Criterion], item: str) -> str:
+    """PB-C-WORDS: the item cites confirmed criteria, so it may be only their own words; one sentence per id says how to write it."""
+    sentences = "".join(
+        (PB_C_WORDS_LONG if len(c.text) > RULE_TEXT_CLIP else PB_C_WORDS_TEXT).format(id=c.id, text=c.text) for c in added if line_key(c.text)
+    )
+    many = len(added) > 1
+    return PB_C_WORDS.format(
+        ids=", ".join(c.id for c in added), be="are" if many else "is", them="them" if many else "it", their="their" if many else "its",
+        sentences=sentences, client=client, service=service, first=clip_line(item, QUESTION_LINE_CLIP),
+    )
 
 
 def _tag_of(line: str, tags: Sequence[str]) -> str | None:
@@ -268,8 +361,8 @@ def _verdict_note(v: Verdict) -> str:
 def _no_client_evidence(service: str, client: str, amended: str, notes: Sequence[str], reason: str) -> str:
     """G1: none of the evidence is the client's own."""
     return (
-        f"refused: none of this evidence is the client's own: {'; '.join(notes) or 'no evidence given'}. A revision is admitted only when (b) the "
-        f"same criterion or regression assertion failed in 2 different cases the client rejected, or (c) it cites a criterion {client} added to "
+        f"refused: none of this evidence is the client's own: {'; '.join(notes) or 'no evidence given'}. An item is admitted only when (b) the "
+        f"same criterion or regression assertion failed in 2 different cases the client rejected, or (c) it is the own words of a criterion {client} added to "
         f"the contract by an amendment the client confirmed ({amended}). Your team's lessons, relayed verdicts (the assistant's own reading) and an agent client's "
         "verdicts weigh nothing. Nothing was written: follow the playbook and the contract.\n"
         f"If you think the client wants this from now on, send {client} (`send`) this question once, and do not wait for an answer (it reaches "
@@ -288,6 +381,6 @@ def _one_case(service: str, client: str, amended: str, crit: Mapping[str, Criter
         "first. Nothing was written: apply the client's words to the work at hand without changing the playbook.\n"
         f"Send {client} (`send`) this question once, and do not wait for an answer (it reaches you as a contract change or a criterion link): "
         f'"In case {g.case} you said: "{clip_line(g.verdict.note, WORDS_CLIP)}". Is that a lasting requirement? If yes, which criterion should '
-        f'say it: a new one, or a clarification of {" / ".join(current) or "an existing one"}?" Revise when the answer is in the contract (cite '
-        "its new criterion), or when a second case shows the same criterion failing."
+        f'say it: a new one, or a clarification of {" / ".join(current) or "an existing one"}?" Add the item when the answer is in the contract (its '
+        "new criterion's own words, citing it), or when a second case shows the same criterion failing."
     )

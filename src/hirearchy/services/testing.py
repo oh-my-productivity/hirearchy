@@ -209,6 +209,12 @@ class AdmittingServiceEvidence(ServiceEvidence):
         admitting = ids[0] if ids else "b"  # every line rests on the first id it cites
         return Admission("b", ids, "admitted by the stand-in for the gate", lines=tuple((admitting, line) for line in lines))
 
+    def admit_item(
+        self, owner: str, service: str, evidence: Sequence[str], reason: str, *, kind: str, text: str, when: str | None,
+    ) -> Admission:
+        ids = normalize_evidence(list(evidence))
+        return Admission("b", ids, "admitted by the stand-in for the gate", why=ids or ("R1",))  # a gated item's WHY holds an R id (6.3)
+
 
 class RefusingServiceEvidence(AdmittingServiceEvidence):
     """The gate that refuses every revision that is not exempt, with the text it was given (the links as the admitting one)."""
@@ -222,6 +228,11 @@ class RefusingServiceEvidence(AdmittingServiceEvidence):
     ) -> Admission:
         if exempt:
             return super().admit(owner, service, evidence, reason, exempt=exempt, lines=lines)
+        raise OrgError(self._text)
+
+    def admit_item(
+        self, owner: str, service: str, evidence: Sequence[str], reason: str, *, kind: str, text: str, when: str | None,
+    ) -> Admission:
         raise OrgError(self._text)
 
 
