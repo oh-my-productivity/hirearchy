@@ -1075,8 +1075,8 @@ def test_the_whole_section_is_at_most_600_words(tmp_path):
     story = wordy_cases(w)
     sup.ask(w, "open")
     text = w.sections.prompt_sections("ceo", w.s.d.inbox("ceo"))
-    section = text.split("# Reflect before you start: weekly-brief")[1].split("\n# ")[0]
-    assert words_of(section) <= _sections.REFLECT_WORDS
+    section = "# Reflect before you start: weekly-brief" + text.split("# Reflect before you start: weekly-brief")[1].split("\n# ")[0]
+    assert words_of(section) <= _sections.REFLECT_WORDS  # the whole section, its heading line included
     assert len(story.asks) == 8 and "- case " in section  # the digest keeps at least one case
 
 
