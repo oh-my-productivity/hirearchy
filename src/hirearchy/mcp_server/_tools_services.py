@@ -181,7 +181,8 @@ class ServiceTools(ToolGroup):
             confirms: str | None = None,
         ) -> str:
             """Record the user's verdict on a delivered task: one of your service requests (or a rework) or one of your
-        one-off tasks: verdict "accept" or "reject".
+        one-off tasks: verdict "accept" or "reject". An accept waits while an earlier rejection of the same case has no answer from the user; the
+        refusal gives the question.
 
         task_id: a service request (or rework) you sent that has a result. note: required for reject (what was wrong),
         optional for accept: the user's own words, verbatim. It costs no run and does not wake the owner; it shows up in

@@ -190,3 +190,21 @@ def test_hirearchy_request_meets_request_unanswered(svc, capsys):
     assert "CLI: hirearchy define-service ... --answers, --about, --words" in err and len(svc.sent(ROOT)) == sent
     cli(svc, "request", "weekly-brief", "--input", "topic=ai", "--revises", first.id)  # a rework is not held
     assert len(svc.sent(ROOT)) == sent + 1
+
+
+def test_cli_feedback_accept_is_human_by_default_and_waits_for_the_answer(svc, capsys):
+    """Clause 2 (design 13.2): the CLI's accept defaults to ``--source human``, so it waits for the answer to an earlier rejection of its case."""
+    first = request(svc)
+    deliver(svc, "ceo", first)
+    cli(svc, "feedback", first.id, "reject", "--note", "Too long.")
+    verdict = [m for m in svc.sent(ROOT) if m.feedback][-1]
+    capsys.readouterr()
+    sent = len(svc.sent(ROOT))
+    with pytest.raises(SystemExit):
+        cli(svc, "feedback", first.id, "accept")
+    err = capsys.readouterr().err
+    assert f"rejection R1 (message {verdict.id}) on task {first.id} of this case of `weekly-brief` has no recorded answer yet, so the user's accept waits" in err
+    assert "CLI: hirearchy feedback <task> reject --confirms ... --criterion ... --source human --note ..." in err and len(svc.sent(ROOT)) == sent
+    cli(svc, "feedback", first.id, "reject", "--confirms", verdict.id, "--criterion", "none", "--note", "No: as it is.")  # the user's answer
+    cli(svc, "feedback", first.id, "accept")
+    assert [m.feedback for m in svc.sent(ROOT) if m.feedback][-1] == "accept"

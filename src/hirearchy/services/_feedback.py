@@ -8,7 +8,7 @@ from ..agents import AgentDirectory
 from ..dispatch import MessageSender
 from ..kernel import ROOT, Message, OrgError, latest_results, link_ids, verdict_tier
 from ..mail import MailboxReader
-from ._criteria import answer_ids, answering_version
+from ._criteria import answer_ids, answering_version, unanswered
 from ._protocols import ClientFeedback, LinkNotes
 from .api import FEEDBACK_HEADER, FEEDBACK_MAX, LINK_HEADER, VERDICTS, ServiceEvidence, ServiceStore, normalize_links
 
@@ -36,6 +36,19 @@ ONE_OFF_NO_LINK = (
 )
 ONE_OFF_GONE = "refused: {to}, who did {task_id}, was retired, so the verdict has no one to tell. Nothing was recorded."
 NEWEST = 10  # the ids ONE_OFF_UNKNOWN names
+FEEDBACK_UNANSWERED = (  # FEEDBACK-UNANSWERED (clause 2, design 13.2): {more} is "" or " (and {k} more: {R ids})"
+    "refused: rejection {assertion} (message {note}) on task {task} of this case of `{service}` has no recorded answer yet{more}, so the user's "
+    "accept waits: a case is closed only after its rejections have the user's answers. Record the answer first, then this accept again. "
+    "Ask the user the one question first if you have not: {question}. On yes: "
+    'define_service(owner="{owner}", name="{service}", ..., answers="{note}", about=<the id you asked about>, words=<their answer, verbatim>) '
+    "(CLI: hirearchy define-service ... --answers, --about, --words). "
+    'On no, a one-off or "as it is": feedback(task_id="{task}", verdict="reject", confirms="{note}", criterion=["none"], '
+    '["R<j>"] or ["C<k>"], source="human", note=<their answer, verbatim>) '
+    "(CLI: hirearchy feedback <task> reject --confirms ... --criterion ... --source human --note ...). Nothing was recorded."
+)
+FEEDBACK_UNREADABLE = (  # FEEDBACK-UNREADABLE (design 13.2)
+    "refused: the record of `{service}` cannot be read ({error}), so the verdict was not recorded. Try again; if it persists, tell the user."
+)
 
 
 class SenderLinkNotes(LinkNotes):
@@ -84,6 +97,8 @@ class RuleClientFeedback(ClientFeedback):
                 f"{task_id} is not a service request you sent. Feedback is for requests made with `request`. Yours: {mine}"
             )
         note = self._checked(actor, task_id, verdict, note)
+        if actor == ROOT and verdict == "accept" and source == "human":
+            self._answered_first(actor, task)
         if actor != ROOT and (criterion or confirms):
             raise OrgError(CLIENT_ONLY)
         ids = normalize_links(criterion)
@@ -110,6 +125,39 @@ class RuleClientFeedback(ClientFeedback):
         if task_id not in latest_results(self._mail.received(actor)):
             raise OrgError(f"task {task_id} has no result yet: wait for the result, then give feedback.")
         return note
+
+    def _answered_first(self, actor: str, task: Message) -> None:
+        """Clause 2 (design 13.2): the user's accept of a case waits while an earlier human rejection of the same case has no recorded answer
+        (``unanswered``), unless the accepted task is one whose delivery has no verdict yet (``basis.unrated``): P2-UNRATED makes the answer wait for
+        exactly that verdict. The case is the one of the head of the task's ``revises`` chain; a record that cannot be read refuses too."""
+        service = task.service or ""
+        try:
+            head = self._case_head(actor, task)
+            basis = self._evidence.amendment_basis(task.to, service)
+            waiting = [r for r in unanswered(basis, self._store, task.to, service) if r.case == head]
+        except (OrgError, OSError) as error:
+            raise OrgError(FEEDBACK_UNREADABLE.format(service=service, error=error)) from error
+        if not waiting or task.id in basis.unrated:
+            return
+        oldest, others = waiting[0], waiting[1:]
+        more = f" (and {len(others)} more: {', '.join(r.assertion for r in others)})" if others else ""
+        raise OrgError(FEEDBACK_UNANSWERED.format(
+            assertion=oldest.assertion, note=oldest.note, task=oldest.task, service=service, more=more, question=oldest.question.removesuffix("."),
+            owner=task.to,
+        ))
+
+    def _case_head(self, actor: str, task: Message) -> str:
+        """The id of the first task of ``task``'s ``revises`` chain in ``actor``'s sent mail, followed only through tasks of the same service sent to
+        the same assignee (the head ``CaseHistory`` uses): a task that revises one sent to another assignee starts its own case."""
+        sent = {m.id: m for m in self._mail.sent(actor) if m.type == "task"}
+        head, seen = task, {task.id}
+        while head.revises and head.revises not in seen:
+            earlier = sent.get(head.revises)
+            if earlier is None or earlier.service != task.service or earlier.to != task.to:
+                break
+            head = earlier
+            seen.add(head.id)
+        return head.id
 
     def _record(self, actor: str, task: Message, verdict: str, note: str, source: str | None, criterion: str | None) -> Message:
         """The verdict as a quiet note to the task's assignee: it wakes nobody and costs no run."""

@@ -470,3 +470,23 @@ def test_root_request_docstring_says_a_new_request_waits_for_the_answers(svc):
     text = " ".join(described(svc, ROOT)["request"].description.split())
     assert "A new request waits until every rejection since the previous one has the user's answer; the refusal gives the question." in text
     assert "answer" not in " ".join(described(svc, "ceo")["request"].description.split())  # the agents' tool is what it was
+
+
+# ----------------------------------------------------------------------------------------- clause 2: a human accept waits for the case's answers (design 13.2, 14.5)
+def test_root_feedback_with_source_human_meets_feedback_unanswered(svc):
+    server = build_server(svc, ROOT)
+    first = request(svc, "ai")
+    deliver(svc, "ceo", first)
+    no = svc.feedback(ROOT, first.id, "reject", "Too long.", source="human")
+    sent = len(svc.sent(ROOT))
+    text = fails(server, "feedback", task_id=first.id, verdict="accept", source="human")
+    assert f"refused: rejection R1 (message {no.id}) on task {first.id} of this case of `weekly-brief` has no recorded answer yet, so the user's accept waits" in text
+    assert text.endswith("Nothing was recorded.") and len(svc.sent(ROOT)) == sent
+    relayed = call(server, "feedback", task_id=first.id, verdict="accept")  # the MCP default source is relayed: never held
+    assert "source relayed" in relayed
+
+
+def test_root_feedback_docstring_says_an_accept_waits_for_the_cases_answers(svc):
+    text = " ".join(described(svc, ROOT)["feedback"].description.split())
+    assert "An accept waits while an earlier rejection of the same case has no answer from the user; the refusal gives the question." in text
+    assert "waits" not in " ".join(described(svc, "ceo")["feedback"].description.split())  # the agents' tool is what it was

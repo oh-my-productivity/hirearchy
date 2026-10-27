@@ -248,3 +248,142 @@ def test_an_agents_feedback_on_a_non_service_task_keeps_todays_refusal(svc):
     with pytest.raises(OrgError) as info:
         org.feedback("ceo", delegated.id, "accept")
     assert str(info.value) == f"{delegated.id} is not a service request you sent. Feedback is for requests made with `request`. Yours: none"
+
+
+# ----------------------------------------------------------------------------------------- FEEDBACK-UNANSWERED: an accept waits for the case's answers (clause 2, design 13.2)
+from hirearchy.kernel import Message  # noqa: E402
+from hirearchy.services import AmendmentBasis  # noqa: E402
+from hirearchy.services.testing import fs_world, memory_world  # noqa: E402
+
+from . import _support as sup  # noqa: E402
+from .test_request import QUESTION, BasisEvidence, held  # noqa: E402
+
+
+@pytest.fixture(params=[fs_world, memory_world], ids=lambda f: f.__name__)
+def gated(request, tmp_path):
+    """A services world whose feedback asks a ``BasisEvidence`` (the record the test sets), the service defined."""
+    evidence = BasisEvidence()
+    w = sup.populated(request.param(tmp_path, evidence=evidence))
+    sup.define(w)
+    return w, evidence
+
+
+def unanswered_text(note, assertion, rejected_task, service="weekly-brief", more="", question=QUESTION):
+    """FEEDBACK-UNANSWERED (design 13.2), written out here word for word, for ``weekly-brief`` of ``ceo``."""
+    return (
+        f"refused: rejection {assertion} (message {note}) on task {rejected_task} of this case of `{service}` has no recorded answer yet{more}, so "
+        "the user's accept waits: a case is closed only after its rejections have the user's answers. Record the answer first, then this accept again. "
+        f"Ask the user the one question first if you have not: {question.removesuffix('.')}. On yes: "
+        'define_service(owner="ceo", name="' + service + '", ..., answers="' + note + '", about=<the id you asked about>, words=<their answer, verbatim>) '
+        "(CLI: hirearchy define-service ... --answers, --about, --words). "
+        'On no, a one-off or "as it is": feedback(task_id="' + rejected_task + '", verdict="reject", confirms="' + note + '", criterion=["none"], '
+        '["R<j>"] or ["C<k>"], source="human", note=<their answer, verbatim>) '
+        "(CLI: hirearchy feedback <task> reject --confirms ... --criterion ... --source human --note ...). Nothing was recorded."
+    )
+
+
+def test_a_human_accept_is_refused_while_an_earlier_human_rejection_of_the_same_case_has_no_answer(svc):
+    task, no = rejected(svc)
+    sent = len(svc.sent(ROOT))
+    with pytest.raises(OrgError, match=r"^refused: rejection R1 \(message " + no.id + r"\) on task " + task.id + " of this case of `weekly-brief` has no recorded answer yet"):
+        svc.feedback(ROOT, task.id, "accept", "This is right after all.", source="human")  # L-ASIS: "as it is", before the answer
+    assert len(svc.sent(ROOT)) == sent  # nothing was recorded
+    svc.feedback(ROOT, task.id, "reject", "No: as it is.", source="human", criterion=["none"], confirms=no.id)  # the user's answer
+    assert svc.feedback(ROOT, task.id, "accept", "This is right after all.", source="human").feedback == "accept"
+
+
+def test_the_refusal_is_feedback_unanswered_word_for_word(svc):
+    task, no = rejected(svc)
+    with pytest.raises(OrgError) as refusal:
+        svc.feedback(ROOT, task.id, "accept", source="human")
+    assert str(refusal.value) == unanswered_text(no.id, "R1", task.id, question='About <its id>: add "<the rule, in their words>" as a lasting rule? Yes or no.')
+
+
+def test_several_unanswered_name_the_oldest_then_and_k_more(svc):
+    first, one = rejected(svc)
+    again = request(svc, revises=first.id, source="human")  # the same case
+    deliver(svc, "ceo", again)
+    svc.feedback(ROOT, again.id, "reject", "Still no.", source="human")
+    with pytest.raises(OrgError) as refusal:
+        svc.feedback(ROOT, again.id, "accept", source="human")  # the rework already has its verdict: it is not unrated
+    assert str(refusal.value).startswith(f"refused: rejection R1 (message {one.id}) on task {first.id} of this case of `weekly-brief` has no recorded answer yet (and 1 more: R2), so the user's accept waits")
+
+
+def test_an_accept_of_an_already_judged_delivery_a_blocked_result_or_an_earlier_delivery_waits(svc):
+    first, no = rejected(svc)
+    rework = request(svc, revises=first.id, source="human")
+    deliver(svc, "ceo", rework)  # unrated: its accept is the exception
+    with pytest.raises(OrgError, match="has no recorded answer yet"):
+        svc.feedback(ROOT, first.id, "accept", source="human")  # an earlier delivery of the case, already judged
+    svc.feedback(ROOT, first.id, "reject", "No: a one-off.", source="human", criterion=["none"], confirms=no.id)  # answer R1 so the next request passes
+    blocked = request(svc, "blocked")
+    deliver(svc, "ceo", blocked, status="blocked")
+    no_blocked = svc.feedback(ROOT, blocked.id, "reject", "It never finished.", source="human")  # a rejection of a blocked result is a rejection to answer
+    with pytest.raises(OrgError, match=f"rejection R2 \\(message {no_blocked.id}\\) on task {blocked.id}"):
+        svc.feedback(ROOT, blocked.id, "accept", source="human")
+
+
+def test_a_revises_chain_to_another_assignee_starts_its_own_case(gated):
+    w, evidence = gated
+    first = sup.request(w)
+    sup.answer(w, first)
+    evidence.basis = AmendmentBasis((held("29990101T000000000000-root-0001", "R1", task=first.id),), ())
+    elsewhere = w.d.post(Message(
+        sender="root", to="ops", type="task", title="elsewhere", body="b", service="weekly-brief", revises=first.id, budget=1, source="human",
+    ))  # sent to another assignee: not followed into the rejected case
+    sup.answer(w, elsewhere)
+    assert w.commands.feedback("root", elsewhere.id, "accept", source="human").feedback == "accept"  # its own case: nothing waits for it
+    rework = sup.request(w, revises=first.id, source="human")  # the same assignee: the rejected case
+    sup.answer(w, rework)
+    with pytest.raises(OrgError, match="^refused: rejection R1 .* of this case of `weekly-brief` has no recorded answer yet"):
+        w.commands.feedback("root", rework.id, "accept", source="human")  # not in `unrated` here: no exception
+
+
+def test_an_unreadable_record_refuses_with_feedback_unreadable(gated):
+    w, evidence = gated
+    task = sup.request(w)
+    sup.answer(w, task)
+    evidence.error = OrgError("a mailbox cannot be read")
+    sent = len(w.d.mail.sent("root"))
+    with pytest.raises(OrgError) as refusal:
+        w.commands.feedback("root", task.id, "accept", source="human")
+    assert str(refusal.value) == (
+        "refused: the record of `weekly-brief` cannot be read (a mailbox cannot be read), so the verdict was not recorded. "
+        "Try again; if it persists, tell the user."
+    )
+    assert len(w.d.mail.sent("root")) == sent
+    evidence.error = OSError("disk")
+    with pytest.raises(OrgError, match=r"cannot be read \(disk\)"):
+        w.commands.feedback("root", task.id, "accept", source="human")
+
+
+# guards: they pin the edges of 13.2 and are green when written
+def test_the_accept_of_the_cases_unrated_latest_rework_passes_and_then_the_answer_passes_p2_unrated(svc):
+    first, no = rejected(svc)
+    rework = request(svc, revises=first.id, source="human")
+    deliver(svc, "ceo", rework)  # delivered before the answer: it has no verdict yet
+    with pytest.raises(OrgError, match="have no verdict yet"):
+        svc.define_service(ROOT, "ceo", "weekly-brief", add_acceptance=[NEW_RULE], answers=no.id, about="C1", words=YES)  # P2-UNRATED: the verdict first
+    assert svc.feedback(ROOT, rework.id, "accept", "This is right.", source="human").feedback == "accept"  # the exception (13.2)
+    svc.define_service(ROOT, "ceo", "weekly-brief", add_acceptance=[NEW_RULE], answers=no.id, about="C1", words=YES)  # then the answer passes
+    assert svc.feedback(ROOT, first.id, "accept", source="human").feedback == "accept"  # and every accept passes
+
+
+def test_an_accept_without_source_is_stamped_relayed_and_never_held(svc):
+    task, no = rejected(svc)
+    accepted = svc.feedback(ROOT, task.id, "accept")  # Org.feedback's default source is None: stamped relayed on root's verdict note
+    assert (accepted.feedback, accepted.source) == ("accept", "relayed")
+
+
+def test_relayed_and_agent_accepts_are_never_held(svc):
+    task, no = rejected(svc)
+    assert svc.feedback(ROOT, task.id, "accept", source="relayed").source == "relayed"
+    define(svc, owner=ENG, actor="ceo", name="eng-brief", budget=4)
+    svc.delegate(ROOT, "ceo", "Project", "g", "c", budget=20)
+    inner = svc.request("ceo", "eng-brief", {"topic": "x"}, budget=3)
+    deliver(svc, ENG, inner)
+    svc.feedback("ceo", inner.id, "reject", "Not good.")
+    assert svc.feedback("ceo", inner.id, "accept").feedback == "accept"  # an agent client's accept after its own rejection
+    plain = svc.delegate(ROOT, "ceo", "Plain", "g", "c", budget=2)
+    deliver(svc, "ceo", plain)
+    assert svc.feedback(ROOT, plain.id, "accept", source="human").feedback == "accept"  # a one-off task has no service: never held

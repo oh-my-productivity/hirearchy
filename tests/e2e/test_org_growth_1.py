@@ -42,3 +42,20 @@ def test_e7_flow_the_next_memo_requested_before_the_answer_is_request_unanswered
     answered = Org(materialize("s1", S1_ANSWER[:21], tmp_path / "answered"))
     memo = answered.request(ROOT, SERVICE, {"notes_file": "2026-10-12.md"})
     assert (memo.type, memo.service, memo.revises) == ("task", SERVICE, None)
+
+
+def test_an_l_asis_accept_recorded_before_its_answer_is_feedback_unanswered(tmp_path):
+    """Scenario 7 (design 20 e2e (7); Q1, L-ASIS): E7 s1 at Lena's rejection 905b. Her accept of the rejected delivery "as it is" is refused while
+    the rejection has no answer, and recorded once the human link 6096 (what E7 did) is there. A relayed accept is never held."""
+    waiting = Org(materialize("s1", S1_REJECTION[:21], tmp_path / "waiting"))
+    sent = len(waiting.sent(ROOT))
+    with pytest.raises(OrgError) as refusal:
+        waiting.feedback(ROOT, S1_REWORK, "accept", "It is right as it is.", source="human")
+    assert str(refusal.value).startswith(
+        f"refused: rejection R1 (message {S1_REJECTION}) on task {S1_REWORK} of this case of `{SERVICE}` has no recorded answer yet, so the user's "
+        "accept waits: a case is closed only after its rejections have the user's answers. "
+    )
+    assert len(waiting.sent(ROOT)) == sent
+    assert waiting.feedback(ROOT, S1_REWORK, "accept", "The assistant's reading.", source="relayed").source == "relayed"
+    answered = Org(materialize("s1", S1_ANSWER[:21], tmp_path / "answered"))
+    assert answered.feedback(ROOT, S1_REWORK, "accept", "It is right as it is.", source="human").feedback == "accept"

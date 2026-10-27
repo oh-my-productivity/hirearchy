@@ -178,7 +178,8 @@ def test_the_head_s_late_result_ties_with_the_rework_the_user_judged_and_her_ver
     finding names `b` (not the newer result `a`), and the given delivery is `b`, so the case is not without a verdict."""
     org, folder, a, b, c = tie
     (folder / "memo.md").write_text(V2, encoding="utf-8")  # the copy the user was given
-    org.feedback(ROOT, b.id, "reject", "Not quite.", source="human")
+    no = org.feedback(ROOT, b.id, "reject", "Not quite.", source="human")
+    org.feedback(ROOT, b.id, "reject", "No: as it is.", source="human", criterion=["none"], confirms=no.id)  # her answer, before her accept (clause 2)
     org.feedback(ROOT, b.id, "accept", "That one is right - keep it.", source="human")
     org.feedback(ROOT, c.id, "reject", "Not requested by the user.", source="relayed")
     (found,) = org.runtime.deliverable_checks.findings(ROOT, SERVICE, settled=True)
