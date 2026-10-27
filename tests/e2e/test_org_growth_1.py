@@ -14,12 +14,17 @@ import subprocess
 from pathlib import Path
 
 import pytest
+from testkit import REPO
 from testkit.e2e_world import build_server
+from testkit.e4_replay import evidence
 from testkit.e7_replay import materialize
-from testkit.services_world import call, confirmed_amendment, deliver, fails, playbook_meta, request, svc  # noqa: F401  (svc is a fixture)
+from testkit.services_world import (  # noqa: F401  (svc is a fixture)
+    ENG, call, confirmed_amendment, define, deliver, fails, playbook_meta, request, svc,
+)
 
 from hirearchy.core import ROOT, Org
-from hirearchy.kernel import OrgError
+from hirearchy.kernel import OrgError, split_frontmatter, strip_markers
+from hirearchy.services import changed_lines
 
 SERVICE = "weekly-meeting-memo"
 S1_MEMO_1 = "20261025T070423629042-root-5efc"  # E7 s1: the first memo's case
@@ -455,3 +460,108 @@ def test_a_corrected_link_after_k_warns_it_and_a_second_retires_it(svc):
     assert playbook_of(svc).version == 3 and WEEKS not in playbook_of(svc).body
     gone = watched(svc)
     assert (gone.state, gone.related, gone.retire_due) == ("retired", ("R2", "R3"), False)
+
+
+# ============================================================================================ what the gate admits and what it refuses (design 20 e2e (1), (2), (5))
+def confirm(org, owner, name, inputs, criterion):
+    """The client rejects a fresh delivery of ``name`` and answers yes to the question about ``criterion``: ``define_service(answers=...)`` adds it and the
+    product writes the link that confirms it. Returns (the new id, the rejection's id)."""
+    task = org.request(ROOT, name, inputs)
+    deliver(org, owner, task)
+    no = org.feedback(ROOT, task.id, "reject", f"Missing: {criterion}", source="human")
+    about = next(c.id for c in org.runtime.service_catalog.criteria(owner, name) if c.current)
+    org.define_service(ROOT, owner, name, add_acceptance=[criterion], answers=no.id, about=about, words="Yes, add it.")
+    return next(c.id for c in reversed(org.runtime.service_catalog.criteria(owner, name)) if c.text == criterion and c.current), no.id
+
+
+def test_e4_s2r_vague_deadline_rule_citing_c9_is_pb_c_words(tmp_path):
+    """Design 20 e2e (1): E4 s2r. The user confirmed C9 (a summary line first); the assistant's wrong playbook v2 carried the vague-deadline rule with it as
+    if C9 asked for it. Offered now line by line as an `add` citing R1 and C9, the rule is refused PB-C-WORDS (an item citing a confirmed criterion may be only
+    its own words) and nothing is written; C9's own words are admitted (c)."""
+    org = Org.init(tmp_path / "org", "Meeting memos")
+    org.hire(ROOT, "lead", "Lead", "Lead the memo team.", can_hire=True, max_children=3)
+    contract = evidence("s2r/service/history--SERVICE.v1.md")[0]
+    v1, v2 = evidence("s2r/playbook/PLAYBOOK.2b6438a.md")[1].strip(), evidence("s2r/playbook/PLAYBOOK.6b06123.md")[1].strip()
+    name = contract["name"]
+    org.define_service(
+        ROOT, "lead", name, description=contract["description"], inputs=contract["inputs"], acceptance=contract["acceptance"],
+        deliverable={**contract["deliverable"], "path": str(tmp_path / "deliverables")}, budget=contract["budget"], playbook=v1,
+    )
+    c9_words = evidence("s2r/service/current-SERVICE.md")[0]["acceptance"][8]  # the 9th criterion of the kept v2 and v3: what the user's yes added
+    c9, _ = confirm(org, "lead", name, {"notes_file": "2026-10-05.md"}, c9_words)
+    assert c9 == "C9" and len(contract["acceptance"]) == 8
+    lead = build_server(org, "lead")
+    refused = {}
+    for line in changed_lines(v1, v2):  # every line E4's wrong v2 added or changed
+        words = strip_markers(line).strip()
+        refused[line] = fails(lead, "revise_playbook", service=name, op="add", kind="step", text=words, reason="E4's v2", evidence=["R1", c9])
+    assert refused and all("so an item citing it may be only its own words: this item is not." in text for text in refused.values())  # PB-C-WORDS
+    for words in ("Flag any vague deadline as `none`", "Vague deadlines:"):
+        assert any(words in line and strip_markers(line).strip()[:150] in text for line, text in refused.items()), words  # the wrong rule is among them
+    assert playbook_meta(org, "lead", name)[0]["version"] == 1  # nothing was written, not even the migration
+    admitted = org.revise_playbook("lead", name, "add", "C9 confirmed", [c9], kind="step", text=c9_words)
+    assert (admitted.admission.rule, admitted.version, admitted.migrated) == ("c", 2, None)  # `define_service(playbook=...)` wrote v1 in item form
+    assert next(i.text for i in org.runtime.service_catalog.read_playbook("lead", name).items if i.id == admitted.item) == c9_words
+
+
+STREAMS = [(ev, s) for ev in ("E5-org-growth-0a2-recheck", "E6-org-growth-0a3-recheck", "E7-org-growth-0a4-recheck") for s in ("s1", "s2", "s3")]
+
+
+@pytest.mark.parametrize(("study", "stream"), STREAMS, ids=[f"{study[:2]}-{stream}" for study, stream in STREAMS])
+def test_e5_to_e7_c_line_is_an_admitted_c_item(tmp_path, study, stream):
+    """Design 20 e2e (2): the legitimate line every E5, E6 and E7 owner wrote (v2 of its playbook: the one line "- C<k>: <the confirmed criterion's words>",
+    admitted (c) then) is admitted now as a (c) item: the words of a criterion the client confirmed, cited by its id, added as a step."""
+    folder = REPO / "studies" / study / "evidence" / stream / "playbook"
+    hashes = [line.split()[0] for line in (folder / "versions.txt").read_text(encoding="utf-8").splitlines() if line.strip()]
+    kept = []
+    for name in hashes:
+        if not (folder / f"PLAYBOOK.{name}.md").is_file():
+            pytest.fail(f"no evidence file {folder / f'PLAYBOOK.{name}.md'}")
+        kept.append(split_frontmatter((folder / f"PLAYBOOK.{name}.md").read_text(encoding="utf-8")))
+    (_, first), (meta, second) = kept
+    assert meta["admitted"] == "c" and meta["by"] == "lead"
+    (line,) = changed_lines(first, second)  # the one line the owner added
+    kind, _, words = line.partition(": ")
+    assert kind.startswith("- C") and words
+    org = Org.init(tmp_path / "org", "Mission.", {"poll_seconds": 0.05})
+    org.hire(ROOT, "lead", "Lead", "Run the memos.", can_hire=True, max_children=2)
+    org.define_service(
+        ROOT, "lead", "weekly-meeting-memo", description="A memo.", inputs=[{"name": "notes_file", "description": "the notes", "required": True}],
+        acceptance=["Built only from the requested notes file"], deliverable={"description": "one markdown memo"}, budget=12, playbook=first.strip(),
+    )
+    cid, _ = confirm(org, "lead", "weekly-meeting-memo", {"notes_file": "2026-10-05.md"}, words)
+    change = org.revise_playbook("lead", "weekly-meeting-memo", "add", "the client confirmed it", [cid], kind="step", text=words)
+    assert change.admission.rule == "c" and change.admission.evidence == (cid,)
+    item = next(i for i in org.runtime.service_catalog.read_playbook("lead", "weekly-meeting-memo").items if i.id == change.item)
+    assert (item.kind, item.text, item.why[-1]) == ("step", words, cid)
+    (watch,) = [w for w in org.runtime.service_evidence.watch("lead", "weekly-meeting-memo") if w.id == change.item]
+    assert (watch.state, watch.clean) == ("new", 0)  # an admitted item is watched
+
+
+def test_an_agent_clients_service_refuses_every_gated_op_and_watches_nothing(org):
+    """Design 20 e2e (5), G3: ceo, an agent, is the client of eng's service. Its verdicts are hypotheses: an add on rule (b), an add on rule (c) for a criterion
+    ceo added to the contract, a gated edit and a restore of a retired item are all refused with one sentence; nothing is written, and no item is ever
+    watched (the exempt ops leave every item `kept` or `retired`)."""
+    define(org, owner=ENG, actor="ceo", name="eng-brief")
+    org.revise_playbook(ENG, "eng-brief", "first", "first draft", [], text=STEPS)
+    org.delegate(ROOT, "ceo", "Project", "the goal", "done", budget=40)
+    task = org.request("ceo", "eng-brief", {"topic": "a"}, budget=3)
+    deliver(org, ENG, task)
+    verdict = org.feedback("ceo", task.id, "reject", "Too long.")
+    org.define_service("ceo", ENG, "eng-brief", add_acceptance=["Names the week"])  # the agent client's own amendment: nobody can confirm it
+    org.revise_playbook(ENG, "eng-brief", "retire", "not needed", [], item="P2")  # an exempt op
+    refusal = (
+        "refused: the client of `eng-brief` is ceo, an agent, so its verdicts are hypotheses and nothing in this service's history can admit a revision "
+        "(rules (b) and (c) need the human client). Nothing was written."
+    )
+    owner = build_server(org, ENG)
+    for given in (
+        dict(op="add", kind="step", text="Cut it to 600 words.", evidence=["C1", verdict.id]),
+        dict(op="add", kind="step", text="Names the week", evidence=["C3"]),
+        dict(op="edit", item="P3", text="Check twice.", evidence=["C1"]),
+        dict(op="restore", item="P2", evidence=[]),
+    ):
+        assert refusal in fails(owner, "revise_playbook", service="eng-brief", reason="ceo asked", **given), given
+        assert org.runtime.service_catalog.read_playbook(ENG, "eng-brief").version == 2  # v1 and the exempt retire; nothing else
+    states = {w.id: (w.state, w.watch_start) for w in org.runtime.service_evidence.watch(ENG, "eng-brief")}
+    assert states == {"P1": ("kept", None), "P2": ("retired", None), "P3": ("kept", None)}  # nothing watched
