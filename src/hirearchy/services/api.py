@@ -54,6 +54,7 @@ __all__ = [
     "LINK_HEADER",
     "Playbook",
     "PlaybookItem",
+    "PlaybookSection",
     "REASON_MAX",
     "Rejection",
     "ServiceCatalog",
@@ -301,6 +302,16 @@ class PlaybookItem:
     text: str  # a step's words (several lines only for a migrated one), or a rule's THEN
     when: str = ""  # a rule's condition ("always" when none); "" for a step
     why: tuple[str, ...] = ()  # the R and C ids the runtime wrote (the frontmatter `why` entry); () for an item never gated
+
+
+@dataclass(frozen=True)
+class PlaybookSection:
+    """One section of an item-format playbook, in body order (design 4.1): the heading line (``""`` for the text before the first heading), whether
+    its steps render numbered, and the ids of its items in order. A heading may repeat, so a section is told apart by its place, not its heading."""
+
+    heading: str
+    numbered: bool
+    ids: tuple[str, ...] = ()
 
 
 def content_words(items: Sequence[PlaybookItem] | None, headings: Sequence[str] = (), *, body: str = "") -> int:
