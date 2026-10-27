@@ -58,6 +58,7 @@ class MessageSender(Protocol):
         wake: bool = True,
         skip_route_check: bool = False,
         inherited: str | None = None,
+        acknowledges: str | None = None,
     ) -> Message:
         """Check the message against the protocol, deliver it and return the delivered message. The checks, in this order: the size of the body
         (``max_message_chars``, not for root: the human may paste), both addresses exist, the type, an empty body, the route (``actor`` may
@@ -71,7 +72,11 @@ class MessageSender(Protocol):
         goes only on a verdict note (a note with ``feedback``) or on a link note (a note without ``feedback`` that replies to one). A task from
         root that ``revises`` another (a rework), a verdict note and a link note without a ``source`` are stamped ``"relayed"`` (root's own
         reading); a fresh task of root, any other note and every message of an agent stay unstamped unless root says. A task of an
-        agent carries the tier its sender works under (``inherited``, from ``ReworkContext``): the runtime's copy, never the agent's declaration."""
+        agent carries the tier its sender works under (``inherited``, from ``ReworkContext``): the runtime's copy, never the agent's declaration.
+
+        ``acknowledges`` (``"{service} {op} {item}[ {text hash}]"``) marks a parent's acknowledgement of a playbook change and goes only on a plain note
+        (a note without ``feedback`` and without ``criterion``; else ``OrgError``). Only ``ServiceCommands.acknowledge_playbook`` sets it: no
+        surface's ``send`` takes it, and the guarded sender of the facade (``check_root_send``) refuses it."""
         ...
 
 

@@ -3,7 +3,7 @@
 ``Org.deliver`` and ``Org.runtime.<port>`` are the primitives every rule is built on (ARCHITECTURE.md 2.3): they apply no policy, and no surface exposes them.
 What this pins: (1) no module of the MCP server or the CLI calls ``.deliver(``; (2) the MCP ``send`` tool of every identity and the CLI ``send`` command
 cannot pass the fields that make a verdict, a link, a service task or a rework (``type``, ``feedback``, ``criterion``, ``service``, ``revises``,
-``source``); (3) ``Org.deliver`` says it is low level; (4) the guarded ``Org.send`` refuses the four shapes. A new surface that calls the primitive, or
+``source``, ``acknowledges``); (3) ``Org.deliver`` says it is low level; (4) the guarded ``Org.send`` refuses the four shapes. A new surface that calls the primitive, or
 widens ``send``, fails here."""
 
 from __future__ import annotations
@@ -20,7 +20,7 @@ from hirearchy.kernel import OrgError
 
 from .paths import SRC
 
-GUARDED = ("type", "feedback", "criterion", "service", "revises", "source")
+GUARDED = ("type", "feedback", "criterion", "service", "revises", "source", "acknowledges")
 SURFACES = ("mcp_server", "cli")
 
 

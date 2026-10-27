@@ -191,3 +191,18 @@ def test_credited_stems_of_a_received_box() -> None:
 def test_no_credit_gives_an_empty_set() -> None:
     assert credited_stems([]) == set()
     assert credited_stems([Message("root", "ceo", "note", "hi", id="n1")]) == set()
+
+
+def test_acknowledges_round_trips_through_the_frontmatter_and_shows_in_the_header() -> None:
+    m = Message("ceo", "ceo/eng", "note", "Acknowledged.", title="playbook acknowledgement: retire P3 of weekly-brief",
+                acknowledges="weekly-brief edit P3 0123456789ab", id="n1", created="c")
+    assert m.meta()["acknowledges"] == "weekly-brief edit P3 0123456789ab"
+    back = Message.parse(m.to_text())
+    assert back == m and back.acknowledges == "weekly-brief edit P3 0123456789ab"
+    assert Message.parse("---\nfrom: ceo\nacknowledges: ''\n---\nb").acknowledges is None
+    assert m.render() == (
+        "### note n1\nfrom: ceo | to: ceo/eng | title: playbook acknowledgement: retire P3 of weekly-brief"
+        " | acknowledges: weekly-brief edit P3 0123456789ab\n\nAcknowledged.\n"
+    )
+    plain = Message("ceo", "ceo/eng", "note", "x", id="n2")
+    assert plain.acknowledges is None and "acknowledges" not in plain.meta() and "acknowledges" not in plain.render()

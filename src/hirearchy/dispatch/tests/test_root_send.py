@@ -10,7 +10,7 @@ import pytest
 from hirearchy.delivery.testing import RecordingDelivery
 from hirearchy.dispatch import GuardedSender, MessageSender, check_root_send
 from hirearchy.dispatch._guarded import GuardedRootSender
-from hirearchy.dispatch._root_send import FACADE_ROOT_TASK, FACADE_ROOT_VERDICT
+from hirearchy.dispatch._root_send import FACADE_ACKNOWLEDGES, FACADE_ROOT_TASK, FACADE_ROOT_VERDICT
 from hirearchy.dispatch.testing import RecordingSender
 from hirearchy.kernel import Message, OrgError
 from hirearchy.kernel.testing import FakeClock, SequenceIdGenerator
@@ -92,7 +92,7 @@ def test_the_guarded_sender_passes_every_other_message_unchanged() -> None:
     inner = Spy()
     fields = dict(
         type="task", title="T", reply_to="r1", status="done", budget=3, revises="r2", supersedes="r3", service="svc", contract=2, playbook=4,
-        feedback="accept", source="human", criterion="C1", wake=False, skip_route_check=True, inherited="human",
+        feedback="accept", source="human", criterion="C1", wake=False, skip_route_check=True, inherited="human", acknowledges=None,
     )
     sent = GuardedRootSender(inner).send("ceo", "ceo/eng", "body", **fields)  # type: ignore[arg-type]
     assert sent.id == "FROM-THE-INNER" and inner.calls == [(("ceo", "ceo/eng", "body"), fields)]
@@ -100,7 +100,7 @@ def test_the_guarded_sender_passes_every_other_message_unchanged() -> None:
     assert inner.calls[1] == (("root", "ceo", "a budget"), {
         "type": "note", "title": "", "reply_to": None, "status": None, "budget": 4, "revises": None, "supersedes": None, "service": None,
         "contract": None, "playbook": None, "feedback": None, "source": None, "criterion": None, "wake": True, "skip_route_check": False,
-        "inherited": None,
+        "inherited": None, "acknowledges": None,
     })
 
 
@@ -117,3 +117,35 @@ def test_the_guard_is_over_any_sender() -> None:
     clock = FakeClock()
     recording = RecordingSender(RecordingDelivery(clock, SequenceIdGenerator(clock)))
     assert GuardedRootSender(recording).send("root", "ceo", "one-off", type="task").type == "task" and len(recording.messages) == 1
+
+
+ACKNOWLEDGES = (
+    "refused: an acknowledgement of a playbook change is written by acknowledge_playbook(...), which checks that its writer is the owner's parent. "
+    "Nothing was sent."
+)
+
+
+def test_the_text_of_the_acknowledgement_refusal() -> None:
+    assert FACADE_ACKNOWLEDGES == ACKNOWLEDGES
+
+
+@pytest.mark.parametrize("actor", ["root", " /root/ ", "ceo", "ceo/eng"])
+@pytest.mark.parametrize("type", ["note", "task", "result"])
+def test_check_root_send_refuses_acknowledges_from_any_actor(actor: str, type: str) -> None:
+    with pytest.raises(OrgError) as refusal:
+        check_root_send(actor, type, None, None, None, None, "weekly-brief retire P3")
+    assert str(refusal.value) == ACKNOWLEDGES
+
+
+def test_the_facade_sender_refuses_acknowledges() -> None:
+    inner = Spy()
+    for actor in ("root", "ceo"):
+        with pytest.raises(OrgError) as refusal:
+            GuardedRootSender(inner).send(actor, "ceo/eng", "yes", acknowledges="weekly-brief retire P3")
+        assert str(refusal.value) == ACKNOWLEDGES
+    assert inner.calls == []
+    clock = FakeClock()
+    recording = RecordingSender(RecordingDelivery(clock, SequenceIdGenerator(clock)))
+    with pytest.raises(OrgError):
+        GuardedRootSender(recording).send("root", "ceo", "forged", acknowledges="weekly-brief retire P3")
+    assert recording.messages == []

@@ -184,3 +184,34 @@ def test_a_verdict_without_criterion_carries_none_and_a_plain_note_stays_unstamp
     assert (verdict.source, verdict.criterion) == ("relayed", None)
     note = w.sender.send("root", "ceo", "just a note", reply_to=EARLIER)  # no feedback, no criterion: not a link
     assert (note.source, note.criterion) == (None, None)
+
+
+# ------------------------------------------------------------------------------ the acknowledgement of a playbook change (design 9.2)
+
+PLAIN_NOTE = "acknowledges goes only on a plain note"
+ACKNOWLEDGES = "weekly-brief edit P3 0123456789ab"
+
+
+def test_acknowledges_goes_only_on_a_plain_note(w: DispatchWorld) -> None:
+    refused: list[tuple[str, dict[str, Any]]] = [
+        ("root", {"type": "task"}),
+        ("root", {"type": "note", "feedback": "accept", "reply_to": EARLIER}),
+        ("root", {"type": "note", "criterion": "C1", "reply_to": EARLIER}),
+        ("root", {"type": "note", "feedback": "reject", "criterion": "C1", "reply_to": EARLIER, "source": "human"}),
+        ("ceo", {"type": "result", "reply_to": EARLIER, "skip_route_check": True}),
+    ]
+    for actor, kw in refused:
+        with pytest.raises(OrgError) as e:
+            w.sender.send(actor, "ceo" if actor == "root" else "root", "words", acknowledges=ACKNOWLEDGES, **kw)
+        assert str(e.value) == PLAIN_NOTE
+    assert w.inbox("ceo") == [] and w.inbox("root") == []
+
+
+def test_a_plain_note_keeps_its_acknowledges(w: DispatchWorld) -> None:
+    from_root = w.sender.send("root", "ceo", "yes, retire it", title="playbook acknowledgement: edit P3 of weekly-brief", acknowledges=ACKNOWLEDGES,
+                              source="human", wake=False)
+    from_manager = w.sender.send("ceo", "ceo/eng", "Acknowledged.", acknowledges="weekly-brief retire P3")
+    assert (from_root.acknowledges, from_manager.acknowledges) == (ACKNOWLEDGES, "weekly-brief retire P3")
+    assert [(m.acknowledges, m.source) for m in w.inbox("ceo")] == [(ACKNOWLEDGES, "human")]
+    assert [m.acknowledges for m in w.inbox("ceo/eng")] == ["weekly-brief retire P3"]
+    assert w.sender.send("root", "ceo", "just a note").acknowledges is None

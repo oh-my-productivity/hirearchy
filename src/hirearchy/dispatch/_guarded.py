@@ -19,11 +19,11 @@ class GuardedRootSender(GuardedSender):
         status: str | None = None, budget: int = 0, revises: str | None = None, supersedes: str | None = None,
         service: str | None = None, contract: int | None = None, playbook: int | None = None, feedback: str | None = None,
         source: str | None = None, criterion: str | None = None, wake: bool = True, skip_route_check: bool = False,
-        inherited: str | None = None,
+        inherited: str | None = None, acknowledges: str | None = None,
     ) -> Message:
-        check_root_send(actor, type, service, revises, feedback, criterion)
+        check_root_send(actor, type, service, revises, feedback, criterion, acknowledges)
         return self._inner.send(
             actor, to, body, type=type, title=title, reply_to=reply_to, status=status, budget=budget, revises=revises, supersedes=supersedes,
             service=service, contract=contract, playbook=playbook, feedback=feedback, source=source, criterion=criterion, wake=wake,
-            skip_route_check=skip_route_check, inherited=inherited,
+            skip_route_check=skip_route_check, inherited=inherited, acknowledges=acknowledges,
         )

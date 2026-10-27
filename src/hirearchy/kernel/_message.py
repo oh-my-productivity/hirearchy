@@ -75,6 +75,7 @@ class Message(MessageView):
     source: str | None = None  # "human" | "relayed": set by root only, on a verdict, a link or a rework (see ``verdict_tier``)
     criterion: str | None = None  # ids a rejection is about, joined by ", " ("C6", "C6, R2", "none"); root only, on a verdict or a link note
     trace: str | None = None  # id of the root task (request) this message belongs to; stamped by the runtime at send time
+    acknowledges: str | None = None  # "{service} {op} {item}[ {text hash}]": the parent's acknowledgement of a playbook change; set only by ``acknowledge_playbook``
     id: str = ""
     created: str = ""
     path: Path | None = field(default=None, compare=False, repr=False)
@@ -115,6 +116,8 @@ class Message(MessageView):
             meta["criterion"] = self.criterion
         if self.trace:
             meta["trace"] = self.trace
+        if self.acknowledges:
+            meta["acknowledges"] = self.acknowledges
         return meta
 
     def to_text(self) -> str:
@@ -151,6 +154,7 @@ class Message(MessageView):
             source=_text(meta.get("source")),
             criterion=_text(meta.get("criterion")),
             trace=_text(meta.get("trace")),
+            acknowledges=_text(meta.get("acknowledges")),
             id=str(meta.get("id") or (path.stem if path else "")),
             created=str(meta.get("created") or ""),
             path=path,
@@ -195,6 +199,8 @@ class Message(MessageView):
             head.append(f"source: {self.source}")
         if self.criterion:
             head.append(f"criterion: {self.criterion}")
+        if self.acknowledges:
+            head.append(f"acknowledges: {self.acknowledges}")
         if self.budget and self.type == "result":
             head.append(f"returns {self.budget} run(s)")
         elif self.budget:

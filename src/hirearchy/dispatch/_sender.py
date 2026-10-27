@@ -40,6 +40,12 @@ def provenance_source(
     return source
 
 
+def check_acknowledges(type: str, feedback: str | None, criterion: str | None, acknowledges: str | None) -> None:
+    """``acknowledges`` goes only on a plain note: a note without ``feedback`` and without ``criterion`` (design 9.2). Every ``MessageSender`` applies it."""
+    if acknowledges is not None and (type != "note" or feedback or criterion is not None):
+        raise OrgError("acknowledges goes only on a plain note")
+
+
 class RuleMessageSender(MessageSender):
     """Size, type, body, route, budget and hops, in this order; then delivery."""
 
@@ -59,7 +65,7 @@ class RuleMessageSender(MessageSender):
         status: str | None = None, budget: int = 0, revises: str | None = None, supersedes: str | None = None,
         service: str | None = None, contract: int | None = None, playbook: int | None = None, feedback: str | None = None,
         source: str | None = None, criterion: str | None = None, wake: bool = True, skip_route_check: bool = False,
-        inherited: str | None = None,
+        inherited: str | None = None, acknowledges: str | None = None,
     ) -> Message:
         cap = self._settings.message_cap()
         if len(body.strip()) > cap and norm(actor) != ROOT:  # the cap protects agents' runs; the human may paste
@@ -92,10 +98,11 @@ class RuleMessageSender(MessageSender):
                 "Report blocked to whoever assigned your task instead."
             )
         source = provenance_source(actor, type, revises, feedback, reply_to, source, criterion, inherited)
+        check_acknowledges(type, feedback, criterion, acknowledges)
         msg = Message(
             sender=actor, to=to, type=type, body=body.strip(), title=title.strip(),
             reply_to=reply_to, status=status, budget=budget, hops=hops, revises=revises,
             supersedes=supersedes, service=service, contract=contract, playbook=playbook, feedback=feedback,
-            source=source, criterion=criterion, wake=wake,
+            source=source, criterion=criterion, wake=wake, acknowledges=acknowledges,
         )
         return self._delivery.deliver(msg)

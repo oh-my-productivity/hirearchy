@@ -37,7 +37,7 @@ from ._lessons import LessonsPolicy
 from ._protocols import HopCounter, RoutePolicy
 from ._reporter import RuleTaskReporter
 from ._routes import ParentSiblingRoutePolicy
-from ._sender import RuleMessageSender, provenance_source
+from ._sender import RuleMessageSender, check_acknowledges, provenance_source
 from .api import MessageSender, ReworkContext, TaskAssigner, TaskReporter
 
 MEMORY_ROOT = Path("/memory/org")  # where the in-memory worlds pretend the organization is (no artifact exists there)
@@ -63,13 +63,14 @@ class RecordingSender(MessageSender):
         status: str | None = None, budget: int = 0, revises: str | None = None, supersedes: str | None = None,
         service: str | None = None, contract: int | None = None, playbook: int | None = None, feedback: str | None = None,
         source: str | None = None, criterion: str | None = None, wake: bool = True, skip_route_check: bool = False,
-        inherited: str | None = None,
+        inherited: str | None = None, acknowledges: str | None = None,
     ) -> Message:
         source = provenance_source(norm(actor), type, revises, feedback, reply_to, source, criterion, inherited)
+        check_acknowledges(type, feedback, criterion, acknowledges)
         msg = Message(
             sender=norm(actor), to=norm(to), type=type, body=body.strip(), title=title.strip(), reply_to=reply_to, status=status,
             budget=int(budget or 0), revises=revises, supersedes=supersedes, service=service, contract=contract, playbook=playbook,
-            feedback=feedback, source=source, criterion=criterion, wake=wake,
+            feedback=feedback, source=source, criterion=criterion, wake=wake, acknowledges=acknowledges,
         )
         done = self._delivery.deliver(msg)
         self.messages.append(done)
