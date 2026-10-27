@@ -380,3 +380,170 @@ def test_row_xx_a_second_related_rejection_of_a_later_delivery_after_d_is_due_in
     for order in orders:
         due = row_xx(order)
         assert (due.state, due.related, due.retire_due) == ("warning", ("R2", "R3"), True), order
+
+
+# ----------------------------------------------------------------------------------------------- 8.1 W1-W3, carried watches (B2), restored
+
+
+def warned(w: Watching) -> None:
+    """c1 accepted; c2 rejected and linked to C5 (R2): P2 is in ``warning``."""
+    w.case("c1", 20, 21, verdict=(30, "accept"))
+    w.case("c2", 22, 23, verdict=(31, "reject"), link=(32, ["C5"]))
+
+
+def second_rejection(w: Watching, name: str = "c3", first: int = 50) -> None:
+    """A later request, delivered and rejected about C5: the second related rejection."""
+    w.case(name, first, first + 1, verdict=(first + 2, "reject"), link=(first + 3, ["C5"]))
+
+
+def test_row_ix_a_moved_then_reformatted_warned_item_is_retired_in_its_current_text() -> None:
+    """W1: a move and a formatting edit keep the watched change; the second related rejection is read against the text that is live now."""
+    w = world()
+    warned(w)
+    p1, rule2 = w.versions[1].items or ()
+    w.versions.append(playbook(3, 40, [rule2, p1], op="move", item="P2", admitted="exempt"))
+    reformatted = rule("P2", "A date is relative", "Convert it from the date of the request.", why=("R1", "C5"))
+    w.versions.append(playbook(4, 41, [reformatted, p1], op="edit", item="P2", admitted="exempt"))
+    second_rejection(w)
+    due = p2(w)
+    assert (due.state, due.related, due.retire_due, due.text_version, due.watch_start) == ("warning", ("R2", "R3"), True, 2, w.versions[1].revised)
+
+
+def test_row_x_an_exempt_restore_restarts_the_watch_with_the_warning_kept() -> None:
+    """W2: a client-written text restored while the item is in its watch is a change of the text like any other: the clean count restarts, the
+    related rejections found so far stay, and the next related rejection retires the restored text."""
+    w = world(p1="Read the request; check every date (C5).")
+    v1_text = step("P1", "Read the request; check every date (C5).")
+    edited = step("P1", "Read the request and check every date against the notes.", ("R1", "C5"))
+    w.versions.append(playbook(3, 12, [edited, w.items(1)[1]], op="edit", item="P1", admitted="c"))  # P1 on trial from tick 12
+    warned(w)
+    assert w.states()["P1"].state == "warning"
+    w.versions.append(playbook(4, 40, [v1_text, w.items(1)[1]], op="restore", item="P1", admitted="restore", restores=1))
+    restored = w.states()["P1"]
+    assert (restored.state, restored.related, restored.clean, restored.text_version) == ("warning", ("R2",), 0, 4)
+    assert restored.watch_start == w.versions[2].revised  # the watch is the one that began at tick 12
+    second_rejection(w)
+    due = w.states()["P1"]
+    assert (due.state, due.related, due.retire_due) == ("warning", ("R2", "R3"), True)
+
+
+def retired_in_warning(w: Watching) -> None:
+    """P2 warned (R2), then its owner retires it (v3, tick 40)."""
+    warned(w)
+    w.versions.append(playbook(3, 40, [w.items(1)[0]], op="retire", item="P2", admitted="exempt"))
+
+
+def test_row_xi_a_restore_or_an_add_after_an_owners_retire_in_warning_is_carried() -> None:
+    w = world()
+    retired_in_warning(w)
+    p1, old = w.versions[1].items or ()
+    w.versions.append(playbook(4, 41, [p1, old], op="restore", item="P2", admitted="c", restores=2))
+    back = p2(w)
+    assert (back.state, back.carried, back.related, back.clean, back.watch_start) == ("warning", "P2", ("R2",), 0, w.versions[1].revised)
+    v = world()
+    retired_in_warning(v)
+    added = rule("P5", "always", "convert it from the date of the request.", why=("R1", "C5"))  # P2's words, another id and condition
+    v.versions.append(playbook(4, 41, [v.items(1)[0], added], op="add", item="P5", admitted="c"))
+    found = v.states()
+    assert (found["P2"].state, found["P5"].state, found["P5"].carried, found["P5"].related) == ("retired", "warning", "P2", ("R2",))
+
+
+def test_row_xii_a_repaired_item_whose_line_was_untouched_carries_its_watch() -> None:
+    w = world()
+    warned(w)
+    w.versions.append(playbook(3, 40, [], op="", parse_error="line 3: a hand edit"))
+    repaired = [
+        step("P3", "[P1] Read the request."),
+        step("P4", "[P2] WHEN a date is relative THEN convert it from the date of the request WHY R1, C5"),
+    ]
+    w.versions.append(playbook(4, 45, repaired, op="migrate", admitted="migrate"))
+    found = w.states()
+    assert (found["P1"].state, found["P2"].state) == ("retired", "retired")
+    assert (found["P3"].state, found["P3"].carried) == ("kept", "")
+    assert (found["P4"].state, found["P4"].carried, found["P4"].related, found["P4"].watch_start) == ("warning", "P2", ("R2",), w.versions[1].revised)
+    second_rejection(w)
+    assert (w.states()["P4"].state, w.states()["P4"].retire_due) == ("warning", True)  # one more related rejection retires it
+
+
+def test_row_xxi_a_gated_edit_of_another_item_into_a_warned_retired_text_is_carried_with_its_own_rejections() -> None:
+    """B2: P3 is on trial for its own related rejection (R3, about C6); the owner retires P2 in warning, then edits P3 into P2's text."""
+    w = world()
+    p1, rule2 = w.versions[1].items or ()
+    rule3 = rule("P3", "a total is stated", "check it twice", why=("C6",))
+    w.versions.append(playbook(3, 12, [p1, rule2, rule3], op="add", item="P3", admitted="c"))
+    w.case("c1", 20, 21, verdict=(30, "reject"), link=(31, ["C5"]))  # R2: P2's first related rejection
+    w.case("c2", 22, 23, verdict=(32, "reject"), link=(33, ["C6"]))  # R3: P3's own
+    w.versions.append(playbook(4, 40, [p1, rule3], op="retire", item="P2", admitted="exempt"))
+    into = rule("P3", "a date is relative", rule2.text, why=("R1", "C5"))
+    w.versions.append(playbook(5, 41, [p1, into], op="edit", item="P3", admitted="c"))
+    found = w.states()
+    assert (found["P2"].state, found["P2"].related) == ("retired", ("R2",))
+    assert (found["P3"].state, found["P3"].carried, found["P3"].related) == ("warning", "P2", ("R2", "R3"))  # the union of both
+
+
+def test_a_rules_text_key_is_its_thens() -> None:
+    """B2: a rule re-added as a step with its ``then``'s words is caught; other words are not."""
+    w = world()
+    retired_in_warning(w)
+    p1, rule2 = w.versions[1].items or ()
+    w.versions.append(playbook(4, 41, [p1, step("P5", "Convert it from the date of the request!", ("R1", "C5"))], op="add", item="P5", admitted="c"))
+    w.versions.append(playbook(5, 42, [p1, step("P5", "Convert it from the date of the request!", ("R1", "C5")), step("P6", "Another thing.", ("R1", "C5"))], op="add", item="P6", admitted="c"))
+    found = w.states()
+    assert (found["P5"].carried, found["P5"].state, found["P5"].related) == ("P2", "warning", ("R2",))
+    assert (found["P6"].carried, found["P6"].state, found["P6"].related) == ("", "new", ())
+    assert rule2.text.lower().startswith("convert")
+
+
+def test_a_restarted_watch_reads_the_union_of_its_windows() -> None:
+    w = world()
+    warned(w)
+    p1, rule2 = w.versions[1].items or ()
+    edited = rule("P2", "a date is relative", "convert it from the date of the request, and say so", why=("R1", "C5"))
+    w.versions.append(playbook(3, 40, [p1, edited], op="edit", item="P2", admitted="c"))
+    restarted = p2(w)  # D4: a warning survives every edit; the clean count restarts
+    assert (restarted.state, restarted.related, restarted.clean, restarted.text_version, restarted.watch_start) == (
+        "warning", ("R2",), 0, 3, w.versions[1].revised,
+    )
+    w.case("c5", 50, 51, verdict=(55, "accept"))
+    w.case("c6", 52, 53, verdict=(56, "reject"), link=(57, ["C5"]))  # a related rejection in the new window
+    later = p2(w)
+    assert (later.state, later.related, later.retire_due, later.clean, later.waiting) == ("warning", ("R2", "R3"), True, 1, 0)
+
+
+def test_a_watch_retire_without_a_previous_text_reads_retired() -> None:
+    w = world()
+    w.case("c1", 20, 21, verdict=(30, "reject"), link=(31, ["C5"]))
+    w.case("c2", 22, 23, verdict=(32, "reject"), link=(33, ["C5"]))
+    w.versions.append(playbook(3, 40, [w.items(1)[0]], op="watch", item="P2", admitted="watch", related=("R2", "R3")))
+    gone = p2(w)
+    assert (gone.state, gone.related, gone.retire_due, gone.restores) == ("retired", ("R2", "R3"), False, 0)
+
+
+def test_restored_lasts_until_a_gated_change() -> None:
+    w = world()
+    p1, rule2 = w.versions[1].items or ()
+    text_b = rule("P2", "a date is relative", "convert it, and write the date down", why=("R1", "C5"))
+    w.versions.append(playbook(3, 12, [p1, text_b], op="edit", item="P2", admitted="c"))
+    w.case("c1", 20, 21, verdict=(30, "reject"), link=(31, ["C5"]))
+    w.case("c2", 22, 23, verdict=(32, "reject"), link=(33, ["C5"]))
+    w.versions.append(playbook(4, 40, [p1, rule2], op="watch", item="P2", admitted="watch", restores=2, related=("R2", "R3")))
+    back = p2(w)
+    assert (back.state, back.restores, back.related, back.retire_due) == ("restored", 2, ("R2", "R3"), False)
+    w.versions.append(playbook(5, 41, [p1, rule("P2", "A date is relative", rule2.text + ".", why=("R1", "C5"))], op="edit", item="P2", admitted="exempt"))
+    assert p2(w).state == "restored"  # a formatting fix is no gated change
+    w.versions.append(playbook(6, 42, [p1, rule("P2", "a date is relative", "convert it twice", why=("R1", "C5"))], op="edit", item="P2", admitted="c"))
+    fresh = p2(w)
+    assert (fresh.state, fresh.restores, fresh.related, fresh.watch_start) == ("new", 0, (), w.versions[5].revised)
+
+
+def test_a_gated_change_of_a_kept_item_starts_a_new_watch_and_an_exempt_restore_leaves_it_kept() -> None:
+    w = world()
+    accepted(w)
+    assert p2(w).state == "kept"
+    p1, rule2 = w.versions[1].items or ()
+    w.versions.append(playbook(3, 40, [p1, rule("P2", "a date is relative", "convert it twice", why=("R1", "C5"))], op="restore", item="P2", admitted="restore", restores=2))
+    assert (p2(w).state, p2(w).watch_start) == ("kept", w.versions[1].revised)  # outside a watch, an exempt restore leaves it kept
+    w.versions.append(playbook(4, 41, [p1, rule("P2", "a date is relative", "convert it thrice", why=("R1", "C5"))], op="edit", item="P2", admitted="c"))
+    fresh = p2(w)
+    assert (fresh.state, fresh.clean, fresh.related, fresh.watch_start, fresh.text_version) == ("new", 0, (), w.versions[3].revised, 4)
+    assert rule2.id == "P2"

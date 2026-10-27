@@ -156,14 +156,14 @@ def rule(item_id: str, when: str, then: str, why: Sequence[str] = ()) -> Playboo
 
 
 def playbook(
-    version: int, tick: int, items: Sequence[PlaybookItem], *, op: str, item: str = "", admitted: str = "", us: int = 0,
+    version: int, tick: int, items: Sequence[PlaybookItem], *, op: str, item: str = "", admitted: str = "", us: int = 0, restores: int = 0,
     related: Sequence[str] = (), parse_error: str = "",
 ) -> Playbook:
     """A stored version of the playbook in item form (``parse_error`` set: a hand-broken file that does not parse, with no items)."""
     return Playbook(
         version=version, revised=stamp(tick, us), by="runtime (watch)" if op == "watch" else OWNER, items=None if parse_error else tuple(items),
         items_max=max([int(i.id[1:]) for i in items], default=0), op=op, item=item, admitted=admitted,
-        why={i.id: i.why for i in items if i.why}, related=tuple(related), parse_error=parse_error,
+        why={i.id: i.why for i in items if i.why}, related=tuple(related), restores=restores, parse_error=parse_error,
     )
 
 
@@ -176,6 +176,10 @@ class Watching:
     versions: list[Playbook] = field(default_factory=list)
     notes: dict[str, Message] = field(default_factory=dict)  # the verdict note of each case ``case`` made, by the case's name
     tasks: dict[str, Message] = field(default_factory=dict)  # the request of each, by name
+
+    def items(self, index: int) -> tuple[PlaybookItem, ...]:
+        """The items of the ``index``-th playbook version."""
+        return self.versions[index].items or ()
 
     def states(self) -> dict[str, ItemWatch]:
         stored = [(c.version, c.defined_by or "", c.acceptance) for c in self.contracts]
@@ -201,12 +205,12 @@ class Watching:
         return task
 
 
-def world() -> Watching:
+def world(p1: str = "Read the request.") -> Watching:
     """The standard world of the watch's tests: contract v1 with C1-C6 (C5 is "e"); playbook v1 (a step, never watched); R1, the rejection of case c0
     answered about C5; and P2, a rule admitted at tick 10 on R1 and C5 (rule (c)), whose watch these tests read with k = 3."""
     w = Watching()
     w.contracts.append(contract(1, ["a", "b", "c", "d", "e", "f"], 0))
-    first = [step("P1", "Read the request.")]
+    first = [step("P1", p1)]
     w.versions.append(playbook(1, 0, first, op="first", admitted="first"))
     w.case("c0", 1, 2, verdict=(3, "reject"), link=(4, ["C5"]))
     rule2 = rule("P2", "a date is relative", "convert it from the date of the request", why=("R1", "C5"))

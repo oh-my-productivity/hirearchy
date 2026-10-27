@@ -86,7 +86,7 @@ def playbook_of(meta: JsonObject, body: str, path: Path | None) -> Playbook:
         admitted=str(meta.get("admitted") or ""),
         items=parsed.items if parsed is not None and not parsed.error else None, sections=parsed.sections if parsed is not None else (),
         items_max=as_int(meta.get("items_max")), rules=rules_of(meta), why=why_of(meta), op=_text(meta.get("op")), item=_text(meta.get("item")),
-        related=tuple(_ids(meta.get("related"))), acknowledged=_text(meta.get("acknowledged")), parse_error=parsed.error if parsed is not None else "",
+        related=tuple(_ids(meta.get("related"))), restores=as_int(meta.get("restores")), acknowledged=_text(meta.get("acknowledged")), parse_error=parsed.error if parsed is not None else "",
     )
 
 

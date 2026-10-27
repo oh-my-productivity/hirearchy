@@ -410,6 +410,7 @@ class Playbook:
     op: str = ""  # first | migrate | add | edit | retire | restore | move | watch
     item: str = ""  # the id the op changed
     related: tuple[str, ...] = ()  # the R ids a watch retire rests on
+    restores: int = 0  # the version whose text of ``item`` came back (a restore, or a watch retire that put a previous text back); 0 when none
     acknowledged: str = ""  # the id of the parent's acknowledgement note
     parse_error: str = ""  # why an item-format body did not parse ("line {n}: {why}"); "" otherwise
 

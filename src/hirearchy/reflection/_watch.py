@@ -14,7 +14,9 @@ from dataclasses import dataclass, field, replace
 from datetime import datetime, timezone
 
 from ..kernel import Message, link_ids, msg_time, verdict_tier
-from ..services import Contract, Criterion, ItemWatch, Playbook, PlaybookItem, amendment_ids, migrate_body, number_criteria, text_tokens
+from ..services import (
+    Contract, Criterion, ItemWatch, Playbook, PlaybookItem, amendment_ids, line_key, migrate_body, number_criteria, text_tokens,
+)
 from ._quality_rules import deliveries_of
 from .api import Assertion, Case, Delivery, Verdict, regressions
 
@@ -232,7 +234,6 @@ def refs_of(records: Records, text: str, why: Sequence[str], live_from: datetime
 
 # ----------------------------------------------------------------------------------------------------------------- the texts of an item over time
 
-
 _Tokens = tuple[tuple[str, ...], tuple[str, ...]]  # the text tokens of an item's text and, for a rule, of its condition
 
 
@@ -254,23 +255,61 @@ class _Seg:
 
 @dataclass
 class _Change:
-    """A watched change (section 3): the gated change that put a text on trial, live from ``at``. The cases of its ``why`` assertions are no candidates."""
+    """A watched change (section 3): the change that put a text on trial, live from ``at``. The cases of its ``why`` assertions are no candidates;
+    the item is "live in the watched text" while its text has ``tokens`` (W1)."""
 
     version: int
     at: datetime
     excluded: frozenset[str]
-    tokens: _Tokens  # the tokens of the watched text: the item is "live in the watched text" while its text has them (W1)
+    tokens: _Tokens
+
+
+@dataclass
+class _Watch:
+    """A watch (section 8.1): the changes that put texts of an item on trial (a restart adds one: W2), the texts the item had meanwhile, and the
+    watches it continues (a carried watch: their related rejections count as they are). ``ended``: the item left the body, or the runtime's retire
+    brought its previous text back (W3)."""
+
+    start: datetime
+    changes: list[_Change]
+    segs: list[_Seg]
+    inherited: list[_Watch] = field(default_factory=list)
+    carried: str = ""
+    ended: bool = False
+    k: int = K_DEFAULT
+    r: tuple[int, int] = (0, 0)
 
 
 @dataclass
 class _Track:
-    """What the versions say of one item: its texts over time, whether it is live, and the watched change it is on trial for (None: never watched)."""
+    """What the versions say of one item: its texts over time, whether it is live, the watch it is on trial in (None: never watched, or the watch is
+    over and its text is another) and the version whose text the runtime's retire brought back (0: none)."""
 
     id: str
     kind: str
     segs: list[_Seg]
     live: bool = True
-    changes: list[_Change] = field(default_factory=list)
+    watch: _Watch | None = None
+    restored: int = 0
+
+
+@dataclass(frozen=True)
+class _Retired:
+    """A text its owner retired while it was in ``warning``: what a restore, an add or a gated edit of the same words continues (carried watch (i))."""
+
+    item: str
+    key: str
+    watch: _Watch
+
+
+@dataclass
+class _Tracking:
+    """The versions read so far: every item's track, the items live in the last version that parsed, and the retired warned texts."""
+
+    rec: Records
+    tracks: dict[str, _Track]
+    live: dict[str, PlaybookItem]
+    retired: list[_Retired]
 
 
 def _tokens_of(item: PlaybookItem) -> _Tokens:
@@ -283,37 +322,22 @@ def _words_of(item: PlaybookItem) -> str:
     return item.text if item.kind == "step" or item.when in ("", "always") else f"{item.when} {item.text}"
 
 
-def _tracks(versions: Sequence[Playbook], rec: Records) -> dict[str, _Track]:
-    """The texts and watched changes of every item, version by version (oldest first; ``versions`` all parse)."""
-    tracks: dict[str, _Track] = {}
-    live: dict[str, PlaybookItem] = {}
-    for v in versions:
-        at = v.revised or EPOCH
-        now = {i.id: i for i in v.items or ()}
-        for gone in [x for x in live if x not in now]:
-            tracks[gone].live = False
-            tracks[gone].segs[-1].end = at
-        for item in now.values():
-            if live.get(item.id) == item:
-                continue
-            track = tracks.setdefault(item.id, _Track(item.id, item.kind, []))
-            if track.segs and track.live:
-                track.segs[-1].end = at
-            track.live = True
-            track.kind = item.kind
-            tokens = _tokens_of(item)
-            track.segs.append(_Seg(
-                item.id, v.version, at, None, item.kind, item.text, item.when, item.why, refs_of(rec, _words_of(item), item.why, at), tokens,
-            ))
-            if v.admitted in ("b", "c") and v.item == item.id:  # a gated change puts the text on trial
-                track.changes = [_Change(v.version, at, frozenset(rec.by_id[x].case for x in item.why if x in rec.by_id), tokens)]
-        live = now
-    return tracks
+def _line_key(item: PlaybookItem) -> str:
+    """The text key of the line an item renders (4.4), without its list marker: what a repair migration keeps as the words of a step."""
+    why = ", ".join(item.why)
+    if item.kind == "rule":
+        return line_key(f"[{item.id}] WHEN {item.when} THEN {item.text}" + (f" WHY {why}" if why else ""))
+    return line_key(f"[{item.id}] {item.text}" + (f" (WHY {why})" if why else ""))
 
 
-def _seg_at(track: _Track, when: datetime) -> _Seg | None:
-    """The text of the item that was live at ``when``, None when it was not live then."""
-    return next((s for s in track.segs if s.start <= when and (s.end is None or when < s.end)), None)
+def _same(a: PlaybookItem, b: PlaybookItem) -> bool:
+    """Is ``b`` the item ``a``, word for word? Its place in the body is not part of it (a move changes none)."""
+    return (a.kind, a.text, a.when, a.why) == (b.kind, b.text, b.when, b.why)
+
+
+def _seg_at(segs: Sequence[_Seg], when: datetime) -> _Seg | None:
+    """The text that was live at ``when``, None when none was."""
+    return next((s for s in segs if s.start <= when and (s.end is None or when < s.end)), None)
 
 
 # ----------------------------------------------------------------------------------------------------------------- candidates and the window
@@ -384,14 +408,14 @@ def _window(rec: Records, change: _Change, k: int, upto: Moment | None = None) -
     return _Window(first, judged, closed, judging, members)
 
 
-def _relations(rec: Records, track: _Track, members: Sequence[tuple[Assertion, Message]]) -> tuple[list[Assertion], list[Assertion]]:
+def _relations(rec: Records, segs: Sequence[_Seg], members: Sequence[tuple[Assertion, Message]]) -> tuple[list[Assertion], list[Assertion]]:
     """Of rejections with the result each was given on: those related to the item (not pending, given on a result created while a text of it was
     live, and their subjects meet that text's refs) and those pending (no answer yet)."""
     pending = [a for a, _ in members if pending_rejection(rec, a.id)]
     held = {a.id for a in pending}
     related = []
     for a, result in members:
-        seg = _seg_at(track, when_of(result))
+        seg = _seg_at(segs, when_of(result))
         if a.id not in held and seg is not None and subjects_of(rec, a.id) & seg.refs:
             related.append(a)
     return related, pending
@@ -405,26 +429,35 @@ def _records(rec: Records) -> list[Moment]:
     return sorted(found)
 
 
-def _watch_end(rec: Records, track: _Track, change: _Change, k: int) -> Moment | None:
+def _union(windows: Sequence[_Window]) -> list[tuple[Assertion, Message]]:
+    """The rejections of several windows, each once (a restarted or carried watch reads the union of its changes' windows)."""
+    found: dict[str, tuple[Assertion, Message]] = {}
+    for window in windows:
+        for a, result in window.members:
+            found.setdefault(a.id, (a, result))
+    return list(found.values())
+
+
+def _watch_end(rec: Records, w: _Watch) -> Moment | None:
     """``K``, the end of the watch (section 3): the earliest record at or after ``D`` such that the files created up to and including it derive ``kept``
-    (``E`` defined, every rejection in the window answered and unrelated). None while the item has not reached ``kept``."""
-    judging = _window(rec, change, k).judging
+    (``E`` defined, every rejection in the window answered and unrelated, no related rejection carried). None while it has not reached ``kept``."""
+    judging = _window(rec, w.changes[-1], w.k).judging
     if judging is None:
         return None
     for place in _records(rec):
         if place < moment_of(judging):
             continue
         view = until(rec, place)
-        found = _window(view, change, k)
-        related, pending = _relations(view, track, found.members)
-        if found.closed and not related and not pending:
+        windows = [_window(view, c, w.k) for c in w.changes]
+        related, pending = _relations(view, w.segs, _union(windows))
+        if windows[-1].closed and not related and not pending and not any(_derive_watch(view, i).related for i in w.inherited):
             return place
     return None
 
 
 @dataclass(frozen=True)
 class _Derived:
-    """What one watched change derives: its related and pending rejections, the counts over its first k candidates and whether it reached ``kept``."""
+    """What one watch derives: its related and pending rejections, the counts over the first k candidates of its latest change, whether it reached ``kept``."""
 
     related: tuple[str, ...]
     pending: tuple[str, ...]
@@ -433,35 +466,181 @@ class _Derived:
     kept: bool
 
 
-def _warned_window(rec: Records, track: _Track, change: _Change, known: set[str]) -> list[tuple[Assertion, Message]]:
-    """The warned window of ``change`` (B1): every human rejection on a result created at or after its live-from, recorded while the item was live
-    in the watched text, whatever ``E``, ``D`` and ``K`` are. Those in the window already (``known``) are left out."""
+def _warned_window(rec: Records, w: _Watch, known: set[str]) -> list[tuple[Assertion, Message]]:
+    """The warned window of a watch (B1): every human rejection on a result created at or after the live-from of one of its changes, recorded while
+    the item was live in that change's watched text, whatever ``E``, ``D`` and ``K`` are. Those in the window already (``known``) are left out."""
     found = []
     for a in rec.assertions:
         result = rejected_result(rec, a)
-        if a.id in known or result is None or when_of(result) < change.at:
+        if a.id in known or result is None:
             continue
-        seg = _seg_at(track, when_of(a.verdict.message))
-        if seg is not None and seg.tokens == change.tokens:
+        seg = _seg_at(w.segs, when_of(a.verdict.message))
+        if seg is not None and any(when_of(result) >= c.at and seg.tokens == c.tokens for c in w.changes):
             found.append((a, result))
     return found
 
 
-def _derive(rec: Records, track: _Track, change: _Change, k: int) -> _Derived:
-    """The counts of ``change`` over ``rec``: ``K``, the window closed at it, related and pending rejections, and, once the item has one related
-    rejection, the warned window in which a second retires it whatever the order of the records."""
-    end = _watch_end(rec, track, change, k)
-    window = _window(rec, change, k, end)
-    related, pending = _relations(rec, track, window.members)
-    if related:
-        extra = _warned_window(rec, track, change, {a.id for a, _ in window.members})
-        related += _relations(rec, track, extra)[0]
-    unclean = {a.case for a in (*pending, *related)}
+def _derive_watch(rec: Records, w: _Watch) -> _Derived:
+    """The counts of a watch over ``rec``: ``K``, the union of its changes' windows closed at it, related and pending rejections, the related ones of
+    the watches it continues, and, once it has a related rejection, the warned window in which a second retires it whatever the order of the records."""
+    end = _watch_end(rec, w)
+    windows = [_window(rec, c, w.k, end) for c in w.changes]
+    members = _union(windows)
+    related, pending = _relations(rec, w.segs, members)
+    ids = {a.id for a in related} | {x for i in w.inherited for x in _derive_watch(rec, i).related}
+    if ids:
+        ids |= {a.id for a in _relations(rec, w.segs, _warned_window(rec, w, {a.id for a, _ in members}))[0]}
+    unclean = {rec.by_id[x].case for x in ids} | {a.case for a in pending}
+    latest = windows[-1]
     return _Derived(
-        tuple(sorted((a.id for a in related), key=number_of)), tuple(sorted((a.id for a in pending), key=number_of)),
-        sum(1 for c, j in zip(window.first, window.judged) if j is not None and c.case.id not in unclean),
-        sum(1 for j in window.judged if j is None), end is not None,
+        tuple(sorted(ids, key=number_of)), tuple(sorted((a.id for a in pending), key=number_of)),
+        sum(1 for c, j in zip(latest.first, latest.judged) if j is not None and c.case.id not in unclean),
+        sum(1 for j in latest.judged if j is None), end is not None,
     )
+
+
+# ----------------------------------------------------------------------------------------------------------------- changes during a watch (W1-W3)
+
+
+def _status(tr: _Tracking, w: _Watch, at: datetime) -> str:
+    """The state of the watch ``w`` just before ``at`` (``new``, ``warning`` or ``kept``): what the files created before ``at`` derive."""
+    found = _derive_watch(until(tr.rec, before(at)), w)
+    return "warning" if found.related else "kept" if found.kept else "new"
+
+
+def _new_seg(tr: _Tracking, item: PlaybookItem, version: int, at: datetime) -> _Seg:
+    return _Seg(
+        item.id, version, at, None, item.kind, item.text, item.when, item.why, refs_of(tr.rec, _words_of(item), item.why, at), _tokens_of(item),
+    )
+
+
+def _change_of(tr: _Tracking, item: PlaybookItem, v: Playbook, at: datetime, seg: _Seg) -> _Change:
+    return _Change(v.version, at, frozenset(tr.rec.by_id[x].case for x in item.why if x in tr.rec.by_id), seg.tokens)
+
+
+def _carry(tr: _Tracking, item: PlaybookItem, v: Playbook, before_item: PlaybookItem | None, gated: bool) -> _Retired | None:
+    """The retired warned watch an owner's restore, add or gated edit continues (carried watch (i), B2): a restore of the item its owner retired
+    in ``warning``; an add, a gated edit (of any live item) or a gated restore whose text key equals that of such a retired text. The latest wins."""
+    key = line_key(item.text)
+    if v.op == "restore" and before_item is None:
+        found = [r for r in tr.retired if r.item == item.id]
+        if found:
+            return found[-1]
+    if gated and v.op in ("add", "edit", "restore") and key:
+        found = [r for r in tr.retired if r.key == key]
+        return found[-1] if found else None
+    return None
+
+
+def _begin(track: _Track, change: _Change, seg: _Seg, carry: _Retired | None) -> None:
+    """A new watch of ``track`` starting at ``change``; it continues the watch of ``carry`` (same start, its related rejections counted)."""
+    start = min(change.at, carry.watch.start) if carry is not None else change.at
+    track.watch = _Watch(
+        start, [change], [seg], [carry.watch] if carry is not None else [], carry.item if carry is not None else "",
+        k=carry.watch.k if carry is not None else K_DEFAULT, r=carry.watch.r if carry is not None else (0, 0),
+    )
+    track.restored = 0
+
+
+def _restart(w: _Watch, change: _Change, seg: _Seg, carry: _Retired | None) -> None:
+    """W2: the watch ``w`` goes on with a new watched change; its related rejections found so far stay, and a carried watch joins it (B2)."""
+    w.changes.append(change)
+    w.segs.append(seg)
+    if carry is not None:
+        w.inherited.append(carry.watch)
+        w.carried = carry.item
+        w.start = min(w.start, carry.watch.start)
+
+
+def _repaired(tr: _Tracking, item: PlaybookItem, at: datetime, version: int, sources: Sequence[tuple[PlaybookItem, _Watch]]) -> bool:
+    """Carried watch (ii): an item of a repair migration whose text key equals that of the line of an item that was in its watch continues that
+    watch (same start, k, refs and related rejections), and its repaired text becomes the watched text (W1). True when it did."""
+    key = line_key(item.text)
+    for old, w in sources:
+        if key and key == _line_key(old):
+            seg = _new_seg(tr, item, version, at)
+            changes = [replace(c) for c in w.changes]
+            changes[-1].tokens = seg.tokens
+            track = tr.tracks.setdefault(item.id, _Track(item.id, item.kind, []))
+            track.segs.append(seg)
+            track.watch = _Watch(w.start, changes, [*w.segs, seg], list(w.inherited), old.id, k=w.k, r=w.r)
+            return True
+    return False
+
+
+def _gone(tr: _Tracking, track: _Track, v: Playbook, at: datetime) -> None:
+    """The item left the body: an owner's retire (a warned text is remembered: carried watch (i)), the runtime's retire, a repair or a hand edit."""
+    track.live = False
+    track.segs[-1].end = at
+    w = track.watch
+    if w is None or w.ended:
+        return
+    if v.op == "retire" and v.item == track.id and _status(tr, w, at) == "warning":
+        tr.retired.append(_Retired(track.id, line_key(track.segs[-1].text), w))
+    w.ended = True
+
+
+def _changed(tr: _Tracking, v: Playbook, at: datetime, item: PlaybookItem, previous: PlaybookItem | None) -> None:
+    """The item appears in version ``v`` or has another text: classify the change (sections 3 and 8.1) and update its watch."""
+    track = tr.tracks.setdefault(item.id, _Track(item.id, item.kind, []))
+    seg = _new_seg(tr, item, v.version, at)
+    if previous is not None and track.segs:
+        track.segs[-1].end = at
+    track.segs.append(seg)
+    track.live = True
+    track.kind = item.kind
+    target = v.item == item.id
+    gated = v.admitted in ("b", "c") and target
+    exempt_restore = v.op == "restore" and v.admitted == "restore" and target
+    w = track.watch
+    active = w is not None and not w.ended
+    if v.op == "watch" and target and previous is not None:  # W3: the runtime's retire brought a previous text back
+        if w is not None:
+            w.ended = True
+        track.restored = max(v.restores, 1)
+        return
+    carry = _carry(tr, item, v, previous, gated) if target else None
+    if gated or exempt_restore:
+        in_watch = w is not None and active and _status(tr, w, at) in ("new", "warning")
+        if gated or in_watch or carry is not None:  # an exempt restore outside a watch, and carrying none, changes nothing
+            change = _change_of(tr, item, v, at, seg)
+            if in_watch and w is not None:
+                _restart(w, change, seg, carry)  # W2: a gated change, or an exempt restore, in the watch
+            else:
+                _begin(track, change, seg, carry)
+            return
+    if previous is None:  # appears outside a watch: the first version, a migration, a restore of a client-written text
+        track.watch = None
+        track.restored = 0
+        return
+    if w is not None and active:  # W1: a move, a formatting edit, a hand edit: the watch goes on
+        w.segs.append(seg)
+
+
+def _tracks(versions: Sequence[Playbook], rec: Records) -> dict[str, _Track]:
+    """The texts and watches of every item, version by version (oldest first; ``versions`` all parse)."""
+    tr = _Tracking(rec, {}, {}, [])
+    for v in versions:
+        at = v.revised or EPOCH
+        now = {i.id: i for i in v.items or ()}
+        previous = tr.live
+        sources: list[tuple[PlaybookItem, _Watch]] = []
+        if v.op == "migrate" and previous:  # a repair migration: the watches of its items carry by text key
+            for old in previous.values():
+                w = tr.tracks[old.id].watch
+                if w is not None and not w.ended and _status(tr, w, at) in ("new", "warning"):
+                    sources.append((old, w))
+        for gone in [x for x in previous if x not in now]:
+            _gone(tr, tr.tracks[gone], v, at)
+        for item in now.values():
+            before_item = previous.get(item.id)
+            if before_item is not None and _same(before_item, item):
+                continue
+            if before_item is None and sources and _repaired(tr, item, at, v.version, sources):
+                continue
+            _changed(tr, v, at, item, before_item)
+        tr.live = now
+    return tr.tracks
 
 
 def _virtual(versions: Sequence[Playbook]) -> tuple[ItemWatch, ...]:
@@ -488,15 +667,18 @@ def watch_states(
     for track in sorted(_tracks(parseable, rec).values(), key=lambda t: number_of(t.id)):
         last = track.segs[-1]
         coverage = coverage_of(last.refs, criteria, rec.assertions)
-        if not track.changes:
-            out.append(ItemWatch(track.id, track.kind, "kept" if track.live else "retired", last.version, coverage=coverage))
+        w = track.watch
+        if w is None:
+            state = "retired" if not track.live else "restored" if track.restored else "kept"
+            out.append(ItemWatch(track.id, track.kind, state, last.version, restores=track.restored, coverage=coverage))
             continue
-        change = track.changes[-1]
-        found = _derive(rec, track, change, K_DEFAULT)
-        due = len(found.related) >= 2
-        state = "retired" if not track.live else "warning" if found.related else "kept" if found.kept else "new"
+        found = _derive_watch(rec, w)
+        state = (
+            "retired" if not track.live else "restored" if track.restored else "kept" if w.ended
+            else "warning" if found.related else "kept" if found.kept else "new"
+        )
         out.append(ItemWatch(
-            track.id, track.kind, state, change.version, change.at, K_DEFAULT, (0, 0), found.clean, found.waiting, found.related, found.pending,
-            0, coverage, due and track.live,
+            track.id, track.kind, state, w.changes[-1].version, w.start, w.k, w.r, found.clean, found.waiting, found.related, found.pending,
+            track.restored, coverage, len(found.related) >= 2 and track.live and not w.ended, w.carried,
         ))
     return tuple(out)

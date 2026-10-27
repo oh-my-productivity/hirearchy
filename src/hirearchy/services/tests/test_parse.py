@@ -144,6 +144,14 @@ def test_playbook_of_fills_items_sections_and_the_item_keys() -> None:
     assert pb.evidence == ["R2", "R3", "C6"] and pb.admitted == "b"
 
 
+def test_a_playbook_version_states_the_version_it_restores() -> None:
+    """A restore, and a watch retire that put a previous text back, record the version whose text came back; any other version restores none."""
+    assert playbook_of({**ITEM_META, "op": "watch", "restores": 2}, ITEM_BODY, None).restores == 2
+    assert playbook_of(ITEM_META, ITEM_BODY, None).restores == 0
+    assert playbook_of({**ITEM_META, "restores": "x"}, ITEM_BODY, None).restores == 0
+    assert playbook_of({"version": 2, "restores": 1}, "plain words", None).restores == 1
+
+
 def test_a_body_without_items_max_is_legacy_with_items_none() -> None:
     pb = playbook_of({"version": 2}, "## Steps\n1. [P1] words that look like an item", None)
     assert pb.items is None and pb.sections == () and pb.parse_error == ""
