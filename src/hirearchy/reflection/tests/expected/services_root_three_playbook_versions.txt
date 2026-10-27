@@ -5,4 +5,4 @@ Services you can request (from your direct reports):
     C1: At most 600 words
     C2: Every factual claim has a source URL
   record: 4 request(s): 3 done, 0 failed, 1 open; 0 reworked; avg 1 runs; no feedback
-  playbook v2 (2026-10-18): "playbook v2"
+  playbook v2 (2026-10-18): "playbook v2"; 4 items (0 rules); watched: P4 new (0 of 3 clean cases, k 3; waiting for the client's verdict on 1 case)

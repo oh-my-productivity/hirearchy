@@ -58,7 +58,9 @@ def register(b: Builder) -> None:
     b.provide(CaseAllowance, lambda b: CaseAllowanceOf(b.get(CaseHistory), b.get(ServiceCatalog)))
     b.provide(
         ServiceReports,
-        lambda b: TextServiceReports(b.get(AgentDirectory), b.get(ServiceCatalog), b.get(CaseHistory), OrgServicePaths(b.get(OrgLayout))),
+        lambda b: TextServiceReports(
+            b.get(AgentDirectory), b.get(ServiceCatalog), b.get(CaseHistory), OrgServicePaths(b.get(OrgLayout)), b.get(ServiceEvidence),
+        ),
     )
     b.provide(
         ServiceSteps,

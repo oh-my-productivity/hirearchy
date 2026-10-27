@@ -5,6 +5,6 @@ Services you can request (from your direct reports):
     C1: At most 600 words
     C2: Every factual claim has a source URL
   record: 1 request(s): 0 done, 0 failed, 1 open; 0 reworked; no feedback
-  playbook v1 (2026-01-15): "initial playbook"
+  playbook v1 (2026-01-15): "initial playbook"; 3 items (0 rules), none watched
 
 [exit 0]

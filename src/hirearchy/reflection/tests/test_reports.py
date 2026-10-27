@@ -199,3 +199,162 @@ def test_a_relayed_rework_followed_by_the_users_request_before_it_ran_says_its_r
         "the user's: report them to the user as yours, and never ask the user to fund them."
     )
     assert "has used no run yet" not in total
+
+
+# ------------------------------------------------------------------------------------------ 14.3: the items and the watch in root's listing
+# These tests build ``TextServiceReports`` over a ``ReflectionWorld`` with a stand-in for the watch (``evidence``), so that each state is one value of
+# ``ItemWatch`` and not a story of verdicts (the stories are FEAT-010's). The listing carries ids and counts only, never an item's words.
+from pathlib import Path  # noqa: E402
+
+import pytest  # noqa: E402
+
+from hirearchy.kernel import OrgError  # noqa: E402
+from hirearchy.reflection._reports import TextServiceReports  # noqa: E402
+from hirearchy.reflection.testing import ReflectionWorld, fs_world  # noqa: E402
+from hirearchy.services import ItemWatch  # noqa: E402
+from hirearchy.services.testing import AdmittingServiceEvidence, ServiceEvidence  # noqa: E402
+
+from . import _support as sup  # noqa: E402
+
+
+@pytest.fixture
+def pw(tmp_path: Path) -> ReflectionWorld:
+    """A world where ``ceo`` owns ``weekly-brief`` with playbook v1 (``first``: P1-P3, steps under ``## Steps``)."""
+    w = sup.populated(fs_world(tmp_path))
+    sup.define(w)
+    sup.first_playbook(w, sup.STEPS)
+    return w
+
+
+class FailingWatch(AdmittingServiceEvidence):
+    """The watch that cannot read the record."""
+
+    def watch(self, owner, service):
+        raise OrgError("the mailbox of root cannot be read")
+
+
+def another_world(tmp_path: Path, name: str) -> ReflectionWorld:
+    """A second organization under ``tmp_path`` with ``ceo`` and the service defined (no playbook)."""
+    (tmp_path / name).mkdir()
+    w = sup.populated(fs_world(tmp_path / name))
+    sup.define(w)
+    return w
+
+
+def listing(w, watch=(), *, evidence: ServiceEvidence | None = None, actor: str = "root") -> str:
+    evidence = evidence or AdmittingServiceEvidence(watch=watch)
+    return TextServiceReports(w.s.d.agents, w.s.catalog, w.history, w.paths, evidence).services_text(actor)
+
+
+def playbook_line(text: str, service: str = "weekly-brief") -> str:
+    block = text.split(f"- {service} (")[1]
+    return next(x for x in block.splitlines() if x.startswith("  playbook v"))
+
+
+def add_rules(w, *, n: int = 2) -> None:
+    for k in range(n):
+        w.s.commands.revise_playbook("ceo", sup.SERVICE, "add", "a rule", ["R1"], kind="rule", when=f"case {k} comes up", then=f"handle case {k}")
+
+
+def test_the_playbook_line_gains_items_rules_and_the_watched_items(pw):
+    add_rules(pw)
+    watch = [
+        ItemWatch("P1", "step", "kept", 1), ItemWatch("P2", "step", "kept", 1),
+        ItemWatch("P3", "step", "warning", 1, related=("R4",)),
+        ItemWatch("P4", "rule", "new", 2, k=3, clean=1, waiting=1),
+        ItemWatch("P5", "rule", "kept", 3),
+    ]
+    for who in ("root", "ceo"):  # the same builder for the client and for the owner
+        line = playbook_line(listing(pw, watch, actor=who))
+        assert line.startswith('  playbook v3 (') and '"' in line
+        assert line.endswith(
+            '; 5 items (2 rules); watched: P3 warning (R4; the next related rejection retires it), '
+            "P4 new (1 of 3 clean cases, k 3; waiting for the client's verdict on 1 case)"
+        )
+    text = listing(pw, watch)
+    assert "handle case 0" not in text and "case 1 comes up" not in text  # ids and counts only: no item's words
+
+
+def test_none_watched_free_text_not_in_item_form_and_no_items(pw, tmp_path):
+    kept = [ItemWatch(i, "step", "kept", 1) for i in ("P1", "P2", "P3")]
+    assert playbook_line(listing(pw, kept)).endswith("; 3 items (0 rules), none watched")
+    assert playbook_line(listing(pw, ())).endswith("; 3 items (0 rules), none watched")  # a watch of nothing: nothing is watched
+    one = another_world(tmp_path, "one")
+    sup.first_playbook(one, "## Steps\n1. Only step.")
+    assert playbook_line(listing(one)).endswith("; 1 item (0 rules), none watched")
+    # a retired item is not watched either
+    pw.s.commands.revise_playbook("ceo", sup.SERVICE, "retire", "not needed", [], item="P2")
+    assert playbook_line(listing(pw, [ItemWatch("P2", "step", "retired", 1), *kept])).endswith("; 2 items (0 rules), none watched")
+
+    legacy = another_world(tmp_path, "legacy")
+    sup.legacy_playbook(legacy, "## Steps\n1. Search.\n2. Write.")
+    assert playbook_line(listing(legacy)).endswith("; free text (items when the owner first changes one)")
+
+    broken = another_world(tmp_path, "broken")
+    meta = {"service": sup.SERVICE, "version": 1, "revised": "2026-01-15T10:00:00+00:00", "by": "ceo", "reason": "x", "items_max": 1, "rules": [], "why": {}, "op": "first"}
+    broken.s.store.write_playbook("ceo", sup.SERVICE, 1, meta, "not an item at all\n", None)
+    line = playbook_line(listing(broken))
+    assert "; not in item form (line 1: " in line and line.endswith("): it becomes items at the owner's next change")
+
+    empty = another_world(tmp_path, "empty")
+    sup.first_playbook(empty, "## Steps\n1. Only step.")
+    empty.s.commands.revise_playbook("ceo", sup.SERVICE, "retire", "not needed", [], item="P1")
+    assert playbook_line(listing(empty)).endswith("; no items")
+
+    bare = another_world(tmp_path, "bare")
+    assert "  playbook: none yet" in listing(bare)  # no playbook, no suffix
+
+
+def test_waiting_and_the_next_related_rejection_retires_it(pw):
+    watch = [
+        ItemWatch("P1", "step", "new", 1, k=3, clean=0, waiting=2, pending=("R5", "R6")),
+        ItemWatch("P2", "step", "new", 1, k=3, clean=2, carried="P9"),
+        ItemWatch("P3", "step", "warning", 1, related=("R4", "R6"), retire_due=True),
+    ]
+    assert playbook_line(listing(pw, watch)).endswith(
+        "; 3 items (0 rules); watched: "
+        "P1 new (0 of 3 clean cases, k 3; waiting for the client's verdict on 2 cases; waiting for the user's answer to R5, R6), "
+        "P2 new (2 of 3 clean cases, k 3; carried from P9), "
+        "P3 warning (R4, R6; retire due)"
+    )
+    one = [ItemWatch("P1", "step", "warning", 1, related=("R4",)), ItemWatch("P2", "step", "restored", 3, restores=1)]
+    line = playbook_line(listing(pw, one))
+    assert "watched: P1 warning (R4; the next related rejection retires it)" in line and "P2" not in line  # a restored text is not in its watch
+
+
+def test_watch_not_read_and_the_listing_goes_on(pw):
+    sup.define(pw, name="second")
+    pw.s.commands.revise_playbook("ceo", "second", "first", "first", [], text="## Steps\n1. Do it.")
+    out = listing(pw, evidence=FailingWatch())
+    assert playbook_line(out).endswith("; watch not read (the mailbox of root cannot be read)")
+    assert playbook_line(out, "second").endswith("; watch not read (the mailbox of root cannot be read)")  # every listed service reads its own watch
+    assert out.count("  record: no requests yet") == 2 and "playbook file:" not in out.split("Services you offer:")[0]  # the rest of the listing is whole
+
+
+def rejected_world(w):
+    """The client's request is delivered and rejected (R1) in ``w``; returns the request."""
+    task = sup.ask(w)
+    sup.deliver(w, task, lessons="L.")
+    sup.rate(w, task, "reject", "Too long.")
+    return task
+
+
+def assertion_block(out):
+    return out.split("  regression list (the client's rejections):\n")[1].split("\n  playbook")[0].splitlines()
+
+
+def test_the_regression_line_names_the_rules_citing_it(pw, tmp_path):
+    task = rejected_world(pw)
+    pw.s.commands.revise_playbook("ceo", sup.SERVICE, "add", "from R1", ["R1"], kind="rule", when="it runs long", then="cut it")
+    pw.s.commands.revise_playbook("ceo", sup.SERVICE, "add", "from R1 too", ["R1"], kind="rule", when="it runs longer", then="cut it again")
+    assert assertion_block(listing(pw)) == [f'    R1 (case {task.id}): "Too long." (rules citing it: P4, P5)']
+    assert assertion_block(listing(pw, actor="ceo")) == [f'    R1 (case {task.id}): "Too long." (rules citing it: P4, P5)']
+    steps = another_world(tmp_path, "steps")
+    sup.first_playbook(steps, sup.STEPS)
+    rejected_world(steps)
+    steps.s.commands.revise_playbook("ceo", sup.SERVICE, "add", "a step from R1", ["R1"], kind="step", text="Cut it.")
+    assert assertion_block(listing(steps))[0].endswith('"Too long." (items citing it: P4)')  # a step cites too: the label does not call it a rule
+    plain = another_world(tmp_path, "plain")
+    sup.first_playbook(plain, sup.STEPS)
+    rejected_world(plain)
+    assert "citing it" not in listing(plain)  # no item cites R1

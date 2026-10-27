@@ -13,6 +13,6 @@ Services you can request (from your direct reports):
     C2: Every factual claim has a source URL
   record: 2 request(s): 2 done, 0 failed, 0 open; 0 reworked; avg 1 runs; feedback 0 accept, 2 reject
   regression list (the client's rejections):
-    R1 (case 20260115T090600000000-root-0000, about C1): "Too long."
-    R2 (case 20260115T091000000000-root-0003, about C1): "Still too long."
-  playbook v2 (2026-01-15): "Client rejected: too long."
+    R1 (case 20260115T090600000000-root-0000, about C1): "Too long." (items citing it: P4)
+    R2 (case 20260115T091000000000-root-0003, about C1): "Still too long." (items citing it: P4)
+  playbook v2 (2026-01-15): "Client rejected: too long."; 4 items (0 rules); watched: P4 new (0 of 3 clean cases, k 3)
