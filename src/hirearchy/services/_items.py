@@ -4,11 +4,12 @@ and ``parse_items(render_items(x)) == x`` for every item list the runtime writes
 from __future__ import annotations
 
 import re
-from collections.abc import Mapping, Sequence
+from collections import Counter
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 
 from ..kernel import JsonObject
-from .api import PlaybookItem, PlaybookSection
+from .api import PlaybookItem, PlaybookSection, line_key
 
 HEADING = re.compile(r"#{1,6}(?:\s|$)")
 ITEM_LINE = re.compile(r"(?:(\d+)\.|-) \[P(\d+)\](?: |$)")  # `<n>. [P<k>] ` or `- [P<k>] ` (the space may be gone at the end of a line)
@@ -185,3 +186,179 @@ def _rules_error(drafts: Sequence[_Draft], headings: Sequence[str], rules: tuple
             f"the rule {missing[0]} is not in the body" if missing else "the rules are not in the order of the frontmatter"
         )
     return ""
+
+
+# ----------------------------------------------------------------------------------------------------------------------- migration (4.4)
+
+LIST_MARKER = re.compile(r"(?:[-*+]|\d+[.)])(?:[ \t]+|$)")  # a top-level list item: its marker, the blanks after it
+FENCE = re.compile(r"(`{3,}|~{3,})")
+FALLBACK_SECTIONS = "; one item per section: the per-block split did not keep every line"
+FALLBACK_WHOLE = "; one item: neither split kept every line"
+
+Split = tuple[tuple[PlaybookItem, ...], tuple[PlaybookSection, ...]]
+Splitter = Callable[[str], Split]
+
+
+@dataclass(frozen=True)
+class Migration:
+    """A legacy body as step items: the items (ids ``P1..Pm`` in file order), the sections, and ``reason``, the suffix a fallback adds to the
+    migration's reason (``""`` for the per-block split)."""
+
+    items: tuple[PlaybookItem, ...] = ()
+    sections: tuple[PlaybookSection, ...] = ()
+    reason: str = ""
+
+
+def _fence_end(lines: Sequence[str], start: int) -> int:
+    """The index of the line that closes the fence opened at ``start`` (the last line when it never closes)."""
+    mark = FENCE.match(lines[start])
+    assert mark is not None
+    for k in range(start + 1, len(lines)):
+        closing = lines[k].strip()
+        if closing and closing[0] == mark.group(1)[0] and set(closing) == {closing[0]} and len(closing) >= len(mark.group(1)):
+            return k
+    return len(lines) - 1
+
+
+def _parts(lines: Sequence[str]) -> list[tuple[str, list[str]]]:
+    """The lines of a body as ``(heading, content lines)`` per section, in order; a heading inside a fence is no heading. The first section's heading
+    is ``""`` (the text before the first heading) and it is kept only when it holds a line."""
+    parts: list[tuple[str, list[str]]] = [("", [])]
+    k = 0
+    while k < len(lines):
+        line = lines[k]
+        if HEADING.match(line):
+            parts.append((line, []))
+        elif FENCE.match(line):
+            end = _fence_end(lines, k)
+            parts[-1][1].extend(lines[k : end + 1])
+            k = end
+        else:
+            parts[-1][1].append(line)
+        k += 1
+    return parts if any(line.strip() for line in parts[0][1]) else parts[1:]
+
+
+def _starts_block(line: str) -> bool:
+    return bool(HEADING.match(line) or FENCE.match(line) or LIST_MARKER.match(line) or line.startswith("|"))
+
+
+def _blocks(lines: Sequence[str]) -> list[list[str]]:
+    """The blocks of the content lines of one section: list items (with their indented and lazy continuation lines and the blank lines between),
+    fenced blocks (with their inner blank lines), tables and paragraphs; every non-blank line in exactly one block."""
+    blocks: list[list[str]] = []
+    k = 0
+    while k < len(lines):
+        line = lines[k]
+        if not line.strip():
+            k += 1
+            continue
+        end = k
+        if FENCE.match(line):
+            end = _fence_end(lines, k)
+        elif LIST_MARKER.match(line):
+            while end + 1 < len(lines):
+                nxt = lines[end + 1]
+                if not nxt.strip():
+                    ahead = next((j for j in range(end + 2, len(lines)) if lines[j].strip()), None)
+                    if ahead is None or not lines[ahead][:1].isspace():
+                        break
+                    end = ahead - 1
+                elif nxt[:1].isspace() or not _starts_block(nxt):  # indented, or a lazy continuation
+                    end += 1
+                else:
+                    break
+        elif line.startswith("|"):
+            while end + 1 < len(lines) and lines[end + 1].startswith("|"):
+                end += 1
+        else:
+            while end + 1 < len(lines) and lines[end + 1].strip() and not _starts_block(lines[end + 1]):
+                end += 1
+        block = list(lines[k : end + 1])
+        while not block[-1].strip():
+            block.pop()
+        blocks.append(block)
+        k = end + 1
+    return blocks
+
+
+def _text_of(lines: Sequence[str]) -> str:
+    """The lines of an item as its text: a blank line is empty, every other line verbatim."""
+    return "\n".join(line if line.strip() else "" for line in lines)
+
+
+def _assemble(sections: Sequence[tuple[str, bool | None, list[list[str]]]]) -> Split:
+    """Items ``P1..Pm`` in order and their sections from ``(heading, numbered, item lines)``; ``numbered`` None: the heading's default."""
+    items: list[PlaybookItem] = []
+    out: list[PlaybookSection] = []
+    for heading, numbered, texts in sections:
+        ids: list[str] = []
+        for lines in texts:
+            ids.append(f"P{len(items) + 1}")
+            items.append(PlaybookItem(ids[-1], "step", heading, _text_of(lines)))
+        out.append(PlaybookSection(heading, default_numbered(heading) if numbered is None or not ids else numbered, tuple(ids)))
+    return tuple(items), tuple(out)
+
+
+def split_blocks(body: str) -> Split:
+    """The per-block split (4.4): a heading starts a section, and each block becomes one step; its first line loses its list marker."""
+    sections: list[tuple[str, bool | None, list[list[str]]]] = []
+    for heading, content in _parts(body.splitlines()):
+        texts: list[list[str]] = []
+        numbered: bool | None = None
+        for block in _blocks(content):
+            marker = LIST_MARKER.match(block[0])
+            if numbered is None:
+                numbered = marker is not None and block[0][:1].isdigit()
+            texts.append([block[0][marker.end():] if marker else block[0], *block[1:]])
+        sections.append((heading, numbered, texts))
+    return _assemble(sections)
+
+
+def split_sections(body: str) -> Split:
+    """The first fallback: each section is one multi-line step (its lines verbatim)."""
+    sections: list[tuple[str, bool | None, list[list[str]]]] = []
+    for heading, content in _parts(body.splitlines()):
+        lines = list(content)
+        while lines and not lines[0].strip():
+            lines.pop(0)
+        while lines and not lines[-1].strip():
+            lines.pop()
+        sections.append((heading, False, [lines] if lines else []))
+    return _assemble(sections)
+
+
+def split_whole(body: str) -> Split:
+    """The last fallback: the whole body is the single step ``P1`` (every line after the first is a continuation)."""
+    lines = body.splitlines()
+    while lines and not lines[0].strip():
+        lines.pop(0)
+    while lines and not lines[-1].strip():
+        lines.pop()
+    return _assemble([("", False, [lines])] if lines else [])
+
+
+def split_check(body: str, items: Sequence[PlaybookItem], sections: Sequence[PlaybookSection]) -> bool:
+    """The loss check (4.4): the multiset of the non-empty ``line_key`` values of the lines of ``body`` equals the one of the lines of the rendering of
+    the items, each with its item marker removed first. List numbering, bullet style, indentation and blank lines are invisible to it."""
+
+    def keys(lines: Sequence[str]) -> Counter[str]:
+        return Counter(key for line in lines if (key := line_key(line)))
+
+    rendered = [line[m.end():] if (m := ITEM_LINE.match(line)) else line for line in render_items(items, sections).split("\n")]
+    return keys(body.splitlines()) == keys(rendered)
+
+
+SPLITTERS: tuple[Splitter, ...] = (split_blocks, split_sections, split_whole)
+_REASONS = ("", FALLBACK_SECTIONS, FALLBACK_WHOLE)
+
+
+def migrate_body(body: str, *, splitters: Sequence[Splitter] = SPLITTERS) -> Migration:
+    """A legacy playbook body as step items without losing a line (pure). The first split that passes the loss check wins: the per-block split, else
+    one item per section, else one item for the whole body (which passes by construction). A fallback is named in ``Migration.reason``. No block
+    becomes a rule and no item gets a ``why``. The last split failing the check is an ``AssertionError``, never a user path."""
+    for splitter, reason in zip(splitters, _REASONS):
+        items, sections = splitter(body)
+        if split_check(body, items, sections):
+            return Migration(items, sections, reason)
+    raise AssertionError("the migration of the playbook lost a line")
