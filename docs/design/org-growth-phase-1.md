@@ -4,7 +4,7 @@ Status: design, revision 4 (the third and last fix pass, after design review 3 o
 binding directives of passes 3 and 4; the first run `wf_b5e00b63cdb0f479` wrote nothing; how each finding of review 1 (30), review 2 (25) and
 review 3 (11) was resolved is in section 23), **approved with the manager's binding amendments B1-B10** after design review 4 (0 HIGH, 4
 MEDIUM, 5 LOW), when the manager closed the design loop by decision; section 24 lists each amendment and where it landed, and where an
-amendment and older text of this file differ, the amendment wins. Branch
+amendment and older text of this file differ, the amendment wins; section 25 records the design **as built** (the planner's corrections PC-1 to PC-12 and the build's deviations) and wins over older text in turn. Branch
 `feat/org-growth-phase-1`, worktree `/Volumes/workspace/hirearchy/.worktrees/org-growth-p1`, base `main` = `05cfc2bf` (0a to 0a.5, 0b and 0b.1).
 Every function named below was read at `05cfc2bf` in the worktree. `SRC` is `src/hirearchy/`, `RESEARCH` is
 `/Volumes/workspace/hirearchy/docs/research/org-growth/`. Binding briefs: `RESEARCH/phase-1-resume-brief.md` (wins) and `RESEARCH/phase-1-brief.md`.
@@ -1935,7 +1935,7 @@ approvals against the product's (backlog 6); failed empty-argument calls per str
 | `quality/e3.json` (the `watch` key, and the `op`, `item`, `item_kind` keys of its one playbook mark), `cli/tests/expected/quality.txt` | 2 | the `watch` list; the marks' new keys (14.4). No other quality golden holds a playbook mark (`a5_one_off_block.txt`, `e3.txt`, `empty_org.txt` and `empty_service.txt` are text views whose legacy mark lines are unchanged) |
 | `tests/architecture/org_signatures.json`, `facade_cases.py` | 2 | `Org.revise_playbook`'s signature and return type, `Org.acknowledge_playbook`, `MessageSender.send(acknowledges=)` |
 | `events/line_shapes.txt` | 0 | unchanged: `msg.deliver` gains no key (9.2) and `service.revise` keeps its fields (`actor` stays a string) |
-| **Total** | **about 39-41** | none of the E-G0 replay expectations moves (legacy marks unchanged, 14.4) |
+| **Total** | **about 46 (44 changed, 2 new) by the plan's section 5; 49 as built (47 changed, 2 new), see 25.3** | none of the E-G0 replay expectations moves (legacy marks unchanged, 14.4) |
 
 Test sites that change (not goldens): every test that calls `revise_playbook(content=...)`, among them `tests/e2e/test_org_growth_0a.py`,
 `test_org_growth_0a2.py`, `test_no_bypass_0a2.py` and the services and reflection unit tests of P1's line stage. Each keeps its outcome under the
@@ -2252,3 +2252,155 @@ approved; (3) L15, superseded by B1. Where an amendment and older text of this f
 
 Unchanged by the amendments: the goal, the exit criterion, the binding design principle, SKILL.md's constraints (14.6), the owner's test policy
 (section 2), the study's shape and cost (18.7), and the rule that this run commits only this file.
+
+## 25. As built
+
+This section is written after the build (FEAT-001 to FEAT-010, commits 1-45 of the plan, on `feat/org-growth-phase-1`) and records what the code at that
+point does where it differs from the text above, or where the text left a reading open. Where it and older text of this file differ, this section wins
+(like section 24). Every claim here was taken from the build's evidence note (`.agents/tasks/verification.md`, one section per FEAT) and from the code at
+the build's HEAD. The design's behaviour (sections 4 to 16, B1-B10) is built as written; no pre-registered expectation moved (every E-G0 replay and
+published count in `tests/e2e` and `tests/meta` passed unchanged in every FEAT's scoped run), and no FEAT recorded a stop to ask the manager. The owner questions
+of 21.6 stay open: the build used the recommended answers (B10), Q1 (both refusals, commits 3 and 4), Q2 (P2-UNRATED kept, commit 4) and Q4 (the
+acknowledgement path, commits 30-33 and 36's sentence).
+
+### 25.1 The planner's corrections PC-1 to PC-12, as built
+
+| Id | Correction | As built | Commit(s) |
+|---|---|---|---|
+| PC-1 | The golden estimate is about 46 files (44 changed, 2 new), not 39-41 (21.4). `reflection/tests/expected` moves 13 files (7 `sections_*`, 4 `digest_*`, the 2 `services_{root,ceo}_three_playbook_versions.txt` listings); the colocated CLI help copies move; `cli/tests/expected/quality.txt` and the four `plans/template_*_service.yaml` do not | Held. The count as built is in 25.3: 49 files (47 changed, 2 new), 46 from the plan's list and 3 outside it | 3-41 |
+| PC-2 | An `op: first` version keeps today's quality-mark text. Root's v1 from `define_service(playbook=...)` and `apply_org` stores no `admitted` key, so its basis stays `client` | Held. Root's v1 is in item form (`op: first`, no `admitted`) and its mark reads "written by the client (no admission needed)"; the owner's `op="first"` reads "first version". `quality/empty_service.txt` is byte-identical. Guards: `reflection/tests/test_marks.py::test_roots_item_form_v1_keeps_written_by_the_client`, `::test_a_first_version_keeps_todays_text` | 20, 41 |
+| PC-3 | The `Org` facade cannot write an acknowledgement: `check_root_send` refuses `acknowledges` from any actor and `Org.send` gains no parameter | Held. The refusal text is `FACADE_ACKNOWLEDGES`; `MessageSender.send` gains `acknowledges`, accepted only on a plain note (`check_acknowledges`, applied by every sender and by the recording fake); `acknowledges` is among the guarded fields of `tests/architecture/test_policy_free_primitives.py` | 29 |
+| PC-4 | `ServiceEvidence.admit` stays beside `admit_item` from commit 18 until commit 21 switches the reviser, then `admit` and P1's line stage go | Held. `ServiceEvidence` ends at 5 methods (`links`, `admit_item`, `confirmed`, `amendment_basis`, `watch`); `Admission.lines`, `LINES_REFUSED`, `_admitted`, `_tag_of` and `_lines_refused` are gone | 18, 21 |
+| PC-5 | The CLI prints `watch_step`'s lines: `FeedbackCommand` and `DefineServiceCommand` gain `steps: Provider[ServiceSteps]` | Held, wired in `app/wire_cli.py`; one line per sentence after `feedback --confirms`, the automatic link and `define-service --answers` | 28 |
+| PC-6 | The generated-v1 half of 4.4's corpus assertion lives in `tests/meta/test_playbook_migration_corpus.py` | Held: 42 kept files and every generated v1 migrate with the per-block split and no fallback | 7 |
+| PC-7 | The reflection stories write playbooks through the new ops | Held: `reflection/tests/_support.py:revise` is replaced by `first_playbook` and `add_step` (and `legacy_playbook` for a v1 that must be free text) | 21 |
+| PC-8 | `acknowledge_playbook` has one MCP signature for root and managers | Held: `owner, service, item, op, text_hash=None, words=None` for both; a manager that passes `words` meets ACK-AGENT-WORDS | 31 |
+| PC-9 | `Rejection.case` has the default `""` | Held; `amendment_basis` fills it | 2 |
+| PC-10 | The lock file's git-ignore test lives in `tests/e2e/test_org_growth_1.py`; the two-writer test (`multiprocessing`, a real directory) lives in `services/tests/test_store_race.py` with no `integration` marker | Held (`test_the_playbook_lock_file_is_never_committed`; the race test uses the `spawn` context) | 10 |
+| PC-11 | FEAT-010's end-to-end tests are acceptance guards, GREEN when written | Held: all 13 test functions (the E5-E7 one in nine streams) were green when written; no fix commit was needed | 42-45 |
+| PC-12 | The merge step runs claude-sonnet-5.5 at effort high | Binds the merge step; nothing in the code. Every agent seat of the build ran claude-sonnet-5.5 at effort high or better, and no test configures a lower model or effort | merge |
+
+### 25.2 Deviations and readings, by FEAT
+
+Each entry is a place where the text left a gap and the build chose a reading, or where the build differs from the plan's or the design's wording. None
+changes a guarantee of sections 15 and 16 or a user-visible change of 21.5.
+
+**FEAT-001 (clause 2, commits 1-4).**
+1. Where 13.1 and 13.2 leave a gap: several unanswered rejections read ` (and {k} more: {R ids})` right after "has no recorded answer yet", and the question's trailing full stop is dropped once (`removesuffix(".")`) so the refusal does not read "no.. On yes". The template constants are the design's, word for word.
+2. Six test sites that send a new request after an unanswered rejection (reflection `test_cases`, `test_digest`, `test_prompt_sections`, `test_reports`, the second request of `tests/golden`'s `test_service_and_playbook_files`, the dashboard demo organization) use a test-only seam (`services.testing.unheld_requests` / `unheld_request`, `testkit.services_world.request_unheld`), because a recorded answer would add a message, shift message ids, move 11 dashboard screen goldens and a case id in `services_text_root.txt`. Production code has no switch.
+3. Services tests that need rejections to stay unanswered use a rework (never held) instead of a fresh request; mcp_server, health and the 0b and 0b_given e2e files record the user's answer first, with their assertions unchanged.
+
+**FEAT-002 (the item model, commits 5-9).**
+4. `services.api.PlaybookSection(heading, numbered, ids)` is new: two sections can have the same heading line, so a section also carries its item ids in order, and the round trip is exact. No stored key changes.
+5. `content_words(items, headings, *, body="")` counts a heading's `str.split` words verbatim (the `#` run included); `items=None` is the legacy form (`len(body.split())`).
+6. The parser accepts `- [P<k>]` at the end of a line without its trailing space (an empty first line may lose it to a strip). A rule must be one line (a continuation is a parse error). When the frontmatter has a `why` entry for an item, the body must end with exactly its canonical suffix. A section without items is numbered only for `## Steps`.
+7. Placement errors are `PlacementError(ValueError)` carrying the PB-ARGS clause; a restore whose old section is gone is placed like an add; a restored rule with no live predecessor goes first in the rules section.
+8. `migrate_body(body, *, splitters=...)` is a seam so the two fallbacks of 4.4 are tested with a lossy splitter; the per-section fallback keeps each section's lines verbatim with `numbered=False`. The corpus is 42 files, 493 items, all migrated by the per-block split.
+
+**FEAT-003 (the lock, commits 10-11).**
+9. A playbook that states no version counts as version 0 (`playbook_version`): a missing file and a versionless hand-made file both compare equal to `archive_version or 0`, so such a file is written over without an archive, as before. Every versioned file is compared strictly.
+10. The archive's temp file is written through the store's `AtomicWriter` (`history/.tmp-archive-PLAYBOOK.v<n>.md`, a fixed name because the lock allows one writer), hard-linked to `history/PLAYBOOK.v<n>.md` and removed; the `.tmp-` prefix keeps it out of `FILE_SHAPE`, the history glob and git.
+11. `PlaybookRace`'s message is the store's ("the playbook was changed by another writer while this call ran: it is at v{current} now, so this write was not made"); PB-RACE (5.3) is the reviser's text, built from `.current`.
+12. The runtime-write tests live in `services/tests/test_events.py`; the two-writer test runs one race in a module fixture and its tests read the outcome.
+
+**FEAT-004 (the watch, commits 12-17 and two more).**
+13. `migrate_body` is exported by `services.api` (a late re-export) so the watch reads a legacy playbook as it would migrate (8.7: virtual items, all `kept`). `Playbook.restores` is a new field read by `playbook_of`.
+14. `ItemWatch` readings: `r` is `(failed, judged)` (the views print `unknown (n judged cases)` or the fraction); an item never watched has `k` 0, `r` `(0, 0)` and `watch_start` None; `text_version` is the version that wrote the watched change while the item is in a watch, else the version of its current (or last) text; `coverage` lists `R` ids first, then `C` ids.
+15. Relayed and agent links are left out of the watch's records (they weigh nothing). `Records` is a data-only dataclass with module functions (R6). A user-initiated criterion has no lineage as of t: a `user` version that is the latest to add the text gives none, it does not fall back.
+16. "After the live-from" is strict for a candidate's `done` result and for `judged(c)`; the window's results are "at or after the watch start". `K` is searched over every verdict note, every human link note and every answering contract version at or after `D`, re-reading the files up to each (0.29 s for a warned item over 120 judged cases). The warned window of a restarted watch is read per watched change, and a carried watch is evaluated again over the files, so a corrected link on an old rejection reaches the carrying item.
+17. O9's "edit" variant: the edit cites the evidence B rested on (`WHY R2; C10`), the only evidence that could admit B's words, so R4 relates to the carrying item through its own refs.
+18. Repair carry (ii) compares the keys of the old item's re-rendered line with the repaired item's text, because `render_items` is private to `services`; unparseable versions are skipped when versions are read.
+19. `CaseServiceEvidence.watch` reads playbook versions through the catalog and contract versions through `ContractVersions`; the cases are `chains(..., since=contract.created, runs=False)`; it returns `()` for no contract, no playbook or an owner with no client. The "equal to the derivation from scratch" property is read as: the same files with cases, results and contract versions listed in reverse order give the state the last record left. An agent client's verdict is a verdict note whose sender is not root.
+20. Two commits beyond the plan, neither adding a test function or changing behaviour: `cb74062a` (the corrected-link seeds of the order test each hold a corrected link) and `74bca5e0` (a docstring). Test helpers `reflection/tests/_watch_kit.py` and `_watch_stream.py` were added.
+
+**FEAT-005 (the operations, commits 18-25).**
+21. `RuleItemReviser(agents, catalog, texts, playbooks, delivery, evidence, mail, settler, *, splitters=SPLITTERS)` takes `mail` from commit 21 (PB-FIRST-LATE needs the oldest verdict or rework of any tier from the client's sent mail, and `ServiceEvidence` has no data path for it), not at commit 32; `splitters` is the 4.4 seam. The settler is the last positional parameter, after `mail` (20.1 listed it before).
+22. `revise_playbook(actor, service, op: str | None, reason, evidence, *, item, kind, text, when, then, after, version, acknowledged, content)`: `content` and a nullable `op` are kept so that PB-FORM is the reviser's first check (5.1).
+23. `PlaybookChange` carries more than 5.1 lists: `after`, `sections`, `migration` (the ready-made migration sentence), `watch_unread` (19.1's fixed sentence) and `carried_related`; `services._reply.playbook_reply` builds 5.2's reply from it alone. `Admission.confirmed` (new, `""` by default) is the id of the user's link that confirmed the criterion a (c) item is the words of (8.6 needs its time).
+24. `{ids}` in "admitted ({rule}) on {ids}" is the admission's `why` (R ids, then C ids), not the cited evidence ids. PB-TEXT uses `text and then have more than 150 words with when ({x})` literally, for a step's text too. PB-ARGS joins its clauses in the order of the arguments; an edit with none of text, then and when says `text is missing`.
+25. The 30% rule counts text tokens on both sides; the cap counts `content_words` (`## Steps` is two words); the refusal says "words" for both. 8.6's "owner retired while its retire was due" is judged by the watch as it is now (`related` of at least 2). `restore`'s default source is the latest version that holds a text different from the current one.
+26. E4 replays (s1r, s2r, s3): E4's whole-text v2 is offered line by line, each changed line as one `add` of a step; every line is refused by PB-C-WORDS (the same criteria named), and the criterion's own words are admitted as an `edit` of the "none yet" item (rule (c)). Refusals quote the first 160 characters of an item (the old refusal quoted 600).
+27. Tests that changed because the design changes the flow, outcomes kept: `services/tests/test_continue.py` (D6: a v1 after a verdict or rework is PB-FIRST-LATE), `app/tests/test_services_facade.py` (the first revision before the first report), `reflection/tests/test_cases.py` and `test_prompt_sections.py` (a v1 after a verdict is written straight into the store with `legacy_playbook`), `services/tests/test_amend.py` and `test_contract_service_prompt_sections.py` (item markers add 7 characters per line). New test helpers: `legacy_playbook`, `first_playbook`, `add_step`, `services/testing.py:_world(playbook_writer=...)`.
+28. Between commits 20 and 21 six e2e tests of `test_org_growth_0a.py` and `test_org_growth_0a2.py` are red (named in commit 20's body): the whole-text revisions that commit 21 replaces by the op form. The README still names `revise_playbook(service, content, reason, evidence)` (the plan keeps the README unchanged). PB-ITEM had no B7 forms until commit 27.
+29. Commit-message slip (history is not amended): commit 20's body gives golden changes as "15", "7" and "5 lines"; the real counts are 18+/14-, 3+/4- and 3+/4-.
+
+**FEAT-006 (the settler, commits 26-28).**
+30. `WatchSettlement.settle(owner, service, before, *, strict=False)`: `before` may be None (no warning note is sent); `strict=True` is the owner's op (a failed write raises, `PlaybookRace` becomes PB-RACE); the default records `SettleReport.failed` and never raises. `SettleReport` lives in `services/_protocols.py` and is re-exported by `_watch.py`.
+31. A read that fails never refuses a call on the settler's path, the owner's included: the report records `("", error)` and nothing is written. The reviser's own reads still raise PB-UNREADABLE (19.1). A note that cannot be delivered is recorded in `failed` on the feedback and define paths and raised when strict.
+32. The warning note's `{subjects}` is the ids the item cites (its `why` entry, else the `C` and `R` ids in its words, else `nothing`); `{case}` is `Rejection.case` (the task id when empty, `unknown` when unreadable). The text before the watch is the item's text in the last parseable version revised before `watch_start`, of the same kind and with other text tokens; an item not live in that version has no text to restore. The warning note fires for an item whose state is `warning` with exactly one related rejection that `before` did not have; after a repair `before` is dropped.
+33. `define_service(answers=)`: `before` is read before the contract is written and the settler runs in a `finally`, also when the owner's note fails (its error still propagates) and before `LINK_FAILED`. `feedback(confirms=)`: the settler runs only when the link written has the human tier.
+34. `watch_step` names every item whose retire is due (not only those related to the rejection answered), and each `op: watch` version whose `related` holds the rejection, oldest first; sentences are joined by newlines (the MCP reply appends them after a newline, the CLI prints one line each).
+35. Refactor inside commit 26: `repair_of`, `and_ids` and `without` moved from `_ops.py` to `_items.py` so the settler shares them; no text changed. `RuleContractDefiner(..., restorer, settler)` and `RuleClientFeedback(..., store, settler)` take the settler last.
+36. Commit-message slip: commit 27's body says `services/tests` 1400 -> 1415; the file went to 1419.
+
+**FEAT-007 (the acknowledgement, commits 29-33).**
+37. `services.api.acknowledge_reply(op, item, service, owner, note)` (a late re-export) is the MCP reply of 9.2; the tool normalises `op` (lower case) and `item` (upper case); the CLI prints its line from the note's `acknowledges` header. `text_hash(kind, text, when)` is `services._acknowledge.text_hash`. ACK-HASH accepts the 12 lower-case hex digits with surrounding blanks stripped. ACK-WORDS counts the stripped words (limit 1000 = `FEEDBACK_MAX`).
+38. The facade's refusal text is `FACADE_ACKNOWLEDGES` ("refused: an acknowledgement of a playbook change is written by acknowledge_playbook(...), which checks that its writer is the owner's parent. Nothing was sent."). `check_acknowledges` in `dispatch/_sender.py` is applied by `RuleMessageSender` and by `RecordingSender`.
+39. `Message.acknowledges` is declared after `trace` and written after it in the frontmatter (`test_message_provenance.py` pins `feedback, source, criterion, trace` as adjacent); the header shows it right after `criterion`.
+40. CLI: `op` is a positional `retire|edit` metavar (not argparse `choices`) and `--words` is optional in argparse, so ACK-OP and ACK-WORDS are what the user reads; `--words` reads like define-service's (`@file` works). The command is exempt from `test_the_scenarios_cover_every_command` (its output is pinned by `test_service_commands.py`).
+41. Sites forced by the new names: the `Org` surface is 99 methods (`test_core_surface.py`, `test_facade_signatures.py`, `test_facade_contract.py` pinned 98); the tool lists and command lists of the MCP and CLI tests; `cli/tests/expected/no_command.txt` and `unknown_command.txt` (see 25.3).
+42. The guard's "new text's coverage" is membership of the old coverage's ids in the new text's ids (the admission's `why`, or the restored text's own `why` entry or `C`/`R` tokens); the one inexact case (a covered `C` reached only through the `about` of an `R` in the `why`) makes it ask the parent once more than needed, never less. A watch that cannot be read refuses a guarded op with PB-UNREADABLE; an op that needs no guard does not read the watch for it.
+43. The reply clause `(acknowledged by {parent}, note {id})` is in the retire and restore replies only. "Older than the current text" compares the note's id time with the `revised` time of the first version of the unbroken run that holds exactly the item's current `(text, when)`. PB-ACK-BAD's `{other op or item}` reads `for {op} {item} of {service}` from the note's header (`for no change: it is not an acknowledgement` for a plain note). A malformed `acknowledged` is a PB-ARGS clause only when the change needs an acknowledgement; otherwise it is ignored with the reply clause.
+44. Commit-message slip: commit 33's body says `skill/tests` 150 -> 152; the real numbers are 133 -> 135. A flake: `app/tests/test_wire_cli.py::test_the_scheduler_runner_runs_the_loop_until_there_is_nothing_to_do` failed once in commit 29's FAST and passed on a re-run of the file.
+
+**FEAT-008 (the owner's texts, commits 34-39 and one more).**
+45. `QuotedPlaybookSection(catalog, config, paths, evidence)` takes a `ConfigSource` as a fourth parameter (the head shows `{w} of {cap} words` and the cap is a setting). `services.api` also exports `render_items` and the new pure `watch_restores(versions, watch) -> int` (the version whose text a watch retire would bring back, 0 for none).
+46. `ReflectSection.section(...)` takes `digest: Callable[[int], str]` (the digest within N words) so the section asks for `REFLECT_WORDS` less the fixed text, at least 200 words; `ReflectionDigest.reflection_digest(owner, service, words=None)` drops the oldest case line first (one stays), then clips the remaining case line ending `… (more: services)`. The digest is therefore derived twice in a reflecting prompt.
+47. The head of a locked playbook stays today's (`# Playbook: {service} (v{n}, locked by your parent)`): the owner cannot change items, so the 14.1 head would say something untrue.
+48. States line readings: `restored` reads `P2 step, restored (the watch put back the text of v1)`; waiting and pending join with `; ` in one parenthesis; a legacy playbook ends `Items get these ids when you first change one.` then `Item states: all items kept.`; `All other items: kept.` is left out when every live item is listed; a carried warning follows the design's example literally, a non-carried one carries `(case {case})` and the restores clause when `watch_restores` finds a version.
+49. AAR parsing: a label needs its colon; a repeated label keeps its first part; a part ends at the next label and loses a trailing `.`/`;`. For a case whose final verdict is an accept the owner's view is its near miss only (`near miss: <part, clipped to 60>` or `none recorded`).
+50. Step 3 for an agent client reads "Your client is an agent, so nothing can admit a change (only the first version): ..."; a locked contract keeps its four steps with "change" for "revise". `{eligible}` reads `now C9 (an item may be the own words of it)`, `C12 not confirmed yet`, `C14 user-initiated (never rule (c))`, at most 5 ids then `+n more`; `eligible_clause` and `warning_line` are public pure functions of `_sections.py`. The warning line is left out when the watch cannot be read, and an item with two related rejections (retire due) is not in it.
+51. The removed-criterion line names at most 5 item ids, then `and {j} more` (`CITING_IDS = 5`); `RuleContractDefiner._quoting` returns a third value (item form) and `ContractAmendment.diff` gains `by_item: bool = False`. Report-hint, refusal and docstring texts are module constants (`dispatch/_lessons.py:AAR_FORM`, `LESSONS_MISSING`, `LESSONS_TOO_LONG`; `services/_hints.py`; `services/_amend.py`).
+52. The generated v1's last step reads "... and pass `lessons` as an after-action review: Expected / Happened / Caught at / Cause / Prevent (the system cause, not a person), or Near miss when nothing went wrong." Text left alone on purpose: README lines 204 and 280, `_example_texts.py:247` and the four `plans/template_*_service.yaml` goldens still say "(steps, budget plan, pitfalls)".
+53. Reflect word counts (heading line included, `str.split`): the longest variant of the fixed text is 398 words (bound 400); with `none yet` and no warning, 340 and 283 (the design's 335/278/393 count the same text without the heading line's 5 extra words); the whole section with 8 delivered cases is 580 words (bound 600). The fix-up commit `efe3f5ad` changed only the test that counted the section without its heading line. E-G0 sites touched, text only: `tests/e2e/test_org_growth_0a2.py:407` and `test_org_growth_0a.py:217` and `:268`; no replay expectation moved.
+
+**FEAT-009 (root's views, commits 40-41).**
+54. `quality/e3.json` carries `watch` for e3's legacy playbook: the 11 virtual items P1-P11, all `kept` (8.7: a legacy playbook's virtual items), not `[]` as the plan's table predicted; the record is filled from `ServiceEvidence.watch` alone. The text view is unaffected (it prints a watch line only for an item that is not `kept`).
+55. `PlaybookMark` has five fields more than the plan names (`related`, `acknowledged`, `acknowledged_by`, `items`, besides `op`, `item`, `item_kind`); only the last three are JSON keys. `reflection` re-exports `ItemWatch` and `watch_entry` because `progress` may not import `services`; `reflection/_watch_text.py` (new, pure) holds the entry words.
+56. The watch is read for the listing only for an item-format playbook with items; a legacy, unparseable or empty playbook has no item to watch (suffixes `free text ...`, `not in item form (...)`, `no items`). A failed read replaces the counts: `; watch not read ({error})` alone, the error clipped to 160 characters.
+57. Wording where 14.3 and 14.4 give one example: `watched:` lists the items in a watch (`new`, `warning`, retire due as `warning (R4, R6; retire due)`), not `restored`; the quality line `playbook watch: ...` lists every item that is not `kept` (also `restored` and `retired`); the regression list's suffix reads `(rules citing it: P12)` when every citing item is a rule and `(items citing it: P4)` when one is a step (`services_text_root.txt` moved by 3 lines, not 1). The record's `watch` JSON has the eleven keys of 14.4 and no `retire_due`. Mark words for ops the design does not give: `edit P1 (step), admitted (b) on R1, R2`, `restores P2 (step) to the text of v2`, `move P2 (step)`, `retires P2`, each followed by `, acknowledged by root (note {id})` when the file names a note.
+
+**FEAT-010 (end to end, commits 42-45).**
+58. All four commits are acceptance guards (PC-11) and only `tests/e2e/test_org_growth_1.py` changed. `define_service(playbook=...)` writes v1 in item form, so the legacy-file migration is shown by writing the kept free-text v1 into the store with `legacy_playbook`. `testkit.g0_replay` puts every G0 contract at `lead/services/weekly-meeting-memo/` while G0's messages name `weekly-memo`: the c45 test moves the directory in the materialized copy. It freezes the runtime clock at 05:53:41Z (memo 1's rework run) so item A is live from the rework as 18.4.1 says, and its history is the kept free-text v1 plus one real `revise_playbook` add of C10's words. The parent of `ceo` is root, who is also the client, so one note each reaches `ceo` and root. The four commit bodies say "Owner questions: none carried" although c42's G2 test asserts REQUEST-UNANSWERED (Q1's behaviour): recorded here instead.
+
+**Across the build.**
+59. Counts: every `count.txt` raised only for the directories that gained tests; `collected_count --write` also raised `access`, `bootstrap`, `hierarchy`, `orgfiles` and `settings` each time (environment-dependent parametrization) and those were restored, never staged. Tests replaced (same directory, no floor dropped): P1's line-stage tests, `test_playbook.py`'s nine (by `test_ops.py`), eight collected whole-version restore tests, the exempt-admit and `lines` contract tests, and several tests renamed with their new text (FEAT-008).
+60. `src/hirearchy/services/testing.py` gained `RecordingSettler`, `unheld_requests` and `unheld_request`; `tests/testkit/services_world.py` gained `legacy_playbook` and `request_unheld`.
+61. `tests/architecture/org_signatures.json` was regenerated hunk by hunk: `_signatures --write` also rewrites 10 to 13 informational `annotated` strings of other methods (the committed pin is stale on them), which were not applied.
+
+### 25.3 Goldens as built
+
+Section 5 of the plan predicted about 46 files (44 changed, 2 new); 21.4 estimated 39-41. **As built: 49 files, 47 changed and 2 new**, counted with
+`git diff --name-status main...HEAD` over `tests/golden/expected`, `src/hirearchy/*/tests/expected`, `src/hirearchy/*/tests/golden`,
+`src/hirearchy/app/tests/snapshots`, `tests/testkit/expected_dash` and `tests/architecture/org_signatures.json` (the 2 new files are both
+`help_acknowledge-playbook.txt`, in `tests/golden/expected/cli` and `src/hirearchy/cli/tests/expected`):
+
+| Area | Files | Why |
+|---|---|---|
+| `tests/golden/expected/mcp/surface_*.txt` | 10 | `request`, `feedback`, `define_service`, `report` and `revise_playbook` texts; the new tool |
+| `tests/golden/expected/plans/*service*.txt` | 10 | the generated v1 (AAR step, no Pitfalls placeholder, the label) |
+| `charters/apply_service_example.md`, `blueprint/tests/golden/second_half.json` | 2 | the generated v1 and v1 in item form |
+| `tests/golden/expected/services/` (`services_text_root.txt`, `service_and_playbook_files.md`) | 2 | the listing's playbook line; v1 in item form |
+| `tests/golden/expected/prompts/` (`service_owner_no_playbook.txt`, `service_owner_reflect.txt`) | 2 | the playbook section and Reflect |
+| `src/hirearchy/reflection/tests/expected/` | 13 | 7 `sections_*`, 4 `digest_*`, 2 `services_*_three_playbook_versions` |
+| `tests/golden/expected/cli/` (`help.txt`, `services.txt`, new `help_acknowledge-playbook.txt`) | 3 | the new command; the listing's playbook line |
+| `src/hirearchy/cli/tests/expected/` (`help.txt`, new `help_acknowledge-playbook.txt`) | 2 | the colocated copies |
+| `tests/golden/expected/quality/e3.json` | 1 | the marks' `op`, `item`, `item_kind`; the record's `watch` |
+| `tests/architecture/org_signatures.json` | 1 | `Org.revise_playbook`, `Org.acknowledge_playbook`, `Message.acknowledges` |
+| **In section 5's list** | **46** | |
+| `src/hirearchy/dashboard/tests/golden/wide-3-services-detail.txt` | 1 | the demo organization's v1 is in item form and the service screen prints the file (commit 21; found by a dashboard run outside commit 20's targets) |
+| `src/hirearchy/cli/tests/expected/no_command.txt`, `unknown_command.txt` | 2 | argparse's usage and "choose from" lists name every command, `acknowledge-playbook` among them (commit 31) |
+| **Outside section 5's list** | **3** | |
+| **Total as built** | **49** | |
+
+Byte-identical, as required: `tests/golden/expected/events/line_shapes.txt`, `messages/*`, `kiro/*`, `files/*`, every other prompt and charter, the four
+`plans/template_*_service.yaml`, `quality/e3.txt`, `empty_org.txt`, `empty_service.txt` (PC-2), `a5_one_off_block.txt`, `cli/tests/expected/quality.txt`,
+`src/hirearchy/app/tests/snapshots/**`, `tests/testkit/expected_dash/**`. Not goldens but pins that moved: `tests/architecture/facade_cases.py` and
+`tests/testkit/quality_schema.py`. `pyproject.toml` and `uv.lock` are unchanged (no new dependency), `skills/hirearchy/SKILL.md` changed only at line 109
+(still 125 lines; lines 39, 72, 92 and 100 byte for byte) and `ROOT_INSTRUCTIONS` measures the same before and after (`2597 2674 2814 27 120`).
+
+### 25.4 Commits beyond the plan's list
+
+Three commits are not in plan section 8: `cb74062a` and `74bca5e0` (FEAT-004, a test seed fix and a docstring) and `efe3f5ad` (FEAT-008, the 600-word test
+counts the section's heading line). None changes a guarantee. Commit 21 carries the dashboard golden and commit 31 the two argparse goldens named in
+25.3 (not amended into earlier commits).
