@@ -89,7 +89,10 @@ def test_the_budget_question_comes_before_the_machine_marker(setup, tmp_path):
     from hirearchy.blueprint.tests.test_services import e5_blueprint
 
     server, _ = setup
-    out = call(server, "propose_org", blueprint=yaml.safe_dump(e5_blueprint(tmp_path)))
+    bp = e5_blueprint(tmp_path)
+    bp["needs"]["elicitation"] = "A memo of the weekly meeting."  # (over MCP the criteria declare their source)
+    bp["services"][0]["acceptance"] = [{"text": c, "default": True} for c in bp["services"][0]["acceptance"]]
+    out = call(server, "propose_org", blueprint=yaml.safe_dump(bp))
     ask = "Use 16 runs per request (covers one round of your questions or a rejection), or keep 12?"
     assert block(out).splitlines()[-1] == ask and out.index(ask) < out.index(bp_mod.PLAN_END)
 

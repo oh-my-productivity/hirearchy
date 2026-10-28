@@ -63,7 +63,7 @@ class RuleBlueprintValidator(BlueprintValidator):
         self._orgs = orgs
 
     def validate(
-        self, bp: Mapping[str, object], *, org_exists: bool = False, allowed_roots: Sequence[str | Path] | None = None,
+        self, bp: Mapping[str, object], *, org_exists: bool = False, allowed_roots: Sequence[str | Path] | None = None, require_sources: bool = False,
     ) -> list[Issue]:
         issues: list[Issue] = []
         if not isinstance(bp, dict):
@@ -213,7 +213,7 @@ class RuleBlueprintValidator(BlueprintValidator):
                 if to not in by or by[to].parent is not None:
                     issues.append(Issue("error", "task.to", f"'{to}' must be the top-level agent ({tops[0].addr}); tasks go to the head of the tree and flow down", "task"))
 
-        issues += criterion_issues(bp, extension=False, require_sources=False)
+        issues += criterion_issues(bp, extension=False, require_sources=require_sources)
 
         # --- deliverable path: how does it get there?
         path = s(d.get("path"))

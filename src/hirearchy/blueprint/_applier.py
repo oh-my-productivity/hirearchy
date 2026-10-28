@@ -25,14 +25,14 @@ class HiringBlueprintApplier(BlueprintApplier):
         self._rollback = rollback
         self._snapshots = snapshots
 
-    def apply(self, bp: Mapping[str, object], *, allowed_roots: Sequence[str | Path] | None = None) -> Summary:
+    def apply(self, bp: Mapping[str, object], *, allowed_roots: Sequence[str | Path] | None = None, require_sources: bool = False) -> Summary:
         """Create the agents (parents first, as root through each parent), define the services, and give the first task.
 
         The first task is a plain task, a first request for a service (``task.service``), or none (services only: they
         are ready to be requested). Refuses on any validation error or existing name, before writing anything. If a hire,
         a service definition or the delegation fails midway, everything created is retired again and the error is raised.
         """
-        issues = self._basis.issues(bp, allowed_roots)
+        issues = self._basis.issues(bp, allowed_roots, require_sources)
         errs = errors(issues)
         if errs:
             raise BlueprintError("blueprint has errors, nothing was created:\n" + "\n".join(f"- {i.path}: {i.message}" for i in errs))

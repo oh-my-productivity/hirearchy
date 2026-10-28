@@ -18,8 +18,8 @@ class ValidatedPlanBasis(PlanBasis):
         self._roots = roots
         self._org = org
 
-    def issues(self, bp: Mapping[str, object], allowed_roots: Sequence[str | Path] | None) -> list[Issue]:
-        return self._validator.validate(bp, org_exists=self._org.root() is not None, allowed_roots=allowed_roots)
+    def issues(self, bp: Mapping[str, object], allowed_roots: Sequence[str | Path] | None, require_sources: bool = False) -> list[Issue]:
+        return self._validator.validate(bp, org_exists=self._org.root() is not None, allowed_roots=allowed_roots, require_sources=require_sources)
 
     def agents(self, bp: Mapping[str, object], allowed_roots: Sequence[str | Path] | None) -> list[Agent]:
         return self._resolver.resolve(bp, self._org, self._roots.roots(allowed_roots), [])

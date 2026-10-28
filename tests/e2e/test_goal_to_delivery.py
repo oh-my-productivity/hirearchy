@@ -65,15 +65,15 @@ def code_text(tmp_path) -> str:
             "deliverable": {"description": "A Python package csv2md with a CLI", "format": "python package"},
             "quality_bar": "tests pass from a clean checkout", "workspace": str(ws), "budget_runs": 40,
             "model_policy": "one model for all", "review": True, "approval": "approve plan first",
-            "progress": "one line on request",
+            "progress": "one line on request", "elicitation": "A csv2md command that prints a markdown table. At least 5 tests that pass.",
             "code": {"tests": "pytest, one per criterion", "packaging": "uv + pyproject", "commits": "local commits, never push"},
         },
         "agents": [{"name": "lead", "template": "manager", "children": [
             {"name": "dev", "template": "engineer"}, {"name": "qa", "template": "tester"},
             {"name": "cr", "template": "code-reviewer"}]}],
         "task": {"title": "Build csv2md", "goal": "Implement the csv2md CLI in the workspace",
-                 "acceptance": ["`uv run pytest -q` passes with at least 5 tests",
-                                "`csv2md in.csv` prints a markdown table to stdout"]},
+                 "acceptance": [{"text": "`uv run pytest -q` passes with at least 5 tests", "from": "At least 5 tests that pass"},
+                                {"text": "`csv2md in.csv` prints a markdown table to stdout", "from": "prints a markdown table"}]},
     }, sort_keys=False)
 
 

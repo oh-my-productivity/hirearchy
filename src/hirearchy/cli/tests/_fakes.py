@@ -261,7 +261,9 @@ class FakeBlueprints(Recording, BlueprintLoader, BlueprintValidator, PlanRendere
         self.note("load", source)
         return {"mission": str(source)}
 
-    def validate(self, bp: Mapping[str, object], *, org_exists: bool = False, allowed_roots: Sequence[str | Path] | None = None) -> list[Issue]:
+    def validate(
+        self, bp: Mapping[str, object], *, org_exists: bool = False, allowed_roots: Sequence[str | Path] | None = None, require_sources: bool = False,
+    ) -> list[Issue]:
         self.note("validate", dict(bp), org_exists=org_exists, allowed_roots=allowed_roots)
         return list(self.issues)
 
@@ -269,7 +271,7 @@ class FakeBlueprints(Recording, BlueprintLoader, BlueprintValidator, PlanRendere
         self.note("render_plan", dict(bp), list(issues or []), allowed_roots=allowed_roots)
         return "# Plan for approval\n" + "\n".join(i.render() for i in issues or [])
 
-    def apply(self, bp: Mapping[str, object], *, allowed_roots: Sequence[str | Path] | None = None) -> Summary:
+    def apply(self, bp: Mapping[str, object], *, allowed_roots: Sequence[str | Path] | None = None, require_sources: bool = False) -> Summary:
         self.note("apply", dict(bp), allowed_roots=allowed_roots)
         return Summary(["lead", "lead/writer"], "t-1", "lead", 10)
 

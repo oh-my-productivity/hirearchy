@@ -63,7 +63,7 @@ class RenderedPlanProposal(PlanProposal):
 
     def propose(self, blueprint: str) -> str:
         bp = self._loader().load_text(blueprint)
-        return self._renderer().propose_text(bp, target=self._target.line())
+        return self._renderer().propose_text(bp, target=self._target.line(), require_sources=True)
 
 
 class ApprovedPlanApplication(PlanApplication):
@@ -92,7 +92,7 @@ class ApprovedPlanApplication(PlanApplication):
         if self._setup.active():
             raise OrgError("not applied: there is no organization yet, so call create_org(mission=...) first, then "
                            "apply_org again with the same blueprint and plan_id")
-        summary = self._applier().apply(bp)
+        summary = self._applier().apply(bp, require_sources=True)
         running = self._scheduler().describe().startswith("scheduler: running")
         if not summary.task_id:
             nxt = ("Nothing runs yet: the services are ready. When the user asks for one, call request(service, inputs) "
@@ -140,6 +140,8 @@ class BlueprintTools(ToolGroup):
         `services` (recurring work the top agent offers on request): [{name, description, inputs: [{name, description,
         required}], acceptance, deliverable {description, format, max_words, path}, budget (runs per request), playbook,
         locked}], in which case `task` may be omitted or be a first request {service, inputs: {name: value}, title}.
+        Criteria (the acceptance items of `task` and of each service): acceptance items: {text, from: <the user's exact words in
+        needs.elicitation>, asked} or {text, default: true}; needs.elicitation: the user's answers, verbatim (required with criteria).
         Works before the organization exists. Returns (1) a block headed "PLAN FOR YOU": show it to the user exactly
         as written and wait for their explicit approval; (2) Details, the full plan for you; (3) a plan_id that
         apply_org requires. If the plan has errors, fix the blueprint and propose again; never ask the user to approve

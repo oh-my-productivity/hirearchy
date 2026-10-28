@@ -7,7 +7,11 @@ from pathlib import Path
 
 import pytest
 
+import testkit
+import testkit.reach.yaml as yaml
+
 from hirearchy.blueprint import BlueprintApplier, BlueprintExamples, BlueprintLoader, PlanIdentity, PlanRenderer, Summary
+from hirearchy.blueprint.testing import applier_over_memory_directories, loader_over_memory, renderer_over_packaged_roles
 from hirearchy.daemon import SchedulerState
 from hirearchy.daemon.testing import FakeSchedulerStatus
 from hirearchy.kernel import ROOT, OrgError, OrgPaths
@@ -50,6 +54,7 @@ class Examples(BlueprintExamples):
 class Renderer(PlanRenderer):
     def __init__(self) -> None:
         self.asked: list[tuple[Mapping[str, object], str]] = []
+        self.sources: list[bool] = []
 
     def render_plan(self, bp, issues=None, *, allowed_roots=None) -> str:  # type: ignore[no-untyped-def]
         return "plan"
@@ -57,8 +62,11 @@ class Renderer(PlanRenderer):
     def plan_for_user(self, bp, issues=None, *, allowed_roots=None) -> str:  # type: ignore[no-untyped-def]
         return "for user"
 
-    def propose_text(self, bp: Mapping[str, object], *, target: str = "", allowed_roots: Sequence[str | Path] | None = None) -> str:
+    def propose_text(
+        self, bp: Mapping[str, object], *, target: str = "", allowed_roots: Sequence[str | Path] | None = None, require_sources: bool = False,
+    ) -> str:
         self.asked.append((bp, target))
+        self.sources.append(require_sources)
         return f"PROPOSAL {bp['text']}\n{target}"
 
     def propose(self, source: object, *, allowed_roots: Sequence[str | Path] | None = None) -> str:
@@ -74,9 +82,11 @@ class Applier(BlueprintApplier):
     def __init__(self, task_id: str = "t1") -> None:
         self.task_id = task_id
         self.applied: list[Mapping[str, object]] = []
+        self.sources: list[bool] = []
 
-    def apply(self, bp: Mapping[str, object], *, allowed_roots: Sequence[str | Path] | None = None) -> Summary:
+    def apply(self, bp: Mapping[str, object], *, allowed_roots: Sequence[str | Path] | None = None, require_sources: bool = False) -> Summary:
         self.applied.append(bp)
+        self.sources.append(require_sources)
         return Summary(["ceo", "ceo/eng"], self.task_id, "ceo", 6)
 
 
@@ -199,3 +209,72 @@ def test_the_tools_hand_over_with_the_defaults_of_their_signature() -> None:
     assert "PROPOSAL x" in call(server, "propose_org", blueprint="x")
     assert "not applied: the user must approve" in fails(server, "apply_org", blueprint="x")
     assert call(server, "apply_org", blueprint="x", approved=True, plan_id="abc123").startswith("applied the blueprint to /memory/org")
+
+
+# ------------------------------------------------------------------------------------------------------------- provenance over MCP (Q9)
+# Design 10.1 step 3: over MCP the proposal and the application ask for sources (`require_sources=True`), so a plan that records none of the user's
+# words, or has a criterion with no source, is a draft without a plan_id and cannot be applied. These tests run the real renderer, loader and
+# applier (over memory) behind the tools.
+
+EXAMPLE = testkit.REPO / "examples" / "blueprint-research.yaml"
+USER_WORDS = "Keep it under 1500 words. Every claim needs a source."
+
+
+def research_text(tmp_path: Path, criteria: Sequence[object], elicitation: str | None = USER_WORDS) -> str:
+    """The shipped research blueprint with the given task criteria and (when given) the user's words."""
+    bp = yaml.safe_load(EXAMPLE.read_text())
+    bp["task"]["acceptance"] = list(criteria)
+    bp["needs"]["deliverable"]["path"] = str(tmp_path / "deliverables" / "competitors.md")
+    bp["needs"].pop("elicitation")
+    if elicitation is not None:
+        bp["needs"]["elicitation"] = elicitation
+    return str(yaml.safe_dump(bp, sort_keys=False))
+
+
+SOURCED = [{"text": "At most 1500 words as counted by read.", "from": "under 1500 words"}, {"text": "Cite 2 sources per claim.", "default": True}]
+
+
+def real_proposal(tmp_path: Path) -> RenderedPlanProposal:
+    return RenderedPlanProposal(lambda: loader_over_memory(tmp_path).loader, lambda: renderer_over_packaged_roles(tmp_path).renderer,
+                                BindingPlanTarget(MemoryBinding(HERE, exists=True), lambda: agents_in()))
+
+
+def test_over_mcp_a_string_criterion_is_criterion_source_and_the_plan_a_draft_without_plan_id(tmp_path: Path) -> None:
+    out = real_proposal(tmp_path).propose(research_text(tmp_path, ["At most 1500 words as counted by read.", SOURCED[1]]))
+    assert "DRAFT - NOT READY" in out and "plan_id: none" in out and "Show the block below" not in out
+    assert "Errors (1):\n- task.acceptance[1]: criterion 1 does not say where it comes from" in out
+
+
+def test_over_mcp_a_plan_without_elicitation_is_a_draft_without_plan_id(tmp_path: Path) -> None:
+    out = real_proposal(tmp_path).propose(research_text(tmp_path, SOURCED, elicitation=None))
+    assert "DRAFT - NOT READY" in out and "plan_id: none" in out
+    assert "this plan records none of the user's words" in out
+    sourced = real_proposal(tmp_path).propose(research_text(tmp_path, SOURCED))
+    assert "DRAFT" not in sourced and "plan_id: none" not in sourced and "\nplan_id: " in sourced  # (control: the same plan with its words)
+
+
+def test_apply_org_refuses_a_sourceless_plan_with_blueprint_has_errors(tmp_path: Path) -> None:
+    applier = applier_over_memory_directories(tmp_path)
+    group = ApprovedPlanApplication(InstructionText(MemoryBinding(HERE, exists=True)), lambda: loader_over_memory(tmp_path).loader, lambda: Identity(),
+                                    lambda: applier.applier, lambda: FakeSchedulerStatus(SchedulerState("stopped")), lambda: OrgPaths(HERE))
+    with pytest.raises(OrgError, match="blueprint has errors, nothing was created:") as refused:
+        group.apply(research_text(tmp_path, ["At most 1500 words as counted by read."]), True, "abc123")
+    assert "criterion 1 does not say where it comes from" in str(refused.value) and applier.log.of("hire") == []
+    group.apply(research_text(tmp_path, SOURCED), True, "abc123")  # the same plan with its sources applies
+    assert applier.log.of("hire") != []
+
+
+def test_propose_org_docstring_gives_the_criteria_schema_and_requires_elicitation() -> None:
+    group = BlueprintTools(TemplateExampleText(lambda: Examples(), EnvironmentExampleLocation(DictEnvironment(cwd=Path("/w")), MemoryBinding(HERE))),
+                           RenderedPlanProposal(lambda: TextLoader(), lambda: Renderer(), BindingPlanTarget(MemoryBinding(HERE), lambda: agents_in())),
+                           application())
+    text = " ".join(described(serve(group, ROOT))["propose_org"].split())
+    assert "acceptance items: {text, from: <the user's exact words in needs.elicitation>, asked} or {text, default: true}" in text
+    assert "needs.elicitation: the user's answers, verbatim (required with criteria)" in text
+
+
+def test_the_tools_ask_the_renderer_and_the_applier_for_sources() -> None:
+    renderer, applier = Renderer(), Applier()
+    RenderedPlanProposal(lambda: TextLoader(), lambda: renderer, BindingPlanTarget(MemoryBinding(HERE, exists=True), lambda: agents_in())).propose("bp")
+    application(applier=applier).apply("bp", True, "abc123")
+    assert renderer.sources == [True] and applier.sources == [True]

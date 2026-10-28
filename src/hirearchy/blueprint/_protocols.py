@@ -134,8 +134,8 @@ class ServiceRules(Protocol):
 class PlanBasis(Protocol):
     """What the plan and the application are made from: the blueprint's problems and its agents, for the organization they are planned against."""
 
-    def issues(self, bp: Mapping[str, object], allowed_roots: Sequence[str | Path] | None) -> list[Issue]:
-        """All problems with the blueprint (the organization counts when it exists)."""
+    def issues(self, bp: Mapping[str, object], allowed_roots: Sequence[str | Path] | None, require_sources: bool = False) -> list[Issue]:
+        """All problems with the blueprint (the organization counts when it exists); ``require_sources``: see ``BlueprintValidator.validate``."""
         ...
 
     def agents(self, bp: Mapping[str, object], allowed_roots: Sequence[str | Path] | None) -> list[Agent]:

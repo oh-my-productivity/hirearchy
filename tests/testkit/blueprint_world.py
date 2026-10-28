@@ -133,8 +133,8 @@ class World:
     def load_text(self, text):
         return self.runtime().blueprint_loader.load_text(text)
 
-    def validate(self, bp, *, org=None, allowed_roots: Roots = None):
-        return self.runtime(org).blueprint_validator.validate(bp, org_exists=org is not None, allowed_roots=allowed_roots)
+    def validate(self, bp, *, org=None, allowed_roots: Roots = None, require_sources: bool = False):
+        return self.runtime(org).blueprint_validator.validate(bp, org_exists=org is not None, allowed_roots=allowed_roots, require_sources=require_sources)
 
     # ------------------------------------------------------------------ the plan
     def render_plan(self, bp, issues=None, *, org=None, allowed_roots: Roots = None):

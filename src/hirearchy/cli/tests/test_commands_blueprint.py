@@ -88,3 +88,25 @@ def test_plan_shows_the_my_wording_line_and_both_warnings(tmp_path: Path, capsys
     assert "- task.acceptance[1]: criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true." in out
     assert "- needs.elicitation: this plan records none of the user's words, so no criterion can show where it comes from." in out
     assert "Reply 'approve' or tell me what to change." in out  # warnings, not errors: the human applies their own file
+
+
+def test_the_same_plan_keeps_warnings_at_the_terminal(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    """Guard (design 10.1 step 3): over MCP a plan without sources is a draft; at the terminal the human applies their own file, so it stays a plan
+    with warnings and applies."""
+    import testkit
+    import testkit.reach.yaml as yaml
+    from testkit.cli_world import main
+    from testkit.reach.hirearchy.core import Org
+
+    bp = yaml.safe_load((testkit.REPO / "examples" / "blueprint-research.yaml").read_text())
+    bp["task"]["acceptance"] = [c["text"] for c in bp["task"]["acceptance"]]
+    del bp["needs"]["elicitation"]
+    (tmp_path / "deliverables").mkdir()
+    bp["needs"]["deliverable"]["path"] = str(tmp_path / "deliverables" / "competitors.md")
+    (tmp_path / "bp.yaml").write_text(yaml.safe_dump(bp, sort_keys=False), encoding="utf-8")
+    org = Org.init(tmp_path / "org", "terminal", {"poll_seconds": 0.05})
+    main(["--root", str(org.root), "plan", str(tmp_path / "bp.yaml"), "--allow-root", str(tmp_path)])
+    out = capsys.readouterr().out
+    assert "Warnings (" in out and "Errors (" not in out and "DRAFT" not in out and "criterion 1 does not say where it comes from" in out
+    main(["--root", str(org.root), "apply", str(tmp_path / "bp.yaml"), "--allow-root", str(tmp_path)])
+    assert "created 4 agents" in capsys.readouterr().out

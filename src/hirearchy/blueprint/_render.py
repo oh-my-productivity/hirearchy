@@ -28,9 +28,11 @@ class TextPlanRenderer(PlanRenderer):
         """The compact, plain-language plan the assistant shows to the user verbatim (about 40 lines at most)."""
         return self._user_plan.render(bp, issues, allowed_roots)
 
-    def propose_text(self, bp: Mapping[str, object], *, target: str = "", allowed_roots: Sequence[str | Path] | None = None) -> str:
+    def propose_text(
+        self, bp: Mapping[str, object], *, target: str = "", allowed_roots: Sequence[str | Path] | None = None, require_sources: bool = False,
+    ) -> str:
         """What ``propose_org`` returns: the block for the user, the full details and the plan_id."""
-        issues = self._basis.issues(bp, allowed_roots)
+        issues = self._basis.issues(bp, allowed_roots, require_sources)
         block = self.plan_for_user(bp, issues, allowed_roots=allowed_roots)
         details = self.render_plan(bp, issues, allowed_roots=allowed_roots)
         if errors(issues):

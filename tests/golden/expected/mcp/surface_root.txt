@@ -1540,6 +1540,8 @@ Validate a blueprint and return the plan the user must approve. Writes nothing; 
         `services` (recurring work the top agent offers on request): [{name, description, inputs: [{name, description,
         required}], acceptance, deliverable {description, format, max_words, path}, budget (runs per request), playbook,
         locked}], in which case `task` may be omitted or be a first request {service, inputs: {name: value}, title}.
+        Criteria (the acceptance items of `task` and of each service): acceptance items: {text, from: <the user's exact words in
+        needs.elicitation>, asked} or {text, default: true}; needs.elicitation: the user's answers, verbatim (required with criteria).
         Works before the organization exists. Returns (1) a block headed "PLAN FOR YOU": show it to the user exactly
         as written and wait for their explicit approval; (2) Details, the full plan for you; (3) a plan_id that
         apply_org requires. If the plan has errors, fix the blueprint and propose again; never ask the user to approve

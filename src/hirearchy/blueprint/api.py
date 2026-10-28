@@ -154,13 +154,15 @@ class BlueprintLoader(Protocol):
 @runtime_checkable
 class BlueprintValidator(Protocol):
     def validate(
-        self, bp: Mapping[str, object], *, org_exists: bool = False, allowed_roots: Sequence[str | Path] | None = None,
+        self, bp: Mapping[str, object], *, org_exists: bool = False, allowed_roots: Sequence[str | Path] | None = None, require_sources: bool = False,
     ) -> list[Issue]:
         """All problems with a blueprint. Errors block ``apply``; warnings are shown in the plan.
 
         ``org_exists``: the organization exists, so its settings (``max_depth``, ``playbook_max_words``) apply and the names it already uses
         (agents, services) are taken; otherwise the defaults apply and nothing is taken. ``allowed_roots``: the directories agents' workspaces
-        and the deliverable path may be in (default: home, the temp dir and the current directory, or ``$HIREARCHY_WORKSPACE_ROOTS``)."""
+        and the deliverable path may be in (default: home, the temp dir and the current directory, or ``$HIREARCHY_WORKSPACE_ROOTS``).
+        ``require_sources``: over MCP, a criterion that declares no source (``criterion-source``) and a plan that records none of the user's words
+        (``criterion-words``) are errors; by default (the terminal) they are warnings."""
         ...
 
 
@@ -215,8 +217,11 @@ class PlanRenderer(Protocol):
         """The compact, plain-language block the assistant shows to the user verbatim (about 40 lines at most)."""
         ...
 
-    def propose_text(self, bp: Mapping[str, object], *, target: str = "", allowed_roots: Sequence[str | Path] | None = None) -> str:
-        """What ``propose_org`` returns: ``target`` line, the block for the user, the details and the ``plan_id`` (none when the blueprint has errors)."""
+    def propose_text(
+        self, bp: Mapping[str, object], *, target: str = "", allowed_roots: Sequence[str | Path] | None = None, require_sources: bool = False,
+    ) -> str:
+        """What ``propose_org`` returns: ``target`` line, the block for the user, the details and the ``plan_id`` (none when the blueprint has errors;
+        with ``require_sources``, also when a criterion declares no source or the plan records none of the user's words)."""
         ...
 
     def propose(self, source: object, *, allowed_roots: Sequence[str | Path] | None = None) -> str:
@@ -234,11 +239,12 @@ class PlanIdentity(Protocol):
 
 @runtime_checkable
 class BlueprintApplier(Protocol):
-    def apply(self, bp: Mapping[str, object], *, allowed_roots: Sequence[str | Path] | None = None) -> Summary:
+    def apply(self, bp: Mapping[str, object], *, allowed_roots: Sequence[str | Path] | None = None, require_sources: bool = False) -> Summary:
         """Create the agents (parents first, as root through each parent), define the services and give the first task: a plain task, a first
-        request for a service (``task.service``) or none. A ``BlueprintError`` on any validation error, before anything is written; if a hire, a
-        service definition or the delegation fails midway, the top-level agents created are retired again, the workspace directories this call made
-        are removed when empty, and the error is raised."""
+        request for a service (``task.service``) or none. A ``BlueprintError`` on any validation error, before anything is written (with
+        ``require_sources``, a criterion without a source or a plan without the user's words is one); if a hire, a service definition or the
+        delegation fails midway, the top-level agents created are retired again, the workspace directories this call made are removed when empty,
+        and the error is raised."""
         ...
 
 

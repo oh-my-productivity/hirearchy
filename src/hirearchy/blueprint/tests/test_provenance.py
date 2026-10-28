@@ -244,3 +244,15 @@ def test_p1s_case_reads_the_line_of_10_1_step_4_exactly(tmp_path: Path) -> None:
         elicitation=P1_WORDS,
     )
     assert f"  1. decisions and actions use the notes' own words\n     {P1_LINE}\n" in block(bp, tmp_path)
+
+
+def test_require_sources_turns_criterion_source_and_criterion_words_into_errors() -> None:
+    bp = plain("a plain one", {"text": "x y z w", "default": True}, elicitation=None)
+    strict, lenient = sourcing(bp, require_sources=True), sourcing(bp)
+    assert [(i.level, i.path, i.code) for i in strict] == [
+        ("error", "task.acceptance[1]", "criterion-source"), ("error", "needs.elicitation", "criterion-words"),
+    ]
+    assert [(i.level, i.path, i.code, i.message) for i in strict] == [(i.level if i.level == "error" else "error", i.path, i.code, i.message) for i in lenient]
+    assert {i.level for i in lenient} == {"warning"}  # (the same issues at the terminal)
+    assert [i.level for i in bpm.validate(bp, require_sources=True) if i.code.startswith("criterion-")] == ["error", "error"]
+    assert [i.level for i in bpm.validate(bp) if i.code.startswith("criterion-")] == ["warning", "warning"]
