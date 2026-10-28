@@ -632,6 +632,7 @@ A global skill with the same name (`~/.kiro/skills/hirearchy/SKILL.md`, what `in
 the V3 engine, stops one that has not started after 60 s, and writes a readable transcript to the run log: the assistant's text, one line per tool call, and kiro's own
 denial text for a refused call, never tool results or tool output. When the run ends on a model-service throttle the launcher counts the tool calls that completed and are not
 read-only; with none it writes a `# kiro: throttled by the model service ...; tool effects: none` line and exits with 75 (kiro's own 75 becomes 1), which makes the scheduler credit the run (see "Org growth: phase 0a.2").
+When kiro-cli says on its stderr that it could not set the run's effort (a line beginning "failed to set effort", such as "[warn] failed to set effort 'high': ..."), the launcher stops the whole run at once and writes "# kiro: effort not set, run stopped (kiro-cli: ...); tool effects: none"; the scheduler gives a run stopped before any tool effect back with a run credit and starts it again, like a throttled run.
 
 - **Requirements.** kiro-cli with the V3 engine (verified with 2.33.0) and a credential: `KIRO_API_KEY` (verified) or a sign-in that
   `KIRO_HOME=<home> kiro-cli whoami` accepts (not verified). `hirearchy run` and `start` check this first and refuse with the reason, which `status` and

@@ -915,3 +915,32 @@ pipe, was not seen live; if it did not, detection fails open to today's behaviou
 Earlier decisions stand: option (a), the bound, conditions 1-3, text E, limit 6 and stderr placed by read time
 (`.agents/tasks/manager-decision-item1.md`). Unchanged by the amendments: the user-visible texts A-G, the cost, the declared limits, SKILL.md
 (section 7) and `READINESS_TIMEOUT`.
+
+### 10.1 As built
+
+The build followed the plan in 13 commits. Where the code or the tests differ from the text above, this subsection is what was built.
+
+- **D1. No reflection pin; the budget test pins the credit instead.** `reflection/tests/test_independence.py` forbids every import of
+  `hirearchy.budget` from `reflection`, its tests included, so section 5's reflection case is not written. `budget`'s test asserts
+  `credited_stems([effort_credit(...)]) == {stem}`, which is the whole contract reflection reads (`reflection/_runs.py:28`), and the progress pin
+  (`test_an_effort_credited_run_is_neither_used_nor_kept`) stays. Not user-visible.
+- **D2. The launcher change is four commits, each with its own RED:** the drain guards (they pass today), the stderr pipe and its transport
+  (`test_kiro_writes_its_stderr_into_a_pipe_of_the_launcher` is the deterministic RED), the scan and the stop, and E5's `skipping`.
+- **D3. E5 is its own RED-GREEN commit.** The first version of `_read_err` drops an over-long `partial` from the scan; the unit case then
+  failed for a real reason (the tail was scanned as a line), and `skipping` fixed it.
+- **D4. `kiro/__init__.py` and `budget/__init__.py` did not change.** Both re-export `api.__all__`.
+- **D5. `_stream`'s return type grew in two steps** (`(state, exited_at)`, then `(state, stopped, exited_at)`).
+- **D6. The single-log helper `launch_logged`** puts fd 1 and fd 2 in one log file, as in a run. E10's test asserts the whole log: the
+  launcher's lines are `["# kiro: run started (engine v3)", A]`, and the 2,000 lines, the warning and A come in that order.
+- **D7. `ARCHITECTURE.md` 3.18** (`budget`) also names `effort_credit`, as the other three edits of E6 do.
+- **D8. The background-child stderr test uses the single log,** so it is a true guard: after the stderr pipe exists it fails if the 2-s rule
+  is missing.
+- **Deviation 1 (strengthening only).** In `_wait_for_start`, when stderr is ready but stdout was not in that `select`, stdout is polled once
+  more (timeout 0) and handled first. The order rule "stdout first before the start" then has no window between the two descriptors being
+  checked. No text, exit code or cost changes.
+- **Deviation 2 (a finding about item 2's twin).** `test_a_spinner_without_a_newline_is_given_up_on_the_same_way` still checks that the
+  spinner text reached the log, which needs the fake shell to print within the 1-s deadline. Under a machine load average of about 10 this check
+  failed 3 of 13 runs (and 1 of 10 on the unchanged test at `main`). The design leaves it as it was (section 3); it is a known load flake of
+  the same kind as item 2's, in its own check. A cheap hardening, if wanted, is a longer deadline for that one test.
+- **Deviation 3 (a load flake outside this batch).** `kiro/tests/test_subprocess_kiro_cli.py::test_an_overrun_kills_the_process_group`
+  (a 0.5-s overrun racing the shell's start) failed once in a FAST run at commit 1 and passed 3 of 3 alone. The batch does not touch it.
