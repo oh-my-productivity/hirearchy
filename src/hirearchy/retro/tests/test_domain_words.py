@@ -11,7 +11,7 @@ from testkit.domain_words import violations
 
 import hirearchy.retro
 
-MODULES = ("api.py", "_thresholds.py")
+MODULES = ("api.py", "_thresholds.py", "_ledger.py")
 PACKAGE = Path(hirearchy.retro.__file__).resolve().parent
 
 

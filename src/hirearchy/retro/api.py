@@ -16,6 +16,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from fractions import Fraction
 from types import MappingProxyType
+from typing import Protocol, runtime_checkable
 
 __all__ = [
     "ASKED_KEPT",
@@ -27,6 +28,7 @@ __all__ = [
     "RECORDS_KEPT",
     "RETRO_DEFAULTS",
     "RecordedItem",
+    "RetroRecords",
     "RetroThresholds",
     "Section",
     "retro_thresholds",
@@ -153,6 +155,30 @@ class Brief:
     notes: tuple[str, ...] = ()
     recorded: bool = False
     shown_again: str = ""
+
+
+@runtime_checkable
+class RetroRecords(Protocol):
+    """The ledger of the briefs held (design 4.2, ``.runtime/retros.json``): the one stored state of ``retro``. It keeps ids and keys only, never a
+    client's words or a text the team wrote. A ledger that holds something other than briefs is unreadable: the readers raise ``OrgError``, and the next
+    ``append`` replaces it."""
+
+    def last(self) -> BriefRecord | None:
+        """The newest record; None before the first brief. ``OrgError`` when the ledger cannot be read."""
+        ...
+
+    def records(self) -> tuple[BriefRecord, ...]:
+        """The records held, oldest first, at most ``RECORDS_KEPT``. ``OrgError`` when the ledger cannot be read."""
+        ...
+
+    def asked(self) -> frozenset[str]:
+        """Every item key any recorded brief offered, at most ``ASKED_KEPT`` (the oldest dropped first). ``OrgError`` when the ledger cannot be read."""
+        ...
+
+    def append(self, record: BriefRecord) -> None:
+        """Add the record (the oldest beyond ``RECORDS_KEPT`` is dropped) and the keys of its items to ``asked``, the newest at the end. ``OrgError``
+        when the ledger cannot be written."""
+        ...
 
 
 # Pure rules re-exported from their modules; they import the types above, so these imports come last.

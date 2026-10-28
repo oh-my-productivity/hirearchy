@@ -197,6 +197,7 @@ other than the owner contains the path literal in a write call (`write_text`, `a
 | `.runtime/nudges.json` | `stalls` (`LedgerNudgeLedger`) | read through `NudgeLedger.entries` (`attention`) |
 | `.runtime/strays.json` | `strays` (`LedgerStrayRegistry`) | - |
 | `.runtime/reviews.json` | `review` (`LedgerHealthReviewer`) | - |
+| `.runtime/retros.json` | `retro` (`LedgerRetroRecords`) | - |
 | `.runtime/scheduler.pid` | `daemon` (`PidFileSchedulerLock`, written by the scheduler process) | read through `SchedulerStatus` |
 | `.runtime/scheduler.exit`, `.runtime/scheduler.log` | `daemon` (`FileExitMarker`, `DetachedSchedulerControl`) | read through `ExitMarker.read`, `SchedulerStatus.exit_reason` |
 | `.runtime/events/<day>/*.jsonl` | `telemetry` (`FsEventSink` of the emitting process; `FsEventRetention` deletes expired days) | read through `EventReader` |
@@ -215,7 +216,7 @@ agent process (`revise_playbook`) and root's process (the watch settler, inside 
 and an exclusive lock on the empty file `<owner>/services/<name>/.tmp-playbook.lock` (under the same owner row, never read, git-ignored) serialises it; 3.21 describes the compare-and-swap.
 
 Ledger names (`kernel.LedgerStore`) are a closed registry: `failures` -> `eligibility`, `running` -> `runs`,
-`nudges` -> `stalls`, `strays` -> `strays`, `reviews` -> `review`. `test_single_writer` also asserts each ledger name literal
+`nudges` -> `stalls`, `strays` -> `strays`, `reviews` -> `review`, `retros` -> `retro`. `test_single_writer` also asserts each ledger name literal
 appears in exactly one package.
 
 ### 2.4 Process-scope resources (module globals today)

@@ -39,6 +39,7 @@ OWNERS: tuple[Owned, ...] = (
     Owned(".runtime/nudges.json", "stalls", ("nudges.json",)),
     Owned(".runtime/strays.json", "strays", ("strays.json",)),
     Owned(".runtime/reviews.json", "review", ("reviews.json",)),
+    Owned(".runtime/retros.json", "retro", ("retros.json",)),
     Owned(".runtime/scheduler.pid", "daemon", ("scheduler.pid",)),
     Owned(".runtime/scheduler.exit, .runtime/scheduler.log", "daemon", ("scheduler.exit", "scheduler.log")),
     Owned(".runtime/events/<day>/*.jsonl", "telemetry", ("events",)),
@@ -67,4 +68,5 @@ LEDGERS: dict[str, str] = {
     "nudges": "stalls",
     "strays": "strays",
     "reviews": "review",
+    "retros": "retro",
 }
