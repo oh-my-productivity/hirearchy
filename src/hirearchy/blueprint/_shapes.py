@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import TypedDict
 
-from .api import Issue
+from .api import Agent, Issue
 
 AgentRuns = TypedDict("AgentRuns", {"pass": int, "rework": int, "total": int})  # ``pass`` is a keyword: the functional form
 
@@ -46,8 +46,52 @@ class Built:
     defined: list[str] = field(default_factory=list)  # names of the services defined
 
 
+@dataclass(frozen=True)
+class Held:
+    """What an existing agent holds and has (read from its charter): the bound on what a new report of it may be given."""
+
+    addr: str
+    tools: tuple[str, ...]
+    workspace: str | None
+    inputs: tuple[str, ...]
+    can_hire: bool
+    max_children: int
+    reports: int  # its direct reports now
+    verifier: bool
+
+
+@dataclass(frozen=True)
+class LimitChange:
+    """A ``limits`` entry of an existing agent: the new values (None: kept) and the ones it has now."""
+
+    agent: str
+    can_hire: bool | None
+    max_children: int | None
+    was_can_hire: bool
+    was_max_children: int
+
+
+@dataclass(frozen=True)
+class DepthChange:
+    value: int
+    was: int
+
+
+@dataclass(frozen=True)
+class Retiring:
+    agent: str
+    reason: str
+    team: tuple[str, ...]  # the agent and everything below it, the agent first
+
+
 @dataclass
 class Extension:
     """An extension blueprint read against the organization (design 5.2): its problems, and what its entries mean once they are valid."""
 
     issues: list[Issue] = field(default_factory=list)
+    reason: str = ""
+    agents: list[Agent] = field(default_factory=list)  # the agents it adds, parents first, at their full addresses (``parent`` None: under root)
+    extras: dict[str, str] = field(default_factory=dict)  # the ``charter_extra`` of an added agent, by address
+    limits: list[LimitChange] = field(default_factory=list)
+    depth: DepthChange | None = None
+    retires: list[Retiring] = field(default_factory=list)

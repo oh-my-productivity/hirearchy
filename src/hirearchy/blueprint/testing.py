@@ -21,6 +21,7 @@ from ..kernel.testing import DictEnvironment
 from ..kiro import Confinement, ConfinementPolicy
 from ..kiro.testing import kiro_confinement
 from ..services import ContractNormalizer, PlaybookChange, ServiceCommands
+from ..services.testing import memory_world
 from ..services.testing import normalizer as contract_normalizer
 from ..settings import DEFAULT_CONFIG
 from ..snapshots import OrgSnapshotter
@@ -28,6 +29,7 @@ from ._access import PolicyAccessReport
 from ._assembly import PlanParts, applier_over, plan_parts
 from ._budgeting import BudgetPlanner
 from ._extension import ExtensionResolver
+from ._extension_org import Reads
 from ._files import FsTextFiles
 from ._loader import YamlBlueprintLoader
 from ._org import NoOrgContext, PresentOrAbsentOrg
@@ -574,12 +576,21 @@ class ExtensionHarness:
     tmp: Path  # the directory of the suites
 
 
+def _reads(tmp_path: Path, org: OrgContext, agents: MemoryAgents) -> Reads:
+    """What an extension's rules read, over fakes: the agents in a ``MemoryAgents``, the services of a memory services world, the real resolver and roles."""
+    environment = DictEnvironment(home=tmp_path, cwd=tmp_path)
+    roles = role_library_of(packaged=True)
+    return Reads(org, agents, agents, roles, resolver_over(roles, paths_over(environment)), roots_over(environment, tmp_path / "temp"),
+                 memory_world(tmp_path / "services").catalog)
+
+
 def resolver_over_a_static_org(tmp_path: Path) -> ExtensionHarness:
-    return ExtensionHarness(ExtensionResolver(StaticOrgContext(tmp_path / "org")), tmp_path)
+    return ExtensionHarness(ExtensionResolver(_reads(tmp_path, StaticOrgContext(tmp_path / "org"), MemoryAgents())), tmp_path)
 
 
 def resolver_over_memory_agents(tmp_path: Path) -> ExtensionHarness:
-    return ExtensionHarness(ExtensionResolver(AgentsOrgContext(tmp_path / "org", MemoryAgents())), tmp_path)
+    agents = MemoryAgents()
+    return ExtensionHarness(ExtensionResolver(_reads(tmp_path, AgentsOrgContext(tmp_path / "org", agents), agents)), tmp_path)
 
 
 @dataclass(frozen=True)

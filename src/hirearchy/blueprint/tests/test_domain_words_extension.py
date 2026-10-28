@@ -8,7 +8,7 @@ from testkit.domain_words import violations
 
 import hirearchy.blueprint
 
-MODULES = ("_provenance.py", "_extension.py", "_extension_form.py")
+MODULES = ("_provenance.py", "_extension.py", "_extension_form.py", "_extension_org.py", "_extension_agents.py", "_extension_changes.py")
 PACKAGE = Path(hirearchy.blueprint.__file__).resolve().parent
 
 

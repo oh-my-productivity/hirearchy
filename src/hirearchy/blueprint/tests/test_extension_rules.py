@@ -8,12 +8,15 @@ from pathlib import Path
 import pytest
 
 from hirearchy.blueprint import Issue, is_extension
-from hirearchy.blueprint._extension import ExtensionResolver
-from hirearchy.blueprint.testing import StaticOrgContext
+from hirearchy.blueprint.testing import resolver_over_a_static_org
+
+
+FORM = ("extend-form", "extend-placeholder", "extend-keeps")
 
 
 def resolve(bp: dict[str, object], tmp: Path | None = None) -> list[Issue]:
-    return ExtensionResolver(StaticOrgContext(tmp)).resolve(bp).issues
+    """The issues of the form of ``bp`` (the rest of the rules read the organization: ``test_extension_org_rules.py``)."""
+    return [i for i in resolver_over_a_static_org(tmp or Path("/nonexistent")).resolver.resolve(bp).issues if i.code in FORM]
 
 
 def extension(**sections: object) -> dict[str, object]:
