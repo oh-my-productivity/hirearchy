@@ -1,2 +1,2 @@
 - `ceo/eng` low_quality: no result for 2h
-  -> compare `ceo/eng`'s last checks with the client's rejections it let through (escapes, and its re-checks after a FAIL): if you own a service, make sure its review tasks carry the regression list; edit the BODY of `ceo/eng`'s charter (its frontmatter - tools, inputs, model - is kept automatically) only if the same kind of item escaped more than once, or replace it
+  -> compare `ceo/eng`'s last checks with the client's rejections it let through (escapes, and its re-checks after a FAIL): if you own a service, make sure its review tasks carry the regression list. Its charter is the plan's: the retro brief shows the user these escapes.

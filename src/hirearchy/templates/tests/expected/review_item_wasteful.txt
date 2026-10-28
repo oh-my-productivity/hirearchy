@@ -1,2 +1,2 @@
 - `ceo/eng` wasteful: no result for 2h
-  -> fix `ceo/eng`'s charter so every run ends with an action (report or send)
+  -> tell `ceo/eng` (send) that every run ends with an action (report or send)

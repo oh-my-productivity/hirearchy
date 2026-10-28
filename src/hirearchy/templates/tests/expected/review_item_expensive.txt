@@ -1,2 +1,2 @@
 - `ceo/eng` expensive: no result for 2h
-  -> narrow `ceo/eng`'s tasks, or edit the body of its charter (its frontmatter is kept) or change its model
+  -> narrow `ceo/eng`'s tasks; its model and its charter are the plan's, which the user changes

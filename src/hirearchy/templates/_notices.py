@@ -6,18 +6,18 @@ from collections.abc import Mapping, Sequence
 
 from .api import Notices
 
-# What to do about each health flag; {a} is the flagged agent.
+# What to do about each health flag; {a} is the flagged agent. None of the actions suggests a change of an agent's charter or model: those are the plan's,
+# which the user changes (design 6.6: the texts that prompted a charter edit by a manager).
 REVIEW_ACTIONS = {
     "stuck": "follow up with `{a}` or reassign the work",
     "out_of_budget": 'grant runs with send(to="{a}", body="<why>", budget=N), or report the task failed',
     "paused": "investigate why `{a}` is paused; failed runs need a human (`hirearchy resume {a}`), so escalate",
     "low_quality": (
         "compare `{a}`'s last checks with the client's rejections it let through (escapes, and its re-checks after a FAIL): if you own a "
-        "service, make sure its review tasks carry the regression list; edit the BODY of `{a}`'s charter (its frontmatter - tools, "
-        "inputs, model - is kept automatically) only if the same kind of item escaped more than once, or replace it"
+        "service, make sure its review tasks carry the regression list. Its charter is the plan's: the retro brief shows the user these escapes."
     ),
-    "expensive": "narrow `{a}`'s tasks, or edit the body of its charter (its frontmatter is kept) or change its model",
-    "wasteful": "fix `{a}`'s charter so every run ends with an action (report or send)",
+    "expensive": "narrow `{a}`'s tasks; its model and its charter are the plan's, which the user changes",
+    "wasteful": "tell `{a}` (send) that every run ends with an action (report or send)",
     "stranded_budget": "ask `{a}` to return its budget (it can `send` its parent a note with `budget=N`), or retire it",
     "idle": "retire `{a}` if it is no longer needed",
 }
