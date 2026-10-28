@@ -8,6 +8,7 @@ import pytest
 
 from hirearchy.agents import RetiredArchive, RetiredTree
 from hirearchy.agents.testing import IMPLEMENTATIONS, AgentsHarness
+from hirearchy.kernel import join_frontmatter
 
 from ._support import agent, make, message
 
@@ -334,3 +335,71 @@ def test_credited_sums_the_run_credits_of_retired_received_boxes(h: AgentsHarnes
     h.put(".retired/cto-S/AGENT.md", "x")
     h.put(".retired/cto-S/inbox/a.md", credit(1, to="cto"))
     assert h.archive.credited() == 1 + 2 + 1 + 1
+
+
+# ------------------------------------------------------------------------------ record, memory, results (design 8.4, L25)
+
+RECORD = {"retired": "2026-10-18T10:15:00+00:00", "by": "root", "reason": "restructuring", "approved_in": "change 0123456789ab"}
+
+
+def result(task: str, *, sender: str = "ceo", at: str = "20261018T100000000001") -> str:
+    return f"---\nid: {at}-{sender.replace('/', '.')}-0001\nfrom: {sender}\nto: root\ntype: result\nstatus: done\nreply_to: {task}\n---\nDone {task}.\n"
+
+
+def test_record_reads_retired_md_and_is_empty_when_absent(h: AgentsHarness) -> None:
+    h.put_dir(".retired/ceo-S")
+    h.put_dir(".retired/cto-S")
+    h.put(".retired/ceo-S/RETIRED.md", join_frontmatter(dict(RECORD), ""))
+    assert h.archive.record(tree(h, "ceo-S")) == RECORD
+    assert h.archive.record(tree(h, "cto-S")) == {}
+    h.put(".retired/cto-S/RETIRED.md", "---\nretired: [unclosed\n---\n")  # unreadable: the same as absent
+    assert h.archive.record(tree(h, "cto-S")) == {}
+
+
+def test_the_record_of_a_retire_is_read_back(h: AgentsHarness) -> None:
+    agent(h, "ceo")
+    h.registry.archive("ceo", STAMP, RECORD)
+    assert h.archive.record(tree(h, f"ceo-{STAMP}")) == RECORD
+
+
+def test_memory_reads_the_top_agents_and_a_nested_agents_archived_memory(h: AgentsHarness) -> None:
+    for addr in ("ceo", "ceo/eng", "ceo/eng/qa"):
+        agent(h, addr)
+    h.put("ceo/MEMORY.md", "ceo notes\n")
+    h.put("ceo/eng/MEMORY.md", "eng notes\n")
+    h.registry.archive("ceo", STAMP)
+    found = tree(h, f"ceo-{STAMP}")
+    assert h.archive.memory(found, "ceo") == "ceo notes\n"
+    assert h.archive.memory(found, "ceo/eng") == "eng notes\n"
+    assert h.archive.memory(found, "ceo/eng/qa") == ""  # an agent whose memory is empty
+
+
+def test_memory_is_empty_when_absent_and_raises_oserror_when_unreadable(h: AgentsHarness) -> None:
+    h.put_dir(f".retired/ceo-{STAMP}")
+    h.put("ceo-elsewhere/MEMORY.md", "not in the tree\n")
+    found = tree(h, f"ceo-{STAMP}")
+    assert h.archive.memory(found, "ceo") == "" and h.archive.memory(found, "ceo/eng") == "" and h.archive.memory(found, "cto") == ""
+    h.put_dir(f".retired/ceo-{STAMP}/MEMORY.md")  # a directory where the memory should be
+    with pytest.raises(OSError):
+        h.archive.memory(found, "ceo")
+
+
+def test_results_are_an_agents_archived_sent_results_oldest_first(h: AgentsHarness) -> None:
+    top = f".retired/ceo-{STAMP}"
+    h.put(f"{top}/sent/20261018T100200000001-ceo-0002.md", result("t2", at="20261018T100200000001"))
+    h.put(f"{top}/sent/20261018T100100000001-ceo-0001.md", result("t1", at="20261018T100100000001"))
+    h.put(f"{top}/sent/20261018T100300000001-ceo-0003.md", message(3, sender="ceo", to="ceo/eng", kind="task"))  # a task is no result
+    h.put(f"{top}/eng/sent/20261018T100400000001-ceo.eng-0001.md", result("t3", sender="ceo/eng", at="20261018T100400000001"))
+    found = tree(h, f"ceo-{STAMP}")
+    assert [m.reply_to for m in h.archive.results(found, "ceo")] == ["t1", "t2"]
+    assert [(m.reply_to, m.sender, m.type, m.status) for m in h.archive.results(found, "ceo/eng")] == [("t3", "ceo/eng", "result", "done")]
+    assert h.archive.results(found, "ceo/qa") == [] and h.archive.results(found, "cto") == []
+
+
+def test_a_dotted_tree_name_maps_back_to_its_address(h: AgentsHarness) -> None:
+    h.put(f".retired/ceo.eng-{STAMP}/MEMORY.md", "eng notes\n")
+    h.put(f".retired/ceo.eng-{STAMP}/sent/20261018T100100000001-ceo.eng-0001.md", result("t1", sender="ceo/eng", at="20261018T100100000001"))
+    found = tree(h, f"ceo.eng-{STAMP}")
+    assert found.addr == "ceo/eng"
+    assert h.archive.memory(found, "ceo/eng") == "eng notes\n"
+    assert [m.reply_to for m in h.archive.results(found, "ceo/eng")] == ["t1"]

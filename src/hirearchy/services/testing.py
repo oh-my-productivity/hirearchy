@@ -179,6 +179,15 @@ class MemoryRetiredTrees(RetiredArchive):
     def credited(self) -> int:
         return 0
 
+    def record(self, tree: RetiredTree) -> Mapping[str, str]:
+        return {}
+
+    def memory(self, tree: RetiredTree, addr: str) -> str:
+        return ""
+
+    def results(self, tree: RetiredTree, addr: str) -> list[Message]:
+        return []
+
 
 # ------------------------------------------------------------------------------ the stand-ins for the evidence gate
 

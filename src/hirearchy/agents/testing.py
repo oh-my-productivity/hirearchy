@@ -12,7 +12,7 @@ from collections.abc import Callable, Iterator, Mapping, MutableMapping, Sequenc
 from dataclasses import dataclass
 from pathlib import Path
 
-from ..kernel import BOXES, ROOT, JsonObject, OrgPaths, child_addr, join_frontmatter, norm
+from ..kernel import BOXES, ROOT, JsonObject, Message, OrgPaths, child_addr, join_frontmatter, norm
 from ..kernel.testing import fs_atomic_writer, system_clock
 from ._caching import CachingAgentDirectory, FsCharterStamps, FsDirectoryProbe, LenientCharterReader
 from ._charters import FsCharterReader
@@ -102,8 +102,12 @@ class MemoryAgents(TreeDirectory, CharterReader, AgentRegistry, RetiredArchive):
             raise FileNotFoundError(2, "No such file or directory", path)
         return parse_charter(self.files[path])
 
-    def memory(self, addr: str) -> str:
-        return self.files.get(self._at(addr, "MEMORY.md"), "")
+    def memory(self, tree: str | RetiredTree, addr: str | None = None) -> str:  # type: ignore[override]
+        """``CharterReader.memory(addr)`` for a live agent; ``RetiredArchive.memory(tree, addr)`` for an archived one. This fake is both ports and the
+        two methods share a name (L25), so it takes either call; the real classes are separate (``FsCharterReader``, ``FsRetiredArchive``)."""
+        if isinstance(tree, RetiredTree):
+            return self._retired.memory(tree, addr or "")
+        return self.files.get(self._at(tree, "MEMORY.md"), "")
 
     # ------------------------------------------------------------------ AgentRegistry
 
@@ -148,6 +152,12 @@ class MemoryAgents(TreeDirectory, CharterReader, AgentRegistry, RetiredArchive):
 
     def credited(self) -> int:
         return self._retired.credited()
+
+    def record(self, tree: RetiredTree) -> Mapping[str, str]:
+        return self._retired.record(tree)
+
+    def results(self, tree: RetiredTree, addr: str) -> list[Message]:
+        return self._retired.results(tree, addr)
 
 
 class MemoryArchiveFiles(ArchiveFiles):

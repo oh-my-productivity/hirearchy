@@ -3,12 +3,12 @@
 from __future__ import annotations
 
 import os
-from collections.abc import Callable, Iterator
+from collections.abc import Callable, Iterator, Mapping
 from dataclasses import replace
 from pathlib import Path
 from typing import Protocol, runtime_checkable
 
-from ..kernel import BOXES, OrgLayout
+from ..kernel import BOXES, Message, OrgLayout, norm, split_frontmatter
 from ._budget import credit_budget, message_budget
 from .api import RetiredArchive, RetiredTree
 
@@ -108,6 +108,57 @@ class FsRetiredArchive(RetiredArchive):
                 if "AGENT.md" in files:
                     total += sum(self._box_budget(here / b, credit_budget) for b in RECV_BOXES)
         return total
+
+    def record(self, tree: RetiredTree) -> Mapping[str, str]:
+        try:
+            meta = split_frontmatter(self._files.read_text(tree.path / "RETIRED.md"))[0]
+        except OSError:
+            return {}
+        except Exception:  # noqa: BLE001 - a record that is not text or not YAML is no record
+            return {}
+        return {str(k): str(v) for k, v in meta.items()}
+
+    def memory(self, tree: RetiredTree, addr: str) -> str:
+        directory = self._agent_dir(tree, addr)
+        if directory is None or "MEMORY.md" not in self._names(directory):
+            return ""
+        return self._text(directory / "MEMORY.md")
+
+    def results(self, tree: RetiredTree, addr: str) -> list[Message]:
+        directory = self._agent_dir(tree, addr)
+        if directory is None:
+            return []
+        sent = directory / "sent"
+        found: list[Message] = []
+        for name in self._names(sent):
+            if name.endswith(".md") and not name.startswith("."):
+                message = Message.parse(self._text(sent / name), sent / name)
+                if message.type == "result":
+                    found.append(message)
+        return sorted(found, key=lambda m: m.id)
+
+    def _agent_dir(self, tree: RetiredTree, addr: str) -> Path | None:
+        """The archived directory of agent ``addr`` of the tree: the tree itself for its top agent, below it for a nested one; None for an address
+        that is not in the tree."""
+        top, here = tree.addr, norm(addr)
+        if here == top:
+            return tree.path
+        if not here.startswith(top + "/"):
+            return None
+        return tree.path.joinpath(*here[len(top) + 1 :].split("/"))
+
+    def _names(self, directory: Path) -> list[str]:
+        try:
+            return self._files.listdir(directory)
+        except OSError:
+            return []
+
+    def _text(self, path: Path) -> str:
+        """The text of a file, or ``OSError``: a file that is no text counts as unreadable."""
+        try:
+            return self._files.read_text(path)
+        except UnicodeDecodeError as error:
+            raise OSError(f"{path} is not valid UTF-8 ({error})") from error
 
     def _box_budget(self, box: Path, budget: Callable[[str], int] = message_budget) -> int:
         """The budget of the messages in one mailbox directory (0 for a directory that cannot be listed); ``budget`` reads one file's text."""

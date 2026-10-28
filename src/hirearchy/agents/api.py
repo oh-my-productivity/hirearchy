@@ -2,7 +2,7 @@
 
 ``AgentDirectory`` answers who exists and where they sit in the tree, ``CharterReader`` reads an agent's charter and memory,
 ``AgentRegistry`` is the only writer of ``AGENT.md``, of the directory skeleton of an agent and of ``.retired/``, and
-``RetiredArchive`` reads the trees that were retired.
+``RetiredArchive`` reads the trees that were retired (their record, and the memory and the results of each agent in them).
 """
 
 from __future__ import annotations
@@ -13,7 +13,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Protocol, runtime_checkable
 
-from ..kernel import JsonObject
+from ..kernel import JsonObject, Message
 
 __all__ = [
     "AgentDirectory",
@@ -109,4 +109,19 @@ class RetiredArchive(Protocol):
     def credited(self) -> int:
         """The runs the runtime gave back with run credits (``kernel.is_run_credit``) that sit in the received boxes (inbox, inflight, read)
         of every agent directory of all retired trees: budget the retired agents received, besides what root and their parents handed down."""
+        ...
+
+    def record(self, tree: RetiredTree) -> Mapping[str, str]:
+        """The frontmatter of the tree's ``RETIRED.md`` (``retired``, ``by``, ``reason``, ``approved_in``), every value as text; ``{}`` when the
+        tree has no record (a tree retired before Phase 2) or it cannot be read."""
+        ...
+
+    def memory(self, tree: RetiredTree, addr: str) -> str:
+        """The archived ``MEMORY.md`` of agent ``addr`` of the tree (the tree's top agent, ``tree.addr``, or an agent below it); ``""`` when the agent
+        or its file is not there. ``OSError`` when the file cannot be read."""
+        ...
+
+    def results(self, tree: RetiredTree, addr: str) -> list[Message]:
+        """The result messages in the archived ``sent/`` of agent ``addr`` of the tree, oldest first; ``[]`` when there are none. ``OSError`` when a
+        file cannot be read."""
         ...
