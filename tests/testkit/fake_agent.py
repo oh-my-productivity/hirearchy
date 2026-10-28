@@ -16,6 +16,10 @@ Behaviour is chosen by FAKE_MODE:
 FAKE_THROTTLE_RUNS=N (unset or 0: nothing changes; any FAKE_MODE): while the number of the agent's run logs (the log of the current run included) is at most N,
 the run prints a ``[run error]`` line carrying ``"retryErrorType":"THROTTLING"`` and then the throttle mark of the kiro launcher, and exits 75 (THROTTLE_EXIT)
 without doing anything; later runs work as FAKE_MODE says.
+
+FAKE_EFFORT_STOP_RUNS=N (unset or 0: nothing changes; any FAKE_MODE): while the number of the agent's run logs (the log of the current run included) is at most N,
+the run writes kiro-cli's effort warning to its stderr, prints the launcher's effort mark and kills itself with SIGKILL (exit -9, as the launcher's group
+kill does), without doing anything; later runs work as FAKE_MODE says.
 """
 
 import os
@@ -33,6 +37,16 @@ if throttled_runs:
         print('[run error] prompt: high traffic (code -32000): {"errorType":"ModelThrottleError","retryErrorType":"THROTTLING"}', flush=True)
         print("# kiro: throttled by the model service (retryErrorType THROTTLING); tool effects: none", flush=True)
         sys.exit(75)
+effort_stopped_runs = int(os.environ.get("FAKE_EFFORT_STOP_RUNS") or 0)
+if effort_stopped_runs:
+    import signal
+    from pathlib import Path
+
+    logs = [p for p in (Path(os.environ["ORG_ROOT"]) / os.environ["ORG_AGENT"] / "runs").glob("*.log") if not p.name.startswith(".")]
+    if len(logs) <= effort_stopped_runs:
+        print("[warn] failed to set effort 'high': model 'claude-sonnet-5.5' offers no effort levels", file=sys.stderr, flush=True)
+        print("# kiro: effort not set, run stopped (kiro-cli: failed to set effort 'high': model 'claude-sonnet-5.5' offers no effort levels); tool effects: none", flush=True)
+        os.kill(os.getpid(), signal.SIGKILL)
 if mode == "crash":
     sys.exit(1)
 if mode == "idle":
