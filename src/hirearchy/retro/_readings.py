@@ -13,6 +13,7 @@ from datetime import datetime
 from ..reflection import CostAlarm, RepeatAlarm
 from ..services import listed_added_words
 from . import _texts as texts
+from ._effect import NOT_EVALUATED, Evaluated
 from ._shapes import RELATIONS, ShapeGroup
 from ._texts import (
     BLOCK_LINES, BLOCK_MORE, BLOCK_WORDS, DETAIL_LINES, DETAIL_MORE, HEADINGS, NONE, UNREADABLE, cause_question, day, quoted,
@@ -255,3 +256,10 @@ def d13_last(fates: Sequence[Fate], last_id: str | None) -> Section:
 def d14_held(held: Sequence[Item]) -> Section:
     """D14 Held back: the candidates beyond the cap of 3 with their weight."""
     return _section("d14", (), [f"- {i.kind} {i.key} (weight {i.weight})" for i in held], (), (("held_back", len(held)),), show=False)
+
+
+def d7_held(rows: Sequence[Evaluated], unreadable: Unreadable) -> Section:
+    """D7 Did past changes hold: one line per change with its outcome (4.4), in the block and in Details."""
+    lines = [f"- {e.text}: {e.outcome}" for e in rows]
+    counts = (("changes", len(rows)), ("recurred", sum(e.outcome.startswith("recurred") for e in rows)), ("not_evaluated", sum(e.outcome == NOT_EVALUATED for e in rows)))
+    return _section("d7", lines, lines, unreadable, counts)

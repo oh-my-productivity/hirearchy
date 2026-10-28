@@ -246,3 +246,39 @@ class Fate:
     kind: str
     state: str
     seen: str = ""
+
+
+@dataclass(frozen=True)
+class Occasion:
+    """A case where a past change was exercised, or a later rejection or one-off task that bears on its target (4.4): the ``case``, the rejection ``ref`` (``""`` for
+    a one-off task), when it happened and the ``tier`` of the verdict (only ``human`` counts)."""
+
+    case: str
+    ref: str = ""
+    when: datetime | None = None
+    tier: str = "human"
+
+
+@dataclass(frozen=True)
+class WatchState:
+    """A playbook item's watch as Phase 1 states it: ``state``, the clean cases out of its own ``k``, and the rejections related to it."""
+
+    state: str
+    k: int
+    clean: int
+    related: tuple[str, ...] = ()
+
+
+@dataclass(frozen=True)
+class Tracked:
+    """A past change D7 weighs (4.4): ``kind`` is ``amendment``, ``playbook``, ``charter`` or ``structural``; ``has_target`` is false for a change that is the effect
+    of no item and has no criterion of its own. ``exercised`` are the cases where it applied, ``recurred`` the later rejections (or one-off tasks of the same shape) on
+    its target; ``watch`` is the item's Phase 1 state, for a playbook item."""
+
+    text: str
+    kind: str
+    when: datetime | None
+    has_target: bool = True
+    exercised: tuple[Occasion, ...] = ()
+    recurred: tuple[Occasion, ...] = ()
+    watch: WatchState | None = None

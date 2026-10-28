@@ -19,7 +19,7 @@ UNREADABLE = "- {service}: cannot be read ({error})"
 
 HEADINGS = {
     "d1": "What you said", "d2": "What got past a check", "d3": "Rejections with no criterion yet", "d4": "Alarms and causes to settle",
-    "d5": "Work you ask for again and again", "d6": "Idle or stranded agents", "d9": "Criteria and your words", "d10": "Your team's own proposals",
+    "d5": "Work you ask for again and again", "d6": "Idle or stranded agents", "d7": "Did past changes hold", "d8": "Changes to your organization", "d9": "Criteria and your words", "d10": "Your team's own proposals",
     "d11": "Playbooks", "d12": "Spend", "d13": "The last brief", "d14": "Held back",
 }
 
