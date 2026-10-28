@@ -59,11 +59,27 @@ def test_setup_mode_other_tools_say_what_to_do(setup_server):
     expected = f"no organization at {target} yet: call create_org(mission=...) first"
     for tool, args in [("inbox", {}), ("delegate", dict(to="a", title="t", goal="g", acceptance="a")),
                        ("report", dict(task_id="x", status="done", summary="s")), ("send", dict(to="a", body="b")),
-                       ("hire", dict(name="a", role="r", charter="c")), ("retire", dict(name="a", reason="r")),
                        ("read", {}), ("write", dict(path="a", content="b")), ("health", {}), ("start", {}),
                        ("stop", {})]:
         assert expected in fails(server, tool, **args), tool
     assert not target.exists()  # nothing was created by the failing calls
+
+
+def test_setup_mode_root_hire_and_retire_are_refused_in_favour_of_the_plan(setup_server):
+    """Root's hire and retire are refused before the organization is asked for (design 13, Q3): the refusal is the same in setup mode."""
+    server, target = setup_server
+    assert "refused: a new agent changes the organization" in fails(server, "hire", name="a", role="r", charter="c")
+    assert "refused: retiring a changes the organization" in fails(server, "retire", name="a", reason="r")
+    assert not target.exists()
+
+
+def test_the_setup_text_names_propose_org_and_apply_org(setup_server):
+    """Root's hire is refused (design 13), so the first step after create_org points to the plan, not to a hire (design 11.2)."""
+    server, target = setup_server
+    for tool in ("whoami", "status"):
+        out = call(server, tool)
+        assert "then propose_org and apply_org a plan, and start() the scheduler." in out
+        assert "hire a team" not in out
 
 
 def test_setup_mode_whoami_and_status_describe_the_setup(setup_server):
@@ -79,7 +95,7 @@ def test_create_org_then_every_tool_works_in_the_same_server(setup_server):
     assert str(target) in out and (target / "ORG.md").is_file()
     assert Org(target).config["default_model"] == "claude-opus-5.5" and "Study octopuses" in Org(target).rules()
     assert "root (human)" in call(server, "status")
-    assert "hired ceo" in call(server, "hire", name="ceo", role="Chief", charter="Lead.", can_hire=True)
+    assert Org(target).hire(ROOT, "ceo", "Chief", "Lead.", can_hire=True) == "ceo"  # (root's MCP hire is refused: the facade is the programs' path)
     assert "delegated" in call(server, "delegate", to="ceo", title="T", goal="g", acceptance="a", budget=3)
     assert "Address: `root`" in call(server, "whoami") and "scheduler: stopped" in call(server, "whoami")
     assert "(no new messages)" in call(server, "inbox")

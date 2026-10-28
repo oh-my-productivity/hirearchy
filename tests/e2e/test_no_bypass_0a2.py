@@ -336,12 +336,15 @@ def test_no_mcp_tool_retires_a_service(svc):
 
 # ------------------------------------------------------------------------------------------------------------ P2: the continuation (plan 7.3, commit 18)
 def restructure_on(org, surface: str) -> str:
-    """root retires ceo's team and hires ceo again on ``surface``; returns the reply of the retirement. No terminal command retires a team, so the
-    CLI leg retires through the facade and hires at the terminal."""
+    """root retires ceo's team and hires ceo again on ``surface``; returns the refusal of root's MCP retire on the mcp leg (root's MCP retire and hire
+    are refused in favour of the extension, design 13: that leg then restructures through the facade, the programs' path), else ``""``. No terminal
+    command retires a team, so the CLI leg retires through the facade and hires at the terminal."""
     if surface == "mcp":
         server = build_server(org, ROOT)
-        said = call(server, "retire", name="ceo", reason="restructure")
-        call(server, "hire", name="ceo", role="Chief executive", charter="Run the company.", can_hire=True, max_children=2)
+        said = fails(server, "retire", name="ceo", reason="restructure")
+        assert "refused: a new agent changes the organization" in fails(server, "hire", name="ceo", role="Chief executive", charter="x")
+        org.retire_team(ROOT, "ceo", "restructure")
+        org.hire(ROOT, "ceo", "Chief executive", "Run the company.", can_hire=True, max_children=2)
         return said
     org.retire_team(ROOT, "ceo", "restructure")
     if surface == "cli":
@@ -377,9 +380,8 @@ def test_retire_team_hire_and_define_continues_on_every_surface(svc, capsys, sur
 
     task, no = rejection(svc)
     said = restructure_on(svc, surface)
-    if surface == "mcp":  # root's retire names what the service keeps and what is open in it (design 5.10)
-        assert said.startswith("retired ceo\nKept with ceo: weekly-brief. Defining one of them again for ceo continues its contract, playbook and cases")
-        assert f"Still open in `weekly-brief`: rejection R1 (message {no.id}) has no answer. Tell the user." in said, said
+    if surface == "mcp":  # root's MCP retire is refused (ROOT-RETIRE) and names the way: the extension's retire
+        assert "refused: retiring ceo changes the organization, so the user approves it in a plan" in said and "Nothing was retired." in said, said
     before = service_files(svc)
     refused_it, got = amend_on(svc, surface, capsys, acceptance=["A different criterion"])
     path = re.search(r"kept at (\S+) \(", got).group(1)

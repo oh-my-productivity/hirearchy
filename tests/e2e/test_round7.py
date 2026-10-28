@@ -40,14 +40,20 @@ def org(tmp_path, dirs):
 
 
 # ---------------------------------------------------------------------------------------- hire with inputs
-def test_root_hire_tool_takes_inputs(org, dirs):
+def test_root_hire_tool_is_refused_and_a_hire_of_root_takes_inputs_through_the_facade(org, dirs):
+    """Root's MCP hire is refused in favour of the plan (design 13, Q3), whatever it passes; the inputs of a hire by root are the facade's and the
+    terminal's (the programs' and the human's path), and keep their rules."""
     server = build_server(binding_at(org.root), ROOT)
-    assert "hired reader" in call(server, "hire", name="reader", role="R", charter="Read.", tools=["read"], inputs=[str(dirs["docs"])])
+    refusal = fails(server, "hire", name="reader", role="R", charter="Read.", tools=["read"], inputs=[str(dirs["docs"])])
+    assert "refused: a new agent changes the organization" in refusal and not (org.root / "reader").exists()
+    org.hire(ROOT, "reader", "R", "Read.", tools=["read"], inputs=[str(dirs["docs"])])
     assert org.charter("reader")[0]["inputs"] == [str(dirs["docs"])] and org.inputs_of("reader") == [dirs["docs"]]
-    call(server, "hire", name="plain", role="P", charter="Nothing.")  # old calls without inputs keep working
+    org.hire(ROOT, "plain", "P", "Nothing.")  # old calls without inputs keep working
     assert "inputs" not in org.charter("plain")[0]
-    assert "absolute path" in fails(server, "hire", name="rel", role="R", charter="x", tools=["read"], inputs=["docs"])
-    assert "organization directory" in fails(server, "hire", name="bad", role="R", charter="x", inputs=[str(org.dir("lead"))])
+    with pytest.raises(Exception, match="absolute path"):
+        org.hire(ROOT, "rel", "R", "x", tools=["read"], inputs=["docs"])
+    with pytest.raises(Exception, match="organization directory"):
+        org.hire(ROOT, "bad", "R", "x", inputs=[str(org.dir("lead"))])
 
 
 def test_manager_hire_tool_narrows_inputs(org, dirs):

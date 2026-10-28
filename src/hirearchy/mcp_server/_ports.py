@@ -154,6 +154,18 @@ class PlanTarget(Protocol):
 
 
 @runtime_checkable
+class StructureGuard(Protocol):
+    def hire(self, me: str) -> None:
+        """Refuse, with an ``OrgError`` that says what to do instead, a ``hire`` that ``me`` may not make over MCP (root's: a new agent changes the
+        organization, so the user approves it in a plan). Returns when ``me`` may hire."""
+        ...
+
+    def retire(self, me: str, name: str) -> None:
+        """The same for ``retire`` of ``name`` (a short name or an address)."""
+        ...
+
+
+@runtime_checkable
 class InstalledSkill(Protocol):
     def stale(self) -> Path | None:
         """The installed assistant skill when it differs from the one this server ships; None otherwise."""

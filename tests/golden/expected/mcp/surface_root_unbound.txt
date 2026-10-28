@@ -490,7 +490,7 @@ output: {
 }
 other: {}
 description:
-Create a direct report (only if your charter allows hiring).
+Root's hire is refused: a new agent changes the organization, so the user approves it in a plan: propose_org(blueprint=<an extension with add_agents>, extend="current"), show its PLAN FOR YOU block, then apply_org after their approval. (Your agents use hire for their own reports; at the terminal the user can run hirearchy hire.)
 
         name: lowercase-dashed (becomes the address <you>/<name>). role: a short job title.
         charter: markdown with purpose, responsibilities, decision rights, what to escalate, quality bar.

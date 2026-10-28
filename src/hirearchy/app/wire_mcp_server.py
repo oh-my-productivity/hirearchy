@@ -131,6 +131,7 @@ def server_factory(binding: OrgBindingPort, scheduler_control: Callable[[Schedul
     from ..mcp_server._factory import GroupedServerFactory
     from ..mcp_server._instructions import InstructionText
     from ..mcp_server._recorder import BatchCallTrace, ToolCallRecorder
+    from ..mcp_server._root_structure import RootStructureGuard
     from ..mcp_server._tools_blueprint import (
         ApprovedPlanApplication,
         BindingPlanTarget,
@@ -165,6 +166,7 @@ def server_factory(binding: OrgBindingPort, scheduler_control: Callable[[Schedul
         return provide(binding, port)
 
     resources, environment = process_resources(), OsEnvironment()
+    structure = RootStructureGuard()  # root's structural calls over MCP are refused in favour of the extension (design 13)
     plan_time = CachedPlanTime()
     text = InstructionText(binding)  # the instructions, and the setup state
     directory = of(AgentDirectory)
@@ -187,7 +189,7 @@ def server_factory(binding: OrgBindingPort, scheduler_control: Callable[[Schedul
         ),
         TaskTools(of(TaskAssigner), of(TaskReporter), of(BudgetQuery), of(MailboxReader), of(ServiceHints)),
         NoteTools(of(MessageSender), of(BudgetQuery), of(BudgetReclaimer)),
-        HiringTools(of(Hiring), of(Retirement), of(ServiceCatalog), of(ServiceEvidence)),
+        HiringTools(of(Hiring), of(Retirement), of(ServiceCatalog), of(ServiceEvidence), structure),
         FileTools(of(ToolNaming), of(OrgFileReader), of(OrgFileWriter), of(OrgLayout)),
         StatusTools(
             text, of(OrgTree), of(SchedulerStatus), directory, of(HealthAnalyzer), of(HealthRenderer), installed_skill, of(DeliverableChecks),

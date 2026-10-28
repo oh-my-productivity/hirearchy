@@ -12,7 +12,7 @@ from testkit.reach.hirearchy.core import ROOT
 
 from hirearchy.kernel import OrgError
 from hirearchy.mcp_server._tools_hiring import HiringTools
-from hirearchy.mcp_server.testing import ScriptedHiring, ScriptedRetirement
+from hirearchy.mcp_server.testing import AllowingStructureGuard, ScriptedHiring, ScriptedRetirement
 from hirearchy.services import AmendmentBasis, Rejection
 from hirearchy.services.testing import AdmittingServiceEvidence
 
@@ -71,7 +71,7 @@ class UntouchedCatalog(Catalog):
 
 def group(retirement: ScriptedRetirement | None = None, catalog: Catalog | None = None, evidence: AdmittingServiceEvidence | None = None) -> HiringTools:
     retiring, offered, record = retirement or ScriptedRetirement(), catalog or Catalog({}), evidence or RecordOf({})
-    return HiringTools(lambda: ScriptedHiring(), lambda: retiring, lambda: offered, lambda: record)
+    return HiringTools(lambda: ScriptedHiring(), lambda: retiring, lambda: offered, lambda: record, AllowingStructureGuard())
 
 
 def test_root_retire_of_an_owner_names_kept_services_and_open_items() -> None:

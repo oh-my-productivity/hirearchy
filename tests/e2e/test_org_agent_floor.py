@@ -88,10 +88,11 @@ def test_an_agent_that_existed_below_the_floor_keeps_its_model(org, isolated_kir
 
 
 def point_hire(org, model: str) -> str | None:
-    """Root hires an agent on ``model`` through its MCP server: the refusal, or None when the agent exists with that model."""
+    """Root hires an agent on ``model`` through the facade (root's MCP hire is refused in favour of the plan, design 13, so the programs' path is the
+    one that reaches the floor): the refusal, or None when the agent exists with that model."""
     name = f"x-{slug(model)}"  # one agent per model, so a test may hire on several
     try:
-        call(build_server(org, ROOT), "hire", name=name, role="X", charter="x", model=model)
+        org.hire(ROOT, name, "X", "x", model=model)
     except Exception as error:
         return str(error)
     meta, _ = split_frontmatter((org.dir(name) / "AGENT.md").read_text(encoding="utf-8"))
@@ -268,8 +269,9 @@ def plan_id_of(server, text: str) -> str:
 BROKEN_CALLS = {  # label: (tool, arguments of the call given the plan_id of the research blueprint, what its refusal says; None = the call answers)
     "status": ("status", lambda pid: {}, None),
     "whoami": ("whoami", lambda pid: {}, None),
-    "hire with a model": ("hire", lambda pid: dict(name="ops", role="Ops", charter="c", model="claude-opus-5.5"), "ORG.md cannot be read"),
-    "hire without a model": ("hire", lambda pid: dict(name="ops", role="Ops", charter="c"), "ORG.md cannot be read"),
+    "hire with a model": (  # (root's MCP hire is refused before ORG.md is read, design 13)
+        "hire", lambda pid: dict(name="ops", role="Ops", charter="c", model="claude-opus-5.5"), "refused: a new agent changes the organization"),
+    "hire without a model": ("hire", lambda pid: dict(name="ops", role="Ops", charter="c"), "refused: a new agent changes the organization"),
     "charter rewrite to a floor model": (
         "write", lambda pid: dict(path="ceo/AGENT.md", content="---\nrole: CEO\nmodel: claude-opus-5.5\n---\nNew body.\n"), None),
     "charter rewrite below the floor": (

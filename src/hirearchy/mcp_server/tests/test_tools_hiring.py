@@ -7,7 +7,7 @@ import asyncio
 import pytest
 
 from hirearchy.mcp_server._tools_hiring import HiringTools
-from hirearchy.mcp_server.testing import ScriptedHiring, ScriptedRetirement
+from hirearchy.mcp_server.testing import AllowingStructureGuard, ScriptedHiring, ScriptedRetirement
 from hirearchy.services.testing import AdmittingServiceEvidence
 
 from ._support import call, described, serve
@@ -15,8 +15,9 @@ from .test_tools_services import Catalog
 
 
 def tools(hiring: ScriptedHiring, retirement: ScriptedRetirement) -> HiringTools:
-    """The group over scripted hiring and retirement, for an organization whose agents offer no service."""
-    return HiringTools(lambda: hiring, lambda: retirement, lambda: Catalog({}), lambda: AdmittingServiceEvidence())
+    """The group over scripted hiring and retirement, for an organization whose agents offer no service. The guard refuses nobody: these tests are
+    about the tools (root's refusals are ``test_root_structure.py``'s)."""
+    return HiringTools(lambda: hiring, lambda: retirement, lambda: Catalog({}), lambda: AdmittingServiceEvidence(), AllowingStructureGuard())
 
 
 def test_hire_passes_everything_and_says_the_address() -> None:

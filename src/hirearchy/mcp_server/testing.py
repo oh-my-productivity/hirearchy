@@ -34,7 +34,7 @@ from ..traces import TraceLookup
 from ._binding import OpenerBindings, OrgBinding
 from ._factory import GroupedServerFactory
 from ._instructions import InstructionText
-from ._ports import InstalledSkill, OrgOpener, OrgPorts, ServerFactories, ToolGroup
+from ._ports import InstalledSkill, OrgOpener, OrgPorts, ServerFactories, StructureGuard, ToolGroup
 from ._recorder import BatchCallTrace, ToolCallRecorder
 from ._resolver import EnvBindingResolver
 from ._serve import StdioMcpRunner
@@ -387,6 +387,16 @@ class ScriptedFiles(OrgFileReader, OrgFileWriter):
     def write_noted(self, actor: str, path: str, content: str, append: bool = False) -> tuple[Path, str]:
         self.log.add("write_noted", actor, path, content, append)
         return self.root / path, self.note
+
+
+class AllowingStructureGuard(StructureGuard):
+    """The guard that refuses nobody: for the tests of the tools themselves, whoever calls them (the refusals are ``RootStructureGuard``'s)."""
+
+    def hire(self, me: str) -> None:
+        pass
+
+    def retire(self, me: str, name: str) -> None:
+        pass
 
 
 class StaticNaming(ToolNaming):

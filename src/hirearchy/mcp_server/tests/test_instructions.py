@@ -54,11 +54,11 @@ def test_the_setup_state_is_what_whoami_and_status_say_before_an_organization_ex
     bound = InstructionText(MemoryBinding(Path("/o")))
     assert bound.active() and bound.state() == (
         "Setup: no organization exists at /o yet.\n"
-        "Next step: call create_org(mission=\"...\") to create it; then hire a team, delegate work and start() the scheduler. "
+        "Next step: call create_org(mission=\"...\") to create it; then propose_org and apply_org a plan, and start() the scheduler. "
         "Until then every other tool returns an error.\nscheduler: stopped")
     assert InstructionText(MemoryBinding(None)).state() == (
         "Setup: no organization exists (none found: ORG_ROOT is not set) yet.\n"
-        "Next step: call create_org(mission=\"...\", path=<absolute path>) to create it; then hire a team, delegate work and start() the scheduler. "
+        "Next step: call create_org(mission=\"...\", path=<absolute path>) to create it; then propose_org and apply_org a plan, and start() the scheduler. "
         "Until then every other tool returns an error.\nscheduler: stopped")
 
 

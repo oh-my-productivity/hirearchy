@@ -77,6 +77,6 @@ class InstructionText(ServerInstructions, SetupMode):
         where = f"at {root}" if root is not None else "(none found: ORG_ROOT is not set)"
         path_arg = "" if root is not None else ", path=<absolute path>"
         return (f"Setup: no organization exists {where} yet.\n"
-                f"Next step: call create_org(mission=\"...\"{path_arg}) to create it; then hire a team, delegate "
-                "work and start() the scheduler. Until then every other tool returns an error.\n"
+                f"Next step: call create_org(mission=\"...\"{path_arg}) to create it; then propose_org and apply_org "
+                "a plan, and start() the scheduler. Until then every other tool returns an error.\n"
                 "scheduler: stopped")
