@@ -16,7 +16,7 @@ WEB_TOOLS = ("web_search", "web_fetch")
 WRITE_TOOLS = ("write", "shell")
 
 NEEDS_KEYS = {"scope", "deliverable", "quality_bar", "sources", "workspace", "inputs", "budget_runs", "models",
-              "model_policy", "review", "approval", "progress", "kind", "code"}
+              "model_policy", "review", "approval", "progress", "kind", "code", "elicitation"}
 AGENT_KEYS = {"name", "role", "template", "charter", "model", "tools", "workspace", "inputs", "can_hire", "max_children",
               "children", "scale", "kind"}
 SERVICE_KEYS = {"name", "owner", "description", "inputs", "acceptance", "deliverable", "budget", "playbook", "locked"}
@@ -62,10 +62,16 @@ def deliverable_of(bp: Mapping[str, object]) -> JsonObject:
     return mapping_or_empty(d)
 
 
+def criterion_text(c: object) -> str:
+    """The words of one acceptance criterion: a string is itself, a mapping (``{text, from | default | from_tasks, asked}``) is its ``text`` alone.
+    The source is never part of a criterion's words (design 10.1 step 5)."""
+    return s(c.get("text")) if isinstance(c, dict) else s(c)
+
+
 def criteria_of(bp: Mapping[str, object]) -> list[str]:
     t = bp.get("task")
     acc = t.get("acceptance") if isinstance(t, dict) else None
-    return [s(c) for c in acc] if isinstance(acc, list) else []
+    return [criterion_text(c) for c in acc] if isinstance(acc, list) else []
 
 
 def services_of(bp: Mapping[str, object]) -> list[JsonObject]:
@@ -100,7 +106,7 @@ def svc_deliverable(sv: Mapping[str, object]) -> JsonObject:
 
 def svc_criteria(sv: Mapping[str, object]) -> list[str]:
     acc = sv.get("acceptance")
-    return [s(c) for c in acc if s(c)] if isinstance(acc, list) else []
+    return [text for c in acc if (text := criterion_text(c))] if isinstance(acc, list) else []
 
 
 def cap_of(needs: Mapping[str, object]) -> int | None:

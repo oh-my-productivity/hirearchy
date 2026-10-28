@@ -40,6 +40,7 @@ __all__ = [
     "Contract",
     "ContractNormalizer",
     "Criterion",
+    "CriterionSource",
     "DELIVERABLE_KEYS",
     "DESCRIPTION_MAX",
     "EVIDENCE_ID_MAX",
@@ -68,6 +69,7 @@ __all__ = [
     "TOKEN",
     "VERDICTS",
     "acknowledge_reply",
+    "added_words",
     "amendment_ids",
     "changed_lines",
     "confirmed_amendments",
@@ -298,6 +300,27 @@ def text_tokens(t: str) -> list[str]:
     list and heading markers are stripped on the second and later lines only, which only migrated items have (L13): a first line is the owner's or
     the migration's words, so a leading ``>``, ``+``, ``-`` or ``1.`` there is a token."""
     return [tok for i, line in enumerate(t.splitlines()) for tok in TOKEN.findall(plain(strip_markers(line) if i else line).casefold())]
+
+
+def added_words(text: str, quote: str, asked: str) -> tuple[str, ...]:
+    """The words a criterion adds to what the user said (pure, design 3 and 10.1): the :func:`text_tokens` of ``text`` that are not among the
+    tokens of ``quote`` (the user's recorded words) and ``asked`` (the question they answered), in order, each once. ``()`` when there are none."""
+    known = {*text_tokens(quote), *text_tokens(asked)}
+    return tuple(dict.fromkeys(tok for tok in text_tokens(text) if tok not in known))
+
+
+@dataclass(frozen=True)
+class CriterionSource:
+    """Where the words of one acceptance criterion come from (design 3, 10.1). ``kind`` is ``user`` (``quote``: a verbatim quote of the user's
+    recorded words; ``asked``: the question it answered, when given), ``default`` (root's proposal, accepted with the plan), ``tasks`` (``tasks``:
+    the case heads whose criteria it copies; extension only), ``amendment`` (``quote``: the words of the contract version that added it;
+    ``asked``: the id its question named) or ``unknown`` (a contract or plan from before Phase 2, or a criterion a terminal plan gave without a
+    source)."""
+
+    kind: str
+    quote: str = ""
+    asked: str = ""
+    tasks: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)

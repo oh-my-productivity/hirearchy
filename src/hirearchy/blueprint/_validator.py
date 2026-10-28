@@ -15,6 +15,7 @@ from ..kernel import JsonObject, inside
 from ..settings import config_default_model, config_effort, effort_floor_problem, model_floor_problem
 from ._budgeting import TIGHT
 from ._protocols import AccessReport, AgentResolution, BudgetPlanning, OrgContexts, PathChecking, ServiceRules, WorkspaceRoots
+from ._provenance import criterion_issues
 from ._resolver import declared_inputs, review_roots
 from ._rules import (
     NO_WEB,
@@ -211,6 +212,8 @@ class RuleBlueprintValidator(BlueprintValidator):
                 to = s(task.get("to")) or tops[0].addr
                 if to not in by or by[to].parent is not None:
                     issues.append(Issue("error", "task.to", f"'{to}' must be the top-level agent ({tops[0].addr}); tasks go to the head of the tree and flow down", "task"))
+
+        issues += criterion_issues(bp, extension=False, require_sources=False)
 
         # --- deliverable path: how does it get there?
         path = s(d.get("path"))

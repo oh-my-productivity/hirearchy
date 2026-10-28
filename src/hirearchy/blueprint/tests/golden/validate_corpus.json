@@ -1768,7 +1768,7 @@
   [
    "warning",
    "needs",
-   "unknown key 'colour' is ignored; check the spelling (known: approval, budget_runs, code, deliverable, inputs, kind, model_policy, models, progress, quality_bar, review, scope, sources, workspace)",
+   "unknown key 'colour' is ignored; check the spelling (known: approval, budget_runs, code, deliverable, elicitation, inputs, kind, model_policy, models, progress, quality_bar, review, scope, sources, workspace)",
    "unknown-key"
   ],
   [
