@@ -167,3 +167,15 @@ class ExtensionText:
     block: str
     details: str
     issues: list[Issue]
+
+
+@dataclass(frozen=True)
+class Undo:
+    """One write of an extension apply that its undo takes back (design 5.5): what ``kind`` wrote at ``target`` (an agent, or the owner of a service)."""
+
+    kind: str  # "charter" | "depth" | "agent" | "service" | "budget"
+    target: str = ""
+    name: str = ""  # the service
+    text: str = ""  # the charter text before the write
+    number: int = 0  # the depth, or the budget, before the write
+    version: int = 0  # the contract version before a budget amendment

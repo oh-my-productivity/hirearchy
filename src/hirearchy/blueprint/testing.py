@@ -14,21 +14,28 @@ from typing import NamedTuple, Protocol
 
 from ..agents import AgentDirectory
 from ..agents.testing import MemoryAgents
-from ..dispatch import TaskAssigner
+from ..dispatch import MessageSender, TaskAssigner
 from ..hierarchy import Hiring, Retired, Retirement
 from ..kernel import NAME_RE, JsonObject, Message, OrgError, child_addr
-from ..kernel.testing import DictEnvironment
+from ..kernel.testing import DictEnvironment, ListEventSink
 from ..kiro import Confinement, ConfinementPolicy
 from ..kiro.testing import kiro_confinement
 from ..services import ContractNormalizer, PlaybookChange, ServiceCommands
 from ..services.testing import memory_world
 from ..services.testing import normalizer as contract_normalizer
 from ..settings import DEFAULT_CONFIG
+from ..settings.testing import MemoryOrgSettings
 from ..snapshots import OrgSnapshotter
 from ._access import PolicyAccessReport
 from ._assembly import PlanParts, applier_over, plan_parts
 from ._budgeting import BudgetPlanner
 from ._extension import ExtensionResolver
+from ._extension_apply import EXTEND_STALE, ExtensionApplier
+from ._fingerprint import OrgFingerprint
+from ._identity import HashPlanIdentity
+from ._playbooks import StepsPlaybookWriter
+from ._charters import CharterWriter
+from ._undo import ExtensionUndo
 from ._extension_org import Reads
 from ._files import FsTextFiles
 from ._loader import YamlBlueprintLoader
@@ -56,15 +63,18 @@ from ._service_rules import ServiceBlueprintRules
 from ._validator import RuleBlueprintValidator
 from .api import (
     BlueprintApplier,
+    BlueprintError,
     BlueprintExamples,
     BlueprintLoader,
     BlueprintValidator,
+    ExtensionApplying,
     PlanIdentity,
     PlanRenderer,
     Role,
     RoleLibrary,
     SummaryText,
     WorkspaceProvisioner,
+    is_extension,
 )
 
 PURE = {"IssueText", "SummaryText", "PlanIdentity", "BlueprintExamples"}  # data with one derived view / a pure function of its argument: one implementation, no fake
@@ -624,6 +634,70 @@ class ScriptedFingerprint(Fingerprinting):
         return self.value
 
 
+class ScriptedExtensionApplier(ExtensionApplying):
+    """An applier that accepts any extension that comes with the plan id it expects (or none), and records what it was asked."""
+
+    def __init__(self, expected: str = "abc123def456") -> None:
+        self.expected = expected
+        self.calls: list[tuple[Mapping[str, object], str | None, bool]] = []
+
+    def apply(
+        self, bp: Mapping[str, object], *, plan_id: str | None, require_sources: bool = False, allowed_roots: Sequence[str | Path] | None = None,
+    ) -> str:
+        self.calls.append((bp, plan_id, require_sources))
+        if not is_extension(bp):
+            raise BlueprintError("blueprint has errors, nothing was created:\n- extend: this is not an extension")
+        if plan_id is not None and plan_id.strip() != self.expected:
+            raise BlueprintError(EXTEND_STALE)
+        return f"applied the change {self.expected} to /org\nNothing runs because of it."
+
+
+@dataclass(frozen=True)
+class ExtensionApplyHarness:
+    applier: ExtensionApplying
+    extension: Mapping[str, object]  # an extension that applies
+    plan_id: str  # the id it is applied with
+    touch: Callable[[], None]  # something the extension names changes in the organization
+
+
+def applier_over_a_script(tmp_path: Path) -> ExtensionApplyHarness:
+    return ExtensionApplyHarness(
+        ScriptedExtensionApplier(), {"reason": "r", "extend": {"limits": [{"agent": "lead", "max_children": 3}]}}, "abc123def456", lambda: None,
+    )
+
+
+class RecordingSender(MessageSender):
+    """The message sender of an application test: it delivers nothing and keeps what it was asked to send."""
+
+    def __init__(self, log: CallRecording) -> None:
+        self._log = log
+
+    def send(
+        self, actor: str, to: str, body: str, *, type: str = "note", title: str = "", reply_to: str | None = None, status: str | None = None, budget: int = 0,
+        revises: str | None = None, supersedes: str | None = None, service: str | None = None, contract: int | None = None, playbook: int | None = None,
+        feedback: str | None = None, source: str | None = None, criterion: str | None = None, wake: bool = True, skip_route_check: bool = False,
+        inherited: str | None = None, acknowledges: str | None = None,
+    ) -> Message:
+        self._log.add("send", actor, to, body, type=type, title=title, wake=wake)
+        return Message(actor, to, type, body, title=title, wake=wake, id=f"note-{len(self._log.of('send'))}")
+
+
+def applier_over_memory_ports(tmp_path: Path) -> ExtensionApplyHarness:
+    """The real extension applier over fakes: the agents in a ``MemoryAgents``, ORG.md in a ``MemoryOrgSettings``, recording hiring, retirement,
+    services, sender and snapshots."""
+    agents, log = MemoryAgents(), CallLog()
+    agents.create("lead", {"role": "Lead", "tools": ["read"], "can_hire": True, "max_children": 2}, "# Role: Lead\n\nDirects.")
+    reads = _reads(tmp_path, AgentsOrgContext(tmp_path / "org", agents), agents)
+    retirement, commands, limits = RecordingRetirement(agents, log), RecordingServiceCommands(log), MemoryOrgSettings("---\nmax_depth: 4\n---\nrules\n")
+    applier = ExtensionApplier(
+        reads, ExtensionResolver(reads), HashPlanIdentity(OrgFingerprint(reads)), CharterWriter(), StepsPlaybookWriter(BudgetPlanner()),
+        contract_normalizer(tmp_path / "temp"), RecordingHiring(agents, log), retirement, agents, commands, limits, RecordingSender(log),
+        ExtensionUndo(agents, retirement, agents, commands, limits), RecordingSnapshots(log), ListEventSink(),
+    )
+    bp = {"reason": "r", "extend": {"limits": [{"agent": "lead", "max_children": 3}]}}
+    return ExtensionApplyHarness(applier, bp, HashPlanIdentity(OrgFingerprint(reads)).plan_id(bp), lambda: agents.create("lead/extra", {"role": "Extra"}, "x"))
+
+
 @dataclass(frozen=True)
 class FingerprintHarness:
     fingerprinting: Fingerprinting
@@ -760,6 +834,7 @@ IMPLEMENTATIONS: Mapping[type, Sequence[Callable[[Path], object]]] = {
     PlanRenderer: [renderer_over_packaged_roles, renderer_over_memory_roles],
     ExtensionResolution: [resolver_over_a_static_org, resolver_over_memory_agents],
     RootTasks: [scripted_root_tasks],
+    ExtensionApplying: [applier_over_memory_ports, applier_over_a_script],
     BlueprintApplier: [applier_over_memory_directories, applier_over_disk_directories],
     WorkspaceProvisioner: [provisioner_on_disk, provisioner_in_memory],
 }

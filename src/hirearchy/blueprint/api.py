@@ -43,6 +43,7 @@ __all__ = [
     "BlueprintExamples",
     "BlueprintLoader",
     "BlueprintValidator",
+    "ExtensionApplying",
     "Issue",
     "IssueText",
     "PlanIdentity",
@@ -270,6 +271,20 @@ class BlueprintApplier(Protocol):
         ``require_sources``, a criterion without a source or a plan without the user's words is one); if a hire, a service definition or the
         delegation fails midway, the top-level agents created are retired again, the workspace directories this call made are removed when empty,
         and the error is raised."""
+        ...
+
+
+@runtime_checkable
+class ExtensionApplying(Protocol):
+    def apply(
+        self, bp: Mapping[str, object], *, plan_id: str | None, require_sources: bool = False, allowed_roots: Sequence[str | Path] | None = None,
+    ) -> str:
+        """Apply the extension ``bp`` to the current organization (design 5.5) and return the reply: limits first (the hiring rules then admit the
+        additions), then the agents and services it adds, the charter lines and budgets it changes, then the services and agents it retires. Validated
+        again against the files as they are now (``BlueprintError``, nothing written, on an error); with a ``plan_id`` (``None`` skips this, for the
+        user's own file at the terminal) it must be the id ``PlanIdentity`` gives the extension now, else it is refused as stale. A failure while
+        writing takes back everything written before it; a failure while retiring leaves what was applied and says so. The owner of a service that
+        got a new verifier is told only after a full apply."""
         ...
 
 

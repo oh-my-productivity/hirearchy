@@ -9,6 +9,7 @@ from ..blueprint import (
     BlueprintExamples,
     BlueprintLoader,
     BlueprintValidator,
+    ExtensionApplying,
     PlanIdentity,
     PlanRenderer,
     RoleLibrary,
@@ -27,5 +28,6 @@ class Fields:
     plan_renderer: PlanRenderer
     plan_identity: PlanIdentity
     blueprint_applier: BlueprintApplier
+    extension_applier: ExtensionApplying
     blueprint_examples: BlueprintExamples
     workspace_provisioner: WorkspaceProvisioner

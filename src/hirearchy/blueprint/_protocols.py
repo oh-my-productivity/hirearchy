@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Protocol, runtime_checkable
 
 from ..kernel import JsonObject, Message
-from ._shapes import AccessFacts, Built, Estimate, Extension, ExtensionText, RootTask, Split
+from ._shapes import AccessFacts, Built, Estimate, Extension, ExtensionText, RootTask, Split, Undo
 from .api import Agent, Issue
 
 
@@ -274,4 +274,13 @@ class ExtensionPlanning(Protocol):
     def plan(self, bp: Mapping[str, object], *, allowed_roots: Sequence[str | Path] | None = None, require_sources: bool = False) -> ExtensionText:
         """The plan of the extension ``bp`` as text (design 5.3): the block headed ``PLAN FOR YOU (a change to your organization)`` (headed as a draft when
         there are errors), the details for the assistant, and the issues. Writes nothing."""
+        ...
+
+
+@runtime_checkable
+class ExtensionUndoing(Protocol):
+    def undo(self, journal: Sequence[Undo], plan_id: str) -> str:
+        """Take back the writes of a failed extension apply, newest first (design 5.5): the old charter texts and depth, the services and agents it
+        made retired again (labelled as taken back), a budget amendment answered with an amendment back. Never raises; returns the sentence about the
+        contract versions a budget amendment left (``""`` when none)."""
         ...

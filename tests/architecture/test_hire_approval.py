@@ -1,7 +1,7 @@
 """Only a person's own decision can exempt a hire from the authority bound (design 5.6).
 
-``Hiring.hire(approved=True)`` skips the check that a non-root hirer grants no ``can_hire`` and no larger ``max_children``. Three callers may pass
-it: the blueprint applier (an approved plan, applied from MCP ``apply_org`` after the user said yes, or by the user at the terminal), the CLI's
+``Hiring.hire(approved=True)`` skips the check that a non-root hirer grants no ``can_hire`` and no larger ``max_children``. Four callers may pass
+it: the blueprint applier and the extension applier (an approved plan or change, applied from MCP ``apply_org`` after the user said yes, or by the user at the terminal), the CLI's
 ``hire`` (the human at the terminal) and the ``Org`` facade (pure delegation). No MCP tool takes the parameter, so no agent can reach it.
 """
 
@@ -9,7 +9,7 @@ import ast
 
 from architecture.paths import SRC
 
-ALLOWED = {"blueprint/_team.py", "cli/_commands_org.py", "app/_facade_hierarchy.py"}
+ALLOWED = {"blueprint/_team.py", "blueprint/_extension_apply.py", "cli/_commands_org.py", "app/_facade_hierarchy.py"}
 
 
 def _library_modules():

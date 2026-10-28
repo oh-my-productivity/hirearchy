@@ -9,19 +9,20 @@ import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 
-from ..agents import AgentDirectory, CharterReader, RetiredArchive
+from ..agents import AgentDirectory, AgentRegistry, CharterReader, RetiredArchive
 from ..blueprint import (
     BlueprintApplier,
     BlueprintExamples,
     BlueprintLoader,
     BlueprintValidator,
+    ExtensionApplying,
     PlanIdentity,
     PlanRenderer,
     RoleLibrary,
     WorkspaceProvisioner,
 )
 from ..blueprint._access import PolicyAccessReport
-from ..blueprint._assembly import PlanParts, applier_over, plan_parts
+from ..blueprint._assembly import PlanParts, applier_over, extension_applier_over, plan_parts
 from ..blueprint._budgeting import BudgetPlanner
 from ..blueprint._examples import TemplateBlueprintExamples
 from ..blueprint._extension_org import Reads
@@ -35,16 +36,16 @@ from ..blueprint._roles import PackagedRoleLibrary
 from ..blueprint._roots import EnvironmentWorkspaceRoots
 from ..blueprint._service_rules import ServiceBlueprintRules
 from ..blueprint._validator import RuleBlueprintValidator
-from ..dispatch import TaskAssigner
+from ..dispatch import MessageSender, TaskAssigner
 from ..hierarchy import Hiring, Retirement
-from ..kernel import Environment, OrgLayout
+from ..kernel import Environment, EventSink, OrgLayout
 from ..kiro import ConfinementPolicy
 from ..mail import MailboxReader
 from ..services import ContractNormalizer, ServiceCatalog, ServiceCommands, ServiceEvidence
 from ..services._continue import RecordedContinuations
 from ..services._places import OrgServicePlaces
 from ..services._store import OsServiceFiles
-from ..settings import OrgSettings
+from ..settings import OrgLimits, OrgSettings
 from ..snapshots import OrgSnapshotter
 from ._builder import Builder
 from ._continued_criteria import RecordedContinuedCriteria
@@ -82,6 +83,7 @@ def register(b: Builder) -> None:
     b.provide(WorkspaceProvisioner, lambda b: FsWorkspaceProvisioner())
     b.provide(BlueprintExamples, lambda b: TemplateBlueprintExamples())
     b.provide(BlueprintApplier, _applier)
+    b.provide(ExtensionApplying, _extension_applier)
 
 
 @dataclass(frozen=True)
@@ -136,4 +138,11 @@ def _applier(b: Builder) -> BlueprintApplier:
     return applier_over(
         _plan(b), BudgetPlanner(), b.get(ContractNormalizer), b.get(Hiring), b.get(Retirement), b.get(AgentDirectory), b.get(ServiceCommands),
         b.get(TaskAssigner), b.get(OrgSnapshotter), b.get(WorkspaceProvisioner),
+    )
+
+
+def _extension_applier(b: Builder) -> ExtensionApplying:
+    return extension_applier_over(
+        _plan(b), _reads(b), b.get(ContractNormalizer), b.get(Hiring), b.get(Retirement), b.get(AgentRegistry), b.get(ServiceCommands), b.get(OrgLimits),
+        b.get(MessageSender), b.get(OrgSnapshotter), b.get(EventSink),
     )

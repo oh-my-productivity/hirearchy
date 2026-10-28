@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from ..settings import EventSwitch, OrgDocumentStore, OrgSettings
+from ..settings import EventSwitch, OrgDocumentStore, OrgLimits, OrgSettings
 
 STEP: str | None = "A-settings"  # the step that filled this part (see test_runtime_fields)
 NOT_A_FIELD: dict[str, str] = {}  # port -> why it is not a runtime field (a value, a factory, ...)
@@ -14,4 +14,5 @@ NOT_A_FIELD: dict[str, str] = {}  # port -> why it is not a runtime field (a val
 class Fields:
     settings: OrgSettings
     documents: OrgDocumentStore
+    org_limits: OrgLimits
     event_switch: EventSwitch

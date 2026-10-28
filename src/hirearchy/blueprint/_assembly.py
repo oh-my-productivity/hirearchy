@@ -7,10 +7,12 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from ..agents import AgentDirectory
-from ..dispatch import TaskAssigner
+from ..agents import AgentDirectory, AgentRegistry
+from ..dispatch import MessageSender, TaskAssigner
 from ..hierarchy import Hiring, Retirement
+from ..kernel import EventSink
 from ..services import ContractNormalizer, ServiceCommands
+from ..settings import OrgLimits
 from ..snapshots import OrgSnapshotter
 from ._accesswords import PlainAccessWords
 from ._applier import HiringBlueprintApplier
@@ -18,6 +20,7 @@ from ._basis import ValidatedPlanBasis
 from ._charters import CharterWriter
 from ._details import TextPlanDetails
 from ._extension import ExtensionResolver
+from ._extension_apply import ExtensionApplier
 from ._extension_org import Reads
 from ._extension_plan import TextExtensionPlan
 from ._fingerprint import OrgFingerprint
@@ -39,10 +42,10 @@ from ._protocols import (
 from ._render import TextPlanRenderer
 from ._servicedef import PlaybookServiceDefiner
 from ._team import CharterTeamBuilder
-from ._undo import RetiringRollback
+from ._undo import ExtensionUndo, RetiringRollback
 from ._userplan import TextUserPlan
 from ._words import ServiceWords
-from .api import BlueprintApplier, BlueprintLoader, BlueprintValidator, PlanIdentity, PlanRenderer, WorkspaceProvisioner
+from .api import BlueprintApplier, BlueprintLoader, BlueprintValidator, ExtensionApplying, PlanIdentity, PlanRenderer, WorkspaceProvisioner
 
 
 @dataclass(frozen=True)
@@ -86,4 +89,15 @@ def applier_over(
         plan.basis, budgets, CharterTeamBuilder(hiring, plan.charters, provisioner),
         PlaybookServiceDefiner(commands, normalizer, plan.playbooks, budgets), FirstTaskGiver(tasks, commands),
         RetiringRollback(agents, retirement, provisioner), snapshots, plan.identity,
+    )
+
+
+def extension_applier_over(
+    plan: PlanParts, reads: Reads, normalizer: ContractNormalizer, hiring: Hiring, retirement: Retirement, registry: AgentRegistry, commands: ServiceCommands,
+    limits: OrgLimits, sender: MessageSender, snapshots: OrgSnapshotter, events: EventSink,
+) -> ExtensionApplying:
+    """The applier of an extension of the current organization over the given plan, the ports it writes through and what its rules read."""
+    return ExtensionApplier(
+        reads, ExtensionResolver(reads), plan.identity, plan.charters, plan.playbooks, normalizer, hiring, retirement, registry, commands, limits, sender,
+        ExtensionUndo(reads.agents, retirement, registry, commands, limits), snapshots, events,
     )
