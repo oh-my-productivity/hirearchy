@@ -78,14 +78,14 @@ class ExtensionApplier(ExtensionApplying):
         if plan_id is not None and plan_id.strip() != pid:
             raise BlueprintError(EXTEND_STALE)
         journal: list[Undo] = []
-        step = "limits"
+        step = ["limits"]  # what is being written, for the event of a failure
         try:
-            step = self._limits_step(ext, pid, journal)
-            step = self._additions(bp, ext, pid, journal)
-            step = self._changes(ext, pid, journal)
+            self._limits_step(ext, pid, journal, step)
+            self._additions(bp, ext, pid, journal, step)
+            self._changes(ext, pid, journal, step)
         except Exception as error:
             budget = self._undo.undo(journal, pid)
-            self._events.emit("extension.rolled_back", actor=ROOT, plan_id=pid, step=step, error=clip(str(error), 500))
+            self._events.emit("extension.rolled_back", actor=ROOT, plan_id=pid, step=step[0], error=clip(str(error), 500))
             raise BlueprintError(NOT_APPLIED.format(error=str(error).rstrip("."), budget=budget)) from error
         done, failure = self._retires(ext, pid)
         if failure is not None and not done:  # nothing irreversible happened yet: take everything back
@@ -101,10 +101,9 @@ class ExtensionApplier(ExtensionApplying):
 
     # ------------------------------------------------------------------ 3: limits, first (the hiring rules check them for every addition)
 
-    def _limits_step(self, ext: Extension, pid: str, journal: list[Undo]) -> str:
-        step = "limits"
+    def _limits_step(self, ext: Extension, pid: str, journal: list[Undo], step: list[str]) -> None:
         for c in ext.limits:
-            step = f"limits of {c.agent}"
+            step[0] = f"limits of {c.agent}"
             meta, body = self._reads.charters.charter(c.agent)
             old = join_frontmatter(meta, body)
             new = dict(meta)
@@ -116,17 +115,15 @@ class ExtensionApplier(ExtensionApplying):
             self._registry.rewrite_charter(c.agent, join_frontmatter(new, with_changes(body, [], [], text, pid)))
             journal.append(Undo("charter", c.agent, text=old))
         if ext.depth is not None:
-            step = "max_depth"
+            step[0] = "max_depth"
             journal.append(Undo("depth", number=self._limits.set_max_depth(ext.depth.value)))
-        return step
 
     # ------------------------------------------------------------------ 4: the agents and services it adds
 
-    def _additions(self, bp: Mapping[str, object], ext: Extension, pid: str, journal: list[Undo]) -> str:
-        step = "agents"
+    def _additions(self, bp: Mapping[str, object], ext: Extension, pid: str, journal: list[Undo], step: list[str]) -> None:
         approval = f"change {pid}"
         for a in ext.agents:  # parents first
-            step = f"hire {a.addr}"
+            step[0] = f"hire {a.addr}"
             below = [x for x in ext.agents if x.addr.startswith(a.addr + "/")]
             charter = self._charters.extension_charter(a, below, pid, ext.extras.get(a.addr, ""))
             addr = self._hiring.hire(
@@ -136,7 +133,7 @@ class ExtensionApplier(ExtensionApplying):
             journal.append(Undo("agent", addr))
         words = s(needs_of(bp).get("elicitation"))
         for sv in ext.services:
-            step = f"define {sv.name}"
+            step[0] = f"define {sv.name}"
             e = sv.entry
             deliverable = dict(self._normalizer.deliverable(svc_deliverable(e)))
             if deliverable.get("path"):
@@ -154,12 +151,10 @@ class ExtensionApplier(ExtensionApplying):
                 elicitation=words or None, approved_in=approval,
             )
             journal.append(Undo("service", sv.owner, sv.name))
-        return step
 
     # ------------------------------------------------------------------ 5: the changes: charter lines and budgets
 
-    def _changes(self, ext: Extension, pid: str, journal: list[Undo]) -> str:
-        step = "charter lines"
+    def _changes(self, ext: Extension, pid: str, journal: list[Undo], step: list[str]) -> None:
         by_agent: dict[str, tuple[list[str], list[str]]] = {}
         for c in ext.lines:
             by_agent.setdefault(c.agent, ([], []))[0].append(c.line)
@@ -169,17 +164,16 @@ class ExtensionApplier(ExtensionApplying):
         for c in ext.removals:
             by_agent.setdefault(c.agent, ([], []))[1].append(c.line)
         for addr, (add, remove) in by_agent.items():
-            step = f"charter lines of {addr}"
+            step[0] = f"charter lines of {addr}"
             meta, body = self._reads.charters.charter(addr)
             old = join_frontmatter(meta, body)
             self._registry.rewrite_charter(addr, join_frontmatter(meta, with_changes(body, add, remove, None, pid)))
             journal.append(Undo("charter", addr, text=old))
         for b in ext.budgets:
-            step = f"budget of {b.service}"
+            step[0] = f"budget of {b.service}"
             contract = self._reads.services.read_contract(b.owner, b.service)
             self._commands.define_service(ROOT, b.owner, b.service, budget=b.budget)
             journal.append(Undo("budget", b.owner, b.service, number=b.was, version=contract.version if contract is not None else 0))
-        return step
 
     # ------------------------------------------------------------------ 7 and 8: the retires, last because they cannot be undone
 
