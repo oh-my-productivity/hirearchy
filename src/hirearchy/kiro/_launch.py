@@ -265,6 +265,7 @@ class ErrPipe:
     open: bool = True
     partial: bytes = b""  # the stderr line that is not finished yet
     warning: str = ""  # the first effort warning kiro wrote, as the mark quotes it
+    skipping: bool = False  # inside the rest of a line over ERR_LINE_LIMIT: its bytes are forwarded but not scanned
 
 
 def _forward(data: bytes) -> None:
@@ -291,11 +292,16 @@ def _read_err(err: ErrPipe) -> None:
         err.partial = b""
         return
     _forward(data)  # before the scan: the warning is in the log before the launcher writes its mark
+    if err.skipping:  # the bytes up to the end of the over-long line are not a line of their own
+        cut = data.find(b"\n")
+        if cut < 0:
+            return
+        err.skipping, data = False, data[cut + 1 :]
     *lines, err.partial = (err.partial + data).split(b"\n")
     for line in lines:
         _scan(err, line)
-    if len(err.partial) > ERR_LINE_LIMIT:  # already forwarded; the rest of such a line is not worth keeping
-        err.partial = b""
+    if len(err.partial) > ERR_LINE_LIMIT:  # already forwarded; the rest of such a line is neither kept nor scanned
+        err.partial, err.skipping = b"", True
 
 
 def _drain_err(err: ErrPipe) -> None:

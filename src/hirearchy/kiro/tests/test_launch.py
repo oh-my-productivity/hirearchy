@@ -880,3 +880,23 @@ def test_a_warning_after_more_than_a_pipe_buffer_of_stderr_stops_the_run(tmp_pat
     code, log = launch_logged(tmp_path, START + script + to_stderr(WARNING) + "exec sleep 30\n")
     assert code == -9
     assert log == ["# kiro: run started (engine v3)", *written, WARNING, mark_a(QUOTED)]
+
+
+def test_the_tail_of_an_over_long_stderr_line_is_not_scanned(capfd: pytest.CaptureFixture[str]) -> None:
+    tail = "failed to set effort 'high': model 'claude-sonnet-5.5' offers no effort levels!!"
+    assert len(tail) == 80
+    pieces = ["x" * 10_000] * 6 + ["x" * 9_920, tail + "\n"]  # one line of 70,000 bytes whose last 80 bytes look like a warning
+    read_fd, write_fd = os.pipe()
+    err = _launch.ErrPipe(read_fd)
+    try:
+        for piece in pieces:
+            os.write(write_fd, piece.encode())
+            _launch._read_err(err)
+        assert err.warning == ""  # the tail of the long line is no line of its own
+        os.write(write_fd, (WARNING + "\n").encode())
+        _launch._read_err(err)
+        assert err.warning == QUOTED  # the next line is scanned again
+    finally:
+        os.close(read_fd)
+        os.close(write_fd)
+    assert capfd.readouterr().err == "".join(pieces) + WARNING + "\n"  # forwarding is unchanged
