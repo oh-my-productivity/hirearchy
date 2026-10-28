@@ -4,15 +4,23 @@
 import os
 import sys
 import time
+from pathlib import Path
 
 import pytest
 import testkit
+from testkit.health_world import with_ports
 from testkit.reach.hirearchy.core import ROOT
 from testkit.scheduler_loop import loop_over, nothing_left, scheduler_line
 
-from hirearchy.daemon import EXIT_FILE
+from hirearchy.daemon import EXIT_FILE, SchedulerCommand
+from hirearchy.daemon.testing import FixedSchedulerCommand
 
 FAKE = str(testkit.FAKE_AGENT)
+READY_SCHEDULER = (
+    "import sys; from hirearchy import main; from hirearchy.app import wiring; from hirearchy.kiro import RuntimeReadiness; "
+    "from hirearchy.kiro.testing import FixedReadiness; ready = wiring.overriding({RuntimeReadiness: FixedReadiness(None)}); "
+    "ready.__enter__(); main(sys.argv[1:])"
+)
 
 
 @pytest.fixture(autouse=True)
@@ -100,6 +108,8 @@ def test_a_real_until_done_scheduler_process_exits_by_itself(org, monkeypatch):
     org.begin_run("ceo")
     org.report("ceo", org.outstanding(ROOT)[0].id, "done", "ok")  # already done, but ceo still has the task result to read
     org.end_run("ceo", ok=True)
+    command = [sys.executable, "-c", READY_SCHEDULER, "--root", str(org.root), "run", "--max-runs", "0", "--until-done"]
+    with_ports(org, {SchedulerCommand: FixedSchedulerCommand(command)})
     pid = org.runtime.scheduler_control.start(0, True)
     deadline = time.time() + 20
     while org.runtime.scheduler_status.state().state != "stopped" and time.time() < deadline:
@@ -108,3 +118,5 @@ def test_a_real_until_done_scheduler_process_exits_by_itself(org, monkeypatch):
     log = (org.root / ".runtime" / "scheduler.log").read_text()
     assert "--until-done" in log and "scheduler exiting: finished: no open tasks" in log and pid > 0
     assert scheduler_line(org) == "scheduler: stopped (finished: no open tasks)"
+    stub_log = Path(os.environ["KIRO_STUB_LOG"])
+    assert not stub_log.exists() or "--version" not in stub_log.read_text(encoding="utf-8").splitlines()  # no readiness call
