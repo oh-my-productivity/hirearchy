@@ -1,0 +1,18 @@
+######## TURN 24  start 04:36:32  end 04:36:57  elapsed 25s  (local, 2026-10-28; UTC wall-clock start 2026-10-28T04:36:32Z end 2026-10-28T04:36:57Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Sam's 2026-11-13 is right. Lee's none is right.
+
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-24.stderr.txt):
+The memo for 2026-11-09 is at `/private/tmp/hirearchy-p1-I3-1793157452/deliverables/memo-2026-11-09.md` (171 words). I delivered it unchanged, so there were no extra runs.
+
+- **C1, C2, C3:** met. It covers only this meeting and has 3 decisions in the notes' words, including "we decided to approve it as written".
+- **C4, C5, C6:** met. The table has 5 rows with Owner | Action | Due, and the Action text comes from the notes.
+- **C7:** met. Due dates are Marta 2026-11-11, Dev 2026-11-20, Priya 2026-11-16, Sam 2026-11-13 and Lee `none`, with Sam and Lee as you confirmed.
+- **C8:** met. Everything traces to the notes.
+- **C9:** met. The reviewer's score was "criteria met: 10 of 10", and the lead judged C9 as met.
+- **C10, C12:** met. It has the title, a one-line "Summary:", the decisions, then the action items, with owners as written in the notes. There is no "Source:" line and no notes section.
+- **C13:** not triggered. This meeting has no owner given only as initials.
+
+The team used 5 runs, inside your 12.
+
+Is this one right, or what should change?

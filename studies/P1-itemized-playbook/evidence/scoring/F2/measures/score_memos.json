@@ -1,0 +1,382 @@
+{
+  "answer_key": {
+    "md5": "2fb69bbef857c2bd4862cd5dd8be9da8",
+    "meetings": {
+      "2026-10-05": {
+        "actions": 5,
+        "decisions": 2,
+        "dues_match": true,
+        "owners_match": true
+      },
+      "2026-10-12": {
+        "actions": 5,
+        "decisions": 3,
+        "dues_match": true,
+        "owners_match": true
+      },
+      "2026-10-19": {
+        "actions": 5,
+        "decisions": 3,
+        "dues_match": true,
+        "owners_match": true
+      }
+    },
+    "ok": true,
+    "path": "/Volumes/workspace/hirearchy/studies/P1-itemized-playbook/evidence/answer-key.md"
+  },
+  "answer_key_p1": {
+    "md5": "d340ff638fa7efe1a7ece8808d9a6168",
+    "meetings": {
+      "2026-10-26": {
+        "actions": 5,
+        "decisions": 3,
+        "dues_match": true,
+        "owners_match": true
+      },
+      "2026-11-02": {
+        "actions": 5,
+        "decisions": 3,
+        "dues_match": true,
+        "owners_match": true
+      },
+      "2026-11-09": {
+        "actions": 5,
+        "decisions": 3,
+        "dues_match": true,
+        "owners_match": true
+      }
+    },
+    "ok": true,
+    "path": "/Volumes/workspace/hirearchy/studies/P1-itemized-playbook/evidence/answer-key-p1.md"
+  },
+  "copies": [],
+  "could_not_derive": [
+    "review task 20261028T002743892731-lead-0b8d (2026-10-28T00:27:43Z, memo 2026-10-05) maps to no version",
+    "review task 20261028T003500412261-lead-8c66 (2026-10-28T00:35:00Z, memo 2026-10-05) maps to no version",
+    "review task 20261028T003907492941-lead-1a8f (2026-10-28T00:39:07Z, memo 2026-10-05) maps to no version",
+    "review task 20261028T004439760580-lead-1365 (2026-10-28T00:44:39Z, memo 2026-10-05) maps to no version",
+    "review task 20261028T005040353011-lead-4114 (2026-10-28T00:50:40Z, memo 2026-10-12) maps to no version",
+    "review task 20261028T005843082170-lead-58a6 (2026-10-28T00:58:43Z, memo 2026-10-12) maps to no version",
+    "review task 20261028T010420419121-lead-0313 (2026-10-28T01:04:20Z, memo 2026-10-12) maps to no version",
+    "review task 20261028T010934549154-lead-99dd (2026-10-28T01:09:34Z, memo 2026-10-19) maps to no version",
+    "review task 20261028T011133904102-lead-2675 (2026-10-28T01:11:33Z, memo 2026-10-19) maps to no version",
+    "review task 20261028T011551330157-lead-6365 (2026-10-28T01:15:51Z, memo 2026-10-19) maps to no version",
+    "review task 20261028T011953471107-lead-663f (2026-10-28T01:19:53Z, memo 2026-10-26) maps to no version",
+    "review task 20261028T012534699338-lead-8885 (2026-10-28T01:25:34Z, memo 2026-10-26) maps to no version",
+    "review task 20261028T012911022959-lead-9c7e (2026-10-28T01:29:11Z, memo 2026-11-02) maps to no version",
+    "review task 20261028T013300148000-lead-ad17 (2026-10-28T01:33:00Z, memo 2026-11-02) maps to no version",
+    "review task 20261028T014306267318-lead-b820 (2026-10-28T01:43:06Z, memo 2026-11-02) maps to no version",
+    "review task 20261028T015104186918-lead-34cb (2026-10-28T01:51:04Z, memo 2026-11-09) maps to no version",
+    "review task 20261028T015306615425-lead-7828 (2026-10-28T01:53:06Z, memo 2026-11-09) maps to no version"
+  ],
+  "delivered": {
+    "k": 0,
+    "n": 0
+  },
+  "final_totals": {
+    "actions": {
+      "k": 0,
+      "n": 30
+    },
+    "decisions": {
+      "k": 0,
+      "n": 17
+    },
+    "extra_rows": 0,
+    "memos": 0,
+    "summary": {
+      "k": 0,
+      "n": 6
+    },
+    "wrong_dates": 0
+  },
+  "finals": [],
+  "label": "F2",
+  "p1_no_regression": {
+    "delivered_bad": [],
+    "delivered_versions": 0,
+    "mechanical_pass": false,
+    "per_memo": {
+      "2026-10-05": {
+        "final": null,
+        "pass": false,
+        "why": "no final memo (E7 10.4: a memo not delivered fails)"
+      },
+      "2026-10-12": {
+        "final": null,
+        "pass": false,
+        "why": "no final memo (E7 10.4: a memo not delivered fails)"
+      },
+      "2026-10-19": {
+        "final": null,
+        "pass": false,
+        "why": "no final memo (E7 10.4: a memo not delivered fails)"
+      },
+      "2026-10-26": {
+        "final": null,
+        "pass": false,
+        "why": "no final memo (E7 10.4: a memo not delivered fails)"
+      },
+      "2026-11-02": {
+        "final": null,
+        "pass": false,
+        "why": "no final memo (E7 10.4: a memo not delivered fails)"
+      },
+      "2026-11-09": {
+        "final": null,
+        "pass": false,
+        "why": "no final memo (E7 10.4: a memo not delivered fails)"
+      }
+    },
+    "reported": {
+      "2026-10-05": {
+        "final": null,
+        "ok": false,
+        "why": "no final memo"
+      },
+      "2026-10-12": {
+        "final": null,
+        "ok": false,
+        "why": "no final memo"
+      },
+      "2026-10-19": {
+        "final": null,
+        "ok": false,
+        "why": "no final memo"
+      },
+      "2026-10-26": {
+        "final": null,
+        "ok": false,
+        "why": "no final memo"
+      },
+      "2026-11-02": {
+        "final": null,
+        "ok": false,
+        "why": "no final memo"
+      },
+      "2026-11-09": {
+        "final": null,
+        "ok": false,
+        "why": "no final memo"
+      }
+    },
+    "reported_ok": false
+  },
+  "review_tasks": 17,
+  "review_unmapped": [
+    {
+      "candidate_version": null,
+      "first_result": "20261028T002836663363-lead.reviewer-cb5d",
+      "first_result_met": 6,
+      "first_result_of": 6,
+      "first_result_verdict": "PASS",
+      "memo": "2026-10-05",
+      "seconds_before_candidate_commit": null,
+      "task": "20261028T002743892731-lead-0b8d",
+      "task_created": "2026-10-28T00:27:43Z"
+    },
+    {
+      "candidate_version": null,
+      "first_result": "20261028T003536706631-lead.reviewer-147a",
+      "first_result_met": 6,
+      "first_result_of": 6,
+      "first_result_verdict": "PASS",
+      "memo": "2026-10-05",
+      "seconds_before_candidate_commit": null,
+      "task": "20261028T003500412261-lead-8c66",
+      "task_created": "2026-10-28T00:35:00Z"
+    },
+    {
+      "candidate_version": null,
+      "first_result": "20261028T003948105869-lead.reviewer-c1e9",
+      "first_result_met": 7,
+      "first_result_of": 7,
+      "first_result_verdict": "PASS",
+      "memo": "2026-10-05",
+      "seconds_before_candidate_commit": null,
+      "task": "20261028T003907492941-lead-1a8f",
+      "task_created": "2026-10-28T00:39:07Z"
+    },
+    {
+      "candidate_version": null,
+      "first_result": "20261028T004519749551-lead.reviewer-1128",
+      "first_result_met": 8,
+      "first_result_of": 8,
+      "first_result_verdict": "PASS",
+      "memo": "2026-10-05",
+      "seconds_before_candidate_commit": null,
+      "task": "20261028T004439760580-lead-1365",
+      "task_created": "2026-10-28T00:44:39Z"
+    },
+    {
+      "candidate_version": null,
+      "first_result": "20261028T005135275203-lead.reviewer-314e",
+      "first_result_met": 8,
+      "first_result_of": 8,
+      "first_result_verdict": "PASS",
+      "memo": "2026-10-12",
+      "seconds_before_candidate_commit": null,
+      "task": "20261028T005040353011-lead-4114",
+      "task_created": "2026-10-28T00:50:40Z"
+    },
+    {
+      "candidate_version": null,
+      "first_result": "20261028T005938356683-lead.reviewer-86c3",
+      "first_result_met": 9,
+      "first_result_of": 9,
+      "first_result_verdict": "PASS",
+      "memo": "2026-10-12",
+      "seconds_before_candidate_commit": null,
+      "task": "20261028T005843082170-lead-58a6",
+      "task_created": "2026-10-28T00:58:43Z"
+    },
+    {
+      "candidate_version": null,
+      "first_result": "20261028T010517777401-lead.reviewer-b01f",
+      "first_result_met": 8,
+      "first_result_of": 8,
+      "first_result_verdict": "PASS",
+      "memo": "2026-10-12",
+      "seconds_before_candidate_commit": null,
+      "task": "20261028T010420419121-lead-0313",
+      "task_created": "2026-10-28T01:04:20Z"
+    },
+    {
+      "candidate_version": null,
+      "first_result": "20261028T011017070727-lead.reviewer-ee3b",
+      "first_result_met": 8,
+      "first_result_of": 8,
+      "first_result_verdict": "PASS",
+      "memo": "2026-10-19",
+      "seconds_before_candidate_commit": null,
+      "task": "20261028T010934549154-lead-99dd",
+      "task_created": "2026-10-28T01:09:34Z"
+    },
+    {
+      "candidate_version": null,
+      "first_result": "20261028T011212329206-lead.reviewer-adc7",
+      "first_result_met": 8,
+      "first_result_of": 8,
+      "first_result_verdict": null,
+      "memo": "2026-10-19",
+      "seconds_before_candidate_commit": null,
+      "task": "20261028T011133904102-lead-2675",
+      "task_created": "2026-10-28T01:11:33Z"
+    },
+    {
+      "candidate_version": null,
+      "first_result": "20261028T011632638145-lead.reviewer-7da9",
+      "first_result_met": 8,
+      "first_result_of": 8,
+      "first_result_verdict": null,
+      "memo": "2026-10-19",
+      "seconds_before_candidate_commit": null,
+      "task": "20261028T011551330157-lead-6365",
+      "task_created": "2026-10-28T01:15:51Z"
+    },
+    {
+      "candidate_version": null,
+      "first_result": "20261028T012036297857-lead.reviewer-e59f",
+      "first_result_met": 11,
+      "first_result_of": 11,
+      "first_result_verdict": "PASS",
+      "memo": "2026-10-26",
+      "seconds_before_candidate_commit": null,
+      "task": "20261028T011953471107-lead-663f",
+      "task_created": "2026-10-28T01:19:53Z"
+    },
+    {
+      "candidate_version": null,
+      "first_result": "20261028T012609835872-lead.reviewer-04e2",
+      "first_result_met": 11,
+      "first_result_of": 11,
+      "first_result_verdict": "PASS",
+      "memo": "2026-10-26",
+      "seconds_before_candidate_commit": null,
+      "task": "20261028T012534699338-lead-8885",
+      "task_created": "2026-10-28T01:25:34Z"
+    },
+    {
+      "candidate_version": null,
+      "first_result": "20261028T012947260610-lead.reviewer-4d32",
+      "first_result_met": 8,
+      "first_result_of": 8,
+      "first_result_verdict": "PASS",
+      "memo": "2026-11-02",
+      "seconds_before_candidate_commit": null,
+      "task": "20261028T012911022959-lead-9c7e",
+      "task_created": "2026-10-28T01:29:11Z"
+    },
+    {
+      "candidate_version": null,
+      "first_result": "20261028T013330808377-lead.reviewer-92aa",
+      "first_result_met": 8,
+      "first_result_of": 8,
+      "first_result_verdict": null,
+      "memo": "2026-11-02",
+      "seconds_before_candidate_commit": null,
+      "task": "20261028T013300148000-lead-ad17",
+      "task_created": "2026-10-28T01:33:00Z"
+    },
+    {
+      "candidate_version": null,
+      "first_result": "20261028T014559943964-lead.reviewer-017d",
+      "first_result_met": 9,
+      "first_result_of": 9,
+      "first_result_verdict": "PASS",
+      "memo": "2026-11-02",
+      "seconds_before_candidate_commit": null,
+      "task": "20261028T014306267318-lead-b820",
+      "task_created": "2026-10-28T01:43:06Z"
+    },
+    {
+      "candidate_version": null,
+      "first_result": "20261028T015139829772-lead.reviewer-0302",
+      "first_result_met": 8,
+      "first_result_of": 9,
+      "first_result_verdict": "NOT PASS",
+      "memo": "2026-11-09",
+      "seconds_before_candidate_commit": null,
+      "task": "20261028T015104186918-lead-34cb",
+      "task_created": "2026-10-28T01:51:04Z"
+    },
+    {
+      "candidate_version": null,
+      "first_result": "20261028T015336761308-lead.reviewer-9b7b",
+      "first_result_met": 9,
+      "first_result_of": 9,
+      "first_result_verdict": "PASS",
+      "memo": "2026-11-09",
+      "seconds_before_candidate_commit": null,
+      "task": "20261028T015306615425-lead-7828",
+      "task_created": "2026-10-28T01:53:06Z"
+    }
+  ],
+  "roles": {
+    "children": [
+      "lead/reviewer",
+      "lead/writer"
+    ],
+    "detected_by": "charter",
+    "owner": "lead",
+    "reviewer": "lead/reviewer",
+    "reviewer_dir": "lead-reviewer",
+    "roles": {
+      "lead/reviewer": "Independent Reviewer",
+      "lead/writer": "Writer"
+    }
+  },
+  "script": {
+    "md5": "4a63660bc6040f443b6fbf997e57b4e2",
+    "name": "score_memos.py"
+  },
+  "source_files": [
+    "/Volumes/workspace/hirearchy/studies/P1-itemized-playbook/evidence/answer-key.md",
+    "deliverables-log.txt",
+    "memos/versions/INDEX.txt",
+    "org-files/lead-reviewer-AGENT.md",
+    "org-files/lead-writer-AGENT.md",
+    "org-git-log.txt"
+  ],
+  "versions": []
+}

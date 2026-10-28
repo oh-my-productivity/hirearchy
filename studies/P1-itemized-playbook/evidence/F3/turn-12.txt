@@ -1,0 +1,18 @@
+######## TURN 12  start 02:37:03  end 02:40:35  elapsed 212s  (local, 2026-10-28; UTC wall-clock start 2026-10-28T02:37:03Z end 2026-10-28T02:40:35Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Yes, add it - and this version is right now, thanks. Once that's added, please do 2026-10-19.md. I'll wait.
+
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-12.stderr.txt):
+The 2026-10-19 memo is drafted and the reviewer passed it 9 of 9. It follows the new rules: Summary line first, then the decisions, then the action table with initials only. I haven't copied it yet, because the Due column probably needs fixing, and part of that is my mistake.
+
+The brief I sent the team said a date inside an action text is not a Due unless the notes state a deadline. They applied that too strictly, so three rows show `none` where the notes name a date. These are the points I need you to settle:
+
+1. **Dev, remove the deploy freeze "on Oct 24".** I recommend Due 2026-10-24.
+2. **Priya, present the benchmark "at the next meeting on Oct 26".** I recommend Due 2026-10-26.
+3. **Lee, sign off on the SSO renewal, "probably by end of next week".** I recommend Due 2026-10-30, the Friday of the following week. You said earlier that "probably" doesn't matter.
+4. **Sam, pair with Jo "during that first week".** It stays `none`, because it's a period (the week of 26 October) and not a deadline. That matches how you handled Lee's pager swap. Keep that?
+5. **Marta, "will keep the agenda as sent".** The memo lists it as an action with Due `none`. It may only be a status note. I'd keep it, because it's a stated intention, but it's your call.
+
+The "Action items" heading is fine as it is.
+
+Reply "recommended" to accept my suggestions on all five, or give a different answer for any of them. A fix means one rework of about 5 runs. This memo has used 5 of its 12, so it fits the budget and needs no extra funding.

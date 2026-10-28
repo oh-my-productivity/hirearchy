@@ -1,0 +1,86 @@
+{
+ "_about": "P1 judged keys for F1 (harness/p1-judged-template.json), written by the scoring step from the raw files; STUDY.md.",
+ "g1_d_judged": {
+  "value": true,
+  "files": [
+   "F1/playbook/",
+   "scoring/F1/guarantees/g1.json"
+  ],
+  "hits_decided": [],
+  "note": "Arm F: playbook v1 only (root's blueprint, 10 items); the lock held from contract v2; no owner version. No item states either. The keyword screen of guarantees.py found 0 hits, so hits_decided is empty."
+ },
+ "d8_presented_deliveries": {
+  "value": [],
+  "files": [
+   "F1/lena-lines.txt",
+   "F1/deliverables-log.txt",
+   "F1/turn-*.txt"
+  ],
+  "note": "Every version a Lena verdict judged was delivered by copy (deliverables-log.txt); every version shown before its copy was stated as not delivered yet (a D8 draft). No version was delivered by presentation only."
+ },
+ "regression_causes": {
+  "value": [
+   {
+    "part": "mechanical, G0's gate-able measures (score_memos p1_no_regression)",
+    "memo": "2026-10-05",
+    "cause": "Memo 1's delivered versions v1 and v3 and the final memo give Marta's room booking Due 'none' (key 2026-10-14: the booking is for the 14 October training). H6 asked for the date; the rework was not funded (Lena's one L-FUND yes of memo 1 was used at turn 4, turns 5, 7 and 8 declined), so L-ASIS kept the memo with its wrong cell (E7 10.4).",
+    "mechanism": "team",
+    "finding": null
+   },
+   {
+    "part": "Summary first and order, owner form (reported)",
+    "memo": "2026-10-05",
+    "cause": "Memo 1 kept without the Summary line under L-ASIS after the declined spend (as G0 m0-s3 and m1-s3).",
+    "mechanism": "other",
+    "finding": null
+   }
+  ],
+  "files": [
+   "scoring/F1/measures/score_memos.json",
+   "F1/memos/",
+   "F1/service/",
+   "F1/lena-lines.txt",
+   "scoring/F1/measures/spend-rederived.json"
+  ],
+  "note": "one entry per regression line (aggregate.py's part names)"
+ },
+ "scripted_item_ids": {
+  "value": "memo 1: About C6 (dated-event rule, K30), the Summary criterion added user-initiated (v4, words = H6's own); memo 2: About C5 (K28, [owner-crit] none); memo 4: About C12 = [plant] (K26); memo 5: About C13 = [full] (K26, base case)",
+  "files": [
+   "F1/lena-lines.txt",
+   "F1/service/"
+  ],
+  "note": "the id each scripted rejection's item named"
+ },
+ "warned_at_end": {
+  "value": [],
+  "files": [
+   "F1/quality/end.json",
+   "scoring/F1/frozen/watch/watch-items.txt"
+  ],
+  "note": "items still warning at the end with the reason (B1)"
+ },
+ "d_offer": {
+  "value": "no",
+  "files": [
+   "F1/turn-03.txt",
+   "F1/lena-lines.txt"
+  ],
+  "note": "the plan's T-BUDGETQ was the product's text; the assistant recommended no number of its own (L-BUDGET-Q and H5 at turn 3, no K7)"
+ },
+ "d_spend": {
+  "value": "memo 1: turn 4 L-FUND yes (2 runs), turns 5, 7, 8 declined; no other memo asked",
+  "files": [
+   "F1/lena-lines.txt",
+   "F1/measures/spend-ledger.json"
+  ],
+  "note": "every K9 row of lena-lines.txt with Lena's line; the product's figures in STUDY.md's spend table"
+ },
+ "harness_trace": {
+  "value": null,
+  "files": [
+   "scoring/F1/watch-ruled/since-cleared.txt"
+  ],
+  "note": "none: the only (f1) mismatches were `since` at sub-second precision, cleared by manager-decision-stage-1-gate.md item 1 (a harness defect read by ruling, not a trace that makes G1(f) NOT DETERMINED)"
+ }
+}

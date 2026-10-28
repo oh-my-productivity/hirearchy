@@ -1,0 +1,32 @@
+# P1 preflight gates 2026-10-27T17:23:21Z
+== protocol.md md5: 70237b0f3a829795a89d81c8eba7a7d6; protocol.md5 holds: 70237b0f3a829795a89d81c8eba7a7d6; freeze.txt says: protocol.md md5 (md5 -q): 70237b0f3a829795a89d81c8eba7a7d6
+zsh:4: no matches found: protocol-amendment-*
+== harness/MD5SUMS check (MISMATCH lines only)
+(done)
+harness/MD5SUMS md5: 524b857e9b75f6f104f22d11860145e2 lines: 64 (freeze.txt: harness/MD5SUMS md5 (md5 -q): 524b857e9b75f6f104f22d11860145e2  lines: 64)
+== pins (found / required)
+OK script/e7-protocol.md 0acc2b4191b8cbfa5f4bb6197b877de1
+OK script/g0-protocol.md 08cccd6458f5f418b4d388cb93d633b5
+OK script/g0-harness-MD5SUMS be21347995b821185a2adaba36d8390c
+OK harness/inject_root_rework.py 1c4e7824e448a3a34e24a7b759a59fcd
+OK script/injection/20261018T035429740646-root-d90e.md daf2085495c213ee9b1c3c6bff1bbd55
+OK answer-key.md 2fb69bbef857c2bd4862cd5dd8be9da8
+OK notes/2026-10-05.md 903e3bbf5f35df2c17444f3313c12395
+OK notes/2026-10-12.md 3893bd637c87760b43be4894b47fdb53
+OK notes/2026-10-19.md 9976a7653a6346b0976c3c38b1c697dd
+OK notes/2026-10-26.md 78cd76ede0804ffdc126f9fb1a8c1bc6
+OK notes/2026-11-02.md 93240174a95598e6b848b0bc6e9dd780
+OK notes/2026-11-09.md f9f8b4249f461bf14fa2bb4b9b1545b0
+OK answer-key-p1.md d340ff638fa7efe1a7ece8808d9a6168
+OK harness/workspace-cli.json 05d30ccbfd35530747c8a542eb67985c
+== product freeze
+HEAD: 8bf7c69bb933bf2e1ecda5dc4ddbefde41eba565 branch main
+git diff --stat 8bf7c69b HEAD -- src skills pyproject.toml uv.lock:
+(end of diff output)
+git status --porcelain:
+ M docs/design/org-growth-phase-1.md
+?? docs/research/
+?? studies/P1-itemized-playbook/
+== skill md5: repo b10238639f48ab351fa44a06aed03ffb lines 125; git blob b10238639f48ab351fa44a06aed03ffb; global (md5 only) b10238639f48ab351fa44a06aed03ffb; required b10238639f48ab351fa44a06aed03ffb
+== KIRO_HOME: unset
+== hirearchy package path: /Volumes/workspace/hirearchy/src/hirearchy/__init__.py

@@ -1,0 +1,7 @@
+The 2026-10-12 memo is ready and the reviewer passed it on all 8 criteria. I haven't copied it to `deliverables` yet because of three questions. The memo has three decisions (rate limiter RFC approved, blameless postmortem, deploy freeze on Oct 22 and 23). It has five action rows for Dev, Marta, Priya, Sam and Lee, and it is 227 words. It starts with the Summary line.
+
+1. **Sam's staging test data.** The notes say he'll "probably sort it out himself" so it's ready "the day before the freeze starts". I kept it as a row with Due 2026-10-21. Keep it, or drop the row because of "probably"? I recommend keeping it.
+2. **Lee's shift swap.** The memo has Lee carrying the pager in demo week and swapping shifts with Dev. The notes give no date, only "demo week", so Due is `none`. Is that right? I recommend `none`.
+3. **"Present" and "Next meeting" lines.** This memo still has them at the bottom, and it has no title. You accepted the 2026-10-05 memo with the same lines, but earlier you said you wanted just the title, Summary, decisions and action items. Should I leave them, or have the team remove them? Removing them needs about 5 more runs, taking this memo to about 10 of the 12 approved.
+
+So far this memo has used 5 of the 12 runs. If you say "defaults", I'll keep the memo as it is and deliver it.

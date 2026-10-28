@@ -1,0 +1,988 @@
+{
+  "given_deliveries": [
+    {
+      "by": "human verdict",
+      "candidates": [
+        "20261028T021113555154-root-3d00"
+      ],
+      "case": "20261028T020446926323-root-853d",
+      "differs": false,
+      "file": "memo-2026-10-05.md",
+      "given": "20261028T021113555154-root-3d00",
+      "kind": "relayed",
+      "p3_names": "20261028T021113555154-root-3d00",
+      "results": [
+        "20261028T021427256760-lead-27ce"
+      ]
+    },
+    {
+      "by": "human verdict",
+      "candidates": [
+        "20261028T023322750495-root-aef7"
+      ],
+      "case": "20261028T022451461753-root-1315",
+      "differs": false,
+      "file": "memo-2026-10-12.md",
+      "given": "20261028T023322750495-root-aef7",
+      "kind": "same",
+      "p3_names": "20261028T023322750495-root-aef7",
+      "results": [
+        "20261028T023554774023-lead-3f56"
+      ]
+    },
+    {
+      "by": "human verdict",
+      "candidates": [
+        "20261028T024159782172-root-3d39"
+      ],
+      "case": "20261028T023724010258-root-60f5",
+      "differs": false,
+      "file": "memo-2026-10-19.md",
+      "given": "20261028T024159782172-root-3d39",
+      "kind": "same",
+      "p3_names": "20261028T024159782172-root-3d39",
+      "results": [
+        "20261028T024431911687-lead-942d"
+      ]
+    },
+    {
+      "by": "human verdict",
+      "candidates": [
+        "20261028T025237108216-root-ca4c"
+      ],
+      "case": "20261028T024549764740-root-721e",
+      "differs": false,
+      "file": "memo-2026-10-26.md",
+      "given": "20261028T025237108216-root-ca4c",
+      "kind": "same",
+      "p3_names": "20261028T025237108216-root-ca4c",
+      "results": [
+        "20261028T025506398498-lead-c55a"
+      ]
+    },
+    {
+      "by": "human verdict",
+      "candidates": [
+        "20261028T030301676983-root-943e"
+      ],
+      "case": "20261028T025708950315-root-7f35",
+      "differs": false,
+      "file": "memo-2026-11-02.md",
+      "given": "20261028T030301676983-root-943e",
+      "kind": "same",
+      "p3_names": "20261028T030301676983-root-943e",
+      "results": [
+        "20261028T030535997235-lead-2052"
+      ]
+    },
+    {
+      "by": "human verdict",
+      "candidates": [
+        "20261028T030649064532-root-926f"
+      ],
+      "case": "20261028T030649064532-root-926f",
+      "differs": false,
+      "file": "memo-2026-11-09.md",
+      "given": "20261028T030649064532-root-926f",
+      "kind": "same",
+      "p3_names": "20261028T030649064532-root-926f",
+      "results": [
+        "20261028T030907700796-lead-eba1"
+      ]
+    }
+  ],
+  "moved_past": [
+    {
+      "addr": "lead/writer",
+      "error": "",
+      "held": 8,
+      "held_error": "",
+      "tasks": [
+        {
+          "blocked": "2026-10-28T02:19:06Z",
+          "id": "20261028T021812104831-lead-17ea",
+          "left_blocked": true,
+          "sender": "lead",
+          "sent_since": 10,
+          "title": null
+        }
+      ]
+    }
+  ],
+  "nested": [],
+  "not_derived": [],
+  "notes": [],
+  "one_off": null,
+  "schema": 1,
+  "script": {
+    "md5": "567d9ce98f538d81d76d94343e778f23",
+    "name": "rederive_quality.py"
+  },
+  "services": [
+    {
+      "alarms": {
+        "cost": {
+          "cases": [],
+          "compared": 6,
+          "judged": 6,
+          "skipped": [],
+          "state": "no"
+        },
+        "repeat": {
+          "fired": [],
+          "judged": 6,
+          "not_counted": {
+            "R3": [
+              "C10"
+            ],
+            "R4": [
+              "C11"
+            ]
+          },
+          "state": "no",
+          "subjects": {
+            "C11": 1,
+            "C12": 1,
+            "R3": 1,
+            "R4": 1
+          },
+          "window": [
+            "20261028T024549764740-root-721e",
+            "20261028T025708950315-root-7f35",
+            "20261028T030649064532-root-926f"
+          ]
+        }
+      },
+      "budget": 12,
+      "cases": [
+        {
+          "assignee": "lead",
+          "budget": 12,
+          "credited": 0,
+          "cut": false,
+          "first": {
+            "outcome": "none",
+            "superseded_by": "20261028T021113555154-root-3d00",
+            "superseded_source": "human",
+            "task": "20261028T020446926323-root-853d"
+          },
+          "id": "20261028T020446926323-root-853d",
+          "ratio": "0.88",
+          "relayed_runs": 5,
+          "runs": 20,
+          "runs_unknown": "",
+          "spend": 20,
+          "stalled": false,
+          "state": "done",
+          "tasks": 3,
+          "title": "Memo for 2026-10-05 meeting",
+          "top_ups": [
+            {
+              "amount": 1,
+              "id": "20261028T021113555154-root-3d00",
+              "source": "human"
+            },
+            {
+              "amount": 5,
+              "id": "20261028T021219105886-root-6315",
+              "source": "granted"
+            },
+            {
+              "amount": 6,
+              "id": "20261028T021734451541-root-9b6d",
+              "source": "relayed"
+            }
+          ],
+          "user_approved": 17,
+          "user_cost": 15
+        },
+        {
+          "assignee": "lead",
+          "budget": 12,
+          "credited": 0,
+          "cut": false,
+          "first": {
+            "outcome": "none",
+            "superseded_by": "20261028T022910229812-root-57c3",
+            "superseded_source": "human",
+            "task": "20261028T022451461753-root-1315"
+          },
+          "id": "20261028T022451461753-root-1315",
+          "ratio": "0.88",
+          "relayed_runs": 0,
+          "runs": 15,
+          "runs_unknown": "",
+          "spend": 15,
+          "stalled": false,
+          "state": "done",
+          "tasks": 3,
+          "title": "Memo for 2026-10-12 meeting",
+          "top_ups": [
+            {
+              "amount": 5,
+              "id": "20261028T022910229812-root-57c3",
+              "source": "human"
+            },
+            {
+              "amount": 1,
+              "id": "20261028T023322750495-root-aef7",
+              "source": "human"
+            },
+            {
+              "amount": 5,
+              "id": "20261028T023327129039-root-8e00",
+              "source": "granted"
+            }
+          ],
+          "user_approved": 17,
+          "user_cost": 15
+        },
+        {
+          "assignee": "lead",
+          "budget": 12,
+          "credited": 0,
+          "cut": false,
+          "first": {
+            "outcome": "none",
+            "superseded_by": "20261028T024159782172-root-3d39",
+            "superseded_source": "human",
+            "task": "20261028T023724010258-root-60f5"
+          },
+          "id": "20261028T023724010258-root-60f5",
+          "ratio": "0.83",
+          "relayed_runs": 0,
+          "runs": 10,
+          "runs_unknown": "",
+          "spend": 10,
+          "stalled": false,
+          "state": "done",
+          "tasks": 2,
+          "title": "Memo for 2026-10-19 meeting",
+          "top_ups": [
+            {
+              "amount": 5,
+              "id": "20261028T024159782172-root-3d39",
+              "source": "human"
+            }
+          ],
+          "user_approved": 12,
+          "user_cost": 10
+        },
+        {
+          "assignee": "lead",
+          "budget": 12,
+          "credited": 0,
+          "cut": false,
+          "first": {
+            "outcome": "rejected",
+            "superseded_by": null,
+            "superseded_source": null,
+            "task": "20261028T024549764740-root-721e"
+          },
+          "id": "20261028T024549764740-root-721e",
+          "ratio": "0.83",
+          "relayed_runs": 0,
+          "runs": 10,
+          "runs_unknown": "",
+          "spend": 10,
+          "stalled": false,
+          "state": "done",
+          "tasks": 2,
+          "title": "Memo for 2026-10-26 meeting",
+          "top_ups": [
+            {
+              "amount": 5,
+              "id": "20261028T025237108216-root-ca4c",
+              "source": "human"
+            }
+          ],
+          "user_approved": 12,
+          "user_cost": 10
+        },
+        {
+          "assignee": "lead",
+          "budget": 12,
+          "credited": 0,
+          "cut": false,
+          "first": {
+            "outcome": "rejected",
+            "superseded_by": null,
+            "superseded_source": null,
+            "task": "20261028T025708950315-root-7f35"
+          },
+          "id": "20261028T025708950315-root-7f35",
+          "ratio": "0.83",
+          "relayed_runs": 0,
+          "runs": 10,
+          "runs_unknown": "",
+          "spend": 10,
+          "stalled": false,
+          "state": "done",
+          "tasks": 2,
+          "title": "Memo for 2026-11-02 meeting",
+          "top_ups": [
+            {
+              "amount": 5,
+              "id": "20261028T030301676983-root-943e",
+              "source": "human"
+            }
+          ],
+          "user_approved": 12,
+          "user_cost": 10
+        },
+        {
+          "assignee": "lead",
+          "budget": 12,
+          "credited": 0,
+          "cut": false,
+          "first": {
+            "outcome": "accepted",
+            "superseded_by": null,
+            "superseded_source": null,
+            "task": "20261028T030649064532-root-926f"
+          },
+          "id": "20261028T030649064532-root-926f",
+          "ratio": "0.42",
+          "relayed_runs": 0,
+          "runs": 5,
+          "runs_unknown": "",
+          "spend": 5,
+          "stalled": false,
+          "state": "done",
+          "tasks": 1,
+          "title": "Memo for 2026-11-09 meeting",
+          "top_ups": [],
+          "user_approved": 12,
+          "user_cost": 5
+        }
+      ],
+      "client": "root",
+      "client_kind": "human",
+      "contract": 6,
+      "deliveries": {
+        "judged": 9,
+        "legacy_verdicts": 0,
+        "neither": [],
+        "not_as_delivered": [],
+        "not_on_a_delivery": [],
+        "relayed_only": [],
+        "total": 13,
+        "unjudged_cases": [],
+        "unseen_relayed": [
+          "20261028T020446926323-root-853d"
+        ]
+      },
+      "error": "",
+      "escapes": [
+        {
+          "also": [],
+          "assertion": "R1",
+          "attribution": "not its",
+          "before_verdict": "20261028T021734451541-root-9b6d",
+          "case": "20261028T020446926323-root-853d",
+          "cause": "contract-gap",
+          "class": null,
+          "detail": [
+            "20261028T022330088423-root-efba",
+            "C9"
+          ],
+          "rule": "answer",
+          "rules": [
+            "answer",
+            "words"
+          ],
+          "signer": "lead/reviewer",
+          "task": "20261028T021113555154-root-3d00",
+          "verdict": "20261028T022145865673-root-8ddc"
+        },
+        {
+          "also": [],
+          "assertion": "R2",
+          "attribution": "not its",
+          "before_verdict": "",
+          "case": "20261028T022451461753-root-1315",
+          "cause": "contract-gap",
+          "class": null,
+          "detail": [
+            "20261028T023720121660-root-4056",
+            "C10"
+          ],
+          "rule": "answer",
+          "rules": [
+            "answer",
+            "words"
+          ],
+          "signer": "lead/reviewer",
+          "task": "20261028T022910229812-root-57c3",
+          "verdict": "20261028T023322666789-root-620b"
+        },
+        {
+          "also": [],
+          "assertion": "R3",
+          "attribution": "not its",
+          "before_verdict": "",
+          "case": "20261028T024549764740-root-721e",
+          "cause": "contract-gap",
+          "class": null,
+          "detail": [
+            "20261028T025233466527-root-8b6f",
+            "C11"
+          ],
+          "rule": "answer",
+          "rules": [
+            "answer",
+            "words"
+          ],
+          "signer": "lead/reviewer",
+          "task": "20261028T024549764740-root-721e",
+          "verdict": "20261028T025125931034-root-8e8c"
+        },
+        {
+          "also": [],
+          "assertion": "R4",
+          "attribution": "not its",
+          "before_verdict": "",
+          "case": "20261028T025708950315-root-7f35",
+          "cause": "contract-gap",
+          "class": null,
+          "detail": [
+            "20261028T030257235503-root-0743",
+            "C12"
+          ],
+          "rule": "answer",
+          "rules": [
+            "answer",
+            "words"
+          ],
+          "signer": "lead/reviewer",
+          "task": "20261028T025708950315-root-7f35",
+          "verdict": "20261028T030200879524-root-bcdd"
+        }
+      ],
+      "files_error": "",
+      "first_deliveries": {
+        "accepted": 1,
+        "neither": 0,
+        "never_delivered": 0,
+        "no_verdict": 3,
+        "rejected": 2,
+        "superseded": 3
+      },
+      "history": {
+        "known": true,
+        "skipped": 0,
+        "truncated": false
+      },
+      "owner": "lead",
+      "playbook": 1,
+      "service": "weekly-meeting-memo",
+      "stalled_error": "",
+      "timeline": [
+        {
+          "adds": [
+            "C1",
+            "C2",
+            "C3",
+            "C4",
+            "C5",
+            "C6",
+            "C7",
+            "C8"
+          ],
+          "answers": null,
+          "basis": "first",
+          "by": "root",
+          "confirmed": [],
+          "kind": "contract",
+          "not_confirmed": [],
+          "removes": [],
+          "version": 1,
+          "when": "2026-10-28T02:04:45Z"
+        },
+        {
+          "agent_written": true,
+          "basis": "client",
+          "beyond": null,
+          "by": "root",
+          "changed": 13,
+          "cited": [],
+          "evidence": [],
+          "evidence_other": 0,
+          "kind": "playbook",
+          "lines": [
+            {
+              "own_words": false,
+              "text": "## Steps"
+            },
+            {
+              "own_words": false,
+              "text": "1. [P1] Read the request in your prompt: its inputs, every acceptance criterion and the deliverable. The criteria come from the contract and can only be met, never changed; copy the relevant ones verbatim into every task you delegate."
+            },
+            {
+              "own_words": false,
+              "text": "2. [P2] Delegate to `writer` (Writer) with `budget=3`: its part of the request, with the criteria it must meet."
+            },
+            {
+              "own_words": false,
+              "text": "3. [P3] When the work exists, delegate to `reviewer` (Independent Reviewer) with `budget=2` to check the final file independently against every criterion. It reports findings and required changes to you and never edits the author's file."
+            },
+            {
+              "own_words": false,
+              "text": "4. [P4] If a check fails: send the required changes, quoted verbatim, to the AUTHOR of the failing file (`delegate(to=<author>, revises=<that author's task id>, budget=1)`; for the deliverable usually `writer`), then have the checker re-check that same file (`delegate(to=<checker>, revises=<the checker's task id>)`). One rework and one re-check; if it still fails, report `blocked` with options and the checker's final line instead of starting another cycle."
+            },
+            {
+              "own_words": false,
+              "text": "5. [P5] Read the final artifact yourself and check it against EVERY criterion of the request, quoting counts from your own `read` output, and paste the checker's final coverage line verbatim."
+            },
+            {
+              "own_words": false,
+              "text": "6. [P6] Report: `done` only if every criterion is met (else `blocked` with the deviation and a recommended decision). Name the deliverable's path (the assistant copies it to /tmp/hirearchy-p1-F3-1793152805/deliverables) and pass `lessons` as an after-action review: Expected / Happened / Caught at / Cause / Prevent (the system cause, not a person), or Near miss when nothing went wrong."
+            },
+            {
+              "own_words": false,
+              "text": "## Budget plan"
+            },
+            {
+              "own_words": false,
+              "text": "- [P7] Request budget: 12 runs (the contract's). Hand down no more than this up front, each with `budget=` set explicitly:"
+            },
+            {
+              "own_words": false,
+              "text": "- [P8] writer: 3 runs (2 work + 1 rework or re-check)"
+            }
+          ],
+          "lines_more": 3,
+          "own_words": null,
+          "removed": 0,
+          "restores": null,
+          "tagged": null,
+          "untagged": null,
+          "version": 1,
+          "when": "2026-10-28T02:04:45Z"
+        },
+        {
+          "adds": [],
+          "answers": null,
+          "basis": "legacy",
+          "by": "root",
+          "confirmed": [],
+          "kind": "contract",
+          "not_confirmed": [],
+          "removes": [],
+          "version": 2,
+          "when": "2026-10-28T02:09:55Z"
+        },
+        {
+          "amount": 1,
+          "case": "20261028T020446926323-root-853d",
+          "id": "20261028T021113555154-root-3d00",
+          "kind": "top-up",
+          "source": "human",
+          "when": "2026-10-28T02:11:13Z"
+        },
+        {
+          "amount": 5,
+          "case": "20261028T020446926323-root-853d",
+          "id": "20261028T021219105886-root-6315",
+          "kind": "top-up",
+          "source": "granted",
+          "when": "2026-10-28T02:12:19Z"
+        },
+        {
+          "amount": 6,
+          "case": "20261028T020446926323-root-853d",
+          "id": "20261028T021734451541-root-9b6d",
+          "kind": "top-up",
+          "source": "relayed",
+          "when": "2026-10-28T02:17:34Z"
+        },
+        {
+          "adds": [
+            "C9"
+          ],
+          "answers": "R1",
+          "basis": "answers",
+          "by": "root",
+          "confirmed": [
+            {
+              "id": "C9",
+              "link": "20261028T022330088423-root-efba"
+            }
+          ],
+          "kind": "contract",
+          "not_confirmed": [],
+          "removes": [],
+          "version": 3,
+          "when": "2026-10-28T02:23:30Z"
+        },
+        {
+          "amount": 5,
+          "case": "20261028T022451461753-root-1315",
+          "id": "20261028T022910229812-root-57c3",
+          "kind": "top-up",
+          "source": "human",
+          "when": "2026-10-28T02:29:10Z"
+        },
+        {
+          "amount": 1,
+          "case": "20261028T022451461753-root-1315",
+          "id": "20261028T023322750495-root-aef7",
+          "kind": "top-up",
+          "source": "human",
+          "when": "2026-10-28T02:33:22Z"
+        },
+        {
+          "amount": 5,
+          "case": "20261028T022451461753-root-1315",
+          "id": "20261028T023327129039-root-8e00",
+          "kind": "top-up",
+          "source": "granted",
+          "when": "2026-10-28T02:33:27Z"
+        },
+        {
+          "adds": [
+            "C10"
+          ],
+          "answers": "R2",
+          "basis": "answers",
+          "by": "root",
+          "confirmed": [
+            {
+              "id": "C10",
+              "link": "20261028T023720121660-root-4056"
+            }
+          ],
+          "kind": "contract",
+          "not_confirmed": [],
+          "removes": [],
+          "version": 4,
+          "when": "2026-10-28T02:37:20Z"
+        },
+        {
+          "amount": 5,
+          "case": "20261028T023724010258-root-60f5",
+          "id": "20261028T024159782172-root-3d39",
+          "kind": "top-up",
+          "source": "human",
+          "when": "2026-10-28T02:41:59Z"
+        },
+        {
+          "adds": [
+            "C11"
+          ],
+          "answers": "R3",
+          "basis": "answers",
+          "by": "root",
+          "confirmed": [
+            {
+              "id": "C11",
+              "link": "20261028T025233466527-root-8b6f"
+            }
+          ],
+          "kind": "contract",
+          "not_confirmed": [],
+          "removes": [
+            "C10"
+          ],
+          "version": 5,
+          "when": "2026-10-28T02:52:33Z"
+        },
+        {
+          "amount": 5,
+          "case": "20261028T024549764740-root-721e",
+          "id": "20261028T025237108216-root-ca4c",
+          "kind": "top-up",
+          "source": "human",
+          "when": "2026-10-28T02:52:37Z"
+        },
+        {
+          "adds": [
+            "C12"
+          ],
+          "answers": "R4",
+          "basis": "answers",
+          "by": "root",
+          "confirmed": [
+            {
+              "id": "C12",
+              "link": "20261028T030257235503-root-0743"
+            }
+          ],
+          "kind": "contract",
+          "not_confirmed": [],
+          "removes": [
+            "C11"
+          ],
+          "version": 6,
+          "when": "2026-10-28T03:02:57Z"
+        },
+        {
+          "amount": 5,
+          "case": "20261028T025708950315-root-7f35",
+          "id": "20261028T030301676983-root-943e",
+          "kind": "top-up",
+          "source": "human",
+          "when": "2026-10-28T03:03:01Z"
+        }
+      ],
+      "unit": "case",
+      "verifiers": [
+        {
+          "addr": "lead/reviewer",
+          "escapes": {
+            "counted": {},
+            "not_its": {
+              "contract-gap": 4
+            }
+          },
+          "fails_error": "",
+          "judged": 9,
+          "pass_precision": [
+            9,
+            9
+          ],
+          "rechecks": 0,
+          "rework_runs": 0
+        }
+      ]
+    }
+  ],
+  "source_files": [
+    "memos/memo-2026-10-05.md",
+    "memos/memo-2026-10-12.md",
+    "memos/memo-2026-10-19.md",
+    "memos/memo-2026-10-26.md",
+    "memos/memo-2026-11-02.md",
+    "memos/memo-2026-11-09.md",
+    "memos/versions/INDEX.txt",
+    "msgs/lead-inbox/20261028T031134635125-root-b4f7.md",
+    "msgs/lead-read/20261028T020446926323-root-853d.md",
+    "msgs/lead-read/20261028T020543448001-lead.writer-fc4e.md",
+    "msgs/lead-read/20261028T020703748230-lead.reviewer-7d54.md",
+    "msgs/lead-read/20261028T020754546006-lead.writer-2933.md",
+    "msgs/lead-read/20261028T020842611204-lead.reviewer-ae01.md",
+    "msgs/lead-read/20261028T020843890861-lead.reviewer-37d6.md",
+    "msgs/lead-read/20261028T020955701882-runtime-1063.md",
+    "msgs/lead-read/20261028T021113555154-root-3d00.md",
+    "msgs/lead-read/20261028T021219105886-root-6315.md",
+    "msgs/lead-read/20261028T021311359268-lead.writer-ab02.md",
+    "msgs/lead-read/20261028T021404028143-lead.reviewer-2029.md",
+    "msgs/lead-read/20261028T021734451541-root-9b6d.md",
+    "msgs/lead-read/20261028T021906963249-lead.writer-f5ba.md",
+    "msgs/lead-read/20261028T022022500181-lead.reviewer-c9ae.md",
+    "msgs/lead-read/20261028T022145865673-root-8ddc.md",
+    "msgs/lead-read/20261028T022327964726-root-3ec8.md",
+    "msgs/lead-read/20261028T022330088423-root-efba.md",
+    "msgs/lead-read/20261028T022330089385-runtime-1fc2.md",
+    "msgs/lead-read/20261028T022447538619-root-792d.md",
+    "msgs/lead-read/20261028T022451461753-root-1315.md",
+    "msgs/lead-read/20261028T022551901648-lead.writer-adfd.md",
+    "msgs/lead-read/20261028T022709324027-lead.reviewer-e882.md",
+    "msgs/lead-read/20261028T022910229812-root-57c3.md",
+    "msgs/lead-read/20261028T023010838036-lead.writer-e1a0.md",
+    "msgs/lead-read/20261028T023119201564-lead.reviewer-f8ba.md",
+    "msgs/lead-read/20261028T023322666789-root-620b.md",
+    "msgs/lead-read/20261028T023322750495-root-aef7.md",
+    "msgs/lead-read/20261028T023327129039-root-8e00.md",
+    "msgs/lead-read/20261028T023429820854-lead.writer-e5f9.md",
+    "msgs/lead-read/20261028T023530235279-lead.reviewer-3899.md",
+    "msgs/lead-read/20261028T023720034029-root-75ea.md",
+    "msgs/lead-read/20261028T023720121660-root-4056.md",
+    "msgs/lead-read/20261028T023720122339-runtime-b773.md",
+    "msgs/lead-read/20261028T023724010258-root-60f5.md",
+    "msgs/lead-read/20261028T023831779589-lead.writer-d034.md",
+    "msgs/lead-read/20261028T023946933522-lead.reviewer-0c53.md",
+    "msgs/lead-read/20261028T024159782172-root-3d39.md",
+    "msgs/lead-read/20261028T024303263375-lead.writer-a5b3.md",
+    "msgs/lead-read/20261028T024409034655-lead.reviewer-8c14.md",
+    "msgs/lead-read/20261028T024549764740-root-721e.md",
+    "msgs/lead-read/20261028T024645393889-lead.writer-8e70.md",
+    "msgs/lead-read/20261028T024747225748-lead.reviewer-b37f.md",
+    "msgs/lead-read/20261028T025017429575-root-0a9e.md",
+    "msgs/lead-read/20261028T025125931034-root-8e8c.md",
+    "msgs/lead-read/20261028T025233466527-root-8b6f.md",
+    "msgs/lead-read/20261028T025233467601-runtime-e87c.md",
+    "msgs/lead-read/20261028T025237108216-root-ca4c.md",
+    "msgs/lead-read/20261028T025304390415-lead.writer-5583.md",
+    "msgs/lead-read/20261028T025339518888-lead.writer-6f48.md",
+    "msgs/lead-read/20261028T025444910520-lead.reviewer-bec8.md",
+    "msgs/lead-read/20261028T025655516420-root-13af.md",
+    "msgs/lead-read/20261028T025708950315-root-7f35.md",
+    "msgs/lead-read/20261028T025756776880-lead.writer-cc0e.md",
+    "msgs/lead-read/20261028T025859296801-lead.reviewer-e8eb.md",
+    "msgs/lead-read/20261028T030200879524-root-bcdd.md",
+    "msgs/lead-read/20261028T030257235503-root-0743.md",
+    "msgs/lead-read/20261028T030257236492-runtime-cbd8.md",
+    "msgs/lead-read/20261028T030301676983-root-943e.md",
+    "msgs/lead-read/20261028T030357971087-lead.writer-1ab0.md",
+    "msgs/lead-read/20261028T030510597102-lead.reviewer-a794.md",
+    "msgs/lead-read/20261028T030648897527-root-8b74.md",
+    "msgs/lead-read/20261028T030649064532-root-926f.md",
+    "msgs/lead-read/20261028T030738293686-lead.writer-bc84.md",
+    "msgs/lead-read/20261028T030841523661-lead.reviewer-08cc.md",
+    "msgs/lead-reviewer-read/20261028T020608897940-lead-5bca.md",
+    "msgs/lead-reviewer-read/20261028T020815147742-lead-1cc4.md",
+    "msgs/lead-reviewer-read/20261028T021331427210-lead-c17a.md",
+    "msgs/lead-reviewer-read/20261028T021937906234-lead-b73d.md",
+    "msgs/lead-reviewer-read/20261028T022618572001-lead-ca35.md",
+    "msgs/lead-reviewer-read/20261028T023047037503-lead-7b72.md",
+    "msgs/lead-reviewer-read/20261028T023451941675-lead-c0be.md",
+    "msgs/lead-reviewer-read/20261028T023854391488-lead-dcdf.md",
+    "msgs/lead-reviewer-read/20261028T024336737773-lead-3621.md",
+    "msgs/lead-reviewer-read/20261028T024707358546-lead-2efc.md",
+    "msgs/lead-reviewer-read/20261028T025408553599-lead-e832.md",
+    "msgs/lead-reviewer-read/20261028T025821417095-lead-c32d.md",
+    "msgs/lead-reviewer-read/20261028T030422229228-lead-6d1f.md",
+    "msgs/lead-reviewer-read/20261028T030802707584-lead-32ea.md",
+    "msgs/lead-reviewer-sent/20261028T020703748230-lead.reviewer-7d54.md",
+    "msgs/lead-reviewer-sent/20261028T020842611204-lead.reviewer-ae01.md",
+    "msgs/lead-reviewer-sent/20261028T020843890861-lead.reviewer-37d6.md",
+    "msgs/lead-reviewer-sent/20261028T021404028143-lead.reviewer-2029.md",
+    "msgs/lead-reviewer-sent/20261028T022022500181-lead.reviewer-c9ae.md",
+    "msgs/lead-reviewer-sent/20261028T022709324027-lead.reviewer-e882.md",
+    "msgs/lead-reviewer-sent/20261028T023119201564-lead.reviewer-f8ba.md",
+    "msgs/lead-reviewer-sent/20261028T023530235279-lead.reviewer-3899.md",
+    "msgs/lead-reviewer-sent/20261028T023946933522-lead.reviewer-0c53.md",
+    "msgs/lead-reviewer-sent/20261028T024409034655-lead.reviewer-8c14.md",
+    "msgs/lead-reviewer-sent/20261028T024747225748-lead.reviewer-b37f.md",
+    "msgs/lead-reviewer-sent/20261028T025444910520-lead.reviewer-bec8.md",
+    "msgs/lead-reviewer-sent/20261028T025859296801-lead.reviewer-e8eb.md",
+    "msgs/lead-reviewer-sent/20261028T030510597102-lead.reviewer-a794.md",
+    "msgs/lead-reviewer-sent/20261028T030841523661-lead.reviewer-08cc.md",
+    "msgs/lead-sent/20261028T020509858918-lead-8ffe.md",
+    "msgs/lead-sent/20261028T020608897940-lead-5bca.md",
+    "msgs/lead-sent/20261028T020727610703-lead-b3f5.md",
+    "msgs/lead-sent/20261028T020815147742-lead-1cc4.md",
+    "msgs/lead-sent/20261028T020909052974-lead-1bd2.md",
+    "msgs/lead-sent/20261028T021246542934-lead-2c1f.md",
+    "msgs/lead-sent/20261028T021331427210-lead-c17a.md",
+    "msgs/lead-sent/20261028T021427256760-lead-27ce.md",
+    "msgs/lead-sent/20261028T021812104831-lead-17ea.md",
+    "msgs/lead-sent/20261028T021937906234-lead-b73d.md",
+    "msgs/lead-sent/20261028T022048263810-lead-57e4.md",
+    "msgs/lead-sent/20261028T022520102127-lead-1387.md",
+    "msgs/lead-sent/20261028T022618572001-lead-ca35.md",
+    "msgs/lead-sent/20261028T022732909488-lead-cd4e.md",
+    "msgs/lead-sent/20261028T022945481676-lead-34e7.md",
+    "msgs/lead-sent/20261028T023047037503-lead-7b72.md",
+    "msgs/lead-sent/20261028T023145442316-lead-2b6d.md",
+    "msgs/lead-sent/20261028T023358640577-lead-06c1.md",
+    "msgs/lead-sent/20261028T023451941675-lead-c0be.md",
+    "msgs/lead-sent/20261028T023554774023-lead-3f56.md",
+    "msgs/lead-sent/20261028T023755249342-lead-d80d.md",
+    "msgs/lead-sent/20261028T023854391488-lead-dcdf.md",
+    "msgs/lead-sent/20261028T024014864122-lead-2166.md",
+    "msgs/lead-sent/20261028T024235032862-lead-f1db.md",
+    "msgs/lead-sent/20261028T024336737773-lead-3621.md",
+    "msgs/lead-sent/20261028T024431911687-lead-942d.md",
+    "msgs/lead-sent/20261028T024614704596-lead-6466.md",
+    "msgs/lead-sent/20261028T024707358546-lead-2efc.md",
+    "msgs/lead-sent/20261028T024809273989-lead-16e4.md",
+    "msgs/lead-sent/20261028T025314750786-lead-34b6.md",
+    "msgs/lead-sent/20261028T025408553599-lead-e832.md",
+    "msgs/lead-sent/20261028T025506398498-lead-c55a.md",
+    "msgs/lead-sent/20261028T025729484217-lead-6e98.md",
+    "msgs/lead-sent/20261028T025821417095-lead-c32d.md",
+    "msgs/lead-sent/20261028T025930876767-lead-77d5.md",
+    "msgs/lead-sent/20261028T030337779568-lead-96a5.md",
+    "msgs/lead-sent/20261028T030422229228-lead-6d1f.md",
+    "msgs/lead-sent/20261028T030535997235-lead-2052.md",
+    "msgs/lead-sent/20261028T030713352910-lead-df27.md",
+    "msgs/lead-sent/20261028T030802707584-lead-32ea.md",
+    "msgs/lead-sent/20261028T030907700796-lead-eba1.md",
+    "msgs/lead-writer-read/20261028T020509858918-lead-8ffe.md",
+    "msgs/lead-writer-read/20261028T020727610703-lead-b3f5.md",
+    "msgs/lead-writer-read/20261028T021246542934-lead-2c1f.md",
+    "msgs/lead-writer-read/20261028T021812104831-lead-17ea.md",
+    "msgs/lead-writer-read/20261028T022520102127-lead-1387.md",
+    "msgs/lead-writer-read/20261028T022945481676-lead-34e7.md",
+    "msgs/lead-writer-read/20261028T023358640577-lead-06c1.md",
+    "msgs/lead-writer-read/20261028T023755249342-lead-d80d.md",
+    "msgs/lead-writer-read/20261028T024235032862-lead-f1db.md",
+    "msgs/lead-writer-read/20261028T024614704596-lead-6466.md",
+    "msgs/lead-writer-read/20261028T025314750786-lead-34b6.md",
+    "msgs/lead-writer-read/20261028T025729484217-lead-6e98.md",
+    "msgs/lead-writer-read/20261028T030337779568-lead-96a5.md",
+    "msgs/lead-writer-read/20261028T030713352910-lead-df27.md",
+    "msgs/lead-writer-sent/20261028T020543448001-lead.writer-fc4e.md",
+    "msgs/lead-writer-sent/20261028T020754546006-lead.writer-2933.md",
+    "msgs/lead-writer-sent/20261028T021311359268-lead.writer-ab02.md",
+    "msgs/lead-writer-sent/20261028T021906963249-lead.writer-f5ba.md",
+    "msgs/lead-writer-sent/20261028T022551901648-lead.writer-adfd.md",
+    "msgs/lead-writer-sent/20261028T023010838036-lead.writer-e1a0.md",
+    "msgs/lead-writer-sent/20261028T023429820854-lead.writer-e5f9.md",
+    "msgs/lead-writer-sent/20261028T023831779589-lead.writer-d034.md",
+    "msgs/lead-writer-sent/20261028T024303263375-lead.writer-a5b3.md",
+    "msgs/lead-writer-sent/20261028T024645393889-lead.writer-8e70.md",
+    "msgs/lead-writer-sent/20261028T025304390415-lead.writer-5583.md",
+    "msgs/lead-writer-sent/20261028T025339518888-lead.writer-6f48.md",
+    "msgs/lead-writer-sent/20261028T025756776880-lead.writer-cc0e.md",
+    "msgs/lead-writer-sent/20261028T030357971087-lead.writer-1ab0.md",
+    "msgs/lead-writer-sent/20261028T030738293686-lead.writer-bc84.md",
+    "msgs/read/20261028T020909052974-lead-1bd2.md",
+    "msgs/read/20261028T021427256760-lead-27ce.md",
+    "msgs/read/20261028T022048263810-lead-57e4.md",
+    "msgs/read/20261028T022732909488-lead-cd4e.md",
+    "msgs/read/20261028T023145442316-lead-2b6d.md",
+    "msgs/read/20261028T023554774023-lead-3f56.md",
+    "msgs/read/20261028T024014864122-lead-2166.md",
+    "msgs/read/20261028T024431911687-lead-942d.md",
+    "msgs/read/20261028T024809273989-lead-16e4.md",
+    "msgs/read/20261028T025506398498-lead-c55a.md",
+    "msgs/read/20261028T025930876767-lead-77d5.md",
+    "msgs/read/20261028T030535997235-lead-2052.md",
+    "msgs/read/20261028T030907700796-lead-eba1.md",
+    "msgs/sent/20261028T020446926323-root-853d.md",
+    "msgs/sent/20261028T021113555154-root-3d00.md",
+    "msgs/sent/20261028T021219105886-root-6315.md",
+    "msgs/sent/20261028T021734451541-root-9b6d.md",
+    "msgs/sent/20261028T022145865673-root-8ddc.md",
+    "msgs/sent/20261028T022327964726-root-3ec8.md",
+    "msgs/sent/20261028T022330088423-root-efba.md",
+    "msgs/sent/20261028T022447538619-root-792d.md",
+    "msgs/sent/20261028T022451461753-root-1315.md",
+    "msgs/sent/20261028T022910229812-root-57c3.md",
+    "msgs/sent/20261028T023322666789-root-620b.md",
+    "msgs/sent/20261028T023322750495-root-aef7.md",
+    "msgs/sent/20261028T023327129039-root-8e00.md",
+    "msgs/sent/20261028T023720034029-root-75ea.md",
+    "msgs/sent/20261028T023720121660-root-4056.md",
+    "msgs/sent/20261028T023724010258-root-60f5.md",
+    "msgs/sent/20261028T024159782172-root-3d39.md",
+    "msgs/sent/20261028T024549764740-root-721e.md",
+    "msgs/sent/20261028T025017429575-root-0a9e.md",
+    "msgs/sent/20261028T025125931034-root-8e8c.md",
+    "msgs/sent/20261028T025233466527-root-8b6f.md",
+    "msgs/sent/20261028T025237108216-root-ca4c.md",
+    "msgs/sent/20261028T025655516420-root-13af.md",
+    "msgs/sent/20261028T025708950315-root-7f35.md",
+    "msgs/sent/20261028T030200879524-root-bcdd.md",
+    "msgs/sent/20261028T030257235503-root-0743.md",
+    "msgs/sent/20261028T030301676983-root-943e.md",
+    "msgs/sent/20261028T030648897527-root-8b74.md",
+    "msgs/sent/20261028T030649064532-root-926f.md",
+    "msgs/sent/20261028T031134635125-root-b4f7.md",
+    "org-files/ORG.md",
+    "org-files/lead-AGENT.md",
+    "org-files/lead-reviewer-AGENT.md",
+    "org-files/lead-writer-AGENT.md",
+    "org-git-log.txt",
+    "playbook/current-PLAYBOOK.md",
+    "run-logs/lead-reviewer/*.log (names)",
+    "run-logs/lead-writer/*.log (names)",
+    "run-logs/lead/*.log (names)",
+    "service/current-SERVICE.md",
+    "service/history--SERVICE.v1.md",
+    "service/history--SERVICE.v2.md",
+    "service/history--SERVICE.v3.md",
+    "service/history--SERVICE.v4.md",
+    "service/history--SERVICE.v5.md"
+  ],
+  "thresholds": {
+    "cost_ratio": "1.25",
+    "min_judged": 3,
+    "repeat_failures": 2,
+    "repeat_window": 3,
+    "source": "defaults"
+  }
+}

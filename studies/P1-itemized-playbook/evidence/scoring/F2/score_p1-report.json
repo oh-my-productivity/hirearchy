@@ -1,0 +1,57 @@
+{
+ "label": "F2",
+ "memo_input": {
+  "first_request": "20261028T002628583154-root-8cba",
+  "name": "notes_file",
+  "value": "/tmp/hirearchy-p1-F2-1793146944/notes/2026-10-05.md",
+  "service_v1_inputs": [
+   "notes_file"
+  ],
+  "name_in_v1": true,
+  "frozen_reader_reads_it": false,
+  "reader": "substituted in memory: name 'notes_file', date from the value's base name (manager-decision-memo-input-name.md + addendum)"
+ },
+ "lena_lines": "F2/lena-lines.txt (frozen form)",
+ "since": {
+  "frozen_total": "0 mismatches (0 on pinned keys, 0 on unpinned keys); 0 services mismatches; 0 services lines unread; 0 lower-margin race matches (reported); 0 snapshots unread",
+  "ruled_total": "0 mismatches (0 on pinned keys, 0 on unpinned keys); 0 services mismatches; 0 services lines unread; 0 lower-margin race matches (reported); 0 snapshots unread",
+  "cleared": 0,
+  "cleared_pinned": 0
+ },
+ "lena_parse": {
+  "turn_lines": 25,
+  "parsed": 25
+ },
+ "memo_map": {
+  "requested": [
+   "2026-10-05",
+   "2026-10-12",
+   "2026-10-19",
+   "2026-10-26",
+   "2026-11-02",
+   "2026-11-09"
+  ],
+  "mapped": {
+   "2026-10-05": "20261028T002628583154-root-8cba",
+   "2026-10-12": "20261028T004913097440-root-a7ad",
+   "2026-10-19": "20261028T010810702123-root-4311",
+   "2026-10-26": "20261028T011833941227-root-2395",
+   "2026-11-02": "20261028T012748529907-root-f321",
+   "2026-11-09": "20261028T014937527074-root-ba39"
+  },
+  "missing": []
+ },
+ "g1": {
+  "a": "PASS",
+  "b": "VACUOUS (no B: the owner added no planted rule)",
+  "c": "PASS",
+  "d": "NOT DETERMINED (judged reading: judged.json g1_d_judged decides, every hit listed there)",
+  "e": "VACUOUS (no planted rule admitted)",
+  "f": "PASS"
+ },
+ "g2": {
+  "a": "PASS",
+  "b": "PASS",
+  "c": "PASS (by construction; the counts are reported)"
+ }
+}

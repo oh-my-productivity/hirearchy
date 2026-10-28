@@ -1,0 +1,46 @@
+=== I1 hirearchy-p1-i1-17931362-53c0ba0683b744d2
+files in home:      182
+  DIFF/MISSING: 641d8432beec0b30/.index/.lock
+  DIFF/MISSING: 56925b98b1c3c63c/.index/.lock
+  DIFF/MISSING: 71173fbd763e7540/.index/.lock
+sessions: 143 files compared (excluding kiro .index), mismatches: 3; evidence files not in home:        6
+  agents/hirearchy-hirearchy-p1-i1-17931362-53c0ba-read-xf4d46fb3.json == profiles/org-kiro-home--hirearchy-hirearchy-p1-i1-17931362-53c0ba-read-xf4d46fb3.json
+  agents/hirearchy-hirearchy-p1-i1-17931362-53c0ba.json == profiles/org-kiro-home--hirearchy-hirearchy-p1-i1-17931362-53c0ba.json
+=== I2 hirearchy-p1-i2-17931420-43a60f0d2f38c7be
+files in home:      174
+  DIFF/MISSING: 3db77c344073cc32/.index/.lock
+  DIFF/MISSING: 1dbf0f34e28299ad/.index/.lock
+  DIFF/MISSING: 3be2689f7c27d622/.index/.lock
+sessions: 135 files compared (excluding kiro .index), mismatches: 3; evidence files not in home:        6
+  agents/hirearchy-hirearchy-p1-i2-17931420-43a60f-read-x3619899a.json == profiles/org-kiro-home--hirearchy-hirearchy-p1-i2-17931420-43a60f-read-x3619899a.json
+  agents/hirearchy-hirearchy-p1-i2-17931420-43a60f.json == profiles/org-kiro-home--hirearchy-hirearchy-p1-i2-17931420-43a60f.json
+=== I3 hirearchy-p1-i3-17931574-331ae4382b4fa231
+files in home:      192
+  DIFF/MISSING: bbc31b1671a34656/.index/.lock
+  DIFF/MISSING: a6319e188c814c15/.index/.lock
+  DIFF/MISSING: 866e4da471c667b2/.index/.lock
+sessions: 153 files compared (excluding kiro .index), mismatches: 3; evidence files not in home:        6
+  agents/hirearchy-hirearchy-p1-i3-17931574-331ae4-read-x35b217c7.json == profiles/org-kiro-home--hirearchy-hirearchy-p1-i3-17931574-331ae4-read-x35b217c7.json
+  agents/hirearchy-hirearchy-p1-i3-17931574-331ae4.json == profiles/org-kiro-home--hirearchy-hirearchy-p1-i3-17931574-331ae4.json
+=== F1 hirearchy-p1-f1-17931291-b710c83948597702
+files in home:      171
+  DIFF/MISSING: 42edee5913b088d5/.index/.lock
+  DIFF/MISSING: 7b1020f5ca44d4b9/.index/.lock
+  DIFF/MISSING: 7d4ca13e40b6d190/.index/.lock
+sessions: 133 files compared (excluding kiro .index), mismatches: 3; evidence files not in home:        6
+  agents/hirearchy-hirearchy-p1-f1-17931291-b710c8-read-x05ac3498.json == profiles/org-kiro-home--hirearchy-hirearchy-p1-f1-17931291-b710c8-read-x05ac3498.json
+=== F2 hirearchy-p1-f2-17931469-141f8d494151e346
+files in home:      208
+  DIFF/MISSING: e438f7dc20eb8778/.index/.lock
+  DIFF/MISSING: 3e1184bea9e3c60e/.index/.lock
+  DIFF/MISSING: e4f455bb359a15e9/.index/.lock
+sessions: 169 files compared (excluding kiro .index), mismatches: 3; evidence files not in home:        6
+  agents/hirearchy-hirearchy-p1-f2-17931469-141f8d-read-x08be564f.json == profiles/org-kiro-home--hirearchy-hirearchy-p1-f2-17931469-141f8d-read-x08be564f.json
+  agents/hirearchy-hirearchy-p1-f2-17931469-141f8d.json == profiles/org-kiro-home--hirearchy-hirearchy-p1-f2-17931469-141f8d.json
+=== F3 hirearchy-p1-f3-17931528-f4b0de7112f5ea07
+files in home:      181
+  DIFF/MISSING: 3120279ade8168e1/.index/.lock
+  DIFF/MISSING: 650cd72014041b09/.index/.lock
+  DIFF/MISSING: 87fd13d70229d137/.index/.lock
+sessions: 143 files compared (excluding kiro .index), mismatches: 3; evidence files not in home:        6
+  agents/hirearchy-hirearchy-p1-f3-17931528-f4b0de-read-xdeb5c239.json == profiles/org-kiro-home--hirearchy-hirearchy-p1-f3-17931528-f4b0de-read-xdeb5c239.json

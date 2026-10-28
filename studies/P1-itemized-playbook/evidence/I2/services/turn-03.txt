@@ -1,0 +1,13 @@
+Services you can request (from your direct reports):
+- weekly-meeting-memo (offered by lead; contract v1, playbook v1): One memo of decisions and action items from one meeting's notes file.
+  inputs: meeting_file* (File name of the meeting notes in the notes folder, e.g. 2026-10-05.md)   (* required)
+  each request: 12 runs; acceptance criteria (lead/services/weekly-meeting-memo/SERVICE.md):
+    C1: The memo is based on the requested notes file only.
+    C2: At most 400 words as counted by read.
+    C3: The memo has a section titled "Decisions" with one bullet for every decision stated in the notes, and a section titled "Actions" containing a markdown table with exactly the columns Owner | Action | Due; it has no other sections besides a title that names the meeting date.
+    C4: The Actions table has one row for every commitment in the notes, including informal ones said in prose (for example 'X said he'd do Y'), and no row for anything nobody committed to.
+    C5: Due is an ISO date (YYYY-MM-DD). A relative deadline such as 'by Friday' is converted to a date using the meeting date when the notes make the date clear. Due is 'none' when the notes give no date or say none.
+    C6: Every decision and action is traceable to the notes, and nothing is invented.
+    C7: The reviewer's report shows every criterion met (criteria met: n of m with n = m), and the writer applied every required change.
+  record: 1 request(s): 0 done, 0 failed, 1 open; 0 reworked; no feedback
+  playbook v1 (2026-10-27): "initial playbook"; 10 items (0 rules), none watched

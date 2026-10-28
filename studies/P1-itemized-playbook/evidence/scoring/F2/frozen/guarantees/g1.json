@@ -1,0 +1,122 @@
+{
+ "arm": "F",
+ "roles": {
+  "R1": null,
+  "R2": null,
+  "R4": null,
+  "R5": null,
+  "A-crit": null,
+  "plant": null,
+  "full": null,
+  "gap": null,
+  "sections-crit": "none",
+  "owner-crit": "none",
+  "v1_role_candidates": {
+   "sections-crit": [],
+   "owner-crit": []
+  },
+  "A": null,
+  "A_version": null,
+  "A_op": null,
+  "B": null,
+  "B_version": null,
+  "B_op": null,
+  "B_carrier": null
+ },
+ "orders": {
+  "O6": {
+   "memo4_rework_human_accept": "none"
+  },
+  "extra_rejections": [
+   {
+    "R": "R1",
+    "memo": "",
+    "note": "20261028T004125902123-root-a854",
+    "related_to": []
+   },
+   {
+    "R": "R2",
+    "memo": "",
+    "note": "20261028T005558538773-root-f9f7",
+    "related_to": []
+   },
+   {
+    "R": "R3",
+    "memo": "",
+    "note": "20261028T010136435687-root-1914",
+    "related_to": []
+   },
+   {
+    "R": "R4",
+    "memo": "",
+    "note": "20261028T012241851922-root-07b5",
+    "related_to": []
+   },
+   {
+    "R": "R5",
+    "memo": "",
+    "note": "20261028T013517140358-root-b0a8",
+    "related_to": []
+   }
+  ],
+  "scripted_related_to_A": []
+ },
+ "expected": {
+  "A": null,
+  "B": null,
+  "B_carrier": null,
+  "g1b": {
+   "live": false,
+   "reason": "no B: the owner added no planted rule"
+  }
+ },
+ "unread_snapshots": [],
+ "a": {
+  "kept_with_related": [],
+  "left_8_1_paths": [],
+  "explained_steps": [],
+  "unread_snapshots": [],
+  "verdict": "PASS",
+  "arm_F_note": "reported only: G1 is arm I's pass rule (21.1); vacuous in arm F (18.5)"
+ },
+ "b": {
+  "items": [],
+  "fails": [],
+  "spurious_runtime_retires": [],
+  "expected": {
+   "live": false,
+   "reason": "no B: the owner added no planted rule"
+  },
+  "retire_ran_live": false,
+  "verdict": "VACUOUS (no B: the owner added no planted rule)",
+  "arm_F_note": "reported only: G1 is arm I's pass rule (21.1); vacuous in arm F (18.5)"
+ },
+ "c": {
+  "bad": [],
+  "verdict": "PASS",
+  "arm_F_note": "reported only: G1 is arm I's pass rule (21.1); vacuous in arm F (18.5)"
+ },
+ "d": {
+  "hits": [],
+  "verdict": "NOT DETERMINED (judged reading: judged.json g1_d_judged decides, every hit listed there)",
+  "note": "the keyword screen is an index: a hit is not a FAIL, a correct counter-rule matches it too (protocol 12.1 G1(d))",
+  "arm_F_note": "reported only: G1 is arm I's pass rule (21.1); vacuous in arm F (18.5)"
+ },
+ "e": {
+  "verdict": "VACUOUS (no planted rule admitted)",
+  "arm_F_note": "reported only: G1 is arm I's pass rule (21.1); vacuous in arm F (18.5)"
+ },
+ "f": {
+  "pinned_mismatches": [],
+  "unpinned_mismatches_reported": 0,
+  "services_unread": [],
+  "race_lower_reported": [],
+  "unread_snapshots": [],
+  "product_defects_unread": [],
+  "harness_own": {},
+  "expected": {},
+  "expected_state_fails": [],
+  "verdict": "PASS",
+  "arm_F_note": "reported only: G1 is arm I's pass rule (21.1); vacuous in arm F (18.5)"
+ }
+}

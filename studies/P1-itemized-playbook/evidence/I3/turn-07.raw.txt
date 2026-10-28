@@ -1,0 +1,16 @@
+The Summary line is in, but the team stopped short. The reviewer scored it "criteria met: 6 of 9" because three checks are open to interpretation, and the team has no runs left. I haven't delivered or changed anything.
+
+The current draft is 199 words. It has a title, then the "Summary:" line, a "Source:" line, the decisions, and the action table. Here is the Summary line:
+
+> Summary: The team decided to push the gateway migration to the week of 26 October and to adopt Renovate, and five people took action items.
+
+Please answer these two:
+
+1. **Your dates:** The notes say only "before Friday" for Sam and "book the on-call training room for Oct 14" for Marta. The memo uses your dates (Sam 2026-10-09, Marta 2026-10-14). It also has a line saying you set them, which isn't in the notes. Do your dates override the notes-only rule, with that line staying?
+2. **Where "Summary:" goes:** The memo opens with a "# Memo: …" title, and a "Source:" line sits between the Summary and the Decisions. Read strictly, "start with a Summary:" and "then the decisions" allow neither. Are the title and the Source line fine where they are?
+
+**Options:**
+- **(a) Accept as is, my recommendation.** If you say yes to both, I deliver it now at no extra cost. Your answers settle the reviewer's open points.
+- **(b) Strict version.** The memo would start directly with "Summary:" and the Source line would move. Sam and Marta would follow the notes-only rule, and the "set by the user" line would go. I'd also need to ask the team to change the dates you already chose. This needs about 4 more runs, on top of the 15 used, and I'd ask for your OK first.
+
+One more point, for your information: Priya's RFC review stays out as a row, as you said.

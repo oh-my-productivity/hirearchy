@@ -1,0 +1,145 @@
+{
+ "_about": "P1 spend ledger of I2 (protocol 6.3). Created by the stream-i2 step at 2026-10-27T23:09:26Z, after turn 3's after_turn and BEFORE turn 4's line was sent. Root's first request of memo 1 exists in S/org/sent/ since 2026-10-27T23:05:07Z (read from the sent file, not from requests-by-turn.txt: this stream's service input is named meeting_file, and the harness greps notes_file only, see harness-failures/meeting-file-input-name.txt). The scorer adds the case facts from the raw files.",
+ "cases": {
+  "20261027T230507597219-root-5204": {
+   "memo": "2026-10-05",
+   "lena_plan_budget": 12,
+   "lena_grants": [
+    {
+     "turn": 6,
+     "runs": 3,
+     "line": "L-FUND",
+     "request": "May I spend 3 more, which would bring the case to 15 runs? (rework needs about 5 runs; only 2 of the 12 approved runs left)"
+    }
+   ],
+   "_declined": [],
+   "state": "blocked",
+   "runs": 20,
+   "relayed_runs": 5,
+   "budget": 24,
+   "contract_budget": 12,
+   "ceilings": [],
+   "d14_used": 15,
+   "_files": {
+    "state": "I2/final-services-progress-status-health.txt (the case's latest task 20261027T231941168451-root-4f23)",
+    "runs, relayed_runs, budget, d14_used": "I2/final-services-progress-status-health.txt (task 20261027T230507597219-root-5204)",
+    "contract_budget": "I2/msgs/sent/20261027T230507597219-root-5204.md budget header",
+    "ceilings": "not derived by hand (STUDY.md, declared limit)"
+   },
+   "_progress_line": "\"Memo for the 2026-10-05 platform team meeting\" [service weekly-meeting-memo v1]: done. runs 5 of 12. 0 returned (kept by lead). last activity 41s ago. artifacts: lead/writer/work/memo-2026-10-05.md, lead/reviewer/work/recheck-memo-2026-10-05.md. case total: 20 runs used: 15 by the user's requests, 5 by your relayed rework 20261027T231350170182-root-0fec; 24 handed down (contract: 12 per request)."
+  },
+  "20261027T233043473862-root-7f7a": {
+   "memo": "2026-10-12",
+   "lena_plan_budget": 12,
+   "lena_grants": [
+    {
+     "turn": 15,
+     "runs": 3,
+     "line": "L-FUND",
+     "request": "A one-line fix would cost about 3 runs, which is about 2 more than that [the 1 run left of the 12 approved]. I'd need your OK to go over."
+    }
+   ],
+   "_declined": [],
+   "_added": "created by the stream-i2 step 2026-10-27T23:34:51Z after turn 11's after_turn and before turn 12's line; root's first request of memo 2 (meeting_file: 2026-10-12.md) was sent 2026-10-27T23:30:43Z (read from S/org/sent); no spend request had been answered for memo 2",
+   "state": "done",
+   "runs": 11,
+   "relayed_runs": 0,
+   "budget": 17,
+   "contract_budget": 12,
+   "ceilings": [],
+   "d14_used": 11,
+   "_files": {
+    "state": "I2/final-services-progress-status-health.txt (the case's latest task 20261027T233835308456-root-b074)",
+    "runs, relayed_runs, budget, d14_used": "I2/final-services-progress-status-health.txt (task 20261027T233043473862-root-7f7a)",
+    "contract_budget": "I2/msgs/sent/20261027T233043473862-root-7f7a.md budget header",
+    "ceilings": "not derived by hand (STUDY.md, declared limit)"
+   },
+   "_progress_line": "\"Memo for the 2026-10-12 platform team meeting\" [service weekly-meeting-memo v2]: done. runs 5 of 12 (5 returned). last activity 41s ago. artifacts: lead/writer/work/memo-2026-10-12.md, lead/reviewer/work/review-memo-2026-10-12.md. case total: 11 runs used of 17 handed down (contract: 12 per request). (task 20261027T233043473862-root-7f7a)"
+  },
+  "20261027T234421361111-root-a19d": {
+   "memo": "2026-10-19",
+   "lena_plan_budget": 12,
+   "lena_grants": [],
+   "_declined": [],
+   "_added": "created by the stream-i2 step 2026-10-27T23:48:08Z after turn 16's after_turn and before turn 17's line; root's first request of memo 3 (meeting_file: 2026-10-19.md) was sent 2026-10-27T23:44:21Z (read from S/org/sent); no spend request had been answered for memo 3",
+   "state": "done",
+   "runs": 10,
+   "relayed_runs": 0,
+   "budget": 17,
+   "contract_budget": 12,
+   "ceilings": [],
+   "d14_used": 10,
+   "_files": {
+    "state": "I2/final-services-progress-status-health.txt (the case's latest task 20261027T234831999613-root-c3c4)",
+    "runs, relayed_runs, budget, d14_used": "I2/final-services-progress-status-health.txt (task 20261027T234421361111-root-a19d)",
+    "contract_budget": "I2/msgs/sent/20261027T234421361111-root-a19d.md budget header",
+    "ceilings": "not derived by hand (STUDY.md, declared limit)"
+   },
+   "_progress_line": "\"Memo for the 2026-10-19 platform team meeting\" [service weekly-meeting-memo v3]: done. runs 5 of 12 (6 returned). last activity 41s ago. artifacts: lead/writer/work/memo-2026-10-19.md, lead/reviewer/work/review-memo-2026-10-19.md. case total: 10 runs used of 17 handed down (contract: 12 per request). (task 20261027T234421361111-root-a19d)"
+  },
+  "20261027T235208782012-root-c7bd": {
+   "memo": "2026-10-26",
+   "lena_plan_budget": 12,
+   "lena_grants": [],
+   "_declined": [],
+   "_added": "created by the stream-i2 step 2026-10-27T23:55:33Z after turn 18's after_turn and before turn 19's line; root's first request of memo 4 (meeting_file: 2026-10-26.md) was sent 2026-10-27T23:52:08Z, during turn 18 (read from S/org/sent); no spend request had been answered for memo 4",
+   "state": "done",
+   "runs": 10,
+   "relayed_runs": 0,
+   "budget": 17,
+   "contract_budget": 12,
+   "ceilings": [],
+   "d14_used": 10,
+   "_files": {
+    "state": "I2/final-services-progress-status-health.txt (the case's latest task 20261027T235815205888-root-2d32)",
+    "runs, relayed_runs, budget, d14_used": "I2/final-services-progress-status-health.txt (task 20261027T235208782012-root-c7bd)",
+    "contract_budget": "I2/msgs/sent/20261027T235208782012-root-c7bd.md budget header",
+    "ceilings": "not derived by hand (STUDY.md, declared limit)"
+   },
+   "_progress_line": "\"Memo for the 2026-10-26 platform team meeting\" [service weekly-meeting-memo v3]: done. runs 5 of 12 (6 returned). last activity 41s ago. artifacts: lead/writer/work/memo-2026-10-26.md, lead/reviewer/work/review-memo-2026-10-26.md. case total: 10 runs used of 17 handed down (contract: 12 per request). (task 20261027T235208782012-root-c7bd)"
+  },
+  "20261028T000316137116-root-2afa": {
+   "memo": "2026-11-02",
+   "lena_plan_budget": 12,
+   "lena_grants": [],
+   "_declined": [],
+   "_added": "created by the stream-i2 step 2026-10-28T00:06:45Z after turn 23's after_turn and before turn 24's line; root's first request of memo 5 (meeting_file: 2026-11-02.md) was sent 2026-10-28T00:03:16Z, during turn 23 (read from S/org/sent); no spend request had been answered for memo 5",
+   "state": "done",
+   "runs": 10,
+   "relayed_runs": 0,
+   "budget": 17,
+   "contract_budget": 12,
+   "ceilings": [],
+   "d14_used": 10,
+   "_files": {
+    "state": "I2/final-services-progress-status-health.txt (the case's latest task 20261028T000921411290-root-2ffa)",
+    "runs, relayed_runs, budget, d14_used": "I2/final-services-progress-status-health.txt (task 20261028T000316137116-root-2afa)",
+    "contract_budget": "I2/msgs/sent/20261028T000316137116-root-2afa.md budget header",
+    "ceilings": "not derived by hand (STUDY.md, declared limit)"
+   },
+   "_progress_line": "\"Memo for the 2026-11-02 platform team meeting\" [service weekly-meeting-memo v5]: done. runs 5 of 12. 0 returned (kept by lead). last activity 41s ago. artifacts: lead/writer/work/memo-2026-11-02.md, lead/reviewer/work/review-memo-2026-11-02-recheck.md. case total: 10 runs used of 17 handed down (contract: 12 per request). (task 20261028T000316137116-root-2afa)"
+  },
+  "20261028T001324513271-root-47f6": {
+   "memo": "2026-11-09",
+   "lena_plan_budget": 12,
+   "lena_grants": [],
+   "_declined": [],
+   "_added": "created by the stream-i2 step 2026-10-28T00:16:46Z after turn 27's after_turn and before turn 28's line; root's first request of memo 6 (meeting_file: 2026-11-09.md) was sent 2026-10-28T00:13:24Z, during turn 27 (read from S/org/sent); no spend request had been answered for memo 6",
+   "state": "done",
+   "runs": 5,
+   "relayed_runs": 0,
+   "budget": 12,
+   "contract_budget": 12,
+   "ceilings": [],
+   "d14_used": 5,
+   "_files": {
+    "state": "I2/final-services-progress-status-health.txt (the case's latest task 20261028T001324513271-root-47f6)",
+    "runs, relayed_runs, budget, d14_used": "I2/final-services-progress-status-health.txt (task 20261028T001324513271-root-47f6)",
+    "contract_budget": "I2/msgs/sent/20261028T001324513271-root-47f6.md budget header",
+    "ceilings": "not derived by hand (STUDY.md, declared limit)"
+   },
+   "_progress_line": "\"Memo for the 2026-11-09 platform team meeting\" [service weekly-meeting-memo v6]: done. runs 5 of 12 (6 returned). last activity 41s ago. artifacts: lead/writer/work/memo-2026-11-09.md, lead/reviewer/work/review-memo-2026-11-09.md. (task 20261028T001324513271-root-47f6)"
+  }
+ },
+ "_about_scorer": "Completed by the scoring step (scoring/complete_ledger.py) from the raw files; the stream step's ledger I2/measures/spend-ledger.json is unchanged."
+}

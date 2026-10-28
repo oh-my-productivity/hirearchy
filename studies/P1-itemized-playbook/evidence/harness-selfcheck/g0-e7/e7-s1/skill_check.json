@@ -1,0 +1,39 @@
+{
+  "disclose_calls": 1,
+  "first_disclose": {
+    "call": 6,
+    "path": "/private/tmp/hirearchy-e7-s1-1792911600/.kiro/skills/hirearchy/SKILL.md",
+    "skill_file_md5": "fd89a7fda55b8f342cf0306173c363fb",
+    "status": "completed",
+    "turn": 1,
+    "uri": "file:///private/tmp/hirearchy-e7-s1-1792911600/.kiro/skills/hirearchy/SKILL.md",
+    "utc": "2026-10-25T07:01:29.788Z",
+    "valid": true
+  },
+  "first_feedback": {
+    "call": 30,
+    "turn": 5,
+    "utc": "2026-10-25T07:15:37.824Z"
+  },
+  "first_propose_org": {
+    "call": 11,
+    "turn": 2,
+    "utc": "2026-10-25T07:03:05.693Z"
+  },
+  "note_count": {
+    "messages": 0,
+    "tool_calls": 0
+  },
+  "required_md5": "fd89a7fda55b8f342cf0306173c363fb",
+  "script": {
+    "md5": "df7bd77dd2b7fc9eb6681e677b6c7e7c",
+    "name": "skill_check.py"
+  },
+  "skill_disclose_calls": 1,
+  "source_files": [
+    "assistant-session-messages.jsonl",
+    "assistant-tool-calls.txt"
+  ],
+  "stratum": "A",
+  "streamdir": "/Volumes/workspace/hirearchy/studies/E7-org-growth-0a4-recheck/evidence/s1"
+}

@@ -1,0 +1,2 @@
+"Reproduction": working. unread work: ceo. runs 0 of 2. last activity 1m ago. (task 20261027T185207501485-root-513a)
+scheduler: stopped - open tasks do not move until it is started (start() or `hirearchy run`)

@@ -1,0 +1,16 @@
+session_start: equal in all four sessions
+tool_load (the reply's other text): equal in all four sessions
+tool_load hirearchy::services: equal in all four sessions
+tool_load hirearchy::whoami: equal in all four sessions
+non-[tool] stderr lines (digits masked): equal
+failed empty-argument calls F1: 0 (session store, f-g0-7 section 1); 'is not available' in stderr: 0 (reported)
+failed empty-argument calls F2: 0 (session store, f-g0-7 section 1); 'is not available' in stderr: 0 (reported)
+failed empty-argument calls I1: 0 (session store, f-g0-7 section 1); 'is not available' in stderr: 0 (reported)
+failed empty-argument calls I2: 0 (session store, f-g0-7 section 1); 'is not available' in stderr: 0 (reported)
+positive control F1: root's services names probe-memo with contract v2: NO
+positive control F2: root's services names probe-memo with contract v2: NO
+positive control I1: root's services names probe-memo with contract v1: NO
+positive control I2: root's services names probe-memo with contract v1: NO
+lock checks F1: NOT all yes
+lock checks F2: NOT all yes
+PROBE: STOP: positive control failed in F1 (want contract v2); positive control failed in F2 (want contract v2); positive control failed in I1 (want contract v1); positive control failed in I2 (want contract v1); the lock checks of F1 failed; the lock checks of F2 failed

@@ -1,0 +1,17 @@
+The updated memo is at `/tmp/hirearchy-p1-I2-1793142034/deliverables/memo-2026-10-12.md`. I checked the copy against the writer's file and they are identical.
+
+Your "No" means names in the Action text stay as written, so Lee's row still says "with Dev." There was nothing left to fix, so I spent none of the extra runs you offered to fund. I haven't made the Action-text question a lasting rule either.
+
+- **C1, based on the 12 Oct notes only:** met.
+- **C2, at most 400 words:** met (178 by `wc`).
+- **C3, Decisions and Actions sections with the Owner | Action | Due table:** met.
+- **C4, a row for every commitment:** met (5 rows).
+- **C5, Due dates:** met. Sam is 2026-10-21 and Lee is none.
+- **C6, nothing invented:** met.
+- **C7, reviewer's report:** met. The reviewer's line reads 8 of 8 (C1 to C6, C8, C9), with 13 of 13 facts verified.
+- **C8, Summary line first, then Decisions, then Actions:** met.
+- **C9, Owners as initials only:** met, in the Owner column.
+
+This memo's case used 11 runs, within the 12 you approved. The scheduler has stopped and nothing is running.
+
+Keep it, or what should change?

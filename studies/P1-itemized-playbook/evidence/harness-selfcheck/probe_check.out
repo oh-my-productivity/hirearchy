@@ -1,0 +1,7 @@
+OK   equal sessions, another load order and split in F1: PROBE: PASS
+OK   F2 loads one more tool: PROBE: PASS
+OK   I2's services description differs: PROBE: STOP: the tool_load result of hirearchy::services differs
+OK   a failed empty-argument call in F1: PROBE: STOP: F1 has 1 failed empty-argument call(s)
+OK   the positive control fails in F2 (contract v1): PROBE: STOP: positive control failed in F2 (want contract v2)
+OK   a different non-[tool] stderr line in I1: PROBE: STOP: non-[tool] stderr of F1 differs from I1's: {} / {'Warning: something else #': 1}; non-[tool] stderr of F2 differs from I1's: {} / {'Warning: something else #': 1}; non-[tool] stderr of I2
+probe_check: 6 of 6 checks OK

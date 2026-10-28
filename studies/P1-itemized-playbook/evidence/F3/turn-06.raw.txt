@@ -1,0 +1,16 @@
+The memo is at `/tmp/hirearchy-p1-F3-1793152805/deliverables/memo-2026-10-05.md`. The copy matches the team's file.
+
+- Covers only the 2026-10-05 meeting: met
+- Markdown, at most 400 words: met (135 by `wc`, which also counts table symbols)
+- Decisions section, one line each (2 decisions): met
+- Action table with columns Owner | Action | Due: met
+- All five commitments included, informal ones too: met
+- Due values are ISO dates or `none`: met (Sam 2026-10-09, Marta 2026-10-14, Lee `none`)
+- Nothing invented: met
+- Reviewer passed 9 of 9, with the writer's changes applied: met
+
+The case used 15 runs: 9 for the first pass and 6 for your rework. That is the 12 approved plus the 5 you granted, minus 2 runs that came back unspent.
+
+The team is ready for the next meeting. Ask me for the memo with the notes file name, for example `2026-10-12.md`. The notes folder also has 2026-11-09.md, your latest meeting, if you want that one next.
+
+Keep it, or what should change?

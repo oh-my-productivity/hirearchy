@@ -1,0 +1,12 @@
+# Reflect before you start: weekly-meeting-memo
+Your playbook is how your team delivers this service. The contract is locked by your parent, so you may not change the playbook. Evidence since v1:
+Cases with new evidence (most recent first):
+- case 20261028T002628583154-root-8cba "Memo for 2026-10-05 meeting": open, playbook v1, 16 of 30 runs, 3 rework(s), 1 relayed; client feedback: reject R1 "No, not right yet. Always start the memo with a one-line 'Summary:' of the meeting, then the decisions, then the action items." -> reject (relayed) "This relayed rework set Sam and Marta back to Due 'none', undoing the client's explicit rulings (Sam 2026-10-09, Marta 2026-10-14). It is superseded: do not us…"; owner's view (from a relayed rework, not the client's): Expected C6, a Due is a date only when the notes make it clear | Happened first memo resolved "before Friday" to Friday 2026-10-09 an… | Caught at client review; reviewer v1 passed them | Cause writer and reviewer lacke…
+By playbook version:
+- v1: 1 request(s): 0 done, 0 failed, 1 open; 1 reworked; feedback 0 accept, 1 reject
+The client rejected a delivery. The contract is locked, so you cannot change the playbook: apply what the feedback shows, then handle the rework.
+1. Look for what repeats, and for anything the client rejected (the regression list). A rejection or a failure is enough to look into on its own; a single slow case is not.
+2. When a lesson of yours conflicts with the client's own feedback (not a relayed verdict), the client is right: follow the feedback.
+3. You cannot change the playbook, but apply what the evidence shows when you plan this rework. The playbook may raise the bar, never lower it: the acceptance criteria come from the contract and travel with every request. Your parent asks the client whether a rejection is a lasting requirement; do not send it yourself.
+4. Then handle the rework following the playbook.
+

@@ -1,0 +1,1 @@
+{"v":1,"ts":"2026-10-27T20:14:26.049649+00:00","seq":1,"proc":"mcp","pid":2808,"kind":"tool.call","actor":"root","run":null,"trace":null,"tool":"observe","ok":true,"ms":17.14,"error":null,"error_type":null,"args":{"view":"trace","target":"20261027T195354174379-root-c39b","since":"24h","errors_only":false,"limit":20}}

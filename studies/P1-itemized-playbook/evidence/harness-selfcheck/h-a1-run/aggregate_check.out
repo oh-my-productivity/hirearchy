@@ -1,0 +1,237 @@
+OK   all pass: G1 (arm I): got PASS
+OK   all pass: G2 (arm F): got PASS
+OK   all pass: G2 (arm I): got PASS
+OK   all pass: no regression (arm I): got PASS
+OK   all pass: exit: got PASS
+OK   all pass: no regression (arm F; reported, not a pass rule): got PASS
+OK   all pass: D14 within the approved runs (arm F; reported): got PASS
+OK   all pass: D14 within the approved runs (arm I; reported): got PASS
+OK   all pass: Summary first and order, owner form (arm I; reported): got PASS
+OK   all pass: regression causes: got none
+OK   I2: g1_d_judged value false: G1 (arm I): got FAIL (FAIL (in I2))
+OK   I2: g1_d_judged value false: G2 (arm F): got PASS
+OK   I2: g1_d_judged value false: G2 (arm I): got PASS
+OK   I2: g1_d_judged value false: no regression (arm I): got PASS
+OK   I2: g1_d_judged value false: exit: got FAIL (FAIL)
+OK   I2: g1_d_judged value false: no regression (arm F; reported, not a pass rule): got PASS
+OK   I2: g1_d_judged value false: D14 within the approved runs (arm F; reported): got PASS
+OK   I2: g1_d_judged value false: D14 within the approved runs (arm I; reported): got PASS
+OK   I2: g1_d_judged value false: Summary first and order, owner form (arm I; reported): got PASS
+OK   I2: g1_d_judged value false: regression causes: got none
+OK   I2: judged.json missing (never a pass): G1 (arm I): got NOT DETERMINED (NOT DETERMINED (I2: NOT DETERMINED (d)))
+OK   I2: judged.json missing (never a pass): G2 (arm F): got PASS
+OK   I2: judged.json missing (never a pass): G2 (arm I): got PASS
+OK   I2: judged.json missing (never a pass): no regression (arm I): got NOT DETERMINED (NOT DETERMINED (I2: NOT DETERMINED (D8 deliveries by presentation (judged))))
+OK   I2: judged.json missing (never a pass): exit: got NOT DETERMINED (NOT DETERMINED)
+OK   I2: judged.json missing (never a pass): no regression (arm F; reported, not a pass rule): got PASS
+OK   I2: judged.json missing (never a pass): D14 within the approved runs (arm F; reported): got PASS
+OK   I2: judged.json missing (never a pass): D14 within the approved runs (arm I; reported): got PASS
+OK   I2: judged.json missing (never a pass): Summary first and order, owner form (arm I; reported): got PASS
+OK   I2: judged.json missing (never a pass): regression causes: got none
+OK   I2: a keyword hit not decided: G1 (arm I): got NOT DETERMINED (NOT DETERMINED (I2: NOT DETERMINED (d)))
+OK   I2: a keyword hit not decided: G2 (arm F): got PASS
+OK   I2: a keyword hit not decided: G2 (arm I): got PASS
+OK   I2: a keyword hit not decided: no regression (arm I): got PASS
+OK   I2: a keyword hit not decided: exit: got NOT DETERMINED (NOT DETERMINED)
+OK   I2: a keyword hit not decided: no regression (arm F; reported, not a pass rule): got PASS
+OK   I2: a keyword hit not decided: D14 within the approved runs (arm F; reported): got PASS
+OK   I2: a keyword hit not decided: D14 within the approved runs (arm I; reported): got PASS
+OK   I2: a keyword hit not decided: Summary first and order, owner form (arm I; reported): got PASS
+OK   I2: a keyword hit not decided: regression causes: got none
+OK   I2: a keyword hit decided, not stating it: G1 (arm I): got PASS
+OK   I2: a keyword hit decided, not stating it: G2 (arm F): got PASS
+OK   I2: a keyword hit decided, not stating it: G2 (arm I): got PASS
+OK   I2: a keyword hit decided, not stating it: no regression (arm I): got PASS
+OK   I2: a keyword hit decided, not stating it: exit: got PASS
+OK   I2: a keyword hit decided, not stating it: no regression (arm F; reported, not a pass rule): got PASS
+OK   I2: a keyword hit decided, not stating it: D14 within the approved runs (arm F; reported): got PASS
+OK   I2: a keyword hit decided, not stating it: D14 within the approved runs (arm I; reported): got PASS
+OK   I2: a keyword hit decided, not stating it: Summary first and order, owner form (arm I; reported): got PASS
+OK   I2: a keyword hit decided, not stating it: regression causes: got none
+OK   I3 invalid: 2 valid streams: G1 (arm I): got NOT DETERMINED (NOT DETERMINED (2 valid stream(s) of at least 3))
+OK   I3 invalid: 2 valid streams: G2 (arm F): got PASS
+OK   I3 invalid: 2 valid streams: G2 (arm I): got NOT DETERMINED (NOT DETERMINED (2 valid stream(s) of at least 3))
+OK   I3 invalid: 2 valid streams: no regression (arm I): got NOT DETERMINED (NOT DETERMINED (2 valid stream(s) of at least 3))
+OK   I3 invalid: 2 valid streams: exit: got NOT DETERMINED (NOT DETERMINED)
+OK   I3 invalid: 2 valid streams: no regression (arm F; reported, not a pass rule): got PASS
+OK   I3 invalid: 2 valid streams: D14 within the approved runs (arm F; reported): got PASS
+OK   I3 invalid: 2 valid streams: D14 within the approved runs (arm I; reported): got PASS
+OK   I3 invalid: 2 valid streams: Summary first and order, owner form (arm I; reported): got PASS
+OK   I3 invalid: 2 valid streams: regression causes: got none
+OK   I3 invalid, G1 FAIL before the failure: G1 (arm I): got FAIL (FAIL (in I3))
+OK   I3 invalid, G1 FAIL before the failure: G2 (arm F): got PASS
+OK   I3 invalid, G1 FAIL before the failure: G2 (arm I): got NOT DETERMINED (NOT DETERMINED (2 valid stream(s) of at least 3))
+OK   I3 invalid, G1 FAIL before the failure: no regression (arm I): got NOT DETERMINED (NOT DETERMINED (2 valid stream(s) of at least 3))
+OK   I3 invalid, G1 FAIL before the failure: exit: got FAIL (FAIL)
+OK   I3 invalid, G1 FAIL before the failure: no regression (arm F; reported, not a pass rule): got PASS
+OK   I3 invalid, G1 FAIL before the failure: D14 within the approved runs (arm F; reported): got PASS
+OK   I3 invalid, G1 FAIL before the failure: D14 within the approved runs (arm I; reported): got PASS
+OK   I3 invalid, G1 FAIL before the failure: Summary first and order, owner form (arm I; reported): got PASS
+OK   I3 invalid, G1 FAIL before the failure: regression causes: got none
+OK   F1: a case over its approved runs (D14 is reported, M7): G1 (arm I): got PASS
+OK   F1: a case over its approved runs (D14 is reported, M7): G2 (arm F): got PASS
+OK   F1: a case over its approved runs (D14 is reported, M7): G2 (arm I): got PASS
+OK   F1: a case over its approved runs (D14 is reported, M7): no regression (arm I): got PASS
+OK   F1: a case over its approved runs (D14 is reported, M7): exit: got PASS
+OK   F1: a case over its approved runs (D14 is reported, M7): no regression (arm F; reported, not a pass rule): got PASS
+OK   F1: a case over its approved runs (D14 is reported, M7): D14 within the approved runs (arm F; reported): got FAIL (FAIL in F1 (3 valid stream(s)))
+OK   F1: a case over its approved runs (D14 is reported, M7): D14 within the approved runs (arm I; reported): got PASS
+OK   F1: a case over its approved runs (D14 is reported, M7): Summary first and order, owner form (arm I; reported): got PASS
+OK   F1: a case over its approved runs (D14 is reported, M7): regression causes: got ['F1: D14 within the approved runs (reported): cause NOT DETERMINED (judged.json regression_causes missing)']
+OK   F2: a D8 delivery with a wrong date: arm F's regression reported, not the exit (M7): G1 (arm I): got PASS
+OK   F2: a D8 delivery with a wrong date: arm F's regression reported, not the exit (M7): G2 (arm F): got PASS
+OK   F2: a D8 delivery with a wrong date: arm F's regression reported, not the exit (M7): G2 (arm I): got PASS
+OK   F2: a D8 delivery with a wrong date: arm F's regression reported, not the exit (M7): no regression (arm I): got PASS
+OK   F2: a D8 delivery with a wrong date: arm F's regression reported, not the exit (M7): exit: got PASS
+OK   F2: a D8 delivery with a wrong date: arm F's regression reported, not the exit (M7): no regression (arm F; reported, not a pass rule): got FAIL (FAIL (in F2))
+OK   F2: a D8 delivery with a wrong date: arm F's regression reported, not the exit (M7): D14 within the approved runs (arm F; reported): got PASS
+OK   F2: a D8 delivery with a wrong date: arm F's regression reported, not the exit (M7): D14 within the approved runs (arm I; reported): got PASS
+OK   F2: a D8 delivery with a wrong date: arm F's regression reported, not the exit (M7): Summary first and order, owner form (arm I; reported): got PASS
+OK   F2: a D8 delivery with a wrong date: arm F's regression reported, not the exit (M7): regression causes: got ['F2: D8 deliveries by presentation (judged): cause NOT DETERMINED (judged.json regression_causes missing)']
+OK   F3: validity.json missing: G1 (arm I): got PASS
+OK   F3: validity.json missing: G2 (arm F): got NOT DETERMINED (NOT DETERMINED (2 valid stream(s) of at least 3))
+OK   F3: validity.json missing: G2 (arm I): got PASS
+OK   F3: validity.json missing: no regression (arm I): got PASS
+OK   F3: validity.json missing: exit: got NOT DETERMINED (NOT DETERMINED)
+OK   F3: validity.json missing: no regression (arm F; reported, not a pass rule): got NOT DETERMINED (NOT DETERMINED (2 valid stream(s) of at least 3))
+OK   F3: validity.json missing: D14 within the approved runs (arm F; reported): got PASS
+OK   F3: validity.json missing: D14 within the approved runs (arm I; reported): got PASS
+OK   F3: validity.json missing: Summary first and order, owner form (arm I; reported): got PASS
+OK   F3: validity.json missing: regression causes: got none
+OK   I1: score_memos mechanical FAIL: G1 (arm I): got PASS
+OK   I1: score_memos mechanical FAIL: G2 (arm F): got PASS
+OK   I1: score_memos mechanical FAIL: G2 (arm I): got PASS
+OK   I1: score_memos mechanical FAIL: no regression (arm I): got FAIL (FAIL (in I1))
+OK   I1: score_memos mechanical FAIL: exit: got FAIL (FAIL)
+OK   I1: score_memos mechanical FAIL: no regression (arm F; reported, not a pass rule): got PASS
+OK   I1: score_memos mechanical FAIL: D14 within the approved runs (arm F; reported): got PASS
+OK   I1: score_memos mechanical FAIL: D14 within the approved runs (arm I; reported): got PASS
+OK   I1: score_memos mechanical FAIL: Summary first and order, owner form (arm I; reported): got PASS
+OK   I1: score_memos mechanical FAIL: regression causes: got ["I1: mechanical, G0's gate-able measures (score_memos p1_no_regression): cause NOT DETERMINED (judged.json regression_causes missing)"]
+OK   I2: the ledger misses a case of the mail (P2-M3): NOT DETERMINED, never PASS: G1 (arm I): got PASS
+OK   I2: the ledger misses a case of the mail (P2-M3): NOT DETERMINED, never PASS: G2 (arm F): got PASS
+OK   I2: the ledger misses a case of the mail (P2-M3): NOT DETERMINED, never PASS: G2 (arm I): got PASS
+OK   I2: the ledger misses a case of the mail (P2-M3): NOT DETERMINED, never PASS: no regression (arm I): got PASS
+OK   I2: the ledger misses a case of the mail (P2-M3): NOT DETERMINED, never PASS: exit: got PASS
+OK   I2: the ledger misses a case of the mail (P2-M3): NOT DETERMINED, never PASS: no regression (arm F; reported, not a pass rule): got PASS
+OK   I2: the ledger misses a case of the mail (P2-M3): NOT DETERMINED, never PASS: D14 within the approved runs (arm F; reported): got PASS
+OK   I2: the ledger misses a case of the mail (P2-M3): NOT DETERMINED, never PASS: D14 within the approved runs (arm I; reported): got NOT DETERMINED (NOT DETERMINED in I2 (3 valid stream(s)))
+OK   I2: the ledger misses a case of the mail (P2-M3): NOT DETERMINED, never PASS: Summary first and order, owner form (arm I; reported): got PASS
+OK   I2: the ledger misses a case of the mail (P2-M3): NOT DETERMINED, never PASS: regression causes: got none
+OK   I2: the ledger's completeness not checked (no --stream): NOT DETERMINED: G1 (arm I): got PASS
+OK   I2: the ledger's completeness not checked (no --stream): NOT DETERMINED: G2 (arm F): got PASS
+OK   I2: the ledger's completeness not checked (no --stream): NOT DETERMINED: G2 (arm I): got PASS
+OK   I2: the ledger's completeness not checked (no --stream): NOT DETERMINED: no regression (arm I): got PASS
+OK   I2: the ledger's completeness not checked (no --stream): NOT DETERMINED: exit: got PASS
+OK   I2: the ledger's completeness not checked (no --stream): NOT DETERMINED: no regression (arm F; reported, not a pass rule): got PASS
+OK   I2: the ledger's completeness not checked (no --stream): NOT DETERMINED: D14 within the approved runs (arm F; reported): got PASS
+OK   I2: the ledger's completeness not checked (no --stream): NOT DETERMINED: D14 within the approved runs (arm I; reported): got NOT DETERMINED (NOT DETERMINED in I2 (3 valid stream(s)))
+OK   I2: the ledger's completeness not checked (no --stream): NOT DETERMINED: Summary first and order, owner form (arm I; reported): got PASS
+OK   I2: the ledger's completeness not checked (no --stream): NOT DETERMINED: regression causes: got none
+OK   F1: a mechanical regression caused in a shared mechanism: a product finding, reported (M7): G1 (arm I): got PASS
+OK   F1: a mechanical regression caused in a shared mechanism: a product finding, reported (M7): G2 (arm F): got PASS
+OK   F1: a mechanical regression caused in a shared mechanism: a product finding, reported (M7): G2 (arm I): got PASS
+OK   F1: a mechanical regression caused in a shared mechanism: a product finding, reported (M7): no regression (arm I): got PASS
+OK   F1: a mechanical regression caused in a shared mechanism: a product finding, reported (M7): exit: got PASS
+OK   F1: a mechanical regression caused in a shared mechanism: a product finding, reported (M7): no regression (arm F; reported, not a pass rule): got FAIL (FAIL (in F1))
+OK   F1: a mechanical regression caused in a shared mechanism: a product finding, reported (M7): D14 within the approved runs (arm F; reported): got PASS
+OK   F1: a mechanical regression caused in a shared mechanism: a product finding, reported (M7): D14 within the approved runs (arm I; reported): got PASS
+OK   F1: a mechanical regression caused in a shared mechanism: a product finding, reported (M7): Summary first and order, owner form (arm I; reported): got PASS
+OK   F1: a mechanical regression caused in a shared mechanism: a product finding, reported (M7): regression causes: got ["F1: mechanical, G0's gate-able measures (score_memos p1_no_regression) (2026-10-05): a rework past the cap left a wrong Due; mechanism spend (shared by both arms: a product finding F-P1-1)"]
+OK   I1: memo 1 kept without a Summary under L-ASIS: reported, not a FAIL (M7): G1 (arm I): got PASS
+OK   I1: memo 1 kept without a Summary under L-ASIS: reported, not a FAIL (M7): G2 (arm F): got PASS
+OK   I1: memo 1 kept without a Summary under L-ASIS: reported, not a FAIL (M7): G2 (arm I): got PASS
+OK   I1: memo 1 kept without a Summary under L-ASIS: reported, not a FAIL (M7): no regression (arm I): got PASS
+OK   I1: memo 1 kept without a Summary under L-ASIS: reported, not a FAIL (M7): exit: got PASS
+OK   I1: memo 1 kept without a Summary under L-ASIS: reported, not a FAIL (M7): no regression (arm F; reported, not a pass rule): got PASS
+OK   I1: memo 1 kept without a Summary under L-ASIS: reported, not a FAIL (M7): D14 within the approved runs (arm F; reported): got PASS
+OK   I1: memo 1 kept without a Summary under L-ASIS: reported, not a FAIL (M7): D14 within the approved runs (arm I; reported): got PASS
+OK   I1: memo 1 kept without a Summary under L-ASIS: reported, not a FAIL (M7): Summary first and order, owner form (arm I; reported): got FAIL (FAIL in I1 (3 valid stream(s)))
+OK   I1: memo 1 kept without a Summary under L-ASIS: reported, not a FAIL (M7): regression causes: got ['I1: Summary first and order, owner form (reported): cause NOT DETERMINED (judged.json regression_causes missing)']
+OK   I3 ended by ruling at turn 22 (memo 5): memos 5-6 undelivered, R5 unanswered: no regression ND, G2 ND, exit ND (C1): G1 (arm I): got PASS
+OK   I3 ended by ruling at turn 22 (memo 5): memos 5-6 undelivered, R5 unanswered: no regression ND, G2 ND, exit ND (C1): G2 (arm F): got PASS
+OK   I3 ended by ruling at turn 22 (memo 5): memos 5-6 undelivered, R5 unanswered: no regression ND, G2 ND, exit ND (C1): G2 (arm I): got NOT DETERMINED (NOT DETERMINED (I3: NOT DETERMINED (b, c)))
+OK   I3 ended by ruling at turn 22 (memo 5): memos 5-6 undelivered, R5 unanswered: no regression ND, G2 ND, exit ND (C1): no regression (arm I): got NOT DETERMINED (NOT DETERMINED (I3: NOT DETERMINED (mechanical, G0's gate-able measures (score_memos p1_no_regression))))
+OK   I3 ended by ruling at turn 22 (memo 5): memos 5-6 undelivered, R5 unanswered: no regression ND, G2 ND, exit ND (C1): exit: got NOT DETERMINED (NOT DETERMINED)
+OK   I3 ended by ruling at turn 22 (memo 5): memos 5-6 undelivered, R5 unanswered: no regression ND, G2 ND, exit ND (C1): no regression (arm F; reported, not a pass rule): got PASS
+OK   I3 ended by ruling at turn 22 (memo 5): memos 5-6 undelivered, R5 unanswered: no regression ND, G2 ND, exit ND (C1): D14 within the approved runs (arm F; reported): got PASS
+OK   I3 ended by ruling at turn 22 (memo 5): memos 5-6 undelivered, R5 unanswered: no regression ND, G2 ND, exit ND (C1): D14 within the approved runs (arm I; reported): got PASS
+OK   I3 ended by ruling at turn 22 (memo 5): memos 5-6 undelivered, R5 unanswered: no regression ND, G2 ND, exit ND (C1): Summary first and order, owner form (arm I; reported): got NOT DETERMINED (NOT DETERMINED in I3 (3 valid stream(s)))
+OK   I3 ended by ruling at turn 22 (memo 5): memos 5-6 undelivered, R5 unanswered: no regression ND, G2 ND, exit ND (C1): regression causes: got none
+OK   I3 ended by ruling at turn 22: memo 5's rejected version delivered, memo 6 undelivered, R5 unanswered: ND, never FAIL (C1): G1 (arm I): got PASS
+OK   I3 ended by ruling at turn 22: memo 5's rejected version delivered, memo 6 undelivered, R5 unanswered: ND, never FAIL (C1): G2 (arm F): got PASS
+OK   I3 ended by ruling at turn 22: memo 5's rejected version delivered, memo 6 undelivered, R5 unanswered: ND, never FAIL (C1): G2 (arm I): got NOT DETERMINED (NOT DETERMINED (I3: NOT DETERMINED (b, c)))
+OK   I3 ended by ruling at turn 22: memo 5's rejected version delivered, memo 6 undelivered, R5 unanswered: ND, never FAIL (C1): no regression (arm I): got NOT DETERMINED (NOT DETERMINED (I3: NOT DETERMINED (mechanical, G0's gate-able measures (score_memos p1_no_regression))))
+OK   I3 ended by ruling at turn 22: memo 5's rejected version delivered, memo 6 undelivered, R5 unanswered: ND, never FAIL (C1): exit: got NOT DETERMINED (NOT DETERMINED)
+OK   I3 ended by ruling at turn 22: memo 5's rejected version delivered, memo 6 undelivered, R5 unanswered: ND, never FAIL (C1): no regression (arm F; reported, not a pass rule): got PASS
+OK   I3 ended by ruling at turn 22: memo 5's rejected version delivered, memo 6 undelivered, R5 unanswered: ND, never FAIL (C1): D14 within the approved runs (arm F; reported): got PASS
+OK   I3 ended by ruling at turn 22: memo 5's rejected version delivered, memo 6 undelivered, R5 unanswered: ND, never FAIL (C1): D14 within the approved runs (arm I; reported): got PASS
+OK   I3 ended by ruling at turn 22: memo 5's rejected version delivered, memo 6 undelivered, R5 unanswered: ND, never FAIL (C1): Summary first and order, owner form (arm I; reported): got NOT DETERMINED (NOT DETERMINED in I3 (3 valid stream(s)))
+OK   I3 ended by ruling at turn 22: memo 5's rejected version delivered, memo 6 undelivered, R5 unanswered: ND, never FAIL (C1): regression causes: got none
+OK   I3 the same files without the ruling (a cap or L-WAIT): no regression FAIL, G2 FAIL, exit FAIL (C1's contrast): G1 (arm I): got PASS
+OK   I3 the same files without the ruling (a cap or L-WAIT): no regression FAIL, G2 FAIL, exit FAIL (C1's contrast): G2 (arm F): got PASS
+OK   I3 the same files without the ruling (a cap or L-WAIT): no regression FAIL, G2 FAIL, exit FAIL (C1's contrast): G2 (arm I): got FAIL (FAIL (in I3))
+OK   I3 the same files without the ruling (a cap or L-WAIT): no regression FAIL, G2 FAIL, exit FAIL (C1's contrast): no regression (arm I): got FAIL (FAIL (in I3))
+OK   I3 the same files without the ruling (a cap or L-WAIT): no regression FAIL, G2 FAIL, exit FAIL (C1's contrast): exit: got FAIL (FAIL)
+OK   I3 the same files without the ruling (a cap or L-WAIT): no regression FAIL, G2 FAIL, exit FAIL (C1's contrast): no regression (arm F; reported, not a pass rule): got PASS
+OK   I3 the same files without the ruling (a cap or L-WAIT): no regression FAIL, G2 FAIL, exit FAIL (C1's contrast): D14 within the approved runs (arm F; reported): got PASS
+OK   I3 the same files without the ruling (a cap or L-WAIT): no regression FAIL, G2 FAIL, exit FAIL (C1's contrast): D14 within the approved runs (arm I; reported): got PASS
+OK   I3 the same files without the ruling (a cap or L-WAIT): no regression FAIL, G2 FAIL, exit FAIL (C1's contrast): Summary first and order, owner form (arm I; reported): got FAIL (FAIL in I3 (3 valid stream(s)))
+OK   I3 the same files without the ruling (a cap or L-WAIT): no regression FAIL, G2 FAIL, exit FAIL (C1's contrast): regression causes: got ["I3: mechanical, G0's gate-able measures (score_memos p1_no_regression), Summary first and order, owner form (reported): cause NOT DETERMINED (judged.json regression_causes missing)"]
+OK   I3 ended by ruling: a version delivered before it had a wrong date: no regression's FAIL stands (C1): G1 (arm I): got PASS
+OK   I3 ended by ruling: a version delivered before it had a wrong date: no regression's FAIL stands (C1): G2 (arm F): got PASS
+OK   I3 ended by ruling: a version delivered before it had a wrong date: no regression's FAIL stands (C1): G2 (arm I): got NOT DETERMINED (NOT DETERMINED (I3: NOT DETERMINED (b, c)))
+OK   I3 ended by ruling: a version delivered before it had a wrong date: no regression's FAIL stands (C1): no regression (arm I): got FAIL (FAIL (in I3))
+OK   I3 ended by ruling: a version delivered before it had a wrong date: no regression's FAIL stands (C1): exit: got FAIL (FAIL)
+OK   I3 ended by ruling: a version delivered before it had a wrong date: no regression's FAIL stands (C1): no regression (arm F; reported, not a pass rule): got PASS
+OK   I3 ended by ruling: a version delivered before it had a wrong date: no regression's FAIL stands (C1): D14 within the approved runs (arm F; reported): got PASS
+OK   I3 ended by ruling: a version delivered before it had a wrong date: no regression's FAIL stands (C1): D14 within the approved runs (arm I; reported): got PASS
+OK   I3 ended by ruling: a version delivered before it had a wrong date: no regression's FAIL stands (C1): Summary first and order, owner form (arm I; reported): got NOT DETERMINED (NOT DETERMINED in I3 (3 valid stream(s)))
+OK   I3 ended by ruling: a version delivered before it had a wrong date: no regression's FAIL stands (C1): regression causes: got ["I3: mechanical, G0's gate-able measures (score_memos p1_no_regression): cause NOT DETERMINED (judged.json regression_causes missing)"]
+OK   I3 ended by ruling: memo 4's final memo has a wrong date: no regression's FAIL stands (C1): G1 (arm I): got PASS
+OK   I3 ended by ruling: memo 4's final memo has a wrong date: no regression's FAIL stands (C1): G2 (arm F): got PASS
+OK   I3 ended by ruling: memo 4's final memo has a wrong date: no regression's FAIL stands (C1): G2 (arm I): got NOT DETERMINED (NOT DETERMINED (I3: NOT DETERMINED (b, c)))
+OK   I3 ended by ruling: memo 4's final memo has a wrong date: no regression's FAIL stands (C1): no regression (arm I): got FAIL (FAIL (in I3))
+OK   I3 ended by ruling: memo 4's final memo has a wrong date: no regression's FAIL stands (C1): exit: got FAIL (FAIL)
+OK   I3 ended by ruling: memo 4's final memo has a wrong date: no regression's FAIL stands (C1): no regression (arm F; reported, not a pass rule): got PASS
+OK   I3 ended by ruling: memo 4's final memo has a wrong date: no regression's FAIL stands (C1): D14 within the approved runs (arm F; reported): got PASS
+OK   I3 ended by ruling: memo 4's final memo has a wrong date: no regression's FAIL stands (C1): D14 within the approved runs (arm I; reported): got PASS
+OK   I3 ended by ruling: memo 4's final memo has a wrong date: no regression's FAIL stands (C1): Summary first and order, owner form (arm I; reported): got NOT DETERMINED (NOT DETERMINED in I3 (3 valid stream(s)))
+OK   I3 ended by ruling: memo 4's final memo has a wrong date: no regression's FAIL stands (C1): regression causes: got ["I3: mechanical, G0's gate-able measures (score_memos p1_no_regression): cause NOT DETERMINED (judged.json regression_causes missing)"]
+OK   I3 ended by ruling: R4 unanswered before memo 5's request: G2's FAIL stands (C1): G1 (arm I): got PASS
+OK   I3 ended by ruling: R4 unanswered before memo 5's request: G2's FAIL stands (C1): G2 (arm F): got PASS
+OK   I3 ended by ruling: R4 unanswered before memo 5's request: G2's FAIL stands (C1): G2 (arm I): got FAIL (FAIL (in I3))
+OK   I3 ended by ruling: R4 unanswered before memo 5's request: G2's FAIL stands (C1): no regression (arm I): got NOT DETERMINED (NOT DETERMINED (I3: NOT DETERMINED (mechanical, G0's gate-able measures (score_memos p1_no_regression))))
+OK   I3 ended by ruling: R4 unanswered before memo 5's request: G2's FAIL stands (C1): exit: got FAIL (FAIL)
+OK   I3 ended by ruling: R4 unanswered before memo 5's request: G2's FAIL stands (C1): no regression (arm F; reported, not a pass rule): got PASS
+OK   I3 ended by ruling: R4 unanswered before memo 5's request: G2's FAIL stands (C1): D14 within the approved runs (arm F; reported): got PASS
+OK   I3 ended by ruling: R4 unanswered before memo 5's request: G2's FAIL stands (C1): D14 within the approved runs (arm I; reported): got PASS
+OK   I3 ended by ruling: R4 unanswered before memo 5's request: G2's FAIL stands (C1): Summary first and order, owner form (arm I; reported): got NOT DETERMINED (NOT DETERMINED in I3 (3 valid stream(s)))
+OK   I3 ended by ruling: R4 unanswered before memo 5's request: G2's FAIL stands (C1): regression causes: got none
+OK   I3 ended by ruling: R5 unanswered at the end but created before the ruling turn: G2's FAIL stands (C1): G1 (arm I): got PASS
+OK   I3 ended by ruling: R5 unanswered at the end but created before the ruling turn: G2's FAIL stands (C1): G2 (arm F): got PASS
+OK   I3 ended by ruling: R5 unanswered at the end but created before the ruling turn: G2's FAIL stands (C1): G2 (arm I): got FAIL (FAIL (in I3))
+OK   I3 ended by ruling: R5 unanswered at the end but created before the ruling turn: G2's FAIL stands (C1): no regression (arm I): got NOT DETERMINED (NOT DETERMINED (I3: NOT DETERMINED (mechanical, G0's gate-able measures (score_memos p1_no_regression))))
+OK   I3 ended by ruling: R5 unanswered at the end but created before the ruling turn: G2's FAIL stands (C1): exit: got FAIL (FAIL)
+OK   I3 ended by ruling: R5 unanswered at the end but created before the ruling turn: G2's FAIL stands (C1): no regression (arm F; reported, not a pass rule): got PASS
+OK   I3 ended by ruling: R5 unanswered at the end but created before the ruling turn: G2's FAIL stands (C1): D14 within the approved runs (arm F; reported): got PASS
+OK   I3 ended by ruling: R5 unanswered at the end but created before the ruling turn: G2's FAIL stands (C1): D14 within the approved runs (arm I; reported): got PASS
+OK   I3 ended by ruling: R5 unanswered at the end but created before the ruling turn: G2's FAIL stands (C1): Summary first and order, owner form (arm I; reported): got NOT DETERMINED (NOT DETERMINED in I3 (3 valid stream(s)))
+OK   I3 ended by ruling: R5 unanswered at the end but created before the ruling turn: G2's FAIL stands (C1): regression causes: got none
+OK   I3 invalid, no_regression FAIL before the failure (C7's key): G1 (arm I): got NOT DETERMINED (NOT DETERMINED (2 valid stream(s) of at least 3))
+OK   I3 invalid, no_regression FAIL before the failure (C7's key): G2 (arm F): got PASS
+OK   I3 invalid, no_regression FAIL before the failure (C7's key): G2 (arm I): got NOT DETERMINED (NOT DETERMINED (2 valid stream(s) of at least 3))
+OK   I3 invalid, no_regression FAIL before the failure (C7's key): no regression (arm I): got FAIL (FAIL (in I3))
+OK   I3 invalid, no_regression FAIL before the failure (C7's key): exit: got FAIL (FAIL)
+OK   I3 invalid, no_regression FAIL before the failure (C7's key): no regression (arm F; reported, not a pass rule): got PASS
+OK   I3 invalid, no_regression FAIL before the failure (C7's key): D14 within the approved runs (arm F; reported): got PASS
+OK   I3 invalid, no_regression FAIL before the failure (C7's key): D14 within the approved runs (arm I; reported): got PASS
+OK   I3 invalid, no_regression FAIL before the failure (C7's key): Summary first and order, owner form (arm I; reported): got PASS
+OK   I3 invalid, no_regression FAIL before the failure (C7's key): regression causes: got none
+OK   before_failure key `no regression` (not no_regression): aggregate.py refuses it: got "I3/measures/validity.json: before_failure key 'no regression' is not one of G1, G2, no_regression (protocol 8)"
+OK   before_failure key `G1(b)`: aggregate.py refuses it: got "I3/measures/validity.json: before_failure key 'G1(b)' is not one of G1, G2, no_regression (protocol 8)"
+OK   before_failure value `fail`: aggregate.py refuses it: got 'I3/measures/validity.json: before_failure[\'G2\'] is \'fail\', not "FAIL" (protocol 8)'
+OK   ended_by_ruling whose decision file is missing: aggregate.py refuses it: got 'I3/measures/validity.json: ended_by_ruling names manager-decision-row-I3-t22.md, which is not in the evidence directory (protocol 5 (b))'
+OK   ended_by_ruling with a turn that is not a number: aggregate.py refuses it: got 'I3/measures/validity.json: ended_by_ruling {\'turn\': \'22\', \'file\': \'manager-decision-row-I3-t22.md\'} is not {"turn": n, "file": "manager-decision-row-I3-t<n>.md"} (protocol 8)'
+OK   ended_by_ruling naming another stream's ruling: aggregate.py refuses it: got 'I3/measures/validity.json: ended_by_ruling {\'turn\': 22, \'file\': \'manager-decision-row-I2-t22.md\'} is not {"turn": n, "file": "manager-decision-row-I3-t<n>.md"} (protocol 8)'
+aggregate_check: 236 of 236 checks OK

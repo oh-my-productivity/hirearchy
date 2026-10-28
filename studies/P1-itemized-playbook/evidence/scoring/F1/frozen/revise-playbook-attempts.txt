@@ -1,0 +1,84 @@
+# revise_playbook attempts (protocol 7.2; amendment 1 A3.3 10.1(c)); facts only
+
+tool.call events with tool == revise_playbook: 0
+
+run-log patterns per run (after '# ---- output ----'): P1 revise_playbook call lines | P2 end lines | P3 all hirearchy call lines | tool.call events whose run is this run
+  lead@20261027T193227059734                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/writer@20261027T193307448475            P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261027T193414232229                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/reviewer@20261027T193456794637          P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261027T193623825486                   P1=0 P2=0 P3=3 events(all)=3 events(revise_playbook)=0
+  lead/writer@20261027T193720496860            P1=0 P2=0 P3=5 events(all)=5 events(revise_playbook)=0
+  lead@20261027T193817190069                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/reviewer@20261027T193859713859          P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261027T193954361560                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead@20261027T194529293031                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/writer@20261027T194633825952            P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261027T194726316360                   P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead/reviewer@20261027T194836978652          P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261027T194939541567                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead@20261027T195354413036                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/writer@20261027T195557649895            P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261027T195654307281                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/reviewer@20261027T195736869767          P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261027T195851709753                   P1=0 P2=0 P3=3 events(all)=2 events(revise_playbook)=0   <-- MISMATCH between run-log lines and events
+  lead@20261027T200713352079                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/writer@20261027T200757747525            P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261027T200914645089                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/reviewer@20261027T200957213046          P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261027T201114165960                   P1=0 P2=0 P3=5 events(all)=5 events(revise_playbook)=0
+  lead@20261027T201755587863                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/writer@20261027T201912318277            P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261027T201924591178                   P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead/reviewer@20261027T202021286489          P1=0 P2=0 P3=5 events(all)=5 events(revise_playbook)=0
+  lead@20261027T202039542942                   P1=0 P2=0 P3=1 events(all)=1 events(revise_playbook)=0
+  lead@20261027T202202521423                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead@20261027T202608373264                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/writer@20261027T202700957320            P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261027T202749446547                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/reviewer@20261027T202840102285          P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261027T202959015018                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead@20261027T203235946075                   P1=0 P2=0 P3=10 events(all)=10 events(revise_playbook)=0
+  lead/writer@20261027T203342383928            P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261027T203428630451                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/reviewer@20261027T203508858635          P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261027T203611140532                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead@20261027T203848115594                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/writer@20261027T203930347106            P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261027T204020621456                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/reviewer@20261027T204110917527          P1=0 P2=0 P3=3 events(all)=3 events(revise_playbook)=0
+  lead@20261027T204217332420                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead@20261027T205030079314                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/writer@20261027T205148602480            P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261027T205234977109                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/reviewer@20261027T205323368613          P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261027T205417975668                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead@20261027T205704946717                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/writer@20261027T205805596675            P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261027T205902099763                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/reviewer@20261027T205950551972          P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261027T210117249774                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead@20261027T210746417397                   P1=0 P2=0 P3=3 events(all)=3 events(revise_playbook)=0
+  lead/writer@20261027T210810652194            P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261027T210840953848                   P1=0 P2=0 P3=3 events(all)=3 events(revise_playbook)=0
+  lead/reviewer@20261027T210909225300          P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261027T210947520148                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead@20261027T211521802776                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/writer@20261027T211552037316            P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261027T211618208413                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/reviewer@20261027T211644417878          P1=0 P2=0 P3=5 events(all)=5 events(revise_playbook)=0
+  lead@20261027T211726758404                   P1=0 P2=0 P3=3 events(all)=3 events(revise_playbook)=0
+
+full arguments and result verbatim, from the org-run session (tool_call with args.tool_id == hirearchy::revise_playbook):
+
+service.revise events:
+- 2026-10-27T19:32:21.246313+00:00 {"ts": "2026-10-27T19:32:21.246313+00:00", "proc": "mcp", "pid": 94305, "kind": "service.revise", "actor": "root", "run": null, "trace": null, "owner": "lead", "service": "weekly-memo", "version": 1, "by": "root", "admitted": "client"}
+
+PLAYBOOK versions (org git history of lead/services/weekly-memo/PLAYBOOK.md and history/):
+15d5f2a 2026-10-27T19:32:21Z root: applied blueprint (3 agents), task 20261027T193221247283-root-ebf5 -> lead, services: weekly-memo
+592034a 2026-10-27T19:41:49Z root: service weekly-memo of lead
+5a35434 2026-10-27T20:08:16Z lead: run ok, 7 message(s) [lead/runs/20261027T200713352079.log]
+c34ff0a 2026-10-27T20:19:24Z lead: run ok, 4 message(s) [lead/runs/20261027T201755587863.log]
+d5ff1fd 2026-10-27T20:52:02Z lead: run ok, 5 message(s) [lead/runs/20261027T205030079314.log]
+b2aaca7 2026-10-27T21:08:18Z lead: run ok, 4 message(s) [lead/runs/20261027T210746417397.log]
+history files now: SERVICE.v1.md, SERVICE.v2.md, SERVICE.v3.md, SERVICE.v4.md, SERVICE.v5.md, SERVICE.v6.md

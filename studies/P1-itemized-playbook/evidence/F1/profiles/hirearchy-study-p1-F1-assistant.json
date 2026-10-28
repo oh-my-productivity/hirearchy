@@ -1,0 +1,24 @@
+{
+  "name": "hirearchy-study-p1-F1-assistant",
+  "description": "internal: hirearchy usability study P1 stream F1 assistant; deleted after the stream",
+  "mcpServers": {
+    "hirearchy": {
+      "command": "uv",
+      "args": ["--directory", "/Volumes/workspace/hirearchy", "run", "hirearchy", "mcp"],
+      "env": { "ORG_ROOT": "/tmp/hirearchy-p1-F1-1793129193/org" }
+    }
+  },
+  "tools": ["*"],
+  "permissions": {
+    "rules": [
+      { "capability": "all", "effect": "allow" }
+    ]
+  },
+  "resources": [
+    "skill:///Volumes/workspace/hirearchy/skills/hirearchy/SKILL.md",
+    "skill://.kiro/skills/*/SKILL.md"
+  ],
+  "hooks": [],
+  "includeMcpJson": false,
+  "model": "claude-sonnet-5.5"
+}

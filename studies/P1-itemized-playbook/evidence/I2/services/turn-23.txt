@@ -1,0 +1,19 @@
+Services you can request (from your direct reports):
+- weekly-meeting-memo (offered by lead; contract v4, playbook v5): One memo of decisions and action items from one meeting's notes file.
+  inputs: meeting_file* (File name of the meeting notes in the notes folder, e.g. 2026-10-05.md)   (* required)
+  each request: 12 runs; acceptance criteria (lead/services/weekly-meeting-memo/SERVICE.md):
+    C1: The memo is based on the requested notes file only.
+    C2: At most 400 words as counted by read.
+    C3: The memo has a section titled "Decisions" with one bullet for every decision stated in the notes, and a section titled "Actions" containing a markdown table with exactly the columns Owner | Action | Due; it has no other sections besides a title that names the meeting date.
+    C4: The Actions table has one row for every commitment in the notes, including informal ones said in prose (for example 'X said he'd do Y'), and no row for anything nobody committed to.
+    C5: Due is an ISO date (YYYY-MM-DD). A relative deadline such as 'by Friday' is converted to a date using the meeting date when the notes make the date clear. Due is 'none' when the notes give no date or say none.
+    C6: Every decision and action is traceable to the notes, and nothing is invented.
+    C7: The reviewer's report shows every criterion met (criteria met: n of m with n = m), and the writer applied every required change.
+    C8: The memo has a one-line 'Summary:' of the meeting directly after the title, then the Decisions section, then the Actions section; the Summary line is the only addition to what the "Decisions"/"Actions" criterion allows.
+    C10: Owners are shown as full names, always: in the Actions table the Owner column holds the owner's full name as written in the notes, never initials.
+  record: 5 request(s): 3 done, 0 failed, 2 open; 4 reworked; avg 10.3 runs; feedback 4 accept (3 after a reject), 0 reject
+  regression list (the client's rejections):
+    R1 (case 20261027T230507597219-root-5204, about C8): "No, not right yet. Always start the memo with a one-line 'Summary:' of the meeting, then the decisions, then the action items." (items citing it: P11)
+    R2 (case 20261027T233043473862-root-7f7a, about C9 (removed)): "No, not right yet. Owners as initials only, always."
+    R3 (case 20261027T235208782012-root-c7bd, about C10): "No: full names again, always, as before." (items citing it: P13)
+  playbook v5 (2026-10-27): "Own words of C10, added by the contract amendment the client confirmed (yes to R3)."; 12 items (0 rules); watched: P13 new (0 of 3 clean cases, k 3)

@@ -1,0 +1,19 @@
+######## TURN 1  start 02:01:15  end 02:01:44  elapsed 29s  (local, 2026-10-28; UTC wall-clock start 2026-10-28T02:01:15Z end 2026-10-28T02:01:44Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Hi! After each of our weekly team meetings I want a short memo from my notes: what we decided and who does what. My notes are in /tmp/hirearchy-p1-F3-1793152805/notes (one file per meeting). Can you set up a team that does this for me every week?
+
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-01.stderr.txt):
+Your notes are one file per meeting, so this is recurring work and I'll set it up as a standing service. The team doesn't exist yet, and nothing will run until you ask for a memo. Before I draft a plan, I need a few answers. Reply "defaults" to accept the proposed ones.
+
+1. **What changes each week.** I propose that you give the team one notes file each time, for example `2026-11-09.md`. Everything else stays fixed. Is that right?
+2. **Informal items.** The latest notes mark some tasks with "ACTION:". Others are only in prose: "Sam said he would add Jo to the on-call rotation by Friday" and "Lee said he'd go through the SSO audit log at some point". My default is to include every decision and every commitment, labelled or not.
+3. **Vague or missing dates.** For "by Friday", "next week", or no date at all, which do you prefer?
+   - (a) Turn it into a calendar date using the meeting date, so "by Friday" becomes Fri 13 Nov. My default.
+   - (b) Quote the wording as written.
+   
+   If a commitment has no date, I'd write "no date given" and not invent one.
+4. **Memo layout.** My default is markdown, at most 400 words. It has a "Decisions" list and a "Who does what" list with owner, task and due date. Each decision and each commitment is one line.
+5. **Where it goes.** My default is a new `deliverables/` folder here, one file per meeting, for example `deliverables/memo-2026-11-09.md`.
+6. **Sources.** The team reads only your notes folder (read-only) and uses no web.
+7. **Review and budget.** My default is that a second agent checks every item in the memo against the notes. I'll propose a per-memo run budget in the plan, and you approve it before anything starts. All agents use claude-sonnet-5.5 at high effort, since nothing lower is available.
+8. **Scheduling.** The team can't start itself every week. After each meeting you ask me for the memo, and I request it. Is that fine?

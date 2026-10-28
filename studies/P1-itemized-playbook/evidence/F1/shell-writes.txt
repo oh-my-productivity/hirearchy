@@ -1,0 +1,200 @@
+# shell writes (protocol 7.2): every execute_bash call of the assistant; facts only
+
+[2026-10-27T19:52:14.832Z] call #26 turn 5 status=completed flags=['writes into the deliverable folder', 'touches S/org']
+COMMAND: mkdir -p /tmp/hirearchy-p1-F1-1793129193/deliverables && cp /private/tmp/hirearchy-p1-F1-1793129193/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-10-05.md && cmp /private/tmp/hirearchy-p1-F1-1793129193/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-10-05.md && wc -w /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-10-05.md && grep Marta /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-10-05.md
+RESULT: Output:
+     135 /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-10-05.md
+| Marta | Book the on-call training room for 14 October | none |
+
+
+Exit Code: 0
+
+[2026-10-27T20:14:18.825Z] call #43 turn 10 status=completed flags=['writes into the deliverable folder', 'touches S/org']
+COMMAND: cp /private/tmp/hirearchy-p1-F1-1793129193/org/lead/writer/work/memo-2026-10-12.md /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-10-12.md && cmp /private/tmp/hirearchy-p1-F1-1793129193/org/lead/writer/work/memo-2026-10-12.md /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-10-12.md && wc -w /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-10-12.md && ls /tmp/hirearchy-p1-F1-1793129193/deliverables
+RESULT: Output:
+     195 /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-10-12.md
+memo-2026-10-05.md
+memo-2026-10-12.md
+
+
+Exit Code: 0
+
+[2026-10-27T20:24:38.163Z] call #55 turn 13 status=completed flags=['writes into the deliverable folder', 'touches S/org']
+COMMAND: cp /private/tmp/hirearchy-p1-F1-1793129193/org/lead/writer/work/memo-2026-10-12.md /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-10-12.md && cmp /private/tmp/hirearchy-p1-F1-1793129193/org/lead/writer/work/memo-2026-10-12.md /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-10-12.md && wc -w /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-10-12.md && grep -E "^\| [A-Z] " /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-10-12.md
+RESULT: Output:
+     195 /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-10-12.md
+| D | Write the postmortem for the Oct 8 outage | 2026-10-14 |
+| M | Send the demo agenda to the customer | 2026-10-16 |
+| P | Start implementing the rate limiter behind a feature flag | 2026-10-20 |
+| S | Sort out the out-of-date staging test data so it is ready the day before the freeze starts | 2026-10-21 |
+| L | Carry the pager during the demo week by swapping shifts with Dev | none |
+
+
+Exit Code: 0
+
+[2026-10-27T20:37:16.830Z] call #70 turn 15 status=completed flags=['writes into the deliverable folder', 'touches S/org']
+COMMAND: cp /private/tmp/hirearchy-p1-F1-1793129193/org/lead/writer/work/memo-2026-10-19.md /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-10-19.md && cmp /private/tmp/hirearchy-p1-F1-1793129193/org/lead/writer/work/memo-2026-10-19.md /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-10-19.md && wc -w /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-10-19.md && grep -E "^\| [A-Z] " /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-10-19.md
+RESULT: Output:
+     174 /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-10-19.md
+| M | Collect demo feedback and circulate it | 2026-10-23 |
+| D | Remove the deploy freeze in the pipeline config | 2026-10-24 |
+| P | Present the rate limiter benchmark results at the next meeting | 2026-10-26 |
+| L | Sign off on the SSO renewal once legal replies | 2026-10-30 |
+| S | Pair with Jo on the CI pipeline during Jo's first week | none |
+
+
+Exit Code: 0
+
+[2026-10-27T20:43:07.058Z] call #78 turn 16 status=completed flags=['touches S/org']
+COMMAND: find /private/tmp/hirearchy-p1-F1-1793129193/org -name "*2026-10-26*" -not -path "*/history/*"
+RESULT: Output:
+/private/tmp/hirearchy-p1-F1-1793129193/org/lead/reviewer/work/review-2026-10-26.md
+/private/tmp/hirearchy-p1-F1-1793129193/org/lead/writer/work/memo-2026-10-26.md
+
+
+Exit Code: 0
+
+[2026-10-27T20:47:17.606Z] call #81 turn 17 status=completed flags=['writes into the deliverable folder', 'touches S/org']
+COMMAND: cp /private/tmp/hirearchy-p1-F1-1793129193/org/lead/writer/work/memo-2026-10-26.md /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-10-26.md && cmp /private/tmp/hirearchy-p1-F1-1793129193/org/lead/writer/work/memo-2026-10-26.md /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-10-26.md && wc -w /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-10-26.md && ls /tmp/hirearchy-p1-F1-1793129193/deliverables
+RESULT: Output:
+     166 /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-10-26.md
+memo-2026-10-05.md
+memo-2026-10-12.md
+memo-2026-10-19.md
+memo-2026-10-26.md
+
+
+Exit Code: 0
+
+[2026-10-27T20:55:07.985Z] call #91 turn 19 status=completed flags=['touches S/org']
+COMMAND: cat /private/tmp/hirearchy-p1-F1-1793129193/org/lead/writer/work/memo-2026-10-26.md
+RESULT: Output:
+# Memo: Platform team weekly, 2026-10-26
+
+Summary: Gateway cutover set for 28 October, rate limiter rollout starts with large-plan customers, Renovate widens in November, and five action items were assigned.
+
+## Decisions
+
+- Cut over to the new API gateway on Wednesday 2026-10-28, in the morning, with the old gateway kept as a fallback.
+- Turn the rate limiter on for the large-plan customers first and wait a week before anyone else gets it.
+- Widen the weekly Renovate batch to all repos starting in November.
+
+## Action items
+
+| Owner | Action | Due |
+|---|---|---|
+| Dev | Run the gateway cutover | 2026-10-28 |
+| Priya | Enable the rate limiter flag for the large-plan customers | 2026-10-30 |
+| Marta | Send the demo feedback summary to the product team | 2026-10-27 |
+| Sam | Write up onboarding notes for the CI pipeline | 2026-10-30 |
+| Lee | Update the SSO runbook with the new certificate dates | none |
+
+
+Exit Code: 0
+
+[2026-10-27T20:55:17.030Z] call #92 turn 19 status=completed flags=['writes into the deliverable folder', 'touches S/org']
+COMMAND: cp /private/tmp/hirearchy-p1-F1-1793129193/org/lead/writer/work/memo-2026-10-26.md /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-10-26.md && cmp /private/tmp/hirearchy-p1-F1-1793129193/org/lead/writer/work/memo-2026-10-26.md /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-10-26.md && wc -w /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-10-26.md
+RESULT: Output:
+     166 /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-10-26.md
+
+
+Exit Code: 0
+
+[2026-10-27T20:57:16.235Z] call #98 turn 20 status=completed flags=['touches S/org']
+COMMAND: cat /private/tmp/hirearchy-p1-F1-1793129193/org/lead/writer/work/memo-2026-11-02.md; ls /private/tmp/hirearchy-p1-F1-1793129193/org/lead/services/weekly-memo/ ; grep -ril "initials" /private/tmp/hirearchy-p1-F1-1793129193/org/lead --include=*.md | head
+RESULT: Output:
+cat: /private/tmp/hirearchy-p1-F1-1793129193/org/lead/writer/work/memo-2026-11-02.md: No such file or directory
+history
+PLAYBOOK.md
+SERVICE.md
+zsh:1: no matches found: --include=*.md
+
+
+Exit Code: 0
+
+[2026-10-27T21:02:24.279Z] call #100 turn 20 status=completed flags=['touches S/org']
+COMMAND: cd /private/tmp/hirearchy-p1-F1-1793129193/org && find . -name "*20261027T210211475549*" -o -name "*2026-11-02*" | grep -v history | head; 
+RESULT: Output:
+./inbox/20261027T210211475549-lead-d398.md
+./lead/reviewer/work/review-2026-11-02.md
+./lead/sent/20261027T210211475549-lead-d398.md
+./lead/writer/work/memo-2026-11-02.md
+
+
+Exit Code: 0
+
+[2026-10-27T21:04:25.443Z] call #103 turn 21 status=completed flags=['writes into the deliverable folder', 'touches S/org']
+COMMAND: cp /private/tmp/hirearchy-p1-F1-1793129193/org/lead/writer/work/memo-2026-11-02.md /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-11-02.md && cmp /private/tmp/hirearchy-p1-F1-1793129193/org/lead/writer/work/memo-2026-11-02.md /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-11-02.md && wc -w /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-11-02.md && grep -E "^\| [A-Z]" /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-11-02.md
+RESULT: Output:
+     175 /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-11-02.md
+| Owner | Action | Due |
+| Dev | Switch off the old gateway | 2026-11-13 |
+| Priya | Write the rollout plan for all plans | 2026-11-06 |
+| JD | Send the deck to the customer | 2026-11-05 |
+| Marta | Set up the quarterly review meeting with the customer once they confirm a slot | none |
+| Lee | Check the SSO renewal invoice against the quote | 2026-11-04 |
+
+
+Exit Code: 0
+
+[2026-10-27T21:10:21.501Z] call #113 turn 23 status=completed flags=['writes into the deliverable folder', 'touches S/org']
+COMMAND: cp /private/tmp/hirearchy-p1-F1-1793129193/org/lead/writer/work/memo-2026-11-02.md /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-11-02.md && cmp /private/tmp/hirearchy-p1-F1-1793129193/org/lead/writer/work/memo-2026-11-02.md /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-11-02.md && wc -w /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-11-02.md && grep JD /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-11-02.md
+RESULT: Output:
+     181 /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-11-02.md
+| JD (full name not in the notes) | Send the deck to the customer | 2026-11-05 |
+
+
+Exit Code: 0
+
+[2026-10-27T21:17:59.381Z] call #123 turn 24 status=completed flags=['touches S/org']
+COMMAND: cd /private/tmp/hirearchy-p1-F1-1793129193/org && find . -name "*2026-11-09*" | grep -v history; ls -t lead/sent | head -3
+RESULT: Output:
+./lead/reviewer/work/review-2026-11-09.md
+./lead/writer/work/memo-2026-11-09.md
+20261027T211753971091-lead-0301.md
+20261027T211643230414-lead-accc.md
+20261027T211550227938-lead-73f4.md
+
+
+Exit Code: 0
+
+[2026-10-27T21:18:05.353Z] call #124 turn 24 status=completed flags=['touches S/org']
+COMMAND: cat /private/tmp/hirearchy-p1-F1-1793129193/org/lead/writer/work/memo-2026-11-09.md
+RESULT: Output:
+# Memo: Platform team weekly, 2026-11-09
+
+Summary: The team moved the old gateway switch-off to 20 November, approved the rate limiter rollout plan as written, and decided that Jo joins the on-call rotation from 16 November.
+
+## Decisions
+
+- Move the switch-off of the old gateway to Friday 20 November.
+- Approve Priya's rollout plan for the rate limiter as written.
+- Jo joins the on-call rotation from Monday 16 November.
+
+## Action items
+
+| Owner | Action | Due |
+|---|---|---|
+| Marta | Circulate the quarterly review notes | 2026-11-11 |
+| Dev | Switch off the old gateway | 2026-11-20 |
+| Priya | Start the rate limiter rollout to all plans | 2026-11-16 |
+| Sam | Add Jo to the on-call rotation | 2026-11-13 |
+| Lee | Go through the SSO audit log to check for old service accounts | none |
+
+
+Exit Code: 0
+
+[2026-10-27T21:19:16.758Z] call #125 turn 25 status=completed flags=['writes into the deliverable folder', 'touches S/org']
+COMMAND: cp /private/tmp/hirearchy-p1-F1-1793129193/org/lead/writer/work/memo-2026-11-09.md /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-11-09.md && cmp /private/tmp/hirearchy-p1-F1-1793129193/org/lead/writer/work/memo-2026-11-09.md /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-11-09.md && wc -w /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-11-09.md && ls /tmp/hirearchy-p1-F1-1793129193/deliverables
+RESULT: Output:
+     148 /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-11-09.md
+memo-2026-10-05.md
+memo-2026-10-12.md
+memo-2026-10-19.md
+memo-2026-10-26.md
+memo-2026-11-02.md
+memo-2026-11-09.md
+
+
+Exit Code: 0
+

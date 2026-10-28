@@ -1,0 +1,22 @@
+######## TURN 21  start 01:31:16  end 01:34:15  elapsed 179s  (local, 2026-10-28; UTC wall-clock start 2026-10-28T01:31:16Z end 2026-10-28T01:34:15Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Lee's should be 2026-11-04. No, JD's row counts.
+
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-21.stderr.txt):
+The 2026-11-02 memo is at `/tmp/hirearchy-p1-F2-1793146944/deliverables/2026-11-02-memo.md`. I checked that the copy matches the team's file.
+
+- C1, at most 400 words: met (140 by the team's count, 170 by `wc`).
+- C2, covers only the 2026-11-02 meeting: met.
+- C3, all three decisions listed and nothing extra: met.
+- C4, table columns Owner | Action | Due: met.
+- C5, all five commitments are rows, including JD's, Marta's and Lee's: met.
+- C6, ISO dates or `none`: met. Dev is 2026-11-13, Priya 2026-11-06, JD 2026-11-05 and Lee 2026-11-04. Marta is `none`, since no date was set.
+- C7, reviewer passed 8 of 8 with no required changes: met.
+- C9, title, Summary line, Decisions and action table, nothing else: met.
+- C11, Owner column shows names as written in the notes: met (Dev, Priya, JD, Marta, Lee).
+
+The "Team note" line in the notes (drop initials-only owners) wasn't followed or mentioned in the memo, and JD's row is in.
+
+Runs: 10 of the 12 approved for this memo.
+
+Keep it, or what should change?

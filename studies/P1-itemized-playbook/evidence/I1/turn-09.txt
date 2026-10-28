@@ -1,0 +1,22 @@
+######## TURN 9  start 21:54:54  end 21:57:55  elapsed 181s  (local, 2026-10-27; UTC wall-clock start 2026-10-27T21:54:54Z end 2026-10-27T21:57:55Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Sam's 2026-10-21 is right. Yes, that counts. No need for 'probably'. No, that's not an action item - leave it out.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-09.stderr.txt):
+The memo for the 12 October meeting is at `/tmp/hirearchy-p1-I1-1793136275/deliverables/memo-2026-10-12.md`. I copied it unchanged and checked that it matches the team's file.
+
+- **Scope, date and attendees:** met. It covers only that meeting, with the date and attendees.
+- **Length:** met, 202 words.
+- **Summary, then Decisions, then Actions:** met, in that order.
+- **Decisions:** met, all 3 listed.
+- **Actions table:** met, 5 rows with columns Owner | Action | Due.
+- **Informal commitments:** met, Sam's and Lee's rows come from prose.
+- **Due dates:** met, using your answers: Sam 2026-10-21 and Lee none.
+- **Your changes:** met. "Probably" is gone from Sam's row and there is no Dev row for the shift swap.
+- **Wording and invented items:** met, the wording follows the notes and nothing is added.
+- **Discussed-only topics:** met, none are listed.
+- **Next meeting:** met, Monday 19 October.
+- **Reviewer's report:** met, 11 of 11 with no required changes.
+
+The memo took 10 runs of the 12 you approved: 5 for the first draft and 5 for your changes. There were no unrequested reworks this time.
+
+Keep it as it is, or should something change?

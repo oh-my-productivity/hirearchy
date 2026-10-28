@@ -1,0 +1,90 @@
+# window runs (protocol 5.4): runs that started in the injection window 2026-10-28T00:37:33Z .. 2026-10-28T00:40:23Z; injected task 20261028T003733460565-root-2753; revised (memo 1) task 20261028T003344380615-root-a59d
+
+## run lead@20261028T003733698577 agent=lead model=claude-sonnet-5.5 start=2026-10-28T00:37:33.711363+00:00 end=2026-10-28T00:38:26.164450+00:00 exit=0 secs=52 session=sess_3f3871ea-b3d4-4ee7-8098-db290032fb3c
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 2
+  lead message 20261028T003819237045-lead-e586 to=lead/writer type=task status=None created=2026-10-28T00:38:19+00:00
+  ## Lessons: (none)
+  org-git commit 1128d6c MEMORY.md diff:
+    commit 1128d6cc6034002d1a285496fd7466ecb431db69
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Wed Oct 28 00:38:26 2026 +0000
+    
+        lead: run ok, 1 message(s) [lead/runs/20261028T003733698577.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index 1707495..df2523e 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,3 +1,6 @@
+     # Memory
+    -Request 1 (memo 2026-10-05) finished: reported done to root for task ...a59d (reviewer v2: 31 of 31 claims, 6 of 6 criteria). Deliverable lead/writer/work/2026-10-05-memo.md.
+    -Nothing outstanding. Next request: follow playbook v1; client rulings: relative deadline 'before Friday' -> that Friday's date; 'Oct 14' room booking -> due that date; keep Present/Next lines.
+    +Request 1 (memo 2026-10-05) reported done earlier (a59d). Now reworking via root task 20261028T003733460565-root-2753 (unclear due dates; supersedes earlier client rulings on Sam/Marta).
+    +Decision: Sam Due=none, Marta Due=none, new '## Open questions' section in memo. Keep Present/Next lines, other rows.
+    +Delegated writer task 20261028T003819237045-lead-e586 (budget 2, revises ...e92a). WAITING for writer result.
+    +Next: read memo, then delegate lead/reviewer (revises 20261028T003500412261-lead-8c66, budget 2) with the 7 criteria verbatim + note from requester: re-check EVERY Due value against notes text, not only changed rows; coverage 'criteria met n of m' and 'n of m factual claims verified'. Then verify myself and report done to root with lessons, pasting reviewer's coverage line verbatim. Deliverable lead/writer/work/2026-10-05-memo.md.
+    +If reviewer lists ambiguous items: put under 'Questions for the client:' at top of report.
+
+## run lead/writer@20261028T003820084998 agent=lead-writer model=claude-sonnet-5.5 start=2026-10-28T00:38:20.099693+00:00 end=2026-10-28T00:38:50.446732+00:00 exit=0 secs=30 session=sess_0f8aafd5-9e8f-404e-ab2e-4b7bae152a07
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 6
+
+## run lead@20261028T003846380552 agent=lead model=claude-sonnet-5.5 start=2026-10-28T00:38:46.402349+00:00 end=2026-10-28T00:39:16.744803+00:00 exit=0 secs=30 session=sess_26af299f-98c8-424f-989d-dddcf7f7a8e8
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 2
+  lead message 20261028T003907492941-lead-1a8f to=lead/reviewer type=task status=None created=2026-10-28T00:39:07+00:00
+  ## Lessons: (none)
+  org-git commit 1bb6af0 MEMORY.md diff:
+    commit 1bb6af045db221919b58a7cc1e6fed10945b5805
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Wed Oct 28 00:39:16 2026 +0000
+    
+        lead: run ok, 1 message(s) [lead/runs/20261028T003846380552.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index df2523e..4f34b6c 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,6 +1,5 @@
+     # Memory
+    -Request 1 (memo 2026-10-05) reported done earlier (a59d). Now reworking via root task 20261028T003733460565-root-2753 (unclear due dates; supersedes earlier client rulings on Sam/Marta).
+    -Decision: Sam Due=none, Marta Due=none, new '## Open questions' section in memo. Keep Present/Next lines, other rows.
+    -Delegated writer task 20261028T003819237045-lead-e586 (budget 2, revises ...e92a). WAITING for writer result.
+    -Next: read memo, then delegate lead/reviewer (revises 20261028T003500412261-lead-8c66, budget 2) with the 7 criteria verbatim + note from requester: re-check EVERY Due value against notes text, not only changed rows; coverage 'criteria met n of m' and 'n of m factual claims verified'. Then verify myself and report done to root with lessons, pasting reviewer's coverage line verbatim. Deliverable lead/writer/work/2026-10-05-memo.md.
+    -If reviewer lists ambiguous items: put under 'Questions for the client:' at top of report.
+    +Root task 20261028T003733460565-root-2753 (rework memo 2026-10-05, unclear due dates) still open.
+    +Writer reworked memo (read by me: Sam none, Marta none, Open questions section, 223 words per writer). Looks right vs notes.
+    +Delegated reviewer re-check 20261028T003907492941-lead-1a8f (revises ...8c66, budget 1). WAITING for result.
+    +Next: read reviewer's report/file; verify C1-C7 myself (word count via org_read); if all met, report done to root with lessons, pasting reviewer's coverage lines ('criteria met n of m', 'n of m factual claims verified') verbatim. Deliverable lead/writer/work/2026-10-05-memo.md. If reviewer lists ambiguous items: 'Questions for the client:' at top of report. If fail: I have ~1 run; report blocked with options.
+
+## run lead/reviewer@20261028T003908656078 agent=lead-reviewer model=claude-sonnet-5.5 start=2026-10-28T00:39:08.671415+00:00 end=2026-10-28T00:39:55.161581+00:00 exit=0 secs=46 session=sess_93cbd649-ef75-4e78-9c79-45f25170577c
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 4
+
+## run lead@20261028T003949063082 agent=lead model=claude-sonnet-5.5 start=2026-10-28T00:39:49.102965+00:00 end=2026-10-28T00:40:23.479465+00:00 exit=0 secs=34 session=sess_850a99fe-76e4-469b-9599-aa657d92d6e4
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 4
+  lead message 20261028T004017734531-lead-35ff to=root type=result status=done created=2026-10-28T00:40:17+00:00
+  ## Lessons: Expected: C6, a Due is a date only when the notes make it clear. Happened: first memo resolved "before Friday" to Friday 2026-10-09 and used the training date Oct 14 as Marta's booking deadline. Caught at: client review; reviewer v1 passed them. Cause: writer and reviewer lacked a rule that a date in an action's description is not a deadline, and "before X" excludes X. Prevent: add to writer and reviewer tasks: a Due is set only if the notes state a deadline for the action itself; "before X" is not X; otherwise none, with an Open questions note.
+  org-git commit 3f91d43 MEMORY.md diff:
+    commit 3f91d43f44b02f8c62a1f2e7d5423a92ed826996
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Wed Oct 28 00:40:23 2026 +0000
+    
+        lead: run ok, 1 message(s) [lead/runs/20261028T003949063082.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index 4f34b6c..9fd0833 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,5 +1,4 @@
+     # Memory
+    -Root task 20261028T003733460565-root-2753 (rework memo 2026-10-05, unclear due dates) still open.
+    -Writer reworked memo (read by me: Sam none, Marta none, Open questions section, 223 words per writer). Looks right vs notes.
+    -Delegated reviewer re-check 20261028T003907492941-lead-1a8f (revises ...8c66, budget 1). WAITING for result.
+    -Next: read reviewer's report/file; verify C1-C7 myself (word count via org_read); if all met, report done to root with lessons, pasting reviewer's coverage lines ('criteria met n of m', 'n of m factual claims verified') verbatim. Deliverable lead/writer/work/2026-10-05-memo.md. If reviewer lists ambiguous items: 'Questions for the client:' at top of report. If fail: I have ~1 run; report blocked with options.
+    +Root task 20261028T003733460565-root-2753 (rework memo 2026-10-05) reported DONE (reviewer: criteria met 7 of 7; 31 of 31 claims verified). Nothing outstanding.
+    +Deliverable lead/writer/work/2026-10-05-memo.md (223 words).
+    +Lesson for next requests: Due only when notes state a deadline for the action itself; 'before X' is not X; a date in the action description (e.g. training date) is not a deadline; else none + Open questions note. Pass this to writer and reviewer.
+

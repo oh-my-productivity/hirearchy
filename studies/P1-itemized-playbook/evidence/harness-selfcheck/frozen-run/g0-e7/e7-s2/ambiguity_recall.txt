@@ -1,0 +1,8 @@
+ambiguity_recall s2: reviewer lead/reviewer, owner lead
+
+AMB-1: 1 of 1 (memo 2026-10-19, Marta)   [D21's literal timing: n/a (0 of 0)]   versions of the memo 2, containing the row 1
+  v1 2cd5611: reviewed=True listed ambiguous=True (ambiguous token); lead forwarded=True (20261025T081037538558-lead-f890); progress flagged=True (#47); writer left it out of the next version=True
+    review task 20261025T080931167519-lead-1414 sent 10 s before the version's commit (the commit that holds it); D21's literal timing: reviewed=False
+AMB-2: n/a (0 of 0) (memo 2026-10-12, Sam)   [D21's literal timing: n/a (0 of 0)]   versions of the memo 1, containing the row 0
+
+all items: 1 of 1   [D21's literal timing: n/a (0 of 0)]

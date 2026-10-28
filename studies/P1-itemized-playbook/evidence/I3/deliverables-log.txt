@@ -1,0 +1,132 @@
+# deliverables log (protocol 7.2, D6); facts only
+
+[2026-10-28T03:31:44.273Z] call #26 turn 4 execute_bash
+COMMAND: mkdir -p /private/tmp/hirearchy-p1-I3-1793157452/deliverables && cp /private/tmp/hirearchy-p1-I3-1793157452/org/lead/writer/work/memo-2026-10-05.md /private/tmp/hirearchy-p1-I3-1793157452/deliverables/ && cmp /private/tmp/hirearchy-p1-I3-1793157452/org/lead/writer/work/memo-2026-10-05.md /private/tmp/hirearchy-p1-I3-1793157452/deliverables/memo-2026-10-05.md && wc -w /private/tmp/hirearchy-p1-I3-1793157452/deliverables/memo-2026-10-05.md
+source file(s): ['lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: 00b6a86 2026-10-28T03:30:16Z', 'lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: 00b6a86 2026-10-28T03:30:16Z']
+result: Output:
+     206 /private/tmp/hirearchy-p1-I3-1793157452/deliverables/memo-2026-10-05.md
+
+
+Exit Code: 0
+
+[2026-10-28T03:44:21.744Z] call #44 turn 8 execute_bash
+COMMAND: cd /private/tmp/hirearchy-p1-I3-1793157452 && cp org/lead/writer/work/memo-2026-10-05.md deliverables/memo-2026-10-05.md && cmp org/lead/writer/work/memo-2026-10-05.md deliverables/memo-2026-10-05.md && wc -w deliverables/memo-2026-10-05.md && ls deliverables
+source file(s): ['lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: 05b6b11 2026-10-28T03:40:48Z', 'lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: 05b6b11 2026-10-28T03:40:48Z']
+result: Output:
+     231 deliverables/memo-2026-10-05.md
+memo-2026-10-05.md
+
+
+Exit Code: 0
+
+[2026-10-28T03:54:10.315Z] call #60 turn 10 execute_bash
+COMMAND: cd /private/tmp/hirearchy-p1-I3-1793157452 && cp org/lead/writer/work/memo-2026-10-12.md deliverables/ && cmp org/lead/writer/work/memo-2026-10-12.md deliverables/memo-2026-10-12.md && wc -w deliverables/memo-2026-10-12.md && ls deliverables
+source file(s): ['lead/writer/work/memo-2026-10-12.md -> org-git commit at that time: 87e5990 2026-10-28T03:52:35Z', 'lead/writer/work/memo-2026-10-12.md -> org-git commit at that time: 87e5990 2026-10-28T03:52:35Z']
+result: Output:
+     177 deliverables/memo-2026-10-12.md
+memo-2026-10-05.md
+memo-2026-10-12.md
+
+
+Exit Code: 0
+
+[2026-10-28T03:59:27.330Z] call #68 turn 12 execute_bash
+COMMAND: cd /private/tmp/hirearchy-p1-I3-1793157452 && cp org/lead/writer/work/memo-2026-10-12.md deliverables/ && cmp org/lead/writer/work/memo-2026-10-12.md deliverables/memo-2026-10-12.md && wc -w deliverables/memo-2026-10-12.md
+source file(s): ['lead/writer/work/memo-2026-10-12.md -> org-git commit at that time: 71c6cb8 2026-10-28T03:57:52Z', 'lead/writer/work/memo-2026-10-12.md -> org-git commit at that time: 71c6cb8 2026-10-28T03:57:52Z']
+result: Output:
+     177 deliverables/memo-2026-10-12.md
+
+
+Exit Code: 0
+
+[2026-10-28T04:08:04.776Z] call #84 turn 14 execute_bash
+COMMAND: cd /private/tmp/hirearchy-p1-I3-1793157452 && cp org/lead/writer/work/memo-2026-10-19.md deliverables/ && cmp org/lead/writer/work/memo-2026-10-19.md deliverables/memo-2026-10-19.md && wc -w deliverables/memo-2026-10-19.md && ls deliverables
+source file(s): ['lead/writer/work/memo-2026-10-19.md -> org-git commit at that time: 626a7fb 2026-10-28T04:06:34Z', 'lead/writer/work/memo-2026-10-19.md -> org-git commit at that time: 626a7fb 2026-10-28T04:06:34Z']
+result: Output:
+     183 deliverables/memo-2026-10-19.md
+memo-2026-10-05.md
+memo-2026-10-12.md
+memo-2026-10-19.md
+
+
+Exit Code: 0
+
+[2026-10-28T04:13:05.811Z] call #92 turn 16 execute_bash
+COMMAND: cd /private/tmp/hirearchy-p1-I3-1793157452 && cp org/lead/writer/work/memo-2026-10-26.md deliverables/ && cmp org/lead/writer/work/memo-2026-10-26.md deliverables/memo-2026-10-26.md && wc -w deliverables/memo-2026-10-26.md && ls deliverables
+source file(s): ['lead/writer/work/memo-2026-10-26.md -> org-git commit at that time: 1380316 2026-10-28T04:10:09Z', 'lead/writer/work/memo-2026-10-26.md -> org-git commit at that time: 1380316 2026-10-28T04:10:09Z']
+result: Output:
+     194 deliverables/memo-2026-10-26.md
+memo-2026-10-05.md
+memo-2026-10-12.md
+memo-2026-10-19.md
+memo-2026-10-26.md
+
+
+Exit Code: 0
+
+[2026-10-28T04:18:19.950Z] call #100 turn 18 execute_bash
+COMMAND: cd /private/tmp/hirearchy-p1-I3-1793157452 && cp org/lead/writer/work/memo-2026-10-26.md deliverables/ && cmp org/lead/writer/work/memo-2026-10-26.md deliverables/memo-2026-10-26.md && wc -w deliverables/memo-2026-10-26.md
+source file(s): ['lead/writer/work/memo-2026-10-26.md -> org-git commit at that time: e82d45c 2026-10-28T04:16:25Z', 'lead/writer/work/memo-2026-10-26.md -> org-git commit at that time: e82d45c 2026-10-28T04:16:25Z']
+result: Output:
+     194 deliverables/memo-2026-10-26.md
+
+
+Exit Code: 0
+
+[2026-10-28T04:26:36.730Z] call #114 turn 20 execute_bash
+COMMAND: cd /private/tmp/hirearchy-p1-I3-1793157452 && cp org/lead/writer/work/memo-2026-11-02.md deliverables/ && cmp org/lead/writer/work/memo-2026-11-02.md deliverables/memo-2026-11-02.md && wc -w deliverables/memo-2026-11-02.md && ls deliverables
+source file(s): ['lead/writer/work/memo-2026-11-02.md -> org-git commit at that time: c236ec3 2026-10-28T04:25:11Z', 'lead/writer/work/memo-2026-11-02.md -> org-git commit at that time: c236ec3 2026-10-28T04:25:11Z']
+result: Output:
+     190 deliverables/memo-2026-11-02.md
+memo-2026-10-05.md
+memo-2026-10-12.md
+memo-2026-10-19.md
+memo-2026-10-26.md
+memo-2026-11-02.md
+
+
+Exit Code: 0
+
+[2026-10-28T04:31:27.133Z] call #122 turn 22 execute_bash
+COMMAND: cd /private/tmp/hirearchy-p1-I3-1793157452 && cp org/lead/writer/work/memo-2026-11-02.md deliverables/ && cmp org/lead/writer/work/memo-2026-11-02.md deliverables/memo-2026-11-02.md && wc -w deliverables/memo-2026-11-02.md
+source file(s): ['lead/writer/work/memo-2026-11-02.md -> org-git commit at that time: 0d0ecad 2026-10-28T04:29:58Z', 'lead/writer/work/memo-2026-11-02.md -> org-git commit at that time: 0d0ecad 2026-10-28T04:29:58Z']
+result: Output:
+     196 deliverables/memo-2026-11-02.md
+
+
+Exit Code: 0
+
+[2026-10-28T04:36:49.453Z] call #130 turn 24 execute_bash
+COMMAND: cd /private/tmp/hirearchy-p1-I3-1793157452 && cp org/lead/writer/work/memo-2026-11-09.md deliverables/ && cmp org/lead/writer/work/memo-2026-11-09.md deliverables/memo-2026-11-09.md && wc -w deliverables/memo-2026-11-09.md && ls deliverables
+source file(s): ['lead/writer/work/memo-2026-11-09.md -> org-git commit at that time: 7a9bd87 2026-10-28T04:34:07Z', 'lead/writer/work/memo-2026-11-09.md -> org-git commit at that time: 7a9bd87 2026-10-28T04:34:07Z']
+result: Output:
+     171 deliverables/memo-2026-11-09.md
+memo-2026-10-05.md
+memo-2026-10-12.md
+memo-2026-10-19.md
+memo-2026-10-26.md
+memo-2026-11-02.md
+memo-2026-11-09.md
+
+
+Exit Code: 0
+
+any other write into the deliverable folder (not by the assistant): none can be seen from the assistant session; the folder holds:
+  memo-2026-10-05.md size 1230 mtime 03:44:21 local md5 a6a188e8e38f42baf5eed4c5e10c38c1
+  memo-2026-10-12.md size 889 mtime 03:59:27 local md5 635de97a88f07e9ca2b05a75e2985fdb
+  memo-2026-10-19.md size 947 mtime 04:08:04 local md5 2997236efe9ab5e679503e91cc2fa3c2
+  memo-2026-10-26.md size 1024 mtime 04:18:19 local md5 083646950ab33a9e1c7100bc21d45637
+  memo-2026-11-02.md size 996 mtime 04:31:27 local md5 58ae7a64bd3e1359fcb9a38f1e4db95b
+  memo-2026-11-09.md size 896 mtime 04:36:49 local md5 818bebaaf6b58955c39c2fd1833dab65
+
+final ls -la:
+total 48
+drwxr-xr-x@ 8 aminalizadeh  wheel   256 Oct 28 04:36 .
+drwxr-xr-x@ 7 aminalizadeh  wheel   224 Oct 28 03:32 ..
+-rw-r--r--@ 1 aminalizadeh  wheel  1230 Oct 28 03:44 memo-2026-10-05.md
+-rw-r--r--@ 1 aminalizadeh  wheel   889 Oct 28 03:59 memo-2026-10-12.md
+-rw-r--r--@ 1 aminalizadeh  wheel   947 Oct 28 04:08 memo-2026-10-19.md
+-rw-r--r--@ 1 aminalizadeh  wheel  1024 Oct 28 04:18 memo-2026-10-26.md
+-rw-r--r--@ 1 aminalizadeh  wheel   996 Oct 28 04:31 memo-2026-11-02.md
+-rw-r--r--@ 1 aminalizadeh  wheel   896 Oct 28 04:36 memo-2026-11-09.md
+

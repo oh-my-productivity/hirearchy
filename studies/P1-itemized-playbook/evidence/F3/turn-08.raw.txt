@@ -1,0 +1,18 @@
+The new rule is now in the contract, and I did no more work on the memo. I also have to tell you about a problem with the memo.
+
+**The new rule.** The contract is now at v3 with a ninth check (C9). Every future memo must start with a one-line "Summary:", then the Decisions, then the action items table.
+
+**This week's memo.** `deliverables/memo-2026-10-05.md` is the version you saw. It has your dates (Sam 2026-10-09, Marta 2026-10-14, Lee `none`). It has no "Summary:" line. You asked me to deliver it as is, so I left it that way.
+
+**An extra rework I didn't send.** The tool log shows a second rework ("Rework memo 2026-10-05: unclear due dates"), created at 02:17 in my seat as root. I didn't send it, and I can't tell from the tools who did. It cost 5 runs and rewrote the memo in the team's own folder. That version:
+- puts Sam back to 2026-10-08;
+- sets Marta to `none`;
+- adds an "Open questions" section you never asked for.
+
+I did not copy that version, and `deliverables/` still holds the one you saw. I recorded that rework as rejected, because it contradicts your answers.
+
+**Cost.** The case used 20 runs:
+- 15 came from your requests, which is the 12 approved plus the 5 you granted, minus 2 runs that came back unspent.
+- 5 came from that unrequested rework. The tool counts those as my spend, not yours, so there's nothing for you to fund.
+
+Nothing is running now, and no more spend is planned.

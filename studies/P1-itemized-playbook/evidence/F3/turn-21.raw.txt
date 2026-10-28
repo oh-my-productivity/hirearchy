@@ -1,0 +1,9 @@
+I've added the rule and replaced `/tmp/hirearchy-p1-F3-1793152805/deliverables/memo-2026-11-02.md` with the reworked memo. The copy matches the team's file.
+
+**The rule.** The contract is now v6. C12 replaces C11: the Owner column shows names as written in the notes. When the notes give only initials, it shows the initials followed by "(full name not in the notes)".
+
+**The memo.** Only JD's Owner cell changed, to `JD (full name not in the notes)`. The Summary, the Decisions and the other rows are as you confirmed. The reviewer passed it 10 of 10, with no required changes. The team's open questions were ones you already answered.
+
+**Cost.** This memo used 10 of the 12 runs approved, because a rework adds about 5 to the first pass of 5. Nothing is running.
+
+Keep it, or what should change?

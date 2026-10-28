@@ -1,0 +1,2 @@
+0.6162 /Volumes/workspace/hirearchy/studies/P1-itemized-playbook/evidence/preflight/org-kiro-session/messages.jsonl
+total 0.6162

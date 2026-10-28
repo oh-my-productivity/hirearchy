@@ -1,0 +1,10 @@
+check3-ruling (stream-f3, 2026-10-28T02:10:13Z), under manager-decision-lock-check3.md (standing rule for arm-F streams; manager-standing-rules-streams.md rule 5)
+hook output: STOP: LOCK FAILED after turn 3 (check 1 yes, check 2 yes, check 3 no; H-LOCK: ok) - check 3 failed on the 'from: root' clause only
+note path: /tmp/hirearchy-p1-F3-1793152805/org/lead/inbox/20261028T020955701882-runtime-1063.md
+note md5 (path above and lock/owner-note.md): e0b5cf28cf263f7e51812b0c6df09dbc / e0b5cf28cf263f7e51812b0c6df09dbc
+fact 1, in the lead's inbox: yes
+fact 2, type: note and wake: false: yes
+fact 3, exact text 'locked: false -> true (you may no longer revise the playbook)': yes
+fact 4, sender root or runtime: from: runtime -> yes
+checks 1 and 2 passed (lock/hook.txt: reply exit 0 naming the lock; SERVICE.md v2 locked: true); h-lock-before.txt: H-LOCK ok (PLAYBOOK.md v1 by root, no owner version before the lock); lock-held.txt: lock held after turn 3
+ruling file: manager-decision-lock-check3.md (EV/)

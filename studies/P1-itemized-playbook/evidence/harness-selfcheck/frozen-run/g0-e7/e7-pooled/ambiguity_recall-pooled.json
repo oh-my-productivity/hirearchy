@@ -1,0 +1,41 @@
+{
+  "items": {
+    "AMB-1": {
+      "recall": {
+        "k": 2,
+        "n": 3
+      },
+      "recall_literal_timing": {
+        "k": 1,
+        "n": 2
+      }
+    },
+    "AMB-2": {
+      "recall": {
+        "k": 0,
+        "n": 0
+      },
+      "recall_literal_timing": {
+        "k": 0,
+        "n": 0
+      }
+    }
+  },
+  "recall": {
+    "k": 2,
+    "n": 3
+  },
+  "recall_literal_timing": {
+    "k": 1,
+    "n": 2
+  },
+  "script": {
+    "md5": "92b67f74a38c04895402803e9388e718",
+    "name": "ambiguity_recall.py"
+  },
+  "streams": [
+    "s1",
+    "s2",
+    "s3"
+  ]
+}

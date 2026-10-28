@@ -1,0 +1,7 @@
+I've recorded your rejection. The memo in `deliverables/` is unchanged, and I haven't started a rework.
+
+One question before I change anything: should "start with a one-line 'Summary:' of the meeting, then the decisions, then the action items" apply to every memo from now on, or only to this one? I'd add it as a lasting rule.
+
+About C3 (the Decisions section check): add "The memo starts with a one-line 'Summary:' of the meeting, followed by the Decisions section, then the Action items section" as a lasting rule? Yes or no.
+
+On yes, I'll add the rule and send this memo back for rework.

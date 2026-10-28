@@ -1,0 +1,31 @@
+lead/writer/work/memo-2026-10-05.md v1 e80ce44 2026-10-28T03:25:33Z md5 b4f77b23f6893a2b5a28a7b0ce05731b
+lead/writer/work/memo-2026-10-05.md v2 00b6a86 2026-10-28T03:30:16Z md5 24812e3dcb7096bde15779246a6881e6
+lead/writer/work/memo-2026-10-05.md v3 6f7c872 2026-10-28T03:34:02Z md5 59c429688c074555a9e45aa0c22bc487
+lead/writer/work/memo-2026-10-05.md v4 05b6b11 2026-10-28T03:40:48Z md5 a6a188e8e38f42baf5eed4c5e10c38c1
+lead/writer/work/memo-2026-10-05.md working tree md5 a6a188e8e38f42baf5eed4c5e10c38c1 (committed head: a6a188e8e38f42baf5eed4c5e10c38c1)
+lead/writer/work/memo-2026-10-12.md v1 184e78a 2026-10-28T03:47:56Z md5 cf9805a6ba64541c47c7c4f7dd8f872b
+lead/writer/work/memo-2026-10-12.md v2 87e5990 2026-10-28T03:52:35Z md5 62f855f69dad7a09f9d61abaf2c659e0
+lead/writer/work/memo-2026-10-12.md v3 71c6cb8 2026-10-28T03:57:52Z md5 635de97a88f07e9ca2b05a75e2985fdb
+lead/writer/work/memo-2026-10-12.md working tree md5 635de97a88f07e9ca2b05a75e2985fdb (committed head: 635de97a88f07e9ca2b05a75e2985fdb)
+lead/writer/work/memo-2026-10-19.md v1 b8c45a2 2026-10-28T04:02:09Z md5 695ea75a0ef52a81c3141156af5ed99f
+lead/writer/work/memo-2026-10-19.md v2 626a7fb 2026-10-28T04:06:34Z md5 2997236efe9ab5e679503e91cc2fa3c2
+lead/writer/work/memo-2026-10-19.md working tree md5 2997236efe9ab5e679503e91cc2fa3c2 (committed head: 2997236efe9ab5e679503e91cc2fa3c2)
+lead/writer/work/memo-2026-10-26.md v1 1380316 2026-10-28T04:10:09Z md5 d7b7909093ae6750597452ac5e2dc36f
+lead/writer/work/memo-2026-10-26.md v2 e82d45c 2026-10-28T04:16:25Z md5 083646950ab33a9e1c7100bc21d45637
+lead/writer/work/memo-2026-10-26.md working tree md5 083646950ab33a9e1c7100bc21d45637 (committed head: 083646950ab33a9e1c7100bc21d45637)
+lead/writer/work/memo-2026-11-02.md v1 0d2bfa3 2026-10-28T04:20:42Z md5 9cdb812049b76e96cf67b5c93619bc8d
+lead/writer/work/memo-2026-11-02.md v2 c236ec3 2026-10-28T04:25:11Z md5 3c634f94ea3b3ec8754e57fad2a3a9f4
+lead/writer/work/memo-2026-11-02.md v3 0d0ecad 2026-10-28T04:29:58Z md5 58ae7a64bd3e1359fcb9a38f1e4db95b
+lead/writer/work/memo-2026-11-02.md working tree md5 58ae7a64bd3e1359fcb9a38f1e4db95b (committed head: 58ae7a64bd3e1359fcb9a38f1e4db95b)
+lead/writer/work/memo-2026-11-09.md v1 7a9bd87 2026-10-28T04:34:07Z md5 818bebaaf6b58955c39c2fd1833dab65
+lead/writer/work/memo-2026-11-09.md working tree md5 818bebaaf6b58955c39c2fd1833dab65 (committed head: 818bebaaf6b58955c39c2fd1833dab65)
+lead/writer/work/questions-2026-10-12.md v1 184e78a 2026-10-28T03:47:56Z md5 df5161516436f988ddb909ef0ced1b74
+lead/writer/work/questions-2026-10-12.md working tree md5 df5161516436f988ddb909ef0ced1b74 (committed head: df5161516436f988ddb909ef0ced1b74)
+lead/writer/work/questions-2026-10-19.md v1 b8c45a2 2026-10-28T04:02:09Z md5 2ba77543e150f359ad53e0091576fc6e
+lead/writer/work/questions-2026-10-19.md working tree md5 2ba77543e150f359ad53e0091576fc6e (committed head: 2ba77543e150f359ad53e0091576fc6e)
+lead/writer/work/questions-2026-10-26.md v1 1380316 2026-10-28T04:10:09Z md5 fcfeb5c5d8efd6ace7abfa2fc014a62e
+lead/writer/work/questions-2026-10-26.md working tree md5 fcfeb5c5d8efd6ace7abfa2fc014a62e (committed head: fcfeb5c5d8efd6ace7abfa2fc014a62e)
+lead/writer/work/questions-2026-11-02.md v1 0d2bfa3 2026-10-28T04:20:42Z md5 60862facae8dfc804fcb27369734ef81
+lead/writer/work/questions-2026-11-02.md working tree md5 60862facae8dfc804fcb27369734ef81 (committed head: 60862facae8dfc804fcb27369734ef81)
+lead/writer/work/questions-2026-11-09.md v1 7a9bd87 2026-10-28T04:34:07Z md5 723fd836c9df065db446254340d4362e
+lead/writer/work/questions-2026-11-09.md working tree md5 723fd836c9df065db446254340d4362e (committed head: 723fd836c9df065db446254340d4362e)

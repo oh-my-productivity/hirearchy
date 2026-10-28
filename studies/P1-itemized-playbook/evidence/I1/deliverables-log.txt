@@ -1,0 +1,154 @@
+# deliverables log (protocol 7.2, D6); facts only
+
+[2026-10-27T21:38:19.473Z] call #21 turn 4 execute_bash
+COMMAND: mkdir -p /tmp/hirearchy-p1-I1-1793136275/deliverables && cp /private/tmp/hirearchy-p1-I1-1793136275/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-p1-I1-1793136275/deliverables/memo-2026-10-05.md && cmp /private/tmp/hirearchy-p1-I1-1793136275/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-p1-I1-1793136275/deliverables/memo-2026-10-05.md && wc -w /tmp/hirearchy-p1-I1-1793136275/deliverables/memo-2026-10-05.md && cat /tmp/hirearchy-p1-I1-1793136275/deliverables/memo-2026-10-05.md
+source file(s): ['lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: 021957c 2026-10-27T21:36:26Z', 'lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: 021957c 2026-10-27T21:36:26Z']
+result: Output:
+     139 /tmp/hirearchy-p1-I1-1793136275/deliverables/memo-2026-10-05.md
+# Platform team weekly, Monday 5 October 2026 (2026-10-05)
+
+Present: Priya, Sam, Lee, Marta, Dev.
+
+Next meeting: Monday 12 October.
+
+## Decisions
+
+- Push the gateway migration to the week of 26 October.
+- Adopt Renovate with a weekly Monday batch of dependency PRs, starting with the three core repos and widening later if the noise is acceptable.
+
+## Actions
+
+| Owner | Action | Due |
+|---|---|---|
+| Priya | Draft the RFC for the new per-key rate limiter | 2026-10-09 |
+| Dev | Enable Renovate on the three core repos
+
+[2026-10-27T21:49:42.783Z] call #36 turn 7 execute_bash
+COMMAND: cp /private/tmp/hirearchy-p1-I1-1793136275/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-p1-I1-1793136275/deliverables/memo-2026-10-05.md && cmp /private/tmp/hirearchy-p1-I1-1793136275/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-p1-I1-1793136275/deliverables/memo-2026-10-05.md && echo MATCH && head -3 /tmp/hirearchy-p1-I1-1793136275/deliverables/memo-2026-10-05.md && wc -w /tmp/hirearchy-p1-I1-1793136275/deliverables/memo-2026-10-05.md
+source file(s): ['lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: 2317b33 2026-10-27T21:46:42Z', 'lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: 2317b33 2026-10-27T21:46:42Z']
+result: Output:
+MATCH
+Summary: The team decided to push the gateway migration to the week of 26 October and to adopt Renovate, and five actions were assigned.
+## Decisions
+- Push the gateway migration to the week of 26 October.
+     162 /tmp/hirearchy-p1-I1-1793136275/deliverables/memo-2026-10-05.md
+
+
+Exit Code: 0
+
+[2026-10-27T21:57:51.355Z] call #53 turn 9 execute_bash
+COMMAND: mkdir -p /tmp/hirearchy-p1-I1-1793136275/deliverables && cp /private/tmp/hirearchy-p1-I1-1793136275/org/lead/writer/work/memo-2026-10-12.md /tmp/hirearchy-p1-I1-1793136275/deliverables/memo-2026-10-12.md && cmp /private/tmp/hirearchy-p1-I1-1793136275/org/lead/writer/work/memo-2026-10-12.md /tmp/hirearchy-p1-I1-1793136275/deliverables/memo-2026-10-12.md && echo MATCH && wc -w /tmp/hirearchy-p1-I1-1793136275/deliverables/memo-2026-10-12.md && cat /tmp/hirearchy-p1-I1-1793136275/deliverables/memo-2026-10-12.md
+source file(s): ['lead/writer/work/memo-2026-10-12.md -> org-git commit at that time: 1f6a321 2026-10-27T21:56:17Z', 'lead/writer/work/memo-2026-10-12.md -> org-git commit at that time: 1f6a321 2026-10-27T21:56:17Z']
+result: Output:
+MATCH
+     202 /tmp/hirearchy-p1-I1-1793136275/deliverables/memo-2026-10-12.md
+Summary: The team decided to approve the rate limiter RFC with the token bucket design, to make the postmortem blameless, and to hold a deploy freeze on Oct 22 and Oct 23, and five actions were assigned.
+## Decisions
+- Approve the RFC with the token bucket design and ship it behind a feature flag first.
+- The postmortem will be blameless and will be shared with the whole company, not just engineering.
+- A deploy freeze on Oct 22 and Oct 23 so nothing changes under the presenter.
+## Actions
+| Owner | Action |
+
+[2026-10-27T22:03:56.564Z] call #63 turn 11 execute_bash
+COMMAND: cp /private/tmp/hirearchy-p1-I1-1793136275/org/lead/writer/work/memo-2026-10-12.md /tmp/hirearchy-p1-I1-1793136275/deliverables/memo-2026-10-12.md && cmp /private/tmp/hirearchy-p1-I1-1793136275/org/lead/writer/work/memo-2026-10-12.md /tmp/hirearchy-p1-I1-1793136275/deliverables/memo-2026-10-12.md && echo MATCH && wc -w /tmp/hirearchy-p1-I1-1793136275/deliverables/memo-2026-10-12.md
+source file(s): ['lead/writer/work/memo-2026-10-12.md -> org-git commit at that time: f66e61a 2026-10-27T22:01:49Z', 'lead/writer/work/memo-2026-10-12.md -> org-git commit at that time: f66e61a 2026-10-27T22:01:49Z']
+result: Output:
+MATCH
+     202 /tmp/hirearchy-p1-I1-1793136275/deliverables/memo-2026-10-12.md
+
+
+Exit Code: 0
+
+[2026-10-27T22:11:44.299Z] call #78 turn 13 execute_bash
+COMMAND: cp /private/tmp/hirearchy-p1-I1-1793136275/org/lead/writer/work/memo-2026-10-19.md /tmp/hirearchy-p1-I1-1793136275/deliverables/memo-2026-10-19.md && cmp /private/tmp/hirearchy-p1-I1-1793136275/org/lead/writer/work/memo-2026-10-19.md /tmp/hirearchy-p1-I1-1793136275/deliverables/memo-2026-10-19.md && echo MATCH && wc -w /tmp/hirearchy-p1-I1-1793136275/deliverables/memo-2026-10-19.md
+source file(s): ['lead/writer/work/memo-2026-10-19.md -> org-git commit at that time: 8ba497e 2026-10-27T22:10:05Z', 'lead/writer/work/memo-2026-10-19.md -> org-git commit at that time: 8ba497e 2026-10-27T22:10:05Z']
+result: Output:
+MATCH
+     214 /tmp/hirearchy-p1-I1-1793136275/deliverables/memo-2026-10-19.md
+
+
+Exit Code: 0
+
+[2026-10-27T22:16:35.650Z] call #86 turn 15 execute_bash
+COMMAND: cp /private/tmp/hirearchy-p1-I1-1793136275/org/lead/writer/work/memo-2026-10-26.md /tmp/hirearchy-p1-I1-1793136275/deliverables/memo-2026-10-26.md && cmp /private/tmp/hirearchy-p1-I1-1793136275/org/lead/writer/work/memo-2026-10-26.md /tmp/hirearchy-p1-I1-1793136275/deliverables/memo-2026-10-26.md && echo MATCH && wc -w /tmp/hirearchy-p1-I1-1793136275/deliverables/memo-2026-10-26.md && ls /tmp/hirearchy-p1-I1-1793136275/deliverables
+source file(s): ['lead/writer/work/memo-2026-10-26.md -> org-git commit at that time: d7a638a 2026-10-27T22:13:59Z', 'lead/writer/work/memo-2026-10-26.md -> org-git commit at that time: d7a638a 2026-10-27T22:13:59Z']
+result: Output:
+MATCH
+     215 /tmp/hirearchy-p1-I1-1793136275/deliverables/memo-2026-10-26.md
+memo-2026-10-05.md
+memo-2026-10-12.md
+memo-2026-10-19.md
+memo-2026-10-26.md
+
+
+Exit Code: 0
+
+[2026-10-27T22:21:57.881Z] call #94 turn 17 execute_bash
+COMMAND: cp /private/tmp/hirearchy-p1-I1-1793136275/org/lead/writer/work/memo-2026-10-26.md /tmp/hirearchy-p1-I1-1793136275/deliverables/memo-2026-10-26.md && cmp /private/tmp/hirearchy-p1-I1-1793136275/org/lead/writer/work/memo-2026-10-26.md /tmp/hirearchy-p1-I1-1793136275/deliverables/memo-2026-10-26.md && echo MATCH && wc -w /tmp/hirearchy-p1-I1-1793136275/deliverables/memo-2026-10-26.md
+source file(s): ['lead/writer/work/memo-2026-10-26.md -> org-git commit at that time: 63f357a 2026-10-27T22:20:25Z', 'lead/writer/work/memo-2026-10-26.md -> org-git commit at that time: 63f357a 2026-10-27T22:20:25Z']
+result: Output:
+MATCH
+     215 /tmp/hirearchy-p1-I1-1793136275/deliverables/memo-2026-10-26.md
+
+
+Exit Code: 0
+
+[2026-10-27T22:27:08.038Z] call #102 turn 19 execute_bash
+COMMAND: cp /private/tmp/hirearchy-p1-I1-1793136275/org/lead/writer/work/memo-2026-11-02.md /tmp/hirearchy-p1-I1-1793136275/deliverables/memo-2026-11-02.md && cmp /private/tmp/hirearchy-p1-I1-1793136275/org/lead/writer/work/memo-2026-11-02.md /tmp/hirearchy-p1-I1-1793136275/deliverables/memo-2026-11-02.md && echo MATCH && wc -w /tmp/hirearchy-p1-I1-1793136275/deliverables/memo-2026-11-02.md && grep -n "JD\|Lee" /tmp/hirearchy-p1-I1-1793136275/deliverables/memo-2026-11-02.md
+source file(s): ['lead/writer/work/memo-2026-11-02.md -> org-git commit at that time: 933f751 2026-10-27T22:24:20Z', 'lead/writer/work/memo-2026-11-02.md -> org-git commit at that time: 933f751 2026-10-27T22:24:20Z']
+result: Output:
+MATCH
+     204 /tmp/hirearchy-p1-I1-1793136275/deliverables/memo-2026-11-02.md
+11:| JD | Send the deck to the customer by Nov 5 | 2026-11-05 |
+13:| Lee | Check the SSO renewal invoice against the quote on Wednesday | 2026-11-04 |
+16:Present: Priya, Sam, Lee, Marta, Dev.
+
+
+Exit Code: 0
+
+[2026-10-27T22:31:52.564Z] call #110 turn 21 execute_bash
+COMMAND: cp /private/tmp/hirearchy-p1-I1-1793136275/org/lead/writer/work/memo-2026-11-02.md /tmp/hirearchy-p1-I1-1793136275/deliverables/memo-2026-11-02.md && cmp /private/tmp/hirearchy-p1-I1-1793136275/org/lead/writer/work/memo-2026-11-02.md /tmp/hirearchy-p1-I1-1793136275/deliverables/memo-2026-11-02.md && echo MATCH && wc -w /tmp/hirearchy-p1-I1-1793136275/deliverables/memo-2026-11-02.md
+source file(s): ['lead/writer/work/memo-2026-11-02.md -> org-git commit at that time: 3f3e4d1 2026-10-27T22:30:14Z', 'lead/writer/work/memo-2026-11-02.md -> org-git commit at that time: 3f3e4d1 2026-10-27T22:30:14Z']
+result: Output:
+MATCH
+     210 /tmp/hirearchy-p1-I1-1793136275/deliverables/memo-2026-11-02.md
+
+
+Exit Code: 0
+
+[2026-10-27T22:36:37.197Z] call #118 turn 23 execute_bash
+COMMAND: cp /private/tmp/hirearchy-p1-I1-1793136275/org/lead/writer/work/memo-2026-11-09.md /tmp/hirearchy-p1-I1-1793136275/deliverables/memo-2026-11-09.md && cmp /private/tmp/hirearchy-p1-I1-1793136275/org/lead/writer/work/memo-2026-11-09.md /tmp/hirearchy-p1-I1-1793136275/deliverables/memo-2026-11-09.md && echo MATCH && wc -w /tmp/hirearchy-p1-I1-1793136275/deliverables/memo-2026-11-09.md && ls /tmp/hirearchy-p1-I1-1793136275/deliverables
+source file(s): ['lead/writer/work/memo-2026-11-09.md -> org-git commit at that time: fa18aef 2026-10-27T22:34:04Z', 'lead/writer/work/memo-2026-11-09.md -> org-git commit at that time: fa18aef 2026-10-27T22:34:04Z']
+result: Output:
+MATCH
+     179 /tmp/hirearchy-p1-I1-1793136275/deliverables/memo-2026-11-09.md
+memo-2026-10-05.md
+memo-2026-10-12.md
+memo-2026-10-19.md
+memo-2026-10-26.md
+memo-2026-11-02.md
+memo-2026-11-09.md
+
+
+Exit Code: 0
+
+any other write into the deliverable folder (not by the assistant): none can be seen from the assistant session; the folder holds:
+  memo-2026-10-05.md size 864 mtime 21:49:42 local md5 e030324c1a3b2855a544c259b0689c89
+  memo-2026-10-12.md size 1066 mtime 22:03:56 local md5 afa4574e2dc34f629661a9854ccc8e0b
+  memo-2026-10-19.md size 1106 mtime 22:11:44 local md5 24b66c9539d8964d89099802d6e855f2
+  memo-2026-10-26.md size 1136 mtime 22:21:57 local md5 639d40321d5f43d159f18bc3d26db023
+  memo-2026-11-02.md size 1086 mtime 22:31:52 local md5 9c236991ef0b43545cd234b6178b4c3a
+  memo-2026-11-09.md size 955 mtime 22:36:37 local md5 d46cdf214695e73f630b0dca0ffa8547
+
+final ls -la:
+total 48
+drwxr-xr-x@ 8 aminalizadeh  wheel   256 Oct 27 22:36 .
+drwxr-xr-x@ 7 aminalizadeh  wheel   224 Oct 27 21:39 ..
+-rw-r--r--@ 1 aminalizadeh  wheel   864 Oct 27 21:49 memo-2026-10-05.md
+-rw-r--r--@ 1 aminalizadeh  wheel  1066 Oct 27 22:03 memo-2026-10-12.md
+-rw-r--r--@ 1 aminalizadeh  wheel  1106 Oct 27 22:11 memo-2026-10-19.md
+-rw-r--r--@ 1 aminalizadeh  wheel  1136 Oct 27 22:21 memo-2026-10-26.md
+-rw-r--r--@ 1 aminalizadeh  wheel  1086 Oct 27 22:31 memo-2026-11-02.md
+-rw-r--r--@ 1 aminalizadeh  wheel   955 Oct 27 22:36 memo-2026-11-09.md
+

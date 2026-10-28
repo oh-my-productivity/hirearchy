@@ -1,0 +1,10 @@
+The team is set up and running on 2026-10-05.md. The budget is 12 runs for this memo. I'll wait for it to finish.The memo is drafted and the reviewer passed it 8 of 8. I've held it back because two due dates depend on how you read the notes. Please answer both.
+
+1. **Sam, flaky CI.** The notes say he'd look into it "before Friday". Is the Due:
+   - 2026-10-08 (Thursday, strictly before Friday), which the memo uses now, or
+   - 2026-10-09 (Friday)?
+2. **Marta, training room.** The notes say "book the on-call training room for Oct 14". Is Oct 14 the date of the training, or the deadline for booking it?
+   - If it's the training date, Due stays `none` and "Oct 14" stays in the action text. The memo does this now.
+   - If it's the booking deadline, Due becomes 2026-10-14.
+
+I'll put your answers into the memo and send it back for a fix, then copy it to `deliverables/memo-2026-10-05.md`. A fix costs about 3 runs, and 9 of the 12 runs are used, so it fits the budget.

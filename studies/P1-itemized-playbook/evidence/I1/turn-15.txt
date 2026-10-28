@@ -1,0 +1,19 @@
+######## TURN 15  start 22:16:21  end 22:16:41  elapsed 20s  (local, 2026-10-27; UTC wall-clock start 2026-10-27T22:16:21Z end 2026-10-27T22:16:41Z; exit code 0)
+######## LENA (prompt sent verbatim):
+About the 2026-10-19 memo: That one is right, all the items are there - keep it. S's 2026-10-30 is right.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-15.stderr.txt):
+I recorded your "keep it" on the 19 October memo. The 26 October memo is delivered at `/tmp/hirearchy-p1-I1-1793136275/deliverables/memo-2026-10-26.md`. I copied it unchanged and checked that it matches the team's file.
+
+- **Scope, date and attendees:** met. It covers only that meeting, with the date and attendees.
+- **Length:** met, 215 words.
+- **Summary, then Decisions, then Actions:** met, with 3 decisions listed.
+- **Actions table:** met, 5 rows with owners as initials (D, P, M, S, L).
+- **Due dates:** met. Sam's is 2026-10-30, as you confirmed, and Lee's is "none".
+- **Wording and invented items:** met, the wording follows the notes and nothing is added.
+- **Discussed-only topics:** met, none are listed.
+- **Next meeting:** met, Monday 2 November.
+- **Reviewer's report:** met, 12 of 12 with no required changes.
+
+The memo used 5 of the 12 runs, and the other 7 came back unspent.
+
+Keep it as it is, or should something change?

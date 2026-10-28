@@ -1,0 +1,17 @@
+The memo for the 19 October meeting is at `/tmp/hirearchy-p1-I1-1793136275/deliverables/memo-2026-10-19.md`. I copied it unchanged and checked that it matches the team's file.
+
+- **Scope, date and attendees:** met. It covers only that meeting, with the date and attendees.
+- **Length:** met, 214 words.
+- **Summary, then Decisions, then Actions:** met, with 3 decisions listed.
+- **Actions table:** met, 5 rows with owners as initials (L, M, D, P, S).
+- **Due dates:** met, with your answers applied. Lee's is 2026-10-30 and Sam's pairing row has "none".
+- **Marta's "keep the agenda as sent":** dropped, as you said.
+- **Wording and invented items:** met, the wording follows the notes and nothing is added.
+- **Discussed-only topics:** met, none are listed.
+- **Next meeting:** met, Monday 26 October at 14:00.
+- **Reviewer's report:** met, 12 of 12 with no required changes.
+- **C4:** a literal reading of C4 would include Marta's "will keep the agenda as sent" as a row. Dropping it was your decision, so the delivered memo leaves it out.
+
+The memo used 10 of the 12 runs you approved: 5 for the first draft and 5 for your changes. The other 2 runs came back unspent.
+
+Keep it as it is, or should something change?

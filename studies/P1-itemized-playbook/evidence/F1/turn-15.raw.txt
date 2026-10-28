@@ -1,0 +1,18 @@
+The 19 October memo is at `/tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-10-19.md`. Lee's Due is now `2026-10-30` and Sam's stays `none`.
+
+- Title, `Summary:` line, Decisions, Action items, in that order: met.
+- At most 400 words: met. `wc -w` gives 174, and the team counts 143.
+- Every decision listed, none invented: met. There are three decisions.
+- Every commitment is a table row, informal ones included: met. There are five rows, including Sam's offer to pair with Jo.
+- Table columns Owner | Action | Due, one owner per row: met.
+- Owners shown as initials only: met (M, D, P, L, S).
+- Due dates in ISO format or `none`: met.
+- Dated-event rule: met. Nothing in these notes needs it.
+- Everything traceable to the 2026-10-19 notes: met.
+- Reviewer shows every criterion met: met, 9 of 9.
+
+One thing for you to check: Marta's "keep the agenda as sent" has no table row, as you said. I read "leave it out" as only about the row, so the first decision still ends with "the agenda stays as sent". If you want that clause removed too, tell me.
+
+This memo used 10 runs of the 12 you set, 5 for the memo and 5 for the Lee's Due fix. The rework you didn't ask for is still counted separately as my spend.
+
+Keep it, or what should change?

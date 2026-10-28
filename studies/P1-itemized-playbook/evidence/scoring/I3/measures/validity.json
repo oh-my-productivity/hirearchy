@@ -1,0 +1,13 @@
+{
+ "valid": true,
+ "reason": "valid: H1-H8 hold (25/25 turns exit 0); empty calls 0; memories.db unchanged; ruling manager-decision-row-I3-t1.md",
+ "arm_contrast": true,
+ "before_failure": {},
+ "ended_by_ruling": null,
+ "memories_block": {
+  "present": true,
+  "pair": "F3",
+  "pair_same_presence": true,
+  "note": "manager-decision-stage-1-gate.md item 3: an assistant-layer contrast compares a pair only when both streams have the same presence (F1 none, I1 5714 characters: unpaired; the other four the same block)"
+ }
+}

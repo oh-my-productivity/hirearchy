@@ -1,0 +1,20 @@
+######## TURN 19  start 23:55:38  end 23:56:00  elapsed 22s  (local, 2026-10-27; UTC wall-clock start 2026-10-27T23:55:38Z end 2026-10-27T23:56:00Z; exit code 0)
+######## LENA (prompt sent verbatim):
+About the 2026-10-19 memo: That one is right, all the items are there - keep it. No, just the title, the Summary line, the decisions and the action items.
+
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-19.stderr.txt):
+The memo for 26 Oct is at `/tmp/hirearchy-p1-I2-1793142034/deliverables/memo-2026-10-26.md`. I checked the copy against the writer's file and they are identical. The next-meeting date stays out, as you said. I also recorded your approval of the 19 Oct memo.
+
+- **C1, based on the 26 Oct notes only:** met.
+- **C2, at most 400 words:** met (170 by `wc`).
+- **C3, Decisions (3 bullets) and Actions table with Owner | Action | Due:** met.
+- **C4, a row for every commitment:** met (5 rows, with Sam's and Lee's informal ones included).
+- **C5, Due dates:** met. D is 2026-10-28, P is 2026-10-30, M is 2026-10-27, S is 2026-10-30, and L is none.
+- **C6, nothing invented:** met.
+- **C7, reviewer's report:** met. The reviewer's line reads 8 of 8, with 8 of 8 facts verified.
+- **C8, Summary line first, then Decisions, then Actions:** met.
+- **C9, Owners as initials only:** met.
+
+The request used 5 of the 12 runs planned, and the other 7 came back. Nothing is running.
+
+Keep it, or what should change?

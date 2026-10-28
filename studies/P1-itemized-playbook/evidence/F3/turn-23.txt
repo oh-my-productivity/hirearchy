@@ -1,0 +1,22 @@
+######## TURN 23  start 03:10:19  end 03:10:39  elapsed 20s  (local, 2026-10-28; UTC wall-clock start 2026-10-28T03:10:19Z end 2026-10-28T03:10:39Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Sam's 2026-11-13 is right. Lee's none is right. Yes, that's a decision. Yes, that counts. Yes, that's a decision. Yes, that counts.
+
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-23.stderr.txt):
+The 2026-11-09 memo is at `/tmp/hirearchy-p1-F3-1793152805/deliverables/memo-2026-11-09.md`. The copy matches the team's file, and I changed nothing in it.
+
+- Covers only the 2026-11-09 meeting: met
+- Markdown, at most 400 words: met (107 by the team's count)
+- Starts with `Summary:`, then Decisions, then the action table: met
+- Decisions, one line each (3): met
+- Table columns Owner | Action | Due, owners as written in the notes: met (Marta, Dev, Priya, Sam, Lee; no initials-only owners)
+- All commitments included, informal ones too: met
+- Due values: met. Marta 2026-11-11, Dev 2026-11-20, Priya 2026-11-16, Sam 2026-11-13, Lee `none`.
+- Nothing invented: met
+- Reviewer passed 9 of 9, with no required changes: met
+
+Cost: this memo used 5 of its 12 runs. Nothing is running.
+
+All six memos are now in `deliverables/`. For next week, ask me for the memo with the notes file name, for example `2026-11-16.md`. The contract has your rules built in: Summary first, names as written, and "(full name not in the notes)" for initials-only owners.
+
+Keep it, or what should change?

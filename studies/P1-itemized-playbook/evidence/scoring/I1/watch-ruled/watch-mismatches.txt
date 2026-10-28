@@ -1,0 +1,5 @@
+MISMATCH turn-22 P12 waiting unpinned: re-derived 0, product 1
+MISMATCH turn-23 P12 waiting unpinned: re-derived 0, product 1
+MISMATCH turn-24 P12 clean unpinned: re-derived 0, product 1
+MISMATCH end P12 clean unpinned: re-derived 0, product 1
+4 mismatches (0 on pinned keys, 4 on unpinned keys); 0 services mismatches; 0 services lines unread; 0 lower-margin race matches (reported); 0 snapshots unread

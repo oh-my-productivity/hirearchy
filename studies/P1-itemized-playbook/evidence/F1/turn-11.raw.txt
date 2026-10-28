@@ -1,0 +1,7 @@
+About C5: add "Owners are shown as initials only, always" as a lasting rule? Yes or no.
+
+- **Conflict with C5:** C5 currently says each owner is "named as in the notes". On yes, I'd replace that wording so the two rules don't contradict. With this team the initials would be P (Priya), S (Sam), L (Lee), M (Marta) and D (Dev), and none of them clash.
+- **Cost:** Redoing the 12 October memo this way takes about 5 runs. This request has used 5 of its 12, so it fits within your budget and needs no extra approval.
+- **The rework:** Understood that you didn't ask for it. I won't treat it as something you approved, and I'll keep its 5 runs separate from your spend.
+
+I haven't changed anything yet.

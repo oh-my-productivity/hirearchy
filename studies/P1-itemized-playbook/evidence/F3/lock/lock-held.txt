@@ -1,0 +1,44 @@
+after turn 3: contract versions from the lock (v2) on: v2 locked: true
+lock held after turn 3
+after turn 4: contract versions from the lock (v2) on: v2 locked: true
+lock held after turn 4
+after turn 5: contract versions from the lock (v2) on: v2 locked: true
+lock held after turn 5
+after turn 6: contract versions from the lock (v2) on: v2 locked: true
+lock held after turn 6
+after turn 7: contract versions from the lock (v2) on: v2 locked: true
+lock held after turn 7
+after turn 8: contract versions from the lock (v2) on: v2 locked: true, v3 locked: true
+lock held after turn 8
+after turn 9: contract versions from the lock (v2) on: v2 locked: true, v3 locked: true
+lock held after turn 9
+after turn 10: contract versions from the lock (v2) on: v2 locked: true, v3 locked: true
+lock held after turn 10
+after turn 11: contract versions from the lock (v2) on: v2 locked: true, v3 locked: true
+lock held after turn 11
+after turn 12: contract versions from the lock (v2) on: v2 locked: true, v3 locked: true, v4 locked: true
+lock held after turn 12
+after turn 13: contract versions from the lock (v2) on: v2 locked: true, v3 locked: true, v4 locked: true
+lock held after turn 13
+after turn 14: contract versions from the lock (v2) on: v2 locked: true, v3 locked: true, v4 locked: true
+lock held after turn 14
+after turn 15: contract versions from the lock (v2) on: v2 locked: true, v3 locked: true, v4 locked: true
+lock held after turn 15
+after turn 16: contract versions from the lock (v2) on: v2 locked: true, v3 locked: true, v4 locked: true
+lock held after turn 16
+after turn 17: contract versions from the lock (v2) on: v2 locked: true, v3 locked: true, v4 locked: true, v5 locked: true
+lock held after turn 17
+after turn 18: contract versions from the lock (v2) on: v2 locked: true, v3 locked: true, v4 locked: true, v5 locked: true
+lock held after turn 18
+after turn 19: contract versions from the lock (v2) on: v2 locked: true, v3 locked: true, v4 locked: true, v5 locked: true
+lock held after turn 19
+after turn 20: contract versions from the lock (v2) on: v2 locked: true, v3 locked: true, v4 locked: true, v5 locked: true
+lock held after turn 20
+after turn 21: contract versions from the lock (v2) on: v2 locked: true, v3 locked: true, v4 locked: true, v5 locked: true, v6 locked: true
+lock held after turn 21
+after turn 22: contract versions from the lock (v2) on: v2 locked: true, v3 locked: true, v4 locked: true, v5 locked: true, v6 locked: true
+lock held after turn 22
+after turn 23: contract versions from the lock (v2) on: v2 locked: true, v3 locked: true, v4 locked: true, v5 locked: true, v6 locked: true
+lock held after turn 23
+after turn 24: contract versions from the lock (v2) on: v2 locked: true, v3 locked: true, v4 locked: true, v5 locked: true, v6 locked: true
+lock held after turn 24

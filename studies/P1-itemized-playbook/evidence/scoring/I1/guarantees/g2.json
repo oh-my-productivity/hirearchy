@@ -1,0 +1,51 @@
+{
+ "a": {
+  "rejections": [
+   {
+    "turn": 5,
+    "rule": "H6",
+    "memo": "2026-10-05",
+    "R": "R1",
+    "note": "20261027T214339086955-root-6274"
+   },
+   {
+    "turn": 10,
+    "rule": "L-PLANT",
+    "memo": "2026-10-12",
+    "R": "R2",
+    "note": "20261027T215914210347-root-df4e"
+   },
+   {
+    "turn": 16,
+    "rule": "L-MIND",
+    "memo": "2026-10-26",
+    "R": "R3",
+    "note": "20261027T221759090700-root-9a11"
+   },
+   {
+    "turn": 20,
+    "rule": "L-GAP",
+    "memo": "2026-11-02",
+    "R": "R4",
+    "note": "20261027T222816603150-root-6dcb"
+   }
+  ],
+  "missing": [],
+  "unmapped": [],
+  "verdict": "PASS"
+ },
+ "b": {
+  "late_or_missing": [],
+  "late_detail": [],
+  "verdict": "PASS"
+ },
+ "c": {
+  "REQUEST-UNANSWERED": 0,
+  "FEEDBACK-UNANSWERED": 0,
+  "exception_uses": 0,
+  "relayed_accepts_while_unanswered": 0,
+  "one_off_delegates_while_unanswered": 0,
+  "verdict": "PASS (by construction; the counts are reported)"
+ },
+ "scorer_notes": []
+}

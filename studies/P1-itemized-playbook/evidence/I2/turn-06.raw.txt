@@ -1,0 +1,21 @@
+The memo now has the Summary line, but I haven't delivered it yet because of one open question. This is the draft in the writer's file:
+
+```
+# Platform team weekly memo, 2026-10-05
+
+Summary: The API gateway migration is pushed to the week of 26 October, Renovate is adopted, and five actions were assigned.
+
+## Decisions
+(2 bullets, unchanged)
+
+## Actions
+(same 5 rows: Priya 2026-10-09, Dev 2026-10-08, Sam 2026-10-09, Marta 2026-10-14, Lee none)
+```
+
+The Summary line is directly after the title, and the Decisions and Actions sections are unchanged. The memo is 129 words. The reviewer passed every content check (C1 to C6 and the new C8) and found nothing invented.
+
+**Question for you:** the last check, C7, requires the reviewer's report to show every criterion met. The reviewer won't certify that one, because it is about its own report, so its line reads "7 of 8." Nothing was left to change. Should I count C7 as met? I recommend yes. If you agree, I'll copy the memo to `deliverables/` and replace the old version.
+
+**Unrequested rework:** the logs show a second rework request, "Rework memo 2026-10-05: unclear due dates," sent from my seat. I didn't send it in this conversation and can't tell what triggered it. It spent 5 runs and wrote a memo that contradicts your rulings (Sam 10-08, and explanations inside the table cells). It is still blocked, and I've left it alone. The memo in `deliverables/` is still the version you judged, and the new rework started from that version.
+
+**Cost:** your case has used 15 of the 15 runs you approved. The stray rework's 5 runs come on top of that, for 20 in all. I count them as my spend, not yours, and I won't ask you to fund them. Nothing more will run until you answer.

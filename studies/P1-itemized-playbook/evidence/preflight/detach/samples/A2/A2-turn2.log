@@ -1,0 +1,11 @@
+[2m2026-10-27T18:54:28.094011Z[0m [31mERROR[0m [2mchat_cli::api_client::profile[0m[2m:[0m [2m97:[0m GetProfile failed on all endpoints for API key
+[INFO] kas.server.starting {"product":"KAS (Kiro Agent Server)","version":"0.66.48"}
+[INFO] Auth: KIRO_API_KEY env var (api_key) {"regionDiscovery":true}
+[INFO] acp.content_collection.resolved {"enabled":false}
+[INFO] acp.remote_sessions.enabled {"endpoint":"https://app.kiro.dev"}
+[INFO] [KiroAgent] MCP subsystem initialized
+[ERROR] (node:82359) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+[INFO] fs.workflow.recipes.readDir.ok {"system":"fs","tier":"user","durationMs":1}
+[INFO] fs.workflow.recipes.readDir.ok {"system":"fs","tier":"cloud","durationMs":5}
+[INFO] fs.workflow.recipeCatalog.refreshShared.ok {"system":"fs","trigger":"startup","durationMs":7}

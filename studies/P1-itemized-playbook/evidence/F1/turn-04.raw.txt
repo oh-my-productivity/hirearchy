@@ -1,0 +1,5 @@
+The memo now matches your answers. Sam's due date is 2026-10-09, and Lee's vendor ping is an action row only. I haven't copied it to `deliverables` yet because of one open question about Marta's row.
+
+The notes say "Marta to book the on-call training room for Oct 14". The memo reads Oct 14 as the date of the training, not the deadline for booking. So her Due is `none`. Should Due be `none` (as it is now), or `2026-10-14`?
+
+I'll copy the memo once you answer. Changing it to `2026-10-14` would need another fix and re-check, about 3 more runs. So far it has used 14 runs, 2 over the 12 you set. The extra 2 are the ones you approved.

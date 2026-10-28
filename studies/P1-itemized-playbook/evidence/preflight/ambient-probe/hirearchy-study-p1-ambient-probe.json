@@ -1,0 +1,24 @@
+{
+  "name": "hirearchy-study-p1-ambient-probe",
+  "description": "internal: hirearchy usability study P1 preflight ambient probe; deleted after the probe",
+  "mcpServers": {
+    "hirearchy": {
+      "command": "uv",
+      "args": ["--directory", "/Volumes/workspace/hirearchy", "run", "hirearchy", "mcp"],
+      "env": { "ORG_ROOT": "/tmp/hirearchy-p1-ambient-1793121877/org" }
+    }
+  },
+  "tools": ["*"],
+  "permissions": {
+    "rules": [
+      { "capability": "all", "effect": "allow" }
+    ]
+  },
+  "resources": [
+    "skill:///Volumes/workspace/hirearchy/skills/hirearchy/SKILL.md",
+    "skill://.kiro/skills/*/SKILL.md"
+  ],
+  "hooks": [],
+  "includeMcpJson": false,
+  "model": "claude-sonnet-5.5"
+}

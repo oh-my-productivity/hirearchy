@@ -1,0 +1,20 @@
+######## TURN 17  start 20:46:39  end 20:47:26  elapsed 47s  (local, 2026-10-27; UTC wall-clock start 2026-10-27T20:46:39Z end 2026-10-27T20:47:26Z; exit code 0)
+######## LENA (prompt sent verbatim):
+About the 2026-10-19 memo: That one is right, all the items are there - keep it. No, that's not an action item - leave it out. S's 2026-10-30 is right. I don't know anything about that rework - I didn't ask for it.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-17.stderr.txt):
+The 26 October memo is at `/tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-10-26.md`, exactly as the team wrote it. The "Next meeting" line stays out, and Sam's Due is `2026-10-30`. Your keep on the 19 October memo is recorded.
+
+- Title, `Summary:` line, Decisions, Action items, in that order: met.
+- At most 400 words: met. `wc -w` gives 166, and the team counts 135.
+- Every decision listed, none invented: met. There are three decisions.
+- Every commitment is a table row, informal ones included: met. There are five rows, including Sam's and Lee's prose commitments.
+- Table columns Owner | Action | Due, one owner per row: met.
+- Owners shown as initials only: met (D, P, M, S, L).
+- Due dates in ISO format or `none`: met. Lee's is `none` because the notes say no date was set.
+- Dated-event rule: met. Nothing in these notes needs it.
+- Everything traceable to the 2026-10-26 notes: met.
+- Reviewer shows every criterion met: met, 9 of 9.
+
+This request used 5 of the 12 runs, and 7 came back unspent. The 5 runs of the rework you didn't ask for stay counted as my spend, not yours.
+
+Keep it, or what should change?

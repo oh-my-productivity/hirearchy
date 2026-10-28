@@ -1,0 +1,1 @@
+env -u KIRO_HOME kiro-cli chat --v3 --no-interactive --trust-all-tools --resume --effort high --agent hirearchy-study-p1-F1-assistant 'OK, I'\''ll take it as it is and fix the rest myself: Marta'\''s due should be 2026-10-14. it should start with the one-line Summary, then the decisions, then the action items. Please do 2026-10-12.md. I'\''ll wait.'

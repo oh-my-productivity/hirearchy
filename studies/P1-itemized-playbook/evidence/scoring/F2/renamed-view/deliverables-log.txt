@@ -1,0 +1,150 @@
+# deliverables log (protocol 7.2, D6); facts only
+
+[2026-10-28T00:36:08.056Z] call #22 turn 4 execute_bash
+COMMAND: mkdir -p /tmp/hirearchy-p1-F2-1793146944/deliverables && cp /tmp/hirearchy-p1-F2-1793146944/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-p1-F2-1793146944/deliverables/memo-2026-10-05.md && cmp /tmp/hirearchy-p1-F2-1793146944/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-p1-F2-1793146944/deliverables/memo-2026-10-05.md && wc -w /tmp/hirearchy-p1-F2-1793146944/deliverables/memo-2026-10-05.md
+source file(s): ['lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: 2794412 2026-10-28T00:34:39Z', 'lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: 2794412 2026-10-28T00:34:39Z']
+result: Output:
+     200 /tmp/hirearchy-p1-F2-1793146944/deliverables/memo-2026-10-05.md
+
+
+Exit Code: 0
+
+[2026-10-28T00:47:45.573Z] call #43 turn 7 execute_bash
+COMMAND: cd /tmp/hirearchy-p1-F2-1793146944 && cp org/lead/writer/work/memo-2026-10-05.md deliverables/memo-2026-10-05.md && cmp org/lead/writer/work/memo-2026-10-05.md deliverables/memo-2026-10-05.md && wc -w deliverables/memo-2026-10-05.md && head -3 deliverables/memo-2026-10-05.md
+source file(s): ['lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: 1136a20 2026-10-28T00:44:24Z', 'lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: 1136a20 2026-10-28T00:44:24Z']
+result: Output:
+     217 deliverables/memo-2026-10-05.md
+Summary: The team pushed the API gateway migration to the week of 26 October, adopted Renovate for weekly dependency PRs, and assigned five action items.
+
+## Decisions
+
+
+Exit Code: 0
+
+[2026-10-28T01:00:20.781Z] call #60 turn 11 execute_bash
+COMMAND: cd /tmp/hirearchy-p1-F2-1793146944 && cp org/lead/writer/work/memo-2026-10-12.md deliverables/memo-2026-10-12.md && cmp org/lead/writer/work/memo-2026-10-12.md deliverables/memo-2026-10-12.md && wc -w deliverables/memo-2026-10-12.md && ls deliverables
+source file(s): ['lead/writer/work/memo-2026-10-12.md -> org-git commit at that time: 1285a94 2026-10-28T00:58:23Z', 'lead/writer/work/memo-2026-10-12.md -> org-git commit at that time: 1285a94 2026-10-28T00:58:23Z']
+result: Output:
+     242 deliverables/memo-2026-10-12.md
+memo-2026-10-05.md
+memo-2026-10-12.md
+
+
+Exit Code: 0
+
+[2026-10-28T01:07:06.137Z] call #70 turn 14 execute_bash
+COMMAND: cd /tmp/hirearchy-p1-F2-1793146944 && cp org/lead/writer/work/memo-2026-10-12.md deliverables/memo-2026-10-12.md && cmp org/lead/writer/work/memo-2026-10-12.md deliverables/memo-2026-10-12.md && wc -w deliverables/memo-2026-10-12.md && grep -E "^\| [A-Z] " deliverables/memo-2026-10-12.md
+source file(s): ['lead/writer/work/memo-2026-10-12.md -> org-git commit at that time: f23b531 2026-10-28T01:03:55Z', 'lead/writer/work/memo-2026-10-12.md -> org-git commit at that time: f23b531 2026-10-28T01:03:55Z']
+result: Output:
+     242 deliverables/memo-2026-10-12.md
+| D | Write the postmortem for the Oct 8 outage | 2026-10-14 |
+| M | Send the demo agenda to the customer | 2026-10-16 |
+| P | Start implementing the rate limiter behind a feature flag | 2026-10-20 |
+| S | Update the out-of-date staging test data, ready the day before the freeze starts | 2026-10-21 |
+| L | Carry the pager during demo week and swap shifts with Dev, who would rather be free to present the demo | none |
+
+
+Exit Code: 0
+
+[2026-10-28T01:17:07.413Z] call #85 turn 16 execute_bash
+COMMAND: cd /tmp/hirearchy-p1-F2-1793146944 && cp org/lead/writer/work/memo-2026-10-19.md deliverables/memo-2026-10-19.md && cmp org/lead/writer/work/memo-2026-10-19.md deliverables/memo-2026-10-19.md && ls deliverables
+source file(s): ['lead/writer/work/memo-2026-10-19.md -> org-git commit at that time: fcc4b6c 2026-10-28T01:15:26Z', 'lead/writer/work/memo-2026-10-19.md -> org-git commit at that time: fcc4b6c 2026-10-28T01:15:26Z']
+result: Output:
+memo-2026-10-05.md
+memo-2026-10-12.md
+memo-2026-10-19.md
+
+
+Exit Code: 0
+
+[2026-10-28T01:21:14.634Z] call #95 turn 17 execute_bash
+COMMAND: cd /tmp/hirearchy-p1-F2-1793146944 && cp org/lead/writer/work/memo-2026-10-26.md deliverables/memo-2026-10-26.md && cmp org/lead/writer/work/memo-2026-10-26.md deliverables/memo-2026-10-26.md && wc -w deliverables/memo-2026-10-26.md && ls deliverables
+source file(s): ['lead/writer/work/memo-2026-10-26.md -> org-git commit at that time: 594d842 2026-10-28T01:19:35Z', 'lead/writer/work/memo-2026-10-26.md -> org-git commit at that time: 594d842 2026-10-28T01:19:35Z']
+result: Output:
+     187 deliverables/memo-2026-10-26.md
+memo-2026-10-05.md
+memo-2026-10-12.md
+memo-2026-10-19.md
+memo-2026-10-26.md
+
+
+Exit Code: 0
+
+[2026-10-28T01:26:44.188Z] call #105 turn 19 execute_bash
+COMMAND: cd /tmp/hirearchy-p1-F2-1793146944 && cp org/lead/writer/work/memo-2026-10-26.md deliverables/memo-2026-10-26.md && cmp org/lead/writer/work/memo-2026-10-26.md deliverables/memo-2026-10-26.md && grep -E "^\| [A-Z]" deliverables/memo-2026-10-26.md
+source file(s): ['lead/writer/work/memo-2026-10-26.md -> org-git commit at that time: 4429a7c 2026-10-28T01:25:08Z', 'lead/writer/work/memo-2026-10-26.md -> org-git commit at that time: 4429a7c 2026-10-28T01:25:08Z']
+result: Output:
+| Owner | Action | Due |
+| Dev | Run the gateway cutover | 2026-10-28 |
+| Priya | Enable the rate limiter flag for the large-plan customers | 2026-10-30 |
+| Marta | Send the demo feedback summary to the product team | 2026-10-27 |
+| Sam | Write up onboarding notes for the pipeline so the next new hire has them | 2026-10-30 |
+| Lee | Update the SSO runbook with the new certificate dates | none |
+
+
+Exit Code: 0
+
+[2026-10-28T01:34:10.751Z] call #124 turn 21 execute_bash
+COMMAND: cd /tmp/hirearchy-p1-F2-1793146944 && cp org/lead/writer/work/memo-2026-11-02.md deliverables/memo-2026-11-02.md && cmp org/lead/writer/work/memo-2026-11-02.md deliverables/memo-2026-11-02.md && wc -w deliverables/memo-2026-11-02.md && grep -E "^\| " deliverables/memo-2026-11-02.md
+source file(s): ['lead/writer/work/memo-2026-11-02.md -> org-git commit at that time: da0ff8f 2026-10-28T01:32:38Z', 'lead/writer/work/memo-2026-11-02.md -> org-git commit at that time: da0ff8f 2026-10-28T01:32:38Z']
+result: Output:
+     170 deliverables/memo-2026-11-02.md
+| Owner | Action | Due |
+| Dev | Switch off the old gateway | 2026-11-13 |
+| Priya | Write the rollout plan for all plans | 2026-11-06 |
+| JD | Send the deck to the customer | 2026-11-05 |
+| Marta | Set up the quarterly review meeting with the customer once they confirm a slot | none |
+| Lee | Check the SSO renewal invoice against the quote on Wednesday | 2026-11-04 |
+
+
+Exit Code: 0
+
+[2026-10-28T01:47:43.798Z] call #133 turn 23 execute_bash
+COMMAND: cd /tmp/hirearchy-p1-F2-1793146944 && cp org/lead/writer/work/memo-2026-11-02.md deliverables/memo-2026-11-02.md && cmp org/lead/writer/work/memo-2026-11-02.md deliverables/memo-2026-11-02.md && wc -w deliverables/memo-2026-11-02.md && grep JD deliverables/memo-2026-11-02.md && ls deliverables
+source file(s): ['lead/writer/work/memo-2026-11-02.md -> org-git commit at that time: fe2e0f7 2026-10-28T01:40:39Z', 'lead/writer/work/memo-2026-11-02.md -> org-git commit at that time: fe2e0f7 2026-10-28T01:40:39Z']
+result: Output:
+     176 deliverables/memo-2026-11-02.md
+| JD (full name not in the notes) | Send the deck to the customer | 2026-11-05 |
+memo-2026-10-05.md
+memo-2026-10-12.md
+memo-2026-10-19.md
+memo-2026-10-26.md
+memo-2026-11-02.md
+
+
+Exit Code: 0
+
+[2026-10-28T01:54:13.428Z] call #140 turn 24 execute_bash
+COMMAND: cd /tmp/hirearchy-p1-F2-1793146944 && cp org/lead/writer/work/memo-2026-11-09.md deliverables/memo-2026-11-09.md && cmp org/lead/writer/work/memo-2026-11-09.md deliverables/memo-2026-11-09.md && wc -w deliverables/memo-2026-11-09.md && ls deliverables
+source file(s): ['lead/writer/work/memo-2026-11-09.md -> org-git commit at that time: 3dfb36a 2026-10-28T01:52:51Z', 'lead/writer/work/memo-2026-11-09.md -> org-git commit at that time: 3dfb36a 2026-10-28T01:52:51Z']
+result: Output:
+     156 deliverables/memo-2026-11-09.md
+memo-2026-10-05.md
+memo-2026-10-12.md
+memo-2026-10-19.md
+memo-2026-10-26.md
+memo-2026-11-02.md
+memo-2026-11-09.md
+
+
+Exit Code: 0
+
+any other write into the deliverable folder (not by the assistant): none can be seen from the assistant session; the folder holds:
+  memo-2026-10-05.md size 1195 mtime 00:47:45 local md5 d31b15311a8f2c5a9072588cc378ae03
+  memo-2026-10-12.md size 1329 mtime 01:07:06 local md5 d67f768bc2cab7f770153f224ad85332
+  memo-2026-10-19.md size 1323 mtime 01:17:07 local md5 5af675aef2a366a4c71bdd5fa117aefc
+  memo-2026-10-26.md size 1005 mtime 01:26:44 local md5 31941bdd7dd148a7752dd7381c8864c2
+  memo-2026-11-02.md size 902 mtime 01:47:43 local md5 9397adf79fdbe5d002667fb86d10037b
+  memo-2026-11-09.md size 827 mtime 01:54:13 local md5 16b2a50a0b3a85d5e27af19ce1bde8b6
+
+final ls -la:
+total 48
+drwxr-xr-x@ 8 aminalizadeh  wheel   256 Oct 28 01:54 .
+drwxr-xr-x@ 7 aminalizadeh  wheel   224 Oct 28 00:37 ..
+-rw-r--r--@ 1 aminalizadeh  wheel  1195 Oct 28 00:47 memo-2026-10-05.md
+-rw-r--r--@ 1 aminalizadeh  wheel  1329 Oct 28 01:07 memo-2026-10-12.md
+-rw-r--r--@ 1 aminalizadeh  wheel  1323 Oct 28 01:17 memo-2026-10-19.md
+-rw-r--r--@ 1 aminalizadeh  wheel  1005 Oct 28 01:26 memo-2026-10-26.md
+-rw-r--r--@ 1 aminalizadeh  wheel   902 Oct 28 01:47 memo-2026-11-02.md
+-rw-r--r--@ 1 aminalizadeh  wheel   827 Oct 28 01:54 memo-2026-11-09.md
+

@@ -1,0 +1,11 @@
+Your answers are clear on everything except the title, which I need settled before spending any runs. Here is what I'll apply:
+- Sam's row stays with Due 2026-10-21, and I'll remove the "probably" quote from its Action cell.
+- Lee's Due stays `none`.
+- The "Present" and "Next meeting" lines come out.
+
+**Question about the title:** the rule you added (C8) says the memo's first line must be "Summary:", so a title can't go above it. The 2026-10-05 memo you accepted had no title. Which do you want?
+
+- **No title.** The memo is the Summary line, then the decisions, then the action items. I recommend this because it already matches the rule you confirmed.
+- **Title above the Summary.** I'd change C8 to allow a one-line title first, for every future memo.
+
+If you say "no title", I'll start the rework right away. It's about 5 runs, which would bring this memo to about 10 of the 12 approved.

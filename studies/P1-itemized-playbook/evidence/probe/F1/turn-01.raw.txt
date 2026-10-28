@@ -1,0 +1,14 @@
+Here is the `whoami` reply:
+
+```
+- Address: `root`; parent: `-`; role: human (root of the organization)
+- Direct reports:
+  - lead [Memo lead] idle, budget 0, open tasks 0, delegated 0, unread 0
+- Open tasks assigned to you: none
+- Work you delegated that is still outstanding: none
+
+## Charter
+(root has no charter)
+
+scheduler: stopped
+```

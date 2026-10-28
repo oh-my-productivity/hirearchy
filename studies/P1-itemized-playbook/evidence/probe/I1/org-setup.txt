@@ -1,0 +1,10 @@
+org: /private/tmp/hirearchy-p1-probe-I1-1793128490/org
+initialized organization at /private/tmp/hirearchy-p1-probe-I1-1793128490/org
+edit /private/tmp/hirearchy-p1-probe-I1-1793128490/org/ORG.md to set the mission and limits
+init exit 0
+org: /private/tmp/hirearchy-p1-probe-I1-1793128490/org
+hired lead
+hire exit 0
+org: /private/tmp/hirearchy-p1-probe-I1-1793128490/org
+defined service `probe-memo` (contract v1) for lead: lead/services/probe-memo/SERVICE.md. It has no playbook yet: lead writes v1 with revise_playbook after its first request.
+define-service exit 0

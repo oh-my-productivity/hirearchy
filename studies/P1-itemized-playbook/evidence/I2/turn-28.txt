@@ -1,0 +1,23 @@
+######## TURN 28  start 00:16:51  end 00:17:12  elapsed 21s  (local, 2026-10-28; UTC wall-clock start 2026-10-28T00:16:51Z end 2026-10-28T00:17:12Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Sam's 2026-11-13 is right.
+
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-28.stderr.txt):
+The memo for 9 Nov is at `/tmp/hirearchy-p1-I2-1793142034/deliverables/memo-2026-11-09.md`. The copy is identical to the writer's file. No rework was needed.
+
+- **C1, based on the 9 Nov notes only:** met.
+- **C2, at most 400 words:** met (142 by `wc`).
+- **C3, Decisions (3 bullets) and Actions table with Owner | Action | Due:** met.
+- **C4, a row for every commitment:** met (5 rows, including Sam's and Lee's informal ones).
+- **C5, Due dates:** met. Marta is 2026-11-11, Dev is 2026-11-20, Priya is 2026-11-16, Sam is 2026-11-13, and Lee is none.
+- **C6, nothing invented:** met.
+- **C7, reviewer's report:** met. The reviewer's line reads 8 of 8, with 8 of 8 facts verified.
+- **C8, Summary line first, then Decisions, then Actions:** met.
+- **C10, owners as the notes give them:** met.
+- **C11, initials-only owners:** met. No owner in this meeting is given only as initials.
+
+The request used 5 of the 12 runs planned, and nothing is running.
+
+The setup is ready for next week. Ask for any notes file by name, and the team applies all your rules: the Summary line, owners as the notes give them, and "(full name not in the notes)" for initials-only owners.
+
+Keep this one, or what should change?

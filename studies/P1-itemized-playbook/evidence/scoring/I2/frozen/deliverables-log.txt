@@ -1,0 +1,178 @@
+# deliverables log (protocol 7.2, D6); facts only
+
+[2026-10-27T23:12:39.254Z] call #24 turn 4 execute_bash
+COMMAND: mkdir -p /tmp/hirearchy-p1-I2-1793142034/deliverables && cp /tmp/hirearchy-p1-I2-1793142034/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-p1-I2-1793142034/deliverables/memo-2026-10-05.md && diff /tmp/hirearchy-p1-I2-1793142034/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-p1-I2-1793142034/deliverables/memo-2026-10-05.md && echo identical && ls -l /tmp/hirearchy-p1-I2-1793142034/deliverables
+source file(s): ['lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: a3571ff 2026-10-27T23:11:16Z', 'lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: a3571ff 2026-10-27T23:11:16Z']
+result: Output:
+identical
+total 8
+-rw-r--r--@ 1 aminalizadeh  wheel  729 Oct 27 23:12 memo-2026-10-05.md
+
+
+Exit Code: 0
+
+[2026-10-27T23:29:28.126Z] call #40 turn 10 execute_bash
+COMMAND: cd /tmp/hirearchy-p1-I2-1793142034 && cp org/lead/writer/work/memo-2026-10-05.md deliverables/memo-2026-10-05.md && diff org/lead/writer/work/memo-2026-10-05.md deliverables/memo-2026-10-05.md && echo identical && cat deliverables/memo-2026-10-05.md && wc -w deliverables/memo-2026-10-05.md
+source file(s): ['lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: e989720 2026-10-27T23:20:52Z', 'lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: e989720 2026-10-27T23:20:52Z']
+result: Output:
+identical
+# Platform team weekly memo, 2026-10-05
+
+Summary: The API gateway migration is pushed to the week of 26 October, Renovate is adopted, and five actions were assigned.
+
+## Decisions
+
+- Push the API gateway migration to the week of 26 October (not the week of 12 October) and use the extra time for the failing services.
+- Adopt Renovate with a weekly Monday batch of dependency PRs, starting with the three core repos and widening later if the noise is acceptable.
+
+## Actions
+
+| Owner | Action | Due |
+|-------|--------|-----|
+| Priya | Draft the RFC for the new per-key rate limiter
+
+[2026-10-27T23:36:19.039Z] call #48 turn 12 execute_bash
+COMMAND: cd /tmp/hirearchy-p1-I2-1793142034 && cp org/lead/writer/work/memo-2026-10-12.md deliverables/memo-2026-10-12.md && diff org/lead/writer/work/memo-2026-10-12.md deliverables/memo-2026-10-12.md && echo identical && cat deliverables/memo-2026-10-12.md && wc -w deliverables/memo-2026-10-12.md && ls deliverables
+source file(s): ['lead/writer/work/memo-2026-10-12.md -> org-git commit at that time: 6d3e6a9 2026-10-27T23:31:50Z', 'lead/writer/work/memo-2026-10-12.md -> org-git commit at that time: 6d3e6a9 2026-10-27T23:31:50Z']
+result: Output:
+identical
+# Platform team weekly memo, 2026-10-12
+
+Summary: The rate limiter RFC is approved with a per-API-key token bucket, the postmortem will be blameless and company-wide, a deploy freeze is set for 22 and 23 October, and five actions were assigned.
+
+## Decisions
+
+- Approve the rate limiter RFC with the token bucket per API key design, and ship it behind a feature flag first.
+- Make the postmortem for the 8 October billing outage blameless and share it with the whole company, not just engineering.
+- Hold a deploy freeze on 22 and 23 October for the customer demo.
+
+## Actions
+
+| Ow
+
+[2026-10-27T23:43:13.554Z] call #58 turn 15 execute_bash
+COMMAND: cd /tmp/hirearchy-p1-I2-1793142034 && cp org/lead/writer/work/memo-2026-10-12.md deliverables/memo-2026-10-12.md && diff org/lead/writer/work/memo-2026-10-12.md deliverables/memo-2026-10-12.md && echo identical && cat deliverables/memo-2026-10-12.md && wc -w deliverables/memo-2026-10-12.md
+source file(s): ['lead/writer/work/memo-2026-10-12.md -> org-git commit at that time: f9dfb12 2026-10-27T23:40:00Z', 'lead/writer/work/memo-2026-10-12.md -> org-git commit at that time: f9dfb12 2026-10-27T23:40:00Z']
+result: Output:
+identical
+# Platform team weekly memo, 2026-10-12
+
+Summary: The rate limiter RFC is approved with a per-API-key token bucket, the postmortem will be blameless and company-wide, a deploy freeze is set for 22 and 23 October, and five actions were assigned.
+
+## Decisions
+
+- Approve the rate limiter RFC with the token bucket per API key design, and ship it behind a feature flag first.
+- Make the postmortem for the 8 October billing outage blameless and share it with the whole company, not just engineering.
+- Hold a deploy freeze on 22 and 23 October for the customer demo.
+
+## Actions
+
+| Ow
+
+[2026-10-27T23:50:59.926Z] call #71 turn 17 execute_bash
+COMMAND: cd /tmp/hirearchy-p1-I2-1793142034 && cp org/lead/writer/work/memo-2026-10-19.md deliverables/memo-2026-10-19.md && diff org/lead/writer/work/memo-2026-10-19.md deliverables/memo-2026-10-19.md && echo identical && wc -w deliverables/memo-2026-10-19.md && ls deliverables
+source file(s): ['lead/writer/work/memo-2026-10-19.md -> org-git commit at that time: a61baa6 2026-10-27T23:49:31Z', 'lead/writer/work/memo-2026-10-19.md -> org-git commit at that time: a61baa6 2026-10-27T23:49:31Z']
+result: Output:
+identical
+     175 deliverables/memo-2026-10-19.md
+memo-2026-10-05.md
+memo-2026-10-12.md
+memo-2026-10-19.md
+
+
+Exit Code: 0
+
+[2026-10-27T23:55:55.971Z] call #80 turn 19 execute_bash
+COMMAND: cd /tmp/hirearchy-p1-I2-1793142034 && cp org/lead/writer/work/memo-2026-10-26.md deliverables/memo-2026-10-26.md && diff org/lead/writer/work/memo-2026-10-26.md deliverables/memo-2026-10-26.md && echo identical && wc -w deliverables/memo-2026-10-26.md && ls deliverables
+source file(s): ['lead/writer/work/memo-2026-10-26.md -> org-git commit at that time: a73237b 2026-10-27T23:53:08Z', 'lead/writer/work/memo-2026-10-26.md -> org-git commit at that time: a73237b 2026-10-27T23:53:08Z']
+result: Output:
+identical
+     170 deliverables/memo-2026-10-26.md
+memo-2026-10-05.md
+memo-2026-10-12.md
+memo-2026-10-19.md
+memo-2026-10-26.md
+
+
+Exit Code: 0
+
+[2026-10-28T00:02:04.869Z] call #92 turn 22 execute_bash
+COMMAND: cd /tmp/hirearchy-p1-I2-1793142034 && cp org/lead/writer/work/memo-2026-10-26.md deliverables/memo-2026-10-26.md && diff org/lead/writer/work/memo-2026-10-26.md deliverables/memo-2026-10-26.md && echo identical && wc -w deliverables/memo-2026-10-26.md && ls deliverables
+source file(s): ['lead/writer/work/memo-2026-10-26.md -> org-git commit at that time: 4841cd4 2026-10-27T23:59:26Z', 'lead/writer/work/memo-2026-10-26.md -> org-git commit at that time: 4841cd4 2026-10-27T23:59:26Z']
+result: Output:
+identical
+     170 deliverables/memo-2026-10-26.md
+memo-2026-10-05.md
+memo-2026-10-12.md
+memo-2026-10-19.md
+memo-2026-10-26.md
+
+
+Exit Code: 0
+
+[2026-10-28T00:07:05.568Z] call #100 turn 24 execute_bash
+COMMAND: cd /tmp/hirearchy-p1-I2-1793142034 && cp org/lead/writer/work/memo-2026-11-02.md deliverables/memo-2026-11-02.md && diff org/lead/writer/work/memo-2026-11-02.md deliverables/memo-2026-11-02.md && echo identical && wc -w deliverables/memo-2026-11-02.md && cat deliverables/memo-2026-11-02.md && ls deliverables
+source file(s): ['lead/writer/work/memo-2026-11-02.md -> org-git commit at that time: dee803a 2026-10-28T00:04:17Z', 'lead/writer/work/memo-2026-11-02.md -> org-git commit at that time: dee803a 2026-10-28T00:04:17Z']
+result: Output:
+identical
+     169 deliverables/memo-2026-11-02.md
+# Platform team weekly memo, 2026-11-02
+
+Summary: The old gateway stays as a fallback until 13 November, the rate limiter goes to all plans on 16 November, the deck goes to the customer this week, and five actions were assigned.
+
+## Decisions
+
+- Keep the old gateway running as a fallback until Friday 13 November, then switch it off.
+- Roll out the rate limiter to all plans from Monday 16 November.
+- Send the customer the quarterly review deck this week rather than wait for the review itself.
+
+## Actions
+
+| Owner | Action | Due |
+|-----
+
+[2026-10-28T00:12:16.458Z] call #108 turn 26 execute_bash
+COMMAND: cd /tmp/hirearchy-p1-I2-1793142034 && cp org/lead/writer/work/memo-2026-11-02.md deliverables/memo-2026-11-02.md && diff org/lead/writer/work/memo-2026-11-02.md deliverables/memo-2026-11-02.md && echo identical && wc -w deliverables/memo-2026-11-02.md
+source file(s): ['lead/writer/work/memo-2026-11-02.md -> org-git commit at that time: febd4df 2026-10-28T00:10:38Z', 'lead/writer/work/memo-2026-11-02.md -> org-git commit at that time: febd4df 2026-10-28T00:10:38Z']
+result: Output:
+identical
+     175 deliverables/memo-2026-11-02.md
+
+
+Exit Code: 0
+
+[2026-10-28T00:17:07.630Z] call #115 turn 28 execute_bash
+COMMAND: cd /tmp/hirearchy-p1-I2-1793142034 && cp org/lead/writer/work/memo-2026-11-09.md deliverables/memo-2026-11-09.md && diff org/lead/writer/work/memo-2026-11-09.md deliverables/memo-2026-11-09.md && echo identical && wc -w deliverables/memo-2026-11-09.md && ls deliverables
+source file(s): ['lead/writer/work/memo-2026-11-09.md -> org-git commit at that time: 90d88e9 2026-10-28T00:14:27Z', 'lead/writer/work/memo-2026-11-09.md -> org-git commit at that time: 90d88e9 2026-10-28T00:14:27Z']
+result: Output:
+identical
+     142 deliverables/memo-2026-11-09.md
+memo-2026-10-05.md
+memo-2026-10-12.md
+memo-2026-10-19.md
+memo-2026-10-26.md
+memo-2026-11-02.md
+memo-2026-11-09.md
+
+
+Exit Code: 0
+
+any other write into the deliverable folder (not by the assistant): none can be seen from the assistant session; the folder holds:
+  memo-2026-10-05.md size 855 mtime 23:29:28 local md5 6fef99ccc75a588b87ea1fc8f2855763
+  memo-2026-10-12.md size 954 mtime 23:43:13 local md5 eebd2c13329426ae2169876fdf844dba
+  memo-2026-10-19.md size 938 mtime 23:50:59 local md5 12b0f0e5406115de22cf3bf1b4f2bd37
+  memo-2026-10-26.md size 933 mtime 00:02:04 local md5 63742547ba44e2b216211cbd0acb17e5
+  memo-2026-11-02.md size 922 mtime 00:12:16 local md5 cc3fce30b979ff0bb467b4c95ef4ef55
+  memo-2026-11-09.md size 779 mtime 00:17:07 local md5 71bcfc0fd0c6f299b87f4554cd052450
+
+final ls -la:
+total 48
+drwxr-xr-x@ 8 aminalizadeh  wheel  256 Oct 28 00:17 .
+drwxr-xr-x@ 7 aminalizadeh  wheel  224 Oct 27 23:13 ..
+-rw-r--r--@ 1 aminalizadeh  wheel  855 Oct 27 23:29 memo-2026-10-05.md
+-rw-r--r--@ 1 aminalizadeh  wheel  954 Oct 27 23:43 memo-2026-10-12.md
+-rw-r--r--@ 1 aminalizadeh  wheel  938 Oct 27 23:50 memo-2026-10-19.md
+-rw-r--r--@ 1 aminalizadeh  wheel  933 Oct 28 00:02 memo-2026-10-26.md
+-rw-r--r--@ 1 aminalizadeh  wheel  922 Oct 28 00:12 memo-2026-11-02.md
+-rw-r--r--@ 1 aminalizadeh  wheel  779 Oct 28 00:17 memo-2026-11-09.md
+

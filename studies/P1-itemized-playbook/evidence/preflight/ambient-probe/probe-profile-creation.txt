@@ -1,0 +1,1 @@
+profile created 2026-10-27T17:24:37Z: ~/.kiro/agents/hirearchy-study-p1-ambient-probe.json md5 8b7e4dcb57d75a0cf33acdccf352a342

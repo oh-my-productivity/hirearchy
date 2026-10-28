@@ -1,0 +1,39 @@
+[INFO] kas.server.starting {"product":"KAS (Kiro Agent Server)","version":"0.66.48"}
+[INFO] Auth: KIRO_API_KEY env var (api_key) {"regionDiscovery":true}
+[INFO] acp.content_collection.resolved {"enabled":false}
+[INFO] acp.remote_sessions.enabled {"endpoint":"https://app.kiro.dev"}
+[INFO] [KiroAgent] MCP subsystem initialized
+[ERROR] (node:32369) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+[INFO] fs.workflow.recipes.readDir.ok {"system":"fs","tier":"user","durationMs":1}
+[INFO] fs.workflow.recipes.readDir.ok {"system":"fs","tier":"cloud","durationMs":4}
+[INFO] fs.workflow.recipeCatalog.refreshShared.ok {"system":"fs","trigger":"startup","durationMs":6}
+[tool] @hirearchy/feedback
+[tool] status: InProgress
+[tool] status: Completed
+[tool] @hirearchy/request
+[tool] status: InProgress
+[tool] status: Completed
+[tool] @hirearchy/start
+[tool] status: InProgress
+[tool] status: Completed
+[tool] @hirearchy/progress
+[tool] status: InProgress
+[tool] @hirearchy/inbox
+[tool] status: InProgress
+[tool] status: Completed
+[tool] Read File
+[tool] status: InProgress
+[tool] status: Completed
+[tool] Show the draft memo
+[tool] status: InProgress
+[tool] status: InProgress
+[tool] status: Failed: Show the draft memo
+[tool] status: Completed
+[tool] @hirearchy/inbox
+[tool] status: InProgress
+[tool] status: Completed
+[tool] Show the draft memo
+[tool] status: InProgress
+[tool] status: InProgress
+[tool] status: Completed

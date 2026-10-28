@@ -1,0 +1,50 @@
+##### setup_stream.sh F1 --dry-run  2026-10-27T17:23:59Z
+gate: protocol.md md5 = protocol.md5: OK (70237b0f3a829795a89d81c8eba7a7d6)
+gate: MD5SUMS lines: OK (64 lines, no mismatch)
+gate: HEAD = 8bf7c69b: OK (8bf7c69bb933bf2e1ecda5dc4ddbefde41eba565)
+gate: freeze diff empty: OK (git diff --stat 8bf7c69b HEAD -- src skills pyproject.toml uv.lock)
+gate: repo SKILL.md md5: OK (b10238639f48ab351fa44a06aed03ffb)
+gate: global SKILL.md absent or = repo: OK (b10238639f48ab351fa44a06aed03ffb)
+gate: KIRO_HOME unset in this shell: OK
+gate: claude-sonnet-5.5 listed: (not checked in --dry-run: would run kiro-cli chat --list-models)
+memories gate: no previous stream before F1: nothing to compare (memories.db f0aaf02a8a216c3a291a253d2c52d461)
+DRY-RUN setup_stream.sh F1 (nothing is created or written)
+arm: F
+S=/tmp/hirearchy-p1-F1-1793121839   (epoch 1793121839; S/org is NOT created)
+DRY-RUN: mkdir /Volumes/workspace/hirearchy/studies/P1-itemized-playbook/evidence/F1; write sandbox-path.txt, epoch.txt, arm.txt, stream-start-utc.txt
+DRY-RUN: safety-snapshot.sh "F1 before" > /Volumes/workspace/hirearchy/studies/P1-itemized-playbook/evidence/F1/safety-before.txt
+DRY-RUN: write the memories gate's md5 (f0aaf02a8a216c3a291a253d2c52d461) to /Volumes/workspace/hirearchy/studies/P1-itemized-playbook/evidence/F1/memories-md5-before.txt and its line to memories-db.txt
+DRY-RUN: ambient_snapshot.sh "F1 setup"  > /Volumes/workspace/hirearchy/studies/P1-itemized-playbook/evidence/F1/ambient/setup.txt
+DRY-RUN: mkdir /tmp/hirearchy-p1-F1-1793121839/notes /tmp/hirearchy-p1-F1-1793121839/.kiro/skills/hirearchy /tmp/hirearchy-p1-F1-1793121839/.kiro/settings
+DRY-RUN: cp -p /Volumes/workspace/hirearchy/studies/P1-itemized-playbook/evidence/notes/* /tmp/hirearchy-p1-F1-1793121839/notes/
+DRY-RUN: cp -p /Volumes/workspace/hirearchy/skills/hirearchy/SKILL.md /tmp/hirearchy-p1-F1-1793121839/.kiro/skills/hirearchy/SKILL.md   (md5 b10238639f48ab351fa44a06aed03ffb)
+DRY-RUN: cp -p /Volumes/workspace/hirearchy/studies/P1-itemized-playbook/evidence/harness/workspace-cli.json /tmp/hirearchy-p1-F1-1793121839/.kiro/settings/cli.json
+DRY-RUN: profile /Users/aminalizadeh/.kiro/agents/hirearchy-study-p1-F1-assistant.json from /Volumes/workspace/hirearchy/studies/P1-itemized-playbook/evidence/harness/profile-template.json (<LABEL> -> F1, <epoch> -> 1793121839; ORG_ROOT /tmp/hirearchy-p1-F1-1793121839/org)
+DRY-RUN: copy the profile to /Volumes/workspace/hirearchy/studies/P1-itemized-playbook/evidence/F1/profiles/; append name, md5, UTC to /Volumes/workspace/hirearchy/studies/P1-itemized-playbook/evidence/F1/profiles/creations.txt
+DRY-RUN: model_check.sh listed F1; write /Volumes/workspace/hirearchy/studies/P1-itemized-playbook/evidence/F1/setup.txt; zsh /Volumes/workspace/hirearchy/studies/P1-itemized-playbook/evidence/harness/skill_check.sh F1 setup (writes /Volumes/workspace/hirearchy/studies/P1-itemized-playbook/evidence/F1/skill-check.txt)
+exit 0
+##### setup_stream.sh I1 --dry-run  2026-10-27T17:23:59Z
+gate: protocol.md md5 = protocol.md5: OK (70237b0f3a829795a89d81c8eba7a7d6)
+gate: MD5SUMS lines: OK (64 lines, no mismatch)
+gate: HEAD = 8bf7c69b: OK (8bf7c69bb933bf2e1ecda5dc4ddbefde41eba565)
+gate: freeze diff empty: OK (git diff --stat 8bf7c69b HEAD -- src skills pyproject.toml uv.lock)
+gate: repo SKILL.md md5: OK (b10238639f48ab351fa44a06aed03ffb)
+gate: global SKILL.md absent or = repo: OK (b10238639f48ab351fa44a06aed03ffb)
+gate: KIRO_HOME unset in this shell: OK
+gate: claude-sonnet-5.5 listed: (not checked in --dry-run: would run kiro-cli chat --list-models)
+memories gate: no previous stream before I1: nothing to compare (memories.db f0aaf02a8a216c3a291a253d2c52d461)
+DRY-RUN setup_stream.sh I1 (nothing is created or written)
+arm: I
+S=/tmp/hirearchy-p1-I1-1793121839   (epoch 1793121839; S/org is NOT created)
+DRY-RUN: mkdir /Volumes/workspace/hirearchy/studies/P1-itemized-playbook/evidence/I1; write sandbox-path.txt, epoch.txt, arm.txt, stream-start-utc.txt
+DRY-RUN: safety-snapshot.sh "I1 before" > /Volumes/workspace/hirearchy/studies/P1-itemized-playbook/evidence/I1/safety-before.txt
+DRY-RUN: write the memories gate's md5 (f0aaf02a8a216c3a291a253d2c52d461) to /Volumes/workspace/hirearchy/studies/P1-itemized-playbook/evidence/I1/memories-md5-before.txt and its line to memories-db.txt
+DRY-RUN: ambient_snapshot.sh "I1 setup"  > /Volumes/workspace/hirearchy/studies/P1-itemized-playbook/evidence/I1/ambient/setup.txt
+DRY-RUN: mkdir /tmp/hirearchy-p1-I1-1793121839/notes /tmp/hirearchy-p1-I1-1793121839/.kiro/skills/hirearchy /tmp/hirearchy-p1-I1-1793121839/.kiro/settings
+DRY-RUN: cp -p /Volumes/workspace/hirearchy/studies/P1-itemized-playbook/evidence/notes/* /tmp/hirearchy-p1-I1-1793121839/notes/
+DRY-RUN: cp -p /Volumes/workspace/hirearchy/skills/hirearchy/SKILL.md /tmp/hirearchy-p1-I1-1793121839/.kiro/skills/hirearchy/SKILL.md   (md5 b10238639f48ab351fa44a06aed03ffb)
+DRY-RUN: cp -p /Volumes/workspace/hirearchy/studies/P1-itemized-playbook/evidence/harness/workspace-cli.json /tmp/hirearchy-p1-I1-1793121839/.kiro/settings/cli.json
+DRY-RUN: profile /Users/aminalizadeh/.kiro/agents/hirearchy-study-p1-I1-assistant.json from /Volumes/workspace/hirearchy/studies/P1-itemized-playbook/evidence/harness/profile-template.json (<LABEL> -> I1, <epoch> -> 1793121839; ORG_ROOT /tmp/hirearchy-p1-I1-1793121839/org)
+DRY-RUN: copy the profile to /Volumes/workspace/hirearchy/studies/P1-itemized-playbook/evidence/I1/profiles/; append name, md5, UTC to /Volumes/workspace/hirearchy/studies/P1-itemized-playbook/evidence/I1/profiles/creations.txt
+DRY-RUN: model_check.sh listed I1; write /Volumes/workspace/hirearchy/studies/P1-itemized-playbook/evidence/I1/setup.txt; zsh /Volumes/workspace/hirearchy/studies/P1-itemized-playbook/evidence/harness/skill_check.sh I1 setup (writes /Volumes/workspace/hirearchy/studies/P1-itemized-playbook/evidence/I1/skill-check.txt)
+exit 0

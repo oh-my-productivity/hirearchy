@@ -1,0 +1,20 @@
+######## TURN 12  start 20:17:08  end 20:23:06  elapsed 358s  (local, 2026-10-27; UTC wall-clock start 2026-10-27T20:17:08Z end 2026-10-27T20:23:06Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Yes, add it. I don't know anything about that rework - I didn't ask for it.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-12.stderr.txt):
+The memo now shows owners as initials. The reviewer passed all 10 checks, and I haven't copied it to `deliverables` yet because of two points in the notes.
+
+| Owner | Action | Due |
+|---|---|---|
+| D | Write the postmortem for the Oct 8 outage | 2026-10-14 |
+| M | Send the demo agenda to the customer | 2026-10-16 |
+| P | Start implementing the rate limiter behind a feature flag | 2026-10-20 |
+| S | Sort out the out-of-date staging test data so it is ready the day before the freeze starts | 2026-10-21 |
+| L | Carry the pager during the demo week by swapping shifts with Dev | none |
+
+1. **Lee's row.** The Action text still says "swapping shifts with Dev". That is a full name, but it is outside the Owner column. Keep it as is, or change it to "swapping shifts with D"?
+2. **Marta's Due.** I kept `2026-10-16` because the notes say "by Oct 16". The demo itself is the week of 19 October. Keep `2026-10-16`?
+
+If you answer "keep" to both, I deliver this version now at no extra cost. Changing Lee's cell would take about 5 more runs. This case is at 11 of its 12 runs, so that would be about 4 over what you approved, and I'd need your OK on that number first.
+
+The 5 October memo is unchanged.

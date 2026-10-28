@@ -1,0 +1,7 @@
+Here is the reply from `hirearchy::services`:
+
+```
+No services yet. A parent defines a standing service for a direct report with define_service(owner, name, description, acceptance, deliverable, budget, inputs): the contract. Then request(service, inputs) asks for it, and feedback(task_id, verdict) tells the owner how it went.
+```
+
+No standing services are defined yet. To add one, use `define_service` to set up a contract with `lead`. After that, `request` asks for the service and `feedback` rates the result.

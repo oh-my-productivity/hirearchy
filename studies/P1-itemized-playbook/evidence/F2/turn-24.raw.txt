@@ -1,0 +1,18 @@
+The 2026-11-09 memo is at `/tmp/hirearchy-p1-F2-1793146944/deliverables/2026-11-09-memo.md`. I checked that the copy matches the team's file.
+
+- C1, at most 400 words: met (126 by the team's count, 156 by `wc`).
+- C2, covers only the 2026-11-09 meeting: met.
+- C3, all three decisions listed and nothing extra: met.
+- C4, table columns Owner | Action | Due: met.
+- C5, all five commitments are rows, including Sam's and Lee's prose ones: met.
+- C6, ISO dates or `none`: met (Marta 2026-11-11, Dev 2026-11-20, Priya 2026-11-16, Sam 2026-11-13, Lee `none`).
+- C7, reviewer passed 9 of 9: met.
+- C9, title, Summary line, Decisions and action table, nothing else: met.
+- C11, Owner column shows names as written in the notes: met.
+- C12, initials-only owners: not triggered, since everyone in these notes has a name.
+
+Sam's "by Friday" became 2026-11-13, the Friday after Monday 9 November, as you ruled for the same wording in earlier weeks. The team asked about it again, and I treated that as already settled.
+
+Runs: 9 of the 12 approved. The first writer pass left Sam's date as `none`, and the reviewer sent it back for one rework.
+
+Keep it, or what should change?

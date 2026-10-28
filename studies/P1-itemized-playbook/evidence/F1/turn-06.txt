@@ -1,0 +1,10 @@
+######## TURN 6  start 20:00:39  end 20:01:40  elapsed 61s  (local, 2026-10-27; UTC wall-clock start 2026-10-27T20:00:39Z end 2026-10-27T20:01:40Z; exit code 0)
+######## LENA (prompt sent verbatim):
+No, not right yet. And Marta's room is for the training on the 14th, so I want 2026-10-14 there. And always start the memo with a one-line 'Summary:' of the meeting, then the decisions, then the action items.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-06.stderr.txt):
+Your "not right yet" is recorded as a rejection of the delivered memo. The only thing the team got wrong is Marta's Due date.
+
+About C6: add "When an action is for a dated event, Due is the date of that event (for example, the room is for the training on the 14th, so Due is 2026-10-14)" as a lasting rule? Yes or no.
+
+- **Summary line:** I've noted that you want a one-line "Summary:" first, then Decisions, then Action items. That changes check C1, which currently says "exactly two sections and nothing else". I'll make that change after you answer the question above, and I won't change anything this turn.
+- **Cost:** Redoing the memo with both changes would take about 5 more runs. The case is already at 14 runs against the 12 you set, so I won't send anything back without your OK on that number.

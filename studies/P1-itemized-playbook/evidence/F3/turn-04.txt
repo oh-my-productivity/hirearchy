@@ -1,0 +1,8 @@
+######## TURN 4  start 02:10:54  end 02:11:19  elapsed 25s  (local, 2026-10-28; UTC wall-clock start 2026-10-28T02:10:54Z end 2026-10-28T02:11:19Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Sam's should be 2026-10-09. Marta's should be 2026-10-14.
+
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-04.stderr.txt):
+Your two dates need a rework, and that goes past the 12-run budget. 10 runs are used. The team needs about 5 more: the lead plans, the writer fixes the two dates, the reviewer re-checks, and the lead does a final check. That would bring this memo to about 15 of 12.
+
+Can I grant 5 more runs? If you say yes, I'll give the lead the runs and start the rework. The memo is only copied to `deliverables/` once the reviewer has passed it again.

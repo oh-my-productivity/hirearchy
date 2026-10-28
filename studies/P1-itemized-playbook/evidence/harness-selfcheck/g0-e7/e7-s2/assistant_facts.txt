@@ -1,0 +1,81 @@
+# assistant facts: s2 (arm e7; facts only, judged measures are not here)
+
+ask_first_copies: 1 of 3
+assistant_credits: 19.3269
+assistant_seconds: 1173
+boundary_failure_files: 0
+copies: 3
+d1_never_recorded: 0 of 1
+d23_about_differs: 0 of 1
+d23_without_reading: 0 of 1
+deliverable_notes: 0
+delivered_without_verdict: 0 of 3
+facade_refusals: 0
+flagged_items: 11
+flagged_needs_d5: 4
+flagged_never_copied: 0
+flagged_notes: 0
+flagged_questions: 11
+flagged_results: 3
+flagged_superseded: 7
+grants: 1
+hand_edits: 0 of 3
+held_replies: 1
+human_rejects: 1
+human_reworks: 2
+human_reworks_without_budget: 2
+inbox_calls: 5
+lasis_accepted: 1 of 1
+lasis_uses: 1
+lena_keep_l_budget_q: 0
+lena_yes_h4: 0
+m_c_8: 12 of 12
+memo1_turns: 6
+memo2_turns: 3
+memo3_turns: 3
+org_credits_outside: 27.467
+org_credits_window: 4.611
+org_runs_outside: 29
+org_runs_window: 5
+org_seconds_outside: 1200
+org_seconds_window: 174
+other_refusals: 0
+p2_refusals: 1
+p2_unrated: 1
+p4_refusals: 0
+plans: 1
+plans_with_budget_line: 0 of 1
+relayed_reworks_by_assistant: 0
+root_unread_at_end: 0
+run_end_killed: 0
+run_orphan: 0
+scheduler_signals: 0
+schedulers_assistant: 5
+schedulers_running_at_turn_end: 0 of 5
+schedulers_script: 1
+schedulers_total: 6
+schedulers_with_exit: 6 of 6
+shell_commands: 4
+shell_reads: 0
+skill_stratum: A
+sleep_entries: 12
+survival_pairs: n/a (0 of 0)
+topup_replies: 1
+turns_showing_budget_line: 0
+unexplained_signals: n/a (0 of 0)
+user_turns: 12
+wall_seconds: 1973
+wall_time: 32:53
+
+flagged items (class by D7; the D5 judgement is the scorer's):
+- 20261025T074917047599-lead-d5c7 [question] case 2026-10-05: superseded (copy #28 turn 5): C5, Marta: 'Book the on-call training room for Oct 14' has Due 'none'. Reviewer: Oct 14 is a date in the notes but the t
+- 20261025T074917047599-lead-d5c7 [question] case 2026-10-05: superseded (copy #28 turn 5): C5, Sam: 'before Friday' read strictly as 2026-10-08 (memo); inclusive reading would be 2026-10-09. Reviewer took strict
+- 20261025T074917047599-lead-d5c7 [question] case 2026-10-05: superseded (copy #28 turn 5): C5, Lee: 'this week' with 'no hard date attached' gives Due 'none'. Reviewer accepts none.
+- 20261025T074917047599-lead-d5c7 [question] case 2026-10-05: superseded (copy #28 turn 5): C2/C3, Lee: 'We agreed Lee would ping the vendor' is listed once, as an action, not a decision.
+- 20261025T080407667524-lead-433a [question] case 2026-10-12: needs D5 judgement (copy at T) (copy #43 turn 9): C3: Sam's staging item is hedged ("will probably sort it out himself"). It is a row with Due 2026-10-21. Reviewer: "the 
+- 20261025T080407667524-lead-433a [question] case 2026-10-12: needs D5 judgement (copy at T) (copy #43 turn 9): C3: Sam's CI runner-image fix has no row. Reviewer: "a status, nobody said they would do it".
+- 20261025T080407667524-lead-433a [question] case 2026-10-12: needs D5 judgement (copy at T) (copy #43 turn 9): C5: Lee's "swap shifts with Dev" during the demo week has Due none. Reviewer: "'during the demo week' is a period, not a
+- 20261025T080407667524-lead-433a [question] case 2026-10-12: needs D5 judgement (copy at T) (copy #43 turn 9): C2: the swap and the CI update are not in Decisions (notes: "Nobody had a problem with that"; no CI decision).
+- 20261025T081037538558-lead-f890 [question] case 2026-10-19: superseded (copy #55 turn 11): Marta 'will keep the agenda as sent' (C3): included as an action row, due none; reviewer says it could be read as a stat
+- 20261025T081037538558-lead-f890 [question] case 2026-10-19: superseded (copy #55 turn 11): Lee 'probably by end of next week' (C3/C5): hedged, relative period; Due set to none; reviewer says C5 can be read as re
+- 20261025T081037538558-lead-f890 [question] case 2026-10-19: superseded (copy #55 turn 11): Sam 'offered to pair with Jo ... during that first week' (C3/C5): hedged offer kept as a row; Due none (period).

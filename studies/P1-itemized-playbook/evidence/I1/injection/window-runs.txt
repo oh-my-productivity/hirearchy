@@ -1,0 +1,85 @@
+# window runs (protocol 5.4): runs that started in the injection window 2026-10-27T21:39:48Z .. 2026-10-27T21:42:43Z; injected task 20261027T213948671524-root-440b; revised (memo 1) task 20261027T213515405057-root-b506
+
+## run lead@20261027T213948915836 agent=lead model=claude-sonnet-5.5 start=2026-10-27T21:39:48.928474+00:00 end=2026-10-27T21:40:41.402195+00:00 exit=0 secs=52 session=sess_c294c313-d4d1-460c-a23d-e05847db0f09
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 12
+  lead message 20261027T214034505857-lead-ac6f to=lead/writer type=task status=None created=2026-10-27T21:40:34+00:00
+  ## Lessons: (none)
+  org-git commit 2be3d63 MEMORY.md diff:
+    commit 2be3d6324eb6da96c2d4411992d2d1ef841ae95d
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Tue Oct 27 21:40:41 2026 +0000
+    
+        lead: run ok, 1 message(s) [lead/runs/20261027T213948915836.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index dff6d16..1e10905 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,2 +1,4 @@
+     # Memory
+    -Memo 2026-10-05 (weekly-meeting-memo): finished. Tasks b506 and 7ca1 both reported DONE (reviewer: criteria met 10 of 10, on client-ruled C6). Final memo lead/writer/work/memo-2026-10-05.md (109 words). Nothing open, no waiting. Lesson: for relative dates ("before Friday", "for Oct 14") ask client early.
+    +Memo 2026-10-05: first request done earlier (b506/7ca1). Rework task 440b (root, revises b506) open: Sam & Marta Due -> none + Open questions section.
+    +Delegated writer rework (revises e237, budget 1). NEXT: when writer reports, read lead/writer/work/memo-2026-10-05.md, then delegate lead/reviewer (budget 1, revises 20261027T213649138159-lead-12c1) to re-check EVERY Due value vs notes, copying C1-C10 verbatim and client note; then verify, report 440b done with reviewer's coverage line verbatim, lessons.
+    +Lesson: for relative dates ("before Friday", "for Oct 14") do not resolve; use none + Open questions.
+    \ No newline at end of file
+
+## run lead/writer@20261027T214035325258 agent=lead-writer model=claude-sonnet-5.5 start=2026-10-27T21:40:35.339745+00:00 end=2026-10-27T21:41:09.766967+00:00 exit=0 secs=34 session=sess_f376a83b-4a66-4a0a-8034-887510cd7407
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 6
+
+## run lead@20261027T214103658184 agent=lead model=claude-sonnet-5.5 start=2026-10-27T21:41:03.689595+00:00 end=2026-10-27T21:41:32.034732+00:00 exit=0 secs=28 session=sess_1c6541e7-83d1-4846-b8e4-fbe20e6245cc
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 2
+  lead message 20261027T214125252259-lead-d7d9 to=lead/reviewer type=task status=None created=2026-10-27T21:41:25+00:00
+  ## Lessons: (none)
+  org-git commit 8b45058 MEMORY.md diff:
+    commit 8b450581f70693b39b25ca2ad4969fa5edb0891e
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Tue Oct 27 21:41:32 2026 +0000
+    
+        lead: run ok, 1 message(s) [lead/runs/20261027T214103658184.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index 1e10905..a22657f 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,4 +1,5 @@
+     # Memory
+     Memo 2026-10-05: first request done earlier (b506/7ca1). Rework task 440b (root, revises b506) open: Sam & Marta Due -> none + Open questions section.
+    -Delegated writer rework (revises e237, budget 1). NEXT: when writer reports, read lead/writer/work/memo-2026-10-05.md, then delegate lead/reviewer (budget 1, revises 20261027T213649138159-lead-12c1) to re-check EVERY Due value vs notes, copying C1-C10 verbatim and client note; then verify, report 440b done with reviewer's coverage line verbatim, lessons.
+    -Lesson: for relative dates ("before Friday", "for Oct 14") do not resolve; use none + Open questions.
+    \ No newline at end of file
+    +Writer rework done (memo 151 words, I read it: Dues Priya 10-09, Dev 10-08, Sam/Marta/Lee none, Open questions present). Delegated reviewer re-check (budget 1, revises 20261027T213649138159-lead-12c1).
+    +NEXT: when reviewer reports, read its report; if criteria met 10 of 10 and Due values all verified, report 440b done with reviewer's coverage line verbatim + lessons (path lead/writer/work/memo-2026-10-05.md). If it fails: report blocked with options.
+    +Lesson: for relative dates ("before Friday", "for Oct 14") do not resolve; use none + Open questions.
+
+## run lead/reviewer@20261027T214125943407 agent=lead-reviewer model=claude-sonnet-5.5 start=2026-10-27T21:41:25.961732+00:00 end=2026-10-27T21:42:08.562169+00:00 exit=0 secs=43 session=sess_61e60aa0-a149-4f63-b9da-9f629326ecf1
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 4
+
+## run lead@20261027T214202443933 agent=lead model=claude-sonnet-5.5 start=2026-10-27T21:42:02.482611+00:00 end=2026-10-27T21:42:32.868963+00:00 exit=0 secs=30 session=sess_2af607ff-fe2f-43f1-bb07-1ac3e284dfb6
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 3
+  lead message 20261027T214226096604-lead-deb8 to=root type=result status=done created=2026-10-27T21:42:26+00:00
+  ## Lessons: Near miss: relative dates ("before Friday") and event dates ("book the room for Oct 14") were first resolved into Due values. Prevent: Due = ISO only for a stated deadline; otherwise none plus an Open questions line; reviewer re-checks every Due against the notes text.
+  org-git commit a1586dd MEMORY.md diff:
+    commit a1586ddbe96746830b8f1f7603addd1e87a7659d
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Tue Oct 27 21:42:32 2026 +0000
+    
+        lead: run ok, 1 message(s) [lead/runs/20261027T214202443933.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index a22657f..dc10df5 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,5 +1,3 @@
+     # Memory
+    -Memo 2026-10-05: first request done earlier (b506/7ca1). Rework task 440b (root, revises b506) open: Sam & Marta Due -> none + Open questions section.
+    -Writer rework done (memo 151 words, I read it: Dues Priya 10-09, Dev 10-08, Sam/Marta/Lee none, Open questions present). Delegated reviewer re-check (budget 1, revises 20261027T213649138159-lead-12c1).
+    -NEXT: when reviewer reports, read its report; if criteria met 10 of 10 and Due values all verified, report 440b done with reviewer's coverage line verbatim + lessons (path lead/writer/work/memo-2026-10-05.md). If it fails: report blocked with options.
+    -Lesson: for relative dates ("before Friday", "for Oct 14") do not resolve; use none + Open questions.
+    +Memo 2026-10-05: rework task 440b reported done (reviewer 10 of 10, Due values 5 of 5). Nothing open. No further action unless new request/feedback.
+    +Lesson: for relative dates ("before Friday") or event dates ("book room for Oct 14") do not resolve; use Due none + Open questions section.
+

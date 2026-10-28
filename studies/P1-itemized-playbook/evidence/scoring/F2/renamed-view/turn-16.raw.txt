@@ -1,0 +1,17 @@
+The 2026-10-19 memo is at `/tmp/hirearchy-p1-F2-1793146944/deliverables/2026-10-19-memo.md`. I checked that the copy matches the team's file.
+
+- C1, at most 400 words: met (208 by the team's count, 238 by `wc`).
+- C2, covers only the 2026-10-19 meeting: met.
+- C3, all three decisions listed and nothing extra: met.
+- C4, table columns Owner | Action | Due: met.
+- C5, every commitment is a row: met, with Marta's "keep the agenda as sent" left out as you ruled.
+- C6, ISO dates or `none`: met. Lee is 2026-10-30, Marta 2026-10-23, Dev 2026-10-24 and Priya 2026-10-26. Sam is `none`.
+- C7, reviewer passed with no required changes: met.
+- C9, title, Summary line, Decisions and action table, nothing else: met. The Summary says five action items, matching the five rows.
+- C10, Owner column shows initials only: met (L, M, D, P, S).
+
+The reviewer noted that two of your rulings, Lee's date and removing Marta's row, go beyond a literal reading of C5 and C6. I treated both as your decisions.
+
+Runs: 14 for this memo (9 for the first pass and its internal rework, 5 for your rulings). That is the 12 approved plus the 2 extra you agreed to.
+
+Keep it, or what should change?

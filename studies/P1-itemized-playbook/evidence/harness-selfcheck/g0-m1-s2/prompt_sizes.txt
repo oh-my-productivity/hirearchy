@@ -1,0 +1,34 @@
+prompt_sizes m1-s2: owner lead (detected from root tasks), 26 runs
+
+prompt bytes: first 20537, max 32822, last 27606, last minus first 7069
+Reflect section words: min 505, max 578 (3 sections)
+reference E3: 20.2 KB -> 29.9 KB, 452-679 words
+
+  20261026T065738755263  bytes=20537  reflect=no  reflect_words=0
+  20261026T065835408298  bytes=24050  reflect=no  reflect_words=0
+  20261026T065954239239  bytes=24866  reflect=no  reflect_words=0
+  20261026T070058936941  bytes=25084  reflect=no  reflect_words=0
+  20261026T070151560711  bytes=24375  reflect=no  reflect_words=0
+  20261026T070446685785  bytes=23113  reflect=no  reflect_words=0
+  20261026T070553421736  bytes=25838  reflect=no  reflect_words=0
+  20261026T070706170344  bytes=26076  reflect=no  reflect_words=0
+  20261026T070939867540  bytes=23427  reflect=no  reflect_words=0
+  20261026T071052501958  bytes=27611  reflect=no  reflect_words=0
+  20261026T071157105838  bytes=27254  reflect=no  reflect_words=0
+  20261026T071534069038  bytes=32822  reflect=yes  reflect_words=578
+  20261026T071636634801  bytes=30602  reflect=no  reflect_words=0
+  20261026T071733341841  bytes=29507  reflect=no  reflect_words=0
+  20261026T071926601719  bytes=26677  reflect=yes  reflect_words=505
+  20261026T072033266848  bytes=27282  reflect=no  reflect_words=0
+  20261026T072145997911  bytes=27502  reflect=no  reflect_words=0
+  20261026T072340259295  bytes=24385  reflect=no  reflect_words=0
+  20261026T072453046510  bytes=28115  reflect=no  reflect_words=0
+  20261026T072549634761  bytes=27957  reflect=no  reflect_words=0
+  20261026T072846535005  bytes=27351  reflect=yes  reflect_words=575
+  20261026T072947187823  bytes=27324  reflect=no  reflect_words=0
+  20261026T073051605613  bytes=27843  reflect=no  reflect_words=0
+  20261026T073249293454  bytes=23810  reflect=no  reflect_words=0
+  20261026T073409828291  bytes=27317  reflect=no  reflect_words=0
+  20261026T073526326901  bytes=27606  reflect=no  reflect_words=0
+
+lead-prompt-sizes.txt: compared 26 runs, 0 differences

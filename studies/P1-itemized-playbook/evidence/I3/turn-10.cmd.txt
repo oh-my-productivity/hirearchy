@@ -1,0 +1,1 @@
+env -u KIRO_HOME kiro-cli chat --v3 --no-interactive --trust-all-tools --resume --effort high --agent hirearchy-study-p1-I3-assistant 'Yes, that counts. No need for '\'probably\''. Sam'\''s 2026-10-21 is right. No, that'\''s an action item, not a decision. Use the words from the notes. No, that'\''s just a status update, leave it out.'

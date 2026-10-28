@@ -1,0 +1,25 @@
+score_memos F2: 0 versions, 0 final memos; reviewer lead/reviewer (owner lead)
+
+memo       ver sha      D    A    wrong  extra  Summary order words copied  review
+
+final memos: decisions 0 of 17, actions 0 of 30, wrong dates 0, extra rows 0, Summary 0 of 6
+delivered (copied) versions: n/a (0 of 0)
+
+could not derive:
+  review task 20261028T002743892731-lead-0b8d (2026-10-28T00:27:43Z, memo 2026-10-05) maps to no version
+  review task 20261028T003500412261-lead-8c66 (2026-10-28T00:35:00Z, memo 2026-10-05) maps to no version
+  review task 20261028T003907492941-lead-1a8f (2026-10-28T00:39:07Z, memo 2026-10-05) maps to no version
+  review task 20261028T004439760580-lead-1365 (2026-10-28T00:44:39Z, memo 2026-10-05) maps to no version
+  review task 20261028T005040353011-lead-4114 (2026-10-28T00:50:40Z, memo 2026-10-12) maps to no version
+  review task 20261028T005843082170-lead-58a6 (2026-10-28T00:58:43Z, memo 2026-10-12) maps to no version
+  review task 20261028T010420419121-lead-0313 (2026-10-28T01:04:20Z, memo 2026-10-12) maps to no version
+  review task 20261028T010934549154-lead-99dd (2026-10-28T01:09:34Z, memo 2026-10-19) maps to no version
+  review task 20261028T011133904102-lead-2675 (2026-10-28T01:11:33Z, memo 2026-10-19) maps to no version
+  review task 20261028T011551330157-lead-6365 (2026-10-28T01:15:51Z, memo 2026-10-19) maps to no version
+  review task 20261028T011953471107-lead-663f (2026-10-28T01:19:53Z, memo 2026-10-26) maps to no version
+  review task 20261028T012534699338-lead-8885 (2026-10-28T01:25:34Z, memo 2026-10-26) maps to no version
+  review task 20261028T012911022959-lead-9c7e (2026-10-28T01:29:11Z, memo 2026-11-02) maps to no version
+  review task 20261028T013300148000-lead-ad17 (2026-10-28T01:33:00Z, memo 2026-11-02) maps to no version
+  review task 20261028T014306267318-lead-b820 (2026-10-28T01:43:06Z, memo 2026-11-02) maps to no version
+  review task 20261028T015104186918-lead-34cb (2026-10-28T01:51:04Z, memo 2026-11-09) maps to no version
+  review task 20261028T015306615425-lead-7828 (2026-10-28T01:53:06Z, memo 2026-11-09) maps to no version

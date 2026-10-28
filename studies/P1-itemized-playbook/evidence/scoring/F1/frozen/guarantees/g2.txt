@@ -1,0 +1,4 @@
+G2 ()
+G2(a): PASS
+G2(b): PASS
+G2(c): PASS (by construction; the counts are reported)

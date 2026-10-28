@@ -1,0 +1,22 @@
+/Users/aminalizadeh/Library/Application Support/hirearchy/kiro-cwd:
+hirearchy-e4-s1r-1792693-bfcddd47e6ecb16c
+hirearchy-e4-s2-17926988-212f59b7daf49c3f
+hirearchy-e4-s2r-1792702-b0c5db682e7e6ab7
+hirearchy-e4-s3-17927050-8f0c59d32ad49337
+hirearchy-e5-s1-17928110-79a97641d74dd37d
+hirearchy-e5-s2-17928128-86c02ffe84a33875
+hirearchy-e5-s3-17928147-3afa64a909202d97
+hirearchy-e6-s1-17928558-6a43f953dd5df144
+hirearchy-e6-s2-17928592-fa2d6cf9a0cd7209
+hirearchy-e6-s3-17928615-64110e24af48ba66
+hirearchy-e7-s1-17929116-8da189031b753305
+hirearchy-e7-s2-17929140-9e603a789ac06f75
+hirearchy-e7-s3-17929164-224143a5119be2e6
+hirearchy-g0-m0-s1-17929-33e62c5799a5c0c7
+hirearchy-g0-m0-s2-17929-5efce31e3a09a8e9
+hirearchy-g0-m0-s3-17930-ec05daf2f4c4e5e1
+hirearchy-g0-m1-s1-17929-9eefc3fd042dbc94
+hirearchy-g0-m1-s2-17929-f6c7232ac7f305ec
+hirearchy-g0-m1-s3-17930-56715956f09491c4
+
+/Users/aminalizadeh/Library/Application Support/hirearchy/kiro-home:

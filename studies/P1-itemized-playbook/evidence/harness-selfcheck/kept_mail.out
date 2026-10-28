@@ -1,0 +1,139 @@
+spend: 3 cases, 0 mismatches; missing from the ledger: ['20261026T053717246839-root-0b12']
+spend: 3 cases, 0 mismatches; missing from the ledger: ['20261026T065736666388-root-89a4']
+spend: 3 cases, 0 mismatches; missing from the ledger: ['20261026T083454531580-root-60dd']
+OK   G0 m1-s1 A state: got 'new'
+OK   G0 m1-s1 A k: got 3
+OK   G0 m1-s1 A clean: got 2
+OK   G0 m1-s1 A waiting: got 0
+OK   G0 m1-s1 A related: got []
+OK   G0 m1-s1 A pending: got []
+OK   G0 m1-s1 A judged_tasks: got ['2165', '51b6']
+OK   G0 m1-s1 A superseded_before: got [0, 1]
+OK   G0 m1-s1 A E: got None
+OK   G0 m1-s1 A D: got None
+OK   G0 m1-s1 A K: got None
+OK   G0 m1-s1 A' state: got 'kept'
+OK   G0 m1-s1 A' k: got 3
+OK   G0 m1-s1 A' clean: got 3
+OK   G0 m1-s1 A' waiting: got 0
+OK   G0 m1-s1 A' related: got []
+OK   G0 m1-s1 A' pending: got []
+OK   G0 m1-s1 A' judged_tasks: got ['36e8', '2165', '51b6']
+OK   G0 m1-s1 A' superseded_before: got [0, 0, 1]
+OK   G0 m1-s1 A' E: got '06:08:14'
+OK   G0 m1-s1 A' D: got '06:09:23'
+OK   G0 m1-s1 A' K: got '06:09:23'
+OK   G0 m1-s2 A state: got 'new'
+OK   G0 m1-s2 A k: got 3
+OK   G0 m1-s2 A clean: got 2
+OK   G0 m1-s2 A waiting: got 0
+OK   G0 m1-s2 A related: got []
+OK   G0 m1-s2 A pending: got []
+OK   G0 m1-s2 A judged_tasks: got ['6310', '8c68']
+OK   G0 m1-s2 A superseded_before: got [1, 1]
+OK   G0 m1-s2 A E: got None
+OK   G0 m1-s2 A D: got None
+OK   G0 m1-s2 A K: got None
+OK   G0 m1-s2 A' state: got 'kept'
+OK   G0 m1-s2 A' k: got 3
+OK   G0 m1-s2 A' clean: got 3
+OK   G0 m1-s2 A' waiting: got 0
+OK   G0 m1-s2 A' related: got []
+OK   G0 m1-s2 A' pending: got []
+OK   G0 m1-s2 A' judged_tasks: got ['0114', '6310', '8c68']
+OK   G0 m1-s2 A' superseded_before: got [0, 1, 1]
+OK   G0 m1-s2 A' E: got '07:35:50'
+OK   G0 m1-s2 A' D: got '07:37:05'
+OK   G0 m1-s2 A' K: got '07:37:05'
+OK   G0 m1-s3 A state: got 'new'
+OK   G0 m1-s3 A k: got 3
+OK   G0 m1-s3 A clean: got 2
+OK   G0 m1-s3 A waiting: got 0
+OK   G0 m1-s3 A related: got []
+OK   G0 m1-s3 A pending: got []
+OK   G0 m1-s3 A judged_tasks: got ['1523', '36a4']
+OK   G0 m1-s3 A superseded_before: got [1, 1]
+OK   G0 m1-s3 A E: got None
+OK   G0 m1-s3 A D: got None
+OK   G0 m1-s3 A K: got None
+OK   G0 m1-s3 A' state: got 'new'
+OK   G0 m1-s3 A' k: got 3
+OK   G0 m1-s3 A' clean: got 2
+OK   G0 m1-s3 A' waiting: got 0
+OK   G0 m1-s3 A' related: got []
+OK   G0 m1-s3 A' pending: got []
+OK   G0 m1-s3 A' judged_tasks: got ['1523', '36a4']
+OK   G0 m1-s3 A' superseded_before: got [1, 1]
+OK   G0 m1-s3 A' E: got None
+OK   G0 m1-s3 A' D: got None
+OK   G0 m1-s3 A' K: got None
+OK   E7 s1 A state: got 'new'
+OK   E7 s1 A k: got 3
+OK   E7 s1 A clean: got 2
+OK   E7 s1 A waiting: got 0
+OK   E7 s1 A related: got []
+OK   E7 s1 A pending: got []
+OK   E7 s1 A judged_tasks: got ['faaa', 'deb0']
+OK   E7 s1 A superseded_before: got [1, 1]
+OK   E7 s1 A E: got None
+OK   E7 s1 A D: got None
+OK   E7 s1 A K: got None
+OK   E7 s1 A' state: got 'kept'
+OK   E7 s1 A' k: got 3
+OK   E7 s1 A' clean: got 3
+OK   E7 s1 A' waiting: got 0
+OK   E7 s1 A' related: got []
+OK   E7 s1 A' pending: got []
+OK   E7 s1 A' judged_tasks: got ['066f', 'faaa', 'deb0']
+OK   E7 s1 A' superseded_before: got [0, 1, 1]
+OK   E7 s1 A' E: got '07:34:25'
+OK   E7 s1 A' D: got '07:35:36'
+OK   E7 s1 A' K: got '07:35:36'
+OK   E7 s2 A state: got 'new'
+OK   E7 s2 A k: got 3
+OK   E7 s2 A clean: got 2
+OK   E7 s2 A waiting: got 0
+OK   E7 s2 A related: got []
+OK   E7 s2 A pending: got []
+OK   E7 s2 A judged_tasks: got ['ae3f', '2272']
+OK   E7 s2 A superseded_before: got [0, 1]
+OK   E7 s2 A E: got None
+OK   E7 s2 A D: got None
+OK   E7 s2 A K: got None
+OK   E7 s2 A' state: got 'new'
+OK   E7 s2 A' k: got 3
+OK   E7 s2 A' clean: got 2
+OK   E7 s2 A' waiting: got 0
+OK   E7 s2 A' related: got []
+OK   E7 s2 A' pending: got []
+OK   E7 s2 A' judged_tasks: got ['ae3f', '2272']
+OK   E7 s2 A' superseded_before: got [0, 1]
+OK   E7 s2 A' E: got None
+OK   E7 s2 A' D: got None
+OK   E7 s2 A' K: got None
+OK   E7 s3 A state: got 'new'
+OK   E7 s3 A k: got 3
+OK   E7 s3 A clean: got 2
+OK   E7 s3 A waiting: got 0
+OK   E7 s3 A related: got []
+OK   E7 s3 A pending: got []
+OK   E7 s3 A judged_tasks: got ['b576', 'f83d']
+OK   E7 s3 A superseded_before: got [1, 1]
+OK   E7 s3 A E: got None
+OK   E7 s3 A D: got None
+OK   E7 s3 A K: got None
+OK   E7 s3 A' state: got 'new'
+OK   E7 s3 A' k: got 3
+OK   E7 s3 A' clean: got 2
+OK   E7 s3 A' waiting: got 0
+OK   E7 s3 A' related: got []
+OK   E7 s3 A' pending: got []
+OK   E7 s3 A' judged_tasks: got ['b576', 'f83d']
+OK   E7 s3 A' superseded_before: got [1, 1]
+OK   E7 s3 A' E: got None
+OK   E7 s3 A' D: got None
+OK   E7 s3 A' K: got None
+OK   G0 m1-s1 spend ledger completeness (6.3): cases, missing, extra: got (3, ['20261026T053717246839-root-0b12'], ['20990101T000000000000-root-ffff'])
+OK   G0 m1-s2 spend ledger completeness (6.3): cases, missing, extra: got (3, ['20261026T065736666388-root-89a4'], ['20990101T000000000000-root-ffff'])
+OK   G0 m1-s3 spend ledger completeness (6.3): cases, missing, extra: got (3, ['20261026T083454531580-root-60dd'], ['20990101T000000000000-root-ffff'])
+kept_mail: 135 of 135 checks OK

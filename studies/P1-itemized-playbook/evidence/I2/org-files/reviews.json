@@ -1,0 +1,9 @@
+{
+  "at": "2026-10-28T00:00:19+00:00",
+  "runs": 51,
+  "notified": {
+    "root": [
+      "lead:out_of_budget"
+    ]
+  }
+}

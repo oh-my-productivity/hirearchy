@@ -1,0 +1,29 @@
+score_memos I2: 13 versions, 6 final memos; reviewer lead/reviewer (owner lead)
+
+memo       ver sha      D    A    wrong  extra  Summary order words copied  review
+2026-10-05 v1  1052d72  2/2  5/5      1      0  no      yes     140 no      5 of 6 (blocked)
+    wrong date: Marta due none (expected 2026-10-14)
+2026-10-05 v2  a3571ff  2/2  5/5      0      0  no      yes     138 yes     6 of 6 (done)
+2026-10-05 v3  aca7643  2/2  5/5      2      0  no      yes     160 no      5 of 6 (blocked)
+    wrong date: Sam due 2026-10-08 (expected 2026-10-09)
+    wrong date: Marta due none (expected 2026-10-14)
+2026-10-05 v4  e989720  2/2  5/5      0      0  yes     yes     159 yes     7 of 8 (blocked)
+2026-10-12 v1  6d3e6a9  3/3  5/5      0      0  yes     yes     178 yes     8 of 8 (done)
+2026-10-12 v2  f9dfb12  3/3  5/5      0      0  yes     yes     178 yes     8 of 8 (done)
+2026-10-19 v1  f089fbb  3/3  5/5      1      0  yes     yes     175 no      8 of 8 (done)
+    wrong date: Lee due none (expected 2026-10-30)
+2026-10-19 v2  a61baa6  3/3  5/5      0      0  yes     yes     175 yes     8 of 8 (done)
+2026-10-26 v1  a73237b  3/3  5/5      0      0  yes     yes     170 yes     8 of 8 (done)
+2026-10-26 v2  4841cd4  3/3  5/5      0      0  yes     yes     170 yes     8 of 8 (done)
+2026-11-02 v1  dee803a  3/3  5/5      0      0  yes     yes     169 yes     7 of 8 (blocked)
+2026-11-02 v2  febd4df  3/3  5/5      0      0  yes     yes     175 yes     9 of 9 (done)
+2026-11-09 v1  90d88e9  3/3  5/5      0      0  yes     yes     142 yes     8 of 8 (done)
+
+final memos: decisions 17 of 17, actions 30 of 30, wrong dates 0, extra rows 0, Summary 6 of 6
+  2026-10-05 md5 6fef99ccc75a588b87ea1fc8f2855763 = v4 e989720
+  2026-10-12 md5 eebd2c13329426ae2169876fdf844dba = v2 f9dfb12
+  2026-10-19 md5 12b0f0e5406115de22cf3bf1b4f2bd37 = v2 a61baa6
+  2026-10-26 md5 63742547ba44e2b216211cbd0acb17e5 = v2 4841cd4
+  2026-11-02 md5 cc3fce30b979ff0bb467b4c95ef4ef55 = v2 febd4df
+  2026-11-09 md5 71bcfc0fd0c6f299b87f4554cd052450 = v1 90d88e9
+delivered (copied) versions: 10 of 13

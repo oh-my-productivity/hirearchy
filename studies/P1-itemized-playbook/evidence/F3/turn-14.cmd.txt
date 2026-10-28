@@ -1,0 +1,1 @@
+env -u KIRO_HOME kiro-cli chat --v3 --no-interactive --trust-all-tools --resume --effort high --agent hirearchy-study-p1-F3-assistant 'Thanks, I'\''ll look at that one later. Now 2026-10-26.md please. I'\''ll wait.'

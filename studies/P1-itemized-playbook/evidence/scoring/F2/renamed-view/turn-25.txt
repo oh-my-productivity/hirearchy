@@ -1,0 +1,20 @@
+######## TURN 25  start 01:55:05  end 01:55:30  elapsed 25s  (local, 2026-10-28; UTC wall-clock start 2026-10-28T01:55:05Z end 2026-10-28T01:55:30Z; exit code 0)
+######## LENA (prompt sent verbatim):
+This version is right now, thanks - keep it.
+
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-25.stderr.txt):
+I recorded your accept for the 2026-11-09 memo, so all six memos are now in `/tmp/hirearchy-p1-F2-1793146944/deliverables`.
+
+- **2026-10-05, 10-12 and 10-19:** these use the earlier formats. 10-05 has no title and still has the "Present" and "Next meeting" lines. 10-12 and 10-19 use initials in the Owner column. You accepted each as delivered, and I haven't changed them.
+- **2026-10-26, 11-02 and 11-09:** these follow the current rules.
+
+**How the team works from here.** Each week, send me the notes file, for example `2026-11-16.md`, and the team writes the memo. I can't make it run by itself on a schedule. The current rules are:
+- The memo is at most 400 words.
+- It has a title, a "Summary:" line, the Decisions, and then the action table.
+- Names appear as written in the notes.
+- Owners the notes give only as initials get "(full name not in the notes)".
+- Vague deadlines become ISO dates when the notes make the date clear.
+
+Each memo gets 12 runs. That is usually enough for a first pass and one fix, but your rule changes have taken it to 15.
+
+**Unexplained rework.** The unrequested 5-run rework on the 10-05 memo is still unexplained. The logs show it came from the root seat, but not who or what sent it. I haven't charged it to you.

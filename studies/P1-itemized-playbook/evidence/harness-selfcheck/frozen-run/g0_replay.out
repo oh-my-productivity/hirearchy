@@ -1,0 +1,25 @@
+OK   m1-s1 score_memos: = G0 published
+OK   m1-s1 ambiguity_recall: = G0 published
+OK   m1-s1 prompt_sizes: = G0 published
+OK   m1-s1 playbook_attempts: = G0 published
+OK   m1-s1 assistant_facts: = G0 published
+OK   m1-s1 scheduler_survival: = G0 published
+OK   m1-s1 rederive_quality: = G0 published (compared 262 keys, 0 mismatches)
+OK   m1-s1 guarantees G2 (a, b, c): ['PASS', 'PASS', 'PASS (by construction; the counts are reported)']
+OK   m1-s2 score_memos: = G0 published
+OK   m1-s2 ambiguity_recall: = G0 published
+OK   m1-s2 prompt_sizes: = G0 published
+OK   m1-s2 playbook_attempts: = G0 published
+OK   m1-s2 assistant_facts: = G0 published
+OK   m1-s2 scheduler_survival: = G0 published
+OK   m1-s2 rederive_quality: = G0 published (compared 272 keys, 0 mismatches)
+OK   m1-s2 guarantees G2 (a, b, c): ['PASS', 'PASS', 'PASS (by construction; the counts are reported)']
+OK   m1-s3 score_memos: = G0 published
+OK   m1-s3 ambiguity_recall: = G0 published
+OK   m1-s3 prompt_sizes: = G0 published
+OK   m1-s3 playbook_attempts: = G0 published
+OK   m1-s3 assistant_facts: = G0 published
+OK   m1-s3 scheduler_survival: = G0 published
+OK   m1-s3 rederive_quality: = G0 published (compared 246 keys, 0 mismatches)
+OK   m1-s3 guarantees G2 (a, b, c): ['PASS', 'PASS', 'PASS (by construction; the counts are reported)']
+g0_replay: 24 of 24 OK

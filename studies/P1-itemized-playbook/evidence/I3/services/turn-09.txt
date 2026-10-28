@@ -1,0 +1,18 @@
+Services you can request (from your direct reports):
+- weekly-meeting-memo (offered by lead; contract v2, playbook v2): One memo with the decisions and the action-item table for one weekly meeting, from its notes file.
+  inputs: notes_file* (File name of the meeting notes inside the notes folder, for example 2026-11-16.md)   (* required)
+  each request: 12 runs; acceptance criteria (lead/services/weekly-meeting-memo/SERVICE.md):
+    C1: Covers only the meeting in the named notes file and nothing else.
+    C2: At most 400 words.
+    C3: Has a section titled Decisions that lists every decision recorded in the named file, using the notes' own words.
+    C4: Has a section titled Action items containing a markdown table with exactly the columns Owner | Action | Due.
+    C5: The table has one row for every commitment in the named file, including informal ones in prose (someone said they would do something) and ones whose owner is given only by initials; no row is invented and none is left out.
+    C6: The Action column uses the notes' own words for the task.
+    C7: Due is an ISO date (YYYY-MM-DD). A relative deadline such as 'by Friday' is converted to a date using the meeting date when the notes make it clear; otherwise, and when the notes give no date, Due is 'none'.
+    C8: Every statement is traceable to the named notes file.
+    C9: The reviewer's report shows every criterion met (criteria met: n of m with n = m), and the writer applied every required change.
+    C10: The memo starts with a one-line 'Summary:' of the meeting, followed by the Decisions section, then the Action items section.
+  record: 2 request(s): 0 done, 0 failed, 2 open; 1 reworked; feedback 1 accept (1 after a reject), 0 reject
+  regression list (the client's rejections):
+    R1 (case 20261028T032415500205-root-2f8e, about C10): "No, not right yet. Always start the memo with a one-line 'Summary:' of the meeting, then the decisions, then the action items." (items citing it: P11)
+  playbook v2 (2026-10-28): "Own words of C10, added by the client-confirmed amendment (rejection R1, about C3, client yes recorded)."; 11 items (0 rules); watched: P11 new (0 of 3 clean cases, k 3)

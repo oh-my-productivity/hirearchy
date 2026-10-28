@@ -1,0 +1,18 @@
+######## TURN 18  start 04:14:53  end 04:18:24  elapsed 211s  (local, 2026-10-28; UTC wall-clock start 2026-10-28T04:14:53Z end 2026-10-28T04:18:24Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Yes, add it.
+
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-18.stderr.txt):
+The updated memo is at `/private/tmp/hirearchy-p1-I3-1793157452/deliverables/memo-2026-10-26.md` (194 words). The Owner column now shows Dev, Priya, Marta, Sam and Lee.
+
+- **C12 (full names, as written in the notes):** met. The notes give first names only, which I told you earlier, so there are no surnames to show.
+- **C1 to C8 and C10:** met and unchanged. The decisions, Action text, Due dates (2026-10-28, 2026-10-30, 2026-10-27, 2026-10-30, `none`) and the Summary-first layout are as before. There is no "Source:" line and no notes section.
+- **C9:** met. The reviewer's score was "criteria met: 10 of 10", and the lead judged C9 as met.
+
+**Rule change:** the rule is now "full names, as written in the notes" (C12), and the initials-only rule is gone. That applies to every future memo.
+
+**Cost:** the memo used 10 runs, 5 for the first draft and 5 for the change, within your 12.
+
+**Older memos:** the 2026-10-12 memo still shows initials, and the 2026-10-05 memo shows full names. I haven't changed either. If you want the 2026-10-12 memo redone with full names, say so and I'll ask for your OK on the cost first.
+
+Is this one right, or what should change?

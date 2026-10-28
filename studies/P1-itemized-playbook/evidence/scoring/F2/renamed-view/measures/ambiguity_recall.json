@@ -1,0 +1,70 @@
+{
+  "could_not_derive": [],
+  "items": {
+    "AMB-1": {
+      "memo": "2026-10-19",
+      "owner": "Marta",
+      "recall": {
+        "k": 0,
+        "n": 0
+      },
+      "recall_literal_timing": {
+        "k": 0,
+        "n": 0
+      },
+      "versions": [],
+      "versions_containing": 0,
+      "versions_of_the_memo": 0
+    },
+    "AMB-2": {
+      "memo": "2026-10-12",
+      "owner": "Sam",
+      "recall": {
+        "k": 0,
+        "n": 0
+      },
+      "recall_literal_timing": {
+        "k": 0,
+        "n": 0
+      },
+      "versions": [],
+      "versions_containing": 0,
+      "versions_of_the_memo": 0
+    }
+  },
+  "label": "F2",
+  "recall": {
+    "k": 0,
+    "n": 0
+  },
+  "recall_literal_timing": {
+    "k": 0,
+    "n": 0
+  },
+  "roles": {
+    "children": [
+      "lead/reviewer",
+      "lead/writer"
+    ],
+    "detected_by": "charter",
+    "owner": "lead",
+    "reviewer": "lead/reviewer",
+    "reviewer_dir": "lead-reviewer",
+    "roles": {
+      "lead/reviewer": "Independent Reviewer",
+      "lead/writer": "Writer"
+    }
+  },
+  "script": {
+    "md5": "92b67f74a38c04895402803e9388e718",
+    "name": "ambiguity_recall.py"
+  },
+  "source_files": [
+    "assistant-tool-calls.txt",
+    "injection/injection-log.txt",
+    "memos/versions/INDEX.txt",
+    "org-files/lead-reviewer-AGENT.md",
+    "org-files/lead-writer-AGENT.md",
+    "org-git-log.txt"
+  ]
+}

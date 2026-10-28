@@ -1,0 +1,28 @@
+The first draft of the 12 October memo is ready, at 5 of 12 runs used. The team has three questions, so I haven't delivered it.
+
+> Summary: The team decided to approve the rate limiter RFC with the token bucket design, to make the postmortem blameless, and to hold a deploy freeze on Oct 22 and Oct 23, and five actions were assigned.
+>
+> **Decisions**
+> - Approve the RFC with the token bucket design and ship it behind a feature flag first.
+> - The postmortem will be blameless and will be shared with the whole company, not just engineering.
+> - A deploy freeze on Oct 22 and Oct 23 so nothing changes under the presenter.
+>
+> **Actions**
+>
+> | Owner | Action | Due |
+> |---|---|---|
+> | Dev | Write the postmortem for the Oct 8 outage | 2026-10-14 |
+> | Marta | Send the demo agenda to the customer | 2026-10-16 |
+> | Priya | Start implementing the rate limiter behind a feature flag | 2026-10-20 |
+> | Sam | Probably sort out the out-of-date staging test data himself so that it's ready the day before the freeze starts | 2026-10-21 |
+> | Lee | Carry the pager during the demo week and swap shifts with Dev | none |
+>
+> Platform team weekly, Monday 12 October 2026 (2026-10-12). Present: Priya, Sam, Lee, Marta, Dev. Next meeting: Monday 19 October.
+
+The reviewer passed all 11 checks.
+
+1. **Sam's due date:** the notes say he'd "probably" fix the staging test data "so that it's ready the day before the freeze starts". The freeze starts on 22 October, so the draft has 2026-10-21. Keep that date, or use "none" because of "probably"?
+2. **Sam's "probably":** should his hedged commitment stay as an action row? The draft keeps it, with "Probably" in the action text.
+3. **Dev and the shift swap:** Lee swaps shifts with Dev. The draft has only Lee's row. Should Dev get a row too?
+
+My recommendations: keep 2026-10-21, keep Sam's row, and no Dev row, since the notes only say Lee agreed to carry the pager. If you take all three, I deliver the draft as it is, with no extra runs.

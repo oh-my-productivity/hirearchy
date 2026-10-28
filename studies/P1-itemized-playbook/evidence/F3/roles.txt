@@ -1,0 +1,7 @@
+[sections-crit] none lead/services/weekly-meeting-memo/history/SERVICE.v1.md (no v1 criterion matches \b(exactly|only)\b[^.]{0,40}\bsections?\b: C1 'covers only the meeting', C3 'a Decisions section' have no exactly/only before 'section'; checked with the protocol 4.1 regex)
+[owner-crit] none lead/services/weekly-meeting-memo/history/SERVICE.v1.md (no v1 criterion names the Owner without the column list 'Owner | Action | Due' (C4) or a decision; checked with the protocol 4.1 regexes)
+[A-crit] C9 lead/services/weekly-meeting-memo/history/SERVICE.v3.md (added by root at 2026-10-28T02:23:30Z, answering memo 1's item at turn 8; 'The memo starts with a one-line 'Summary:' of the meeting, followed by the Decisions section, then the action items table.')
+[plant] C10 lead/services/weekly-meeting-memo/SERVICE.md v4 (added by root at 2026-10-28T02:37:20Z, answering memo 2's item at turn 12; 'In the action table, the Owner column shows initials only ...'; the item named C4 (K28), the criterion added is C10)
+[full] C11 lead/services/weekly-meeting-memo/SERVICE.md v5 (added by root at turn 17, answering memo 4's item; replaces C10; a new id, not [owner-crit] (none in this stream): the base case, O10 not taken)
+[gap] C12 lead/services/weekly-meeting-memo/SERVICE.md v6 (added by root at turn 21, answering memo 5's item; the item named C11 = [full]; C12 replaces C11)
+(the ids the items named: memo 1 C3 (K28), memo 2 C4 (K28), memo 4 C10 = [plant] (K26), memo 5 C11 = [full] (K26); owner forms: I from turn 11, N from turn 16, N+J from turn 20 (owner-forms.json))

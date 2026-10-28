@@ -1,0 +1,1496 @@
+{
+  "answer_key": {
+    "md5": "2fb69bbef857c2bd4862cd5dd8be9da8",
+    "meetings": {
+      "2026-10-05": {
+        "actions": 5,
+        "decisions": 2,
+        "dues_match": true,
+        "owners_match": true
+      },
+      "2026-10-12": {
+        "actions": 5,
+        "decisions": 3,
+        "dues_match": true,
+        "owners_match": true
+      },
+      "2026-10-19": {
+        "actions": 5,
+        "decisions": 3,
+        "dues_match": true,
+        "owners_match": true
+      }
+    },
+    "ok": true,
+    "path": "/Volumes/workspace/hirearchy/studies/P1-itemized-playbook/evidence/answer-key.md"
+  },
+  "answer_key_p1": {
+    "md5": "d340ff638fa7efe1a7ece8808d9a6168",
+    "meetings": {
+      "2026-10-26": {
+        "actions": 5,
+        "decisions": 3,
+        "dues_match": true,
+        "owners_match": true
+      },
+      "2026-11-02": {
+        "actions": 5,
+        "decisions": 3,
+        "dues_match": true,
+        "owners_match": true
+      },
+      "2026-11-09": {
+        "actions": 5,
+        "decisions": 3,
+        "dues_match": true,
+        "owners_match": true
+      }
+    },
+    "ok": true,
+    "path": "/Volumes/workspace/hirearchy/studies/P1-itemized-playbook/evidence/answer-key-p1.md"
+  },
+  "copies": [
+    {
+      "call": 24,
+      "commit": "a3571ff",
+      "commit_time": "2026-10-27T23:11:16Z",
+      "memo": "2026-10-05",
+      "time": "2026-10-27T23:12:39.254Z",
+      "tool": "execute_bash",
+      "turn": 4
+    },
+    {
+      "call": 40,
+      "commit": "e989720",
+      "commit_time": "2026-10-27T23:20:52Z",
+      "memo": "2026-10-05",
+      "time": "2026-10-27T23:29:28.126Z",
+      "tool": "execute_bash",
+      "turn": 10
+    },
+    {
+      "call": 48,
+      "commit": "6d3e6a9",
+      "commit_time": "2026-10-27T23:31:50Z",
+      "memo": "2026-10-12",
+      "time": "2026-10-27T23:36:19.039Z",
+      "tool": "execute_bash",
+      "turn": 12
+    },
+    {
+      "call": 58,
+      "commit": "f9dfb12",
+      "commit_time": "2026-10-27T23:40:00Z",
+      "memo": "2026-10-12",
+      "time": "2026-10-27T23:43:13.554Z",
+      "tool": "execute_bash",
+      "turn": 15
+    },
+    {
+      "call": 71,
+      "commit": "a61baa6",
+      "commit_time": "2026-10-27T23:49:31Z",
+      "memo": "2026-10-19",
+      "time": "2026-10-27T23:50:59.926Z",
+      "tool": "execute_bash",
+      "turn": 17
+    },
+    {
+      "call": 80,
+      "commit": "a73237b",
+      "commit_time": "2026-10-27T23:53:08Z",
+      "memo": "2026-10-26",
+      "time": "2026-10-27T23:55:55.971Z",
+      "tool": "execute_bash",
+      "turn": 19
+    },
+    {
+      "call": 92,
+      "commit": "4841cd4",
+      "commit_time": "2026-10-27T23:59:26Z",
+      "memo": "2026-10-26",
+      "time": "2026-10-28T00:02:04.869Z",
+      "tool": "execute_bash",
+      "turn": 22
+    },
+    {
+      "call": 100,
+      "commit": "dee803a",
+      "commit_time": "2026-10-28T00:04:17Z",
+      "memo": "2026-11-02",
+      "time": "2026-10-28T00:07:05.568Z",
+      "tool": "execute_bash",
+      "turn": 24
+    },
+    {
+      "call": 108,
+      "commit": "febd4df",
+      "commit_time": "2026-10-28T00:10:38Z",
+      "memo": "2026-11-02",
+      "time": "2026-10-28T00:12:16.458Z",
+      "tool": "execute_bash",
+      "turn": 26
+    },
+    {
+      "call": 115,
+      "commit": "90d88e9",
+      "commit_time": "2026-10-28T00:14:27Z",
+      "memo": "2026-11-09",
+      "time": "2026-10-28T00:17:07.630Z",
+      "tool": "execute_bash",
+      "turn": 28
+    }
+  ],
+  "could_not_derive": [],
+  "delivered": {
+    "k": 10,
+    "n": 13
+  },
+  "final_totals": {
+    "actions": {
+      "k": 30,
+      "n": 30
+    },
+    "decisions": {
+      "k": 17,
+      "n": 17
+    },
+    "extra_rows": 0,
+    "memos": 6,
+    "summary": {
+      "k": 6,
+      "n": 6
+    },
+    "wrong_dates": 0
+  },
+  "finals": [
+    {
+      "actions": {
+        "k": 5,
+        "n": 5
+      },
+      "actions_found": [
+        "A1",
+        "A2",
+        "A4",
+        "A3",
+        "A5"
+      ],
+      "decisions": {
+        "k": 2,
+        "n": 2
+      },
+      "decisions_before_actions": true,
+      "decisions_found": [
+        "D1",
+        "D2"
+      ],
+      "extra_rows": [],
+      "file": "memos/memo-2026-10-05.md",
+      "is_version": {
+        "sha": "e989720",
+        "version": 4
+      },
+      "md5": "6fef99ccc75a588b87ea1fc8f2855763",
+      "memo": "2026-10-05",
+      "n_extra_rows": 0,
+      "n_wrong_dates": 0,
+      "owner_form": "N",
+      "owner_form_errors": [],
+      "summary_first": true,
+      "words": 159,
+      "wrong_date_text": [],
+      "wrong_dates": []
+    },
+    {
+      "actions": {
+        "k": 5,
+        "n": 5
+      },
+      "actions_found": [
+        "A1",
+        "A2",
+        "A3",
+        "A4",
+        "A5"
+      ],
+      "decisions": {
+        "k": 3,
+        "n": 3
+      },
+      "decisions_before_actions": true,
+      "decisions_found": [
+        "D1",
+        "D2",
+        "D3"
+      ],
+      "extra_rows": [],
+      "file": "memos/memo-2026-10-12.md",
+      "is_version": {
+        "sha": "f9dfb12",
+        "version": 2
+      },
+      "md5": "eebd2c13329426ae2169876fdf844dba",
+      "memo": "2026-10-12",
+      "n_extra_rows": 0,
+      "n_wrong_dates": 0,
+      "owner_form": "I",
+      "owner_form_errors": [],
+      "summary_first": true,
+      "words": 178,
+      "wrong_date_text": [],
+      "wrong_dates": []
+    },
+    {
+      "actions": {
+        "k": 5,
+        "n": 5
+      },
+      "actions_found": [
+        "A1",
+        "A2",
+        "A3",
+        "A4",
+        "A5"
+      ],
+      "decisions": {
+        "k": 3,
+        "n": 3
+      },
+      "decisions_before_actions": true,
+      "decisions_found": [
+        "D1",
+        "D2",
+        "D3"
+      ],
+      "extra_rows": [],
+      "file": "memos/memo-2026-10-19.md",
+      "is_version": {
+        "sha": "a61baa6",
+        "version": 2
+      },
+      "md5": "12b0f0e5406115de22cf3bf1b4f2bd37",
+      "memo": "2026-10-19",
+      "n_extra_rows": 0,
+      "n_wrong_dates": 0,
+      "owner_form": "I",
+      "owner_form_errors": [],
+      "summary_first": true,
+      "words": 175,
+      "wrong_date_text": [],
+      "wrong_dates": []
+    },
+    {
+      "actions": {
+        "k": 5,
+        "n": 5
+      },
+      "actions_found": [
+        "A1",
+        "A2",
+        "A3",
+        "A4",
+        "A5"
+      ],
+      "decisions": {
+        "k": 3,
+        "n": 3
+      },
+      "decisions_before_actions": true,
+      "decisions_found": [
+        "D1",
+        "D2",
+        "D3"
+      ],
+      "extra_rows": [],
+      "file": "memos/memo-2026-10-26.md",
+      "is_version": {
+        "sha": "4841cd4",
+        "version": 2
+      },
+      "md5": "63742547ba44e2b216211cbd0acb17e5",
+      "memo": "2026-10-26",
+      "n_extra_rows": 0,
+      "n_wrong_dates": 0,
+      "owner_form": "N",
+      "owner_form_errors": [],
+      "summary_first": true,
+      "words": 170,
+      "wrong_date_text": [],
+      "wrong_dates": []
+    },
+    {
+      "actions": {
+        "k": 5,
+        "n": 5
+      },
+      "actions_found": [
+        "A1",
+        "A2",
+        "A3",
+        "A4",
+        "A5"
+      ],
+      "decisions": {
+        "k": 3,
+        "n": 3
+      },
+      "decisions_before_actions": true,
+      "decisions_found": [
+        "D1",
+        "D2",
+        "D3"
+      ],
+      "extra_rows": [],
+      "file": "memos/memo-2026-11-02.md",
+      "is_version": {
+        "sha": "febd4df",
+        "version": 2
+      },
+      "md5": "cc3fce30b979ff0bb467b4c95ef4ef55",
+      "memo": "2026-11-02",
+      "n_extra_rows": 0,
+      "n_wrong_dates": 0,
+      "owner_form": "N+J",
+      "owner_form_errors": [],
+      "summary_first": true,
+      "words": 175,
+      "wrong_date_text": [],
+      "wrong_dates": []
+    },
+    {
+      "actions": {
+        "k": 5,
+        "n": 5
+      },
+      "actions_found": [
+        "A1",
+        "A2",
+        "A3",
+        "A4",
+        "A5"
+      ],
+      "decisions": {
+        "k": 3,
+        "n": 3
+      },
+      "decisions_before_actions": true,
+      "decisions_found": [
+        "D1",
+        "D2",
+        "D3"
+      ],
+      "extra_rows": [],
+      "file": "memos/memo-2026-11-09.md",
+      "is_version": {
+        "sha": "90d88e9",
+        "version": 1
+      },
+      "md5": "71bcfc0fd0c6f299b87f4554cd052450",
+      "memo": "2026-11-09",
+      "n_extra_rows": 0,
+      "n_wrong_dates": 0,
+      "owner_form": "N+J",
+      "owner_form_errors": [],
+      "summary_first": true,
+      "words": 142,
+      "wrong_date_text": [],
+      "wrong_dates": []
+    }
+  ],
+  "label": "I2",
+  "p1_no_regression": {
+    "delivered_bad": [],
+    "delivered_versions": 10,
+    "mechanical_pass": true,
+    "per_memo": {
+      "2026-10-05": {
+        "final": "memos/memo-2026-10-05.md",
+        "pass": true,
+        "why": "ok"
+      },
+      "2026-10-12": {
+        "final": "memos/memo-2026-10-12.md",
+        "pass": true,
+        "why": "ok"
+      },
+      "2026-10-19": {
+        "final": "memos/memo-2026-10-19.md",
+        "pass": true,
+        "why": "ok"
+      },
+      "2026-10-26": {
+        "final": "memos/memo-2026-10-26.md",
+        "pass": true,
+        "why": "ok"
+      },
+      "2026-11-02": {
+        "final": "memos/memo-2026-11-02.md",
+        "pass": true,
+        "why": "ok"
+      },
+      "2026-11-09": {
+        "final": "memos/memo-2026-11-09.md",
+        "pass": true,
+        "why": "ok"
+      }
+    },
+    "reported": {
+      "2026-10-05": {
+        "final": "memos/memo-2026-10-05.md",
+        "ok": true,
+        "why": "ok"
+      },
+      "2026-10-12": {
+        "final": "memos/memo-2026-10-12.md",
+        "ok": true,
+        "why": "ok"
+      },
+      "2026-10-19": {
+        "final": "memos/memo-2026-10-19.md",
+        "ok": true,
+        "why": "ok"
+      },
+      "2026-10-26": {
+        "final": "memos/memo-2026-10-26.md",
+        "ok": true,
+        "why": "ok"
+      },
+      "2026-11-02": {
+        "final": "memos/memo-2026-11-02.md",
+        "ok": true,
+        "why": "ok"
+      },
+      "2026-11-09": {
+        "final": "memos/memo-2026-11-09.md",
+        "ok": true,
+        "why": "ok"
+      }
+    },
+    "reported_ok": true
+  },
+  "review_tasks": 13,
+  "review_unmapped": [],
+  "roles": {
+    "children": [
+      "lead/reviewer",
+      "lead/writer"
+    ],
+    "detected_by": "charter",
+    "owner": "lead",
+    "reviewer": "lead/reviewer",
+    "reviewer_dir": "lead-reviewer",
+    "roles": {
+      "lead/reviewer": "Independent Reviewer",
+      "lead/writer": "Writer"
+    }
+  },
+  "script": {
+    "md5": "4a63660bc6040f443b6fbf997e57b4e2",
+    "name": "score_memos.py"
+  },
+  "source_files": [
+    "/Volumes/workspace/hirearchy/studies/P1-itemized-playbook/evidence/answer-key.md",
+    "deliverables-log.txt",
+    "memos/memo-2026-10-05.md",
+    "memos/memo-2026-10-12.md",
+    "memos/memo-2026-10-19.md",
+    "memos/memo-2026-10-26.md",
+    "memos/memo-2026-11-02.md",
+    "memos/memo-2026-11-09.md",
+    "memos/versions/INDEX.txt",
+    "memos/versions/memo-2026-10-05.v1.1052d72.md",
+    "memos/versions/memo-2026-10-05.v2.a3571ff.md",
+    "memos/versions/memo-2026-10-05.v3.aca7643.md",
+    "memos/versions/memo-2026-10-05.v4.e989720.md",
+    "memos/versions/memo-2026-10-12.v1.6d3e6a9.md",
+    "memos/versions/memo-2026-10-12.v2.f9dfb12.md",
+    "memos/versions/memo-2026-10-19.v1.f089fbb.md",
+    "memos/versions/memo-2026-10-19.v2.a61baa6.md",
+    "memos/versions/memo-2026-10-26.v1.a73237b.md",
+    "memos/versions/memo-2026-10-26.v2.4841cd4.md",
+    "memos/versions/memo-2026-11-02.v1.dee803a.md",
+    "memos/versions/memo-2026-11-02.v2.febd4df.md",
+    "memos/versions/memo-2026-11-09.v1.90d88e9.md",
+    "msgs/lead-read/20261027T230726050189-lead.reviewer-8cf2.md",
+    "msgs/lead-read/20261027T231207256844-lead.reviewer-abfd.md",
+    "msgs/lead-read/20261027T231628769462-lead.reviewer-ce04.md",
+    "msgs/lead-read/20261027T232157834374-lead.reviewer-cca8.md",
+    "msgs/lead-read/20261027T233306959136-lead.reviewer-2095.md",
+    "msgs/lead-read/20261027T234055693832-lead.reviewer-3612.md",
+    "msgs/lead-read/20261027T234632418807-lead.reviewer-c95e.md",
+    "msgs/lead-read/20261027T235028984264-lead.reviewer-26c5.md",
+    "msgs/lead-read/20261027T235406316563-lead.reviewer-119f.md",
+    "msgs/lead-read/20261028T000018684934-lead.reviewer-d3c7.md",
+    "msgs/lead-read/20261028T000526193382-lead.reviewer-9c79.md",
+    "msgs/lead-read/20261028T001135110346-lead.reviewer-d51c.md",
+    "msgs/lead-read/20261028T001527212798-lead.reviewer-afdf.md",
+    "msgs/lead-reviewer-read/20261027T230635682641-lead-2f82.md",
+    "msgs/lead-reviewer-read/20261027T231133650556-lead-e70f.md",
+    "msgs/lead-reviewer-read/20261027T231533789587-lead-e4f8.md",
+    "msgs/lead-reviewer-read/20261027T232117528451-lead-4a04.md",
+    "msgs/lead-reviewer-read/20261027T233206597872-lead-5116.md",
+    "msgs/lead-reviewer-read/20261027T234014511507-lead-4099.md",
+    "msgs/lead-reviewer-read/20261027T234548618657-lead-5fd7.md",
+    "msgs/lead-reviewer-read/20261027T234957573759-lead-92a2.md",
+    "msgs/lead-reviewer-read/20261027T235324545662-lead-6bca.md",
+    "msgs/lead-reviewer-read/20261027T235946726438-lead-367f.md",
+    "msgs/lead-reviewer-read/20261028T000438917966-lead-9df1.md",
+    "msgs/lead-reviewer-read/20261028T001058790729-lead-3969.md",
+    "msgs/lead-reviewer-read/20261028T001444140159-lead-b276.md",
+    "org-files/lead-reviewer-AGENT.md",
+    "org-files/lead-writer-AGENT.md",
+    "org-git-log.txt"
+  ],
+  "versions": [
+    {
+      "actions": {
+        "k": 5,
+        "n": 5
+      },
+      "actions_found": [
+        "A1",
+        "A2",
+        "A4",
+        "A3",
+        "A5"
+      ],
+      "commit_time": "2026-10-27T23:06:16Z",
+      "copied": false,
+      "copied_by": [],
+      "copies": [],
+      "decisions": {
+        "k": 2,
+        "n": 2
+      },
+      "decisions_before_actions": true,
+      "decisions_found": [
+        "D1",
+        "D2"
+      ],
+      "extra_rows": [],
+      "file": "memos/versions/memo-2026-10-05.v1.1052d72.md",
+      "final": false,
+      "index_md5": "87b4e8cdaf9b9257d1bffd79c5458c27",
+      "md5": "87b4e8cdaf9b9257d1bffd79c5458c27",
+      "memo": "2026-10-05",
+      "n_extra_rows": 0,
+      "n_wrong_dates": 1,
+      "owner_form": "N",
+      "owner_form_errors": [],
+      "review": {
+        "all_met": false,
+        "ambiguous_token": true,
+        "mapped_by": "commit",
+        "met": 5,
+        "of": 6,
+        "result": "20261027T230726050189-lead.reviewer-8cf2",
+        "result_created": "2026-10-27T23:07:26Z",
+        "sent_before_commit_s": 0,
+        "status": "blocked",
+        "task": "20261027T230635682641-lead-2f82",
+        "task_created": "2026-10-27T23:06:35Z",
+        "tasks": [
+          "20261027T230635682641-lead-2f82"
+        ],
+        "verdict": null
+      },
+      "sha": "1052d72",
+      "summary_first": false,
+      "version": 1,
+      "words": 140,
+      "wrong_date_text": [
+        "Marta none"
+      ],
+      "wrong_dates": [
+        {
+          "action": "A3",
+          "due": "none",
+          "expected": "2026-10-14",
+          "owner": "Marta"
+        }
+      ]
+    },
+    {
+      "actions": {
+        "k": 5,
+        "n": 5
+      },
+      "actions_found": [
+        "A1",
+        "A2",
+        "A4",
+        "A3",
+        "A5"
+      ],
+      "commit_time": "2026-10-27T23:11:16Z",
+      "copied": true,
+      "copied_by": [
+        "log-commit"
+      ],
+      "copies": [
+        {
+          "call": 24,
+          "commit": "a3571ff",
+          "commit_time": "2026-10-27T23:11:16Z",
+          "memo": "2026-10-05",
+          "time": "2026-10-27T23:12:39.254Z",
+          "tool": "execute_bash",
+          "turn": 4
+        }
+      ],
+      "decisions": {
+        "k": 2,
+        "n": 2
+      },
+      "decisions_before_actions": true,
+      "decisions_found": [
+        "D1",
+        "D2"
+      ],
+      "extra_rows": [],
+      "file": "memos/versions/memo-2026-10-05.v2.a3571ff.md",
+      "final": false,
+      "index_md5": "73aec807270d2e62dc331b1ae10bfbea",
+      "md5": "73aec807270d2e62dc331b1ae10bfbea",
+      "memo": "2026-10-05",
+      "n_extra_rows": 0,
+      "n_wrong_dates": 0,
+      "owner_form": "N",
+      "owner_form_errors": [],
+      "review": {
+        "all_met": true,
+        "ambiguous_token": true,
+        "mapped_by": "commit",
+        "met": 6,
+        "of": 6,
+        "result": "20261027T231207256844-lead.reviewer-abfd",
+        "result_created": "2026-10-27T23:12:07Z",
+        "sent_before_commit_s": 0,
+        "status": "done",
+        "task": "20261027T231133650556-lead-e70f",
+        "task_created": "2026-10-27T23:11:33Z",
+        "tasks": [
+          "20261027T231133650556-lead-e70f"
+        ],
+        "verdict": null
+      },
+      "sha": "a3571ff",
+      "summary_first": false,
+      "version": 2,
+      "words": 138,
+      "wrong_date_text": [],
+      "wrong_dates": []
+    },
+    {
+      "actions": {
+        "k": 5,
+        "n": 5
+      },
+      "actions_found": [
+        "A1",
+        "A2",
+        "A4",
+        "A3",
+        "A5"
+      ],
+      "commit_time": "2026-10-27T23:15:17Z",
+      "copied": false,
+      "copied_by": [],
+      "copies": [],
+      "decisions": {
+        "k": 2,
+        "n": 2
+      },
+      "decisions_before_actions": true,
+      "decisions_found": [
+        "D1",
+        "D2"
+      ],
+      "extra_rows": [],
+      "file": "memos/versions/memo-2026-10-05.v3.aca7643.md",
+      "final": false,
+      "index_md5": "fc0653383869bb84088d2d11297a67a5",
+      "md5": "fc0653383869bb84088d2d11297a67a5",
+      "memo": "2026-10-05",
+      "n_extra_rows": 0,
+      "n_wrong_dates": 2,
+      "owner_form": "N",
+      "owner_form_errors": [],
+      "review": {
+        "all_met": false,
+        "ambiguous_token": true,
+        "mapped_by": "commit",
+        "met": 5,
+        "of": 6,
+        "result": "20261027T231628769462-lead.reviewer-ce04",
+        "result_created": "2026-10-27T23:16:28Z",
+        "sent_before_commit_s": 0,
+        "status": "blocked",
+        "task": "20261027T231533789587-lead-e4f8",
+        "task_created": "2026-10-27T23:15:33Z",
+        "tasks": [
+          "20261027T231533789587-lead-e4f8"
+        ],
+        "verdict": null
+      },
+      "sha": "aca7643",
+      "summary_first": false,
+      "version": 3,
+      "words": 160,
+      "wrong_date_text": [
+        "Sam 2026-10-08",
+        "Marta none"
+      ],
+      "wrong_dates": [
+        {
+          "action": "A4",
+          "due": "2026-10-08",
+          "expected": "2026-10-09",
+          "owner": "Sam"
+        },
+        {
+          "action": "A3",
+          "due": "none",
+          "expected": "2026-10-14",
+          "owner": "Marta"
+        }
+      ]
+    },
+    {
+      "actions": {
+        "k": 5,
+        "n": 5
+      },
+      "actions_found": [
+        "A1",
+        "A2",
+        "A4",
+        "A3",
+        "A5"
+      ],
+      "commit_time": "2026-10-27T23:20:52Z",
+      "copied": true,
+      "copied_by": [
+        "log-commit",
+        "log-md5",
+        "final-md5"
+      ],
+      "copies": [
+        {
+          "call": 40,
+          "commit": "e989720",
+          "commit_time": "2026-10-27T23:20:52Z",
+          "memo": "2026-10-05",
+          "time": "2026-10-27T23:29:28.126Z",
+          "tool": "execute_bash",
+          "turn": 10
+        }
+      ],
+      "decisions": {
+        "k": 2,
+        "n": 2
+      },
+      "decisions_before_actions": true,
+      "decisions_found": [
+        "D1",
+        "D2"
+      ],
+      "extra_rows": [],
+      "file": "memos/versions/memo-2026-10-05.v4.e989720.md",
+      "final": true,
+      "index_md5": "6fef99ccc75a588b87ea1fc8f2855763",
+      "md5": "6fef99ccc75a588b87ea1fc8f2855763",
+      "memo": "2026-10-05",
+      "n_extra_rows": 0,
+      "n_wrong_dates": 0,
+      "owner_form": "N",
+      "owner_form_errors": [],
+      "review": {
+        "all_met": false,
+        "ambiguous_token": true,
+        "mapped_by": "commit",
+        "met": 7,
+        "of": 8,
+        "result": "20261027T232157834374-lead.reviewer-cca8",
+        "result_created": "2026-10-27T23:21:57Z",
+        "sent_before_commit_s": 0,
+        "status": "blocked",
+        "task": "20261027T232117528451-lead-4a04",
+        "task_created": "2026-10-27T23:21:17Z",
+        "tasks": [
+          "20261027T232117528451-lead-4a04"
+        ],
+        "verdict": null
+      },
+      "sha": "e989720",
+      "summary_first": true,
+      "version": 4,
+      "words": 159,
+      "wrong_date_text": [],
+      "wrong_dates": []
+    },
+    {
+      "actions": {
+        "k": 5,
+        "n": 5
+      },
+      "actions_found": [
+        "A1",
+        "A2",
+        "A3",
+        "A4",
+        "A5"
+      ],
+      "commit_time": "2026-10-27T23:31:50Z",
+      "copied": true,
+      "copied_by": [
+        "log-commit"
+      ],
+      "copies": [
+        {
+          "call": 48,
+          "commit": "6d3e6a9",
+          "commit_time": "2026-10-27T23:31:50Z",
+          "memo": "2026-10-12",
+          "time": "2026-10-27T23:36:19.039Z",
+          "tool": "execute_bash",
+          "turn": 12
+        }
+      ],
+      "decisions": {
+        "k": 3,
+        "n": 3
+      },
+      "decisions_before_actions": true,
+      "decisions_found": [
+        "D1",
+        "D2",
+        "D3"
+      ],
+      "extra_rows": [],
+      "file": "memos/versions/memo-2026-10-12.v1.6d3e6a9.md",
+      "final": false,
+      "index_md5": "887d0c563f0037de15f4736960ac8355",
+      "md5": "887d0c563f0037de15f4736960ac8355",
+      "memo": "2026-10-12",
+      "n_extra_rows": 0,
+      "n_wrong_dates": 0,
+      "owner_form": "N",
+      "owner_form_errors": [],
+      "review": {
+        "all_met": true,
+        "ambiguous_token": true,
+        "mapped_by": "commit",
+        "met": 8,
+        "of": 8,
+        "result": "20261027T233306959136-lead.reviewer-2095",
+        "result_created": "2026-10-27T23:33:06Z",
+        "sent_before_commit_s": 0,
+        "status": "done",
+        "task": "20261027T233206597872-lead-5116",
+        "task_created": "2026-10-27T23:32:06Z",
+        "tasks": [
+          "20261027T233206597872-lead-5116"
+        ],
+        "verdict": null
+      },
+      "sha": "6d3e6a9",
+      "summary_first": true,
+      "version": 1,
+      "words": 178,
+      "wrong_date_text": [],
+      "wrong_dates": []
+    },
+    {
+      "actions": {
+        "k": 5,
+        "n": 5
+      },
+      "actions_found": [
+        "A1",
+        "A2",
+        "A3",
+        "A4",
+        "A5"
+      ],
+      "commit_time": "2026-10-27T23:40:00Z",
+      "copied": true,
+      "copied_by": [
+        "log-commit",
+        "log-md5",
+        "final-md5"
+      ],
+      "copies": [
+        {
+          "call": 58,
+          "commit": "f9dfb12",
+          "commit_time": "2026-10-27T23:40:00Z",
+          "memo": "2026-10-12",
+          "time": "2026-10-27T23:43:13.554Z",
+          "tool": "execute_bash",
+          "turn": 15
+        }
+      ],
+      "decisions": {
+        "k": 3,
+        "n": 3
+      },
+      "decisions_before_actions": true,
+      "decisions_found": [
+        "D1",
+        "D2",
+        "D3"
+      ],
+      "extra_rows": [],
+      "file": "memos/versions/memo-2026-10-12.v2.f9dfb12.md",
+      "final": true,
+      "index_md5": "eebd2c13329426ae2169876fdf844dba",
+      "md5": "eebd2c13329426ae2169876fdf844dba",
+      "memo": "2026-10-12",
+      "n_extra_rows": 0,
+      "n_wrong_dates": 0,
+      "owner_form": "I",
+      "owner_form_errors": [],
+      "review": {
+        "all_met": true,
+        "ambiguous_token": true,
+        "mapped_by": "commit",
+        "met": 8,
+        "of": 8,
+        "result": "20261027T234055693832-lead.reviewer-3612",
+        "result_created": "2026-10-27T23:40:55Z",
+        "sent_before_commit_s": 0,
+        "status": "done",
+        "task": "20261027T234014511507-lead-4099",
+        "task_created": "2026-10-27T23:40:14Z",
+        "tasks": [
+          "20261027T234014511507-lead-4099"
+        ],
+        "verdict": null
+      },
+      "sha": "f9dfb12",
+      "summary_first": true,
+      "version": 2,
+      "words": 178,
+      "wrong_date_text": [],
+      "wrong_dates": []
+    },
+    {
+      "actions": {
+        "k": 5,
+        "n": 5
+      },
+      "actions_found": [
+        "A1",
+        "A2",
+        "A3",
+        "A4",
+        "A5"
+      ],
+      "commit_time": "2026-10-27T23:45:32Z",
+      "copied": false,
+      "copied_by": [],
+      "copies": [],
+      "decisions": {
+        "k": 3,
+        "n": 3
+      },
+      "decisions_before_actions": true,
+      "decisions_found": [
+        "D1",
+        "D2",
+        "D3"
+      ],
+      "extra_rows": [],
+      "file": "memos/versions/memo-2026-10-19.v1.f089fbb.md",
+      "final": false,
+      "index_md5": "ed24b3ee70117c260a8340666bb18a86",
+      "md5": "ed24b3ee70117c260a8340666bb18a86",
+      "memo": "2026-10-19",
+      "n_extra_rows": 0,
+      "n_wrong_dates": 1,
+      "owner_form": "I",
+      "owner_form_errors": [],
+      "review": {
+        "all_met": true,
+        "ambiguous_token": true,
+        "mapped_by": "commit",
+        "met": 8,
+        "of": 8,
+        "result": "20261027T234632418807-lead.reviewer-c95e",
+        "result_created": "2026-10-27T23:46:32Z",
+        "sent_before_commit_s": 0,
+        "status": "done",
+        "task": "20261027T234548618657-lead-5fd7",
+        "task_created": "2026-10-27T23:45:48Z",
+        "tasks": [
+          "20261027T234548618657-lead-5fd7"
+        ],
+        "verdict": null
+      },
+      "sha": "f089fbb",
+      "summary_first": true,
+      "version": 1,
+      "words": 175,
+      "wrong_date_text": [
+        "Lee none"
+      ],
+      "wrong_dates": [
+        {
+          "action": "A4",
+          "due": "none",
+          "expected": "2026-10-30",
+          "owner": "Lee"
+        }
+      ]
+    },
+    {
+      "actions": {
+        "k": 5,
+        "n": 5
+      },
+      "actions_found": [
+        "A1",
+        "A2",
+        "A3",
+        "A4",
+        "A5"
+      ],
+      "commit_time": "2026-10-27T23:49:31Z",
+      "copied": true,
+      "copied_by": [
+        "log-commit",
+        "log-md5",
+        "final-md5"
+      ],
+      "copies": [
+        {
+          "call": 71,
+          "commit": "a61baa6",
+          "commit_time": "2026-10-27T23:49:31Z",
+          "memo": "2026-10-19",
+          "time": "2026-10-27T23:50:59.926Z",
+          "tool": "execute_bash",
+          "turn": 17
+        }
+      ],
+      "decisions": {
+        "k": 3,
+        "n": 3
+      },
+      "decisions_before_actions": true,
+      "decisions_found": [
+        "D1",
+        "D2",
+        "D3"
+      ],
+      "extra_rows": [],
+      "file": "memos/versions/memo-2026-10-19.v2.a61baa6.md",
+      "final": true,
+      "index_md5": "12b0f0e5406115de22cf3bf1b4f2bd37",
+      "md5": "12b0f0e5406115de22cf3bf1b4f2bd37",
+      "memo": "2026-10-19",
+      "n_extra_rows": 0,
+      "n_wrong_dates": 0,
+      "owner_form": "I",
+      "owner_form_errors": [],
+      "review": {
+        "all_met": true,
+        "ambiguous_token": true,
+        "mapped_by": "commit",
+        "met": 8,
+        "of": 8,
+        "result": "20261027T235028984264-lead.reviewer-26c5",
+        "result_created": "2026-10-27T23:50:28Z",
+        "sent_before_commit_s": 0,
+        "status": "done",
+        "task": "20261027T234957573759-lead-92a2",
+        "task_created": "2026-10-27T23:49:57Z",
+        "tasks": [
+          "20261027T234957573759-lead-92a2"
+        ],
+        "verdict": null
+      },
+      "sha": "a61baa6",
+      "summary_first": true,
+      "version": 2,
+      "words": 175,
+      "wrong_date_text": [],
+      "wrong_dates": []
+    },
+    {
+      "actions": {
+        "k": 5,
+        "n": 5
+      },
+      "actions_found": [
+        "A1",
+        "A2",
+        "A3",
+        "A4",
+        "A5"
+      ],
+      "commit_time": "2026-10-27T23:53:08Z",
+      "copied": true,
+      "copied_by": [
+        "log-commit"
+      ],
+      "copies": [
+        {
+          "call": 80,
+          "commit": "a73237b",
+          "commit_time": "2026-10-27T23:53:08Z",
+          "memo": "2026-10-26",
+          "time": "2026-10-27T23:55:55.971Z",
+          "tool": "execute_bash",
+          "turn": 19
+        }
+      ],
+      "decisions": {
+        "k": 3,
+        "n": 3
+      },
+      "decisions_before_actions": true,
+      "decisions_found": [
+        "D1",
+        "D2",
+        "D3"
+      ],
+      "extra_rows": [],
+      "file": "memos/versions/memo-2026-10-26.v1.a73237b.md",
+      "final": false,
+      "index_md5": "fd9b27a86a1884a40b9446730acf9d13",
+      "md5": "fd9b27a86a1884a40b9446730acf9d13",
+      "memo": "2026-10-26",
+      "n_extra_rows": 0,
+      "n_wrong_dates": 0,
+      "owner_form": "I",
+      "owner_form_errors": [],
+      "review": {
+        "all_met": true,
+        "ambiguous_token": true,
+        "mapped_by": "commit",
+        "met": 8,
+        "of": 8,
+        "result": "20261027T235406316563-lead.reviewer-119f",
+        "result_created": "2026-10-27T23:54:06Z",
+        "sent_before_commit_s": 0,
+        "status": "done",
+        "task": "20261027T235324545662-lead-6bca",
+        "task_created": "2026-10-27T23:53:24Z",
+        "tasks": [
+          "20261027T235324545662-lead-6bca"
+        ],
+        "verdict": null
+      },
+      "sha": "a73237b",
+      "summary_first": true,
+      "version": 1,
+      "words": 170,
+      "wrong_date_text": [],
+      "wrong_dates": []
+    },
+    {
+      "actions": {
+        "k": 5,
+        "n": 5
+      },
+      "actions_found": [
+        "A1",
+        "A2",
+        "A3",
+        "A4",
+        "A5"
+      ],
+      "commit_time": "2026-10-27T23:59:26Z",
+      "copied": true,
+      "copied_by": [
+        "log-commit",
+        "log-md5",
+        "final-md5"
+      ],
+      "copies": [
+        {
+          "call": 92,
+          "commit": "4841cd4",
+          "commit_time": "2026-10-27T23:59:26Z",
+          "memo": "2026-10-26",
+          "time": "2026-10-28T00:02:04.869Z",
+          "tool": "execute_bash",
+          "turn": 22
+        }
+      ],
+      "decisions": {
+        "k": 3,
+        "n": 3
+      },
+      "decisions_before_actions": true,
+      "decisions_found": [
+        "D1",
+        "D2",
+        "D3"
+      ],
+      "extra_rows": [],
+      "file": "memos/versions/memo-2026-10-26.v2.4841cd4.md",
+      "final": true,
+      "index_md5": "63742547ba44e2b216211cbd0acb17e5",
+      "md5": "63742547ba44e2b216211cbd0acb17e5",
+      "memo": "2026-10-26",
+      "n_extra_rows": 0,
+      "n_wrong_dates": 0,
+      "owner_form": "N",
+      "owner_form_errors": [],
+      "review": {
+        "all_met": true,
+        "ambiguous_token": false,
+        "mapped_by": "commit",
+        "met": 8,
+        "of": 8,
+        "result": "20261028T000018684934-lead.reviewer-d3c7",
+        "result_created": "2026-10-28T00:00:18Z",
+        "sent_before_commit_s": 0,
+        "status": "done",
+        "task": "20261027T235946726438-lead-367f",
+        "task_created": "2026-10-27T23:59:46Z",
+        "tasks": [
+          "20261027T235946726438-lead-367f"
+        ],
+        "verdict": null
+      },
+      "sha": "4841cd4",
+      "summary_first": true,
+      "version": 2,
+      "words": 170,
+      "wrong_date_text": [],
+      "wrong_dates": []
+    },
+    {
+      "actions": {
+        "k": 5,
+        "n": 5
+      },
+      "actions_found": [
+        "A1",
+        "A2",
+        "A3",
+        "A4",
+        "A5"
+      ],
+      "commit_time": "2026-10-28T00:04:17Z",
+      "copied": true,
+      "copied_by": [
+        "log-commit"
+      ],
+      "copies": [
+        {
+          "call": 100,
+          "commit": "dee803a",
+          "commit_time": "2026-10-28T00:04:17Z",
+          "memo": "2026-11-02",
+          "time": "2026-10-28T00:07:05.568Z",
+          "tool": "execute_bash",
+          "turn": 24
+        }
+      ],
+      "decisions": {
+        "k": 3,
+        "n": 3
+      },
+      "decisions_before_actions": true,
+      "decisions_found": [
+        "D1",
+        "D2",
+        "D3"
+      ],
+      "extra_rows": [],
+      "file": "memos/versions/memo-2026-11-02.v1.dee803a.md",
+      "final": false,
+      "index_md5": "5e9e7077f3bd2bb35efc7b352cf7517e",
+      "md5": "5e9e7077f3bd2bb35efc7b352cf7517e",
+      "memo": "2026-11-02",
+      "n_extra_rows": 0,
+      "n_wrong_dates": 0,
+      "owner_form": "N",
+      "owner_form_errors": [
+        {
+          "action": "A3",
+          "cell": "JD",
+          "form": "N",
+          "owner": "JD"
+        }
+      ],
+      "review": {
+        "all_met": false,
+        "ambiguous_token": true,
+        "mapped_by": "commit",
+        "met": 7,
+        "of": 8,
+        "result": "20261028T000526193382-lead.reviewer-9c79",
+        "result_created": "2026-10-28T00:05:26Z",
+        "sent_before_commit_s": 0,
+        "status": "blocked",
+        "task": "20261028T000438917966-lead-9df1",
+        "task_created": "2026-10-28T00:04:38Z",
+        "tasks": [
+          "20261028T000438917966-lead-9df1"
+        ],
+        "verdict": null
+      },
+      "sha": "dee803a",
+      "summary_first": true,
+      "version": 1,
+      "words": 169,
+      "wrong_date_text": [],
+      "wrong_dates": []
+    },
+    {
+      "actions": {
+        "k": 5,
+        "n": 5
+      },
+      "actions_found": [
+        "A1",
+        "A2",
+        "A3",
+        "A4",
+        "A5"
+      ],
+      "commit_time": "2026-10-28T00:10:38Z",
+      "copied": true,
+      "copied_by": [
+        "log-commit",
+        "log-md5",
+        "final-md5"
+      ],
+      "copies": [
+        {
+          "call": 108,
+          "commit": "febd4df",
+          "commit_time": "2026-10-28T00:10:38Z",
+          "memo": "2026-11-02",
+          "time": "2026-10-28T00:12:16.458Z",
+          "tool": "execute_bash",
+          "turn": 26
+        }
+      ],
+      "decisions": {
+        "k": 3,
+        "n": 3
+      },
+      "decisions_before_actions": true,
+      "decisions_found": [
+        "D1",
+        "D2",
+        "D3"
+      ],
+      "extra_rows": [],
+      "file": "memos/versions/memo-2026-11-02.v2.febd4df.md",
+      "final": true,
+      "index_md5": "cc3fce30b979ff0bb467b4c95ef4ef55",
+      "md5": "cc3fce30b979ff0bb467b4c95ef4ef55",
+      "memo": "2026-11-02",
+      "n_extra_rows": 0,
+      "n_wrong_dates": 0,
+      "owner_form": "N+J",
+      "owner_form_errors": [],
+      "review": {
+        "all_met": true,
+        "ambiguous_token": true,
+        "mapped_by": "commit",
+        "met": 9,
+        "of": 9,
+        "result": "20261028T001135110346-lead.reviewer-d51c",
+        "result_created": "2026-10-28T00:11:35Z",
+        "sent_before_commit_s": 0,
+        "status": "done",
+        "task": "20261028T001058790729-lead-3969",
+        "task_created": "2026-10-28T00:10:58Z",
+        "tasks": [
+          "20261028T001058790729-lead-3969"
+        ],
+        "verdict": null
+      },
+      "sha": "febd4df",
+      "summary_first": true,
+      "version": 2,
+      "words": 175,
+      "wrong_date_text": [],
+      "wrong_dates": []
+    },
+    {
+      "actions": {
+        "k": 5,
+        "n": 5
+      },
+      "actions_found": [
+        "A1",
+        "A2",
+        "A3",
+        "A4",
+        "A5"
+      ],
+      "commit_time": "2026-10-28T00:14:27Z",
+      "copied": true,
+      "copied_by": [
+        "log-commit",
+        "log-md5",
+        "final-md5"
+      ],
+      "copies": [
+        {
+          "call": 115,
+          "commit": "90d88e9",
+          "commit_time": "2026-10-28T00:14:27Z",
+          "memo": "2026-11-09",
+          "time": "2026-10-28T00:17:07.630Z",
+          "tool": "execute_bash",
+          "turn": 28
+        }
+      ],
+      "decisions": {
+        "k": 3,
+        "n": 3
+      },
+      "decisions_before_actions": true,
+      "decisions_found": [
+        "D1",
+        "D2",
+        "D3"
+      ],
+      "extra_rows": [],
+      "file": "memos/versions/memo-2026-11-09.v1.90d88e9.md",
+      "final": true,
+      "index_md5": "71bcfc0fd0c6f299b87f4554cd052450",
+      "md5": "71bcfc0fd0c6f299b87f4554cd052450",
+      "memo": "2026-11-09",
+      "n_extra_rows": 0,
+      "n_wrong_dates": 0,
+      "owner_form": "N+J",
+      "owner_form_errors": [],
+      "review": {
+        "all_met": true,
+        "ambiguous_token": true,
+        "mapped_by": "commit",
+        "met": 8,
+        "of": 8,
+        "result": "20261028T001527212798-lead.reviewer-afdf",
+        "result_created": "2026-10-28T00:15:27Z",
+        "sent_before_commit_s": 0,
+        "status": "done",
+        "task": "20261028T001444140159-lead-b276",
+        "task_created": "2026-10-28T00:14:44Z",
+        "tasks": [
+          "20261028T001444140159-lead-b276"
+        ],
+        "verdict": null
+      },
+      "sha": "90d88e9",
+      "summary_first": true,
+      "version": 1,
+      "words": 142,
+      "wrong_date_text": [],
+      "wrong_dates": []
+    }
+  ]
+}

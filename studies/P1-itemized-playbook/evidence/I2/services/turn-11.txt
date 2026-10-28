@@ -1,0 +1,16 @@
+Services you can request (from your direct reports):
+- weekly-meeting-memo (offered by lead; contract v2, playbook v2): One memo of decisions and action items from one meeting's notes file.
+  inputs: meeting_file* (File name of the meeting notes in the notes folder, e.g. 2026-10-05.md)   (* required)
+  each request: 12 runs; acceptance criteria (lead/services/weekly-meeting-memo/SERVICE.md):
+    C1: The memo is based on the requested notes file only.
+    C2: At most 400 words as counted by read.
+    C3: The memo has a section titled "Decisions" with one bullet for every decision stated in the notes, and a section titled "Actions" containing a markdown table with exactly the columns Owner | Action | Due; it has no other sections besides a title that names the meeting date.
+    C4: The Actions table has one row for every commitment in the notes, including informal ones said in prose (for example 'X said he'd do Y'), and no row for anything nobody committed to.
+    C5: Due is an ISO date (YYYY-MM-DD). A relative deadline such as 'by Friday' is converted to a date using the meeting date when the notes make the date clear. Due is 'none' when the notes give no date or say none.
+    C6: Every decision and action is traceable to the notes, and nothing is invented.
+    C7: The reviewer's report shows every criterion met (criteria met: n of m with n = m), and the writer applied every required change.
+    C8: The memo has a one-line 'Summary:' of the meeting directly after the title, then the Decisions section, then the Actions section; the Summary line is the only addition to what the "Decisions"/"Actions" criterion allows.
+  record: 2 request(s): 1 done, 0 failed, 1 open; 1 reworked; avg 5 runs; feedback 1 accept (1 after a reject), 0 reject
+  regression list (the client's rejections):
+    R1 (case 20261027T230507597219-root-5204, about C8): "No, not right yet. Always start the memo with a one-line 'Summary:' of the meeting, then the decisions, then the action items." (items citing it: P11)
+  playbook v2 (2026-10-27): "Own words of C8, a criterion the client confirmed (rejection R1, link note de21)."; 11 items (0 rules); watched: P11 new (0 of 3 clean cases, k 3; waiting for the client's verdict on 1 case)

@@ -1,0 +1,122 @@
+{
+  "could_not_derive": [],
+  "items": {
+    "AMB-1": {
+      "memo": "2026-10-19",
+      "owner": "Marta",
+      "recall": {
+        "k": 1,
+        "n": 1
+      },
+      "recall_literal_timing": {
+        "k": 1,
+        "n": 1
+      },
+      "versions": [
+        {
+          "commit_time": "2026-10-26T06:03:20Z",
+          "contains": true,
+          "lead_forwarded": true,
+          "lead_item": "C5: Marta 'will keep the agenda as sent' is listed as a row (Due none). Reviewer: 'reads as a commitment, but could be read as status/restatement'.",
+          "lead_item_names_criterion": true,
+          "lead_result": "20261026T060442919168-lead-34d6",
+          "listed_ambiguous": true,
+          "listed_by": "ambiguous token",
+          "listed_line": "Ambiguous (lead to decide, not decided by me): A1 C5 Marta 'will keep the agenda as sent' (in memo as row, Due none); A2 C7 Lee 'probably by end of next week' (Due none, wording kept; I judge consistent); A3 C5 Sam's offer to pair with Jo (",
+          "literal_listed_ambiguous": true,
+          "literal_reviewed": true,
+          "next_version": 2,
+          "progress_call": 54,
+          "progress_flagged": true,
+          "progress_source": "assistant-tool-calls.txt",
+          "progress_time": "2026-10-26T06:04:43.352Z",
+          "review_result": "20261026T060417256257-lead.reviewer-da72",
+          "review_sent_before_commit_s": 0,
+          "review_task": "20261026T060333512699-lead-2bd8",
+          "reviewed": true,
+          "row": "Marta | Keep the demo agenda as sent | none",
+          "sha": "e915785",
+          "version": 1,
+          "writer_left_out": true
+        }
+      ],
+      "versions_containing": 1,
+      "versions_of_the_memo": 2
+    },
+    "AMB-2": {
+      "memo": "2026-10-12",
+      "owner": "Sam",
+      "recall": {
+        "k": 0,
+        "n": 0
+      },
+      "recall_literal_timing": {
+        "k": 0,
+        "n": 0
+      },
+      "versions": [],
+      "versions_containing": 0,
+      "versions_of_the_memo": 1
+    }
+  },
+  "label": "m1-s1",
+  "recall": {
+    "k": 1,
+    "n": 1
+  },
+  "recall_literal_timing": {
+    "k": 1,
+    "n": 1
+  },
+  "roles": {
+    "children": [
+      "lead/reviewer",
+      "lead/writer"
+    ],
+    "detected_by": "charter",
+    "owner": "lead",
+    "reviewer": "lead/reviewer",
+    "reviewer_dir": "lead-reviewer",
+    "roles": {
+      "lead/reviewer": "Independent Reviewer",
+      "lead/writer": "Writer"
+    }
+  },
+  "script": {
+    "md5": "92b67f74a38c04895402803e9388e718",
+    "name": "ambiguity_recall.py"
+  },
+  "source_files": [
+    "assistant-tool-calls.txt",
+    "injection/injection-log.txt",
+    "memos/versions/INDEX.txt",
+    "memos/versions/memo-2026-10-05.v1.ca1e8e3.md",
+    "memos/versions/memo-2026-10-05.v2.936b037.md",
+    "memos/versions/memo-2026-10-05.v3.b981427.md",
+    "memos/versions/memo-2026-10-05.v4.d39640a.md",
+    "memos/versions/memo-2026-10-05.v5.003b89f.md",
+    "memos/versions/memo-2026-10-12.v1.5d74168.md",
+    "memos/versions/memo-2026-10-19.v1.e915785.md",
+    "memos/versions/memo-2026-10-19.v2.6399954.md",
+    "msgs/lead-read/20261026T053918554164-lead.reviewer-2bea.md",
+    "msgs/lead-read/20261026T054116437504-lead.reviewer-7931.md",
+    "msgs/lead-read/20261026T054611593595-lead.reviewer-ce33.md",
+    "msgs/lead-read/20261026T054956586428-lead.reviewer-ee2e.md",
+    "msgs/lead-read/20261026T055459599587-lead.reviewer-4747.md",
+    "msgs/lead-read/20261026T055942026410-lead.reviewer-b730.md",
+    "msgs/lead-read/20261026T060417256257-lead.reviewer-da72.md",
+    "msgs/lead-read/20261026T060752570508-lead.reviewer-bfe3.md",
+    "msgs/lead-reviewer-read/20261026T053831116604-lead-5c3a.md",
+    "msgs/lead-reviewer-read/20261026T054038152910-lead-a346.md",
+    "msgs/lead-reviewer-read/20261026T054522364166-lead-7fc5.md",
+    "msgs/lead-reviewer-read/20261026T054915764930-lead-9b2c.md",
+    "msgs/lead-reviewer-read/20261026T055424709784-lead-1bca.md",
+    "msgs/lead-reviewer-read/20261026T055858844926-lead-de91.md",
+    "msgs/lead-reviewer-read/20261026T060333512699-lead-2bd8.md",
+    "msgs/lead-reviewer-read/20261026T060718028980-lead-486f.md",
+    "msgs/lead-sent/20261026T060442919168-lead-34d6.md",
+    "org-files/lead-reviewer-AGENT.md",
+    "org-files/lead-writer-AGENT.md",
+    "org-git-log.txt"
+  ]
+}

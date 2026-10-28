@@ -1,0 +1,4 @@
+profile deleted 2026-10-27T18:59:21Z: /Users/aminalizadeh/.kiro/agents/hirearchy-study-p1-probe-F1-assistant.json md5 d6379abe4f6b10f0dcaacf64a0991634
+profile deleted 2026-10-27T19:01:28Z: /Users/aminalizadeh/.kiro/agents/hirearchy-study-p1-probe-I1-assistant.json md5 ee593d23a7e64a87c7b6659c3f7d02eb
+profile deleted 2026-10-27T19:03:33Z: /Users/aminalizadeh/.kiro/agents/hirearchy-study-p1-probe-I2-assistant.json md5 e4782e0a10585756d70e95a3d4e51494
+profile deleted 2026-10-27T19:05:45Z: /Users/aminalizadeh/.kiro/agents/hirearchy-study-p1-probe-F2-assistant.json md5 c3a7dff42570ebf4a72b853d7f86fe1b

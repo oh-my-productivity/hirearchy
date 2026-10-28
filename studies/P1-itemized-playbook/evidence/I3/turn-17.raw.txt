@@ -1,0 +1,7 @@
+I've recorded your rejection. The delivered 2026-10-26 memo is unchanged for now.
+
+This conflicts with the initials rule from before (C11, "Owners … initials only"). If you say yes, I'd replace C11 with the new rule, so there is only one rule about owners. The notes give only first names, such as Priya, Sam, Lee, Marta and Dev, and the notes' "JD" is the only initials-only owner. I'll read "full names" as the names exactly as the notes write them.
+
+About C11: add "Owners in the action-items table are shown as full names, as written in the notes" as a lasting rule, replacing the initials-only rule? Yes or no.
+
+On yes, I'll send this memo back for one writer pass and one re-check, about 5 more runs. That would bring it to about 10 of your 12.

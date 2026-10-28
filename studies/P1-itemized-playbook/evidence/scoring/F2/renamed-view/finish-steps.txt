@@ -1,0 +1,21 @@
+# finish_stream.sh F2 started 2026-10-28T01:56:30Z
+no scheduler running at 2026-10-28T01:56:30Z: no --stop
+copy_org_evidence exit 0  (2026-10-28T01:56:30Z .. 2026-10-28T01:56:38Z)  -> copy_org_evidence-output.txt
+copy injection folder exit 0  (2026-10-28T01:56:38Z .. 2026-10-28T01:56:38Z)  -> /dev/null
+observe check -> observe-check.txt (exit code: 0)
+quality_snapshot end exit 0  (2026-10-28T01:56:38Z .. 2026-10-28T01:56:39Z)  -> quality/end-snapshot-output.txt
+services_snapshot end exit 0  (2026-10-28T01:56:39Z .. 2026-10-28T01:56:39Z)  -> services/end-snapshot-output.txt
+extract_tool_calls exit 0  (2026-10-28T01:56:39Z .. 2026-10-28T01:56:39Z)  -> extract_tool_calls-output.txt
+extract_proposals exit 0  (2026-10-28T01:56:39Z .. 2026-10-28T01:56:39Z)  -> measures/extract_proposals-output.txt
+extract_mechanical exit 0  (2026-10-28T01:56:39Z .. 2026-10-28T01:56:40Z)  -> extract_mechanical-output.txt
+scheduler_survival exit 0  (2026-10-28T01:56:40Z .. 2026-10-28T01:56:40Z)  -> measures/scheduler_survival-output.txt
+scheduler_survival (measures/) exit 0  (2026-10-28T01:56:40Z .. 2026-10-28T01:56:40Z)  -> measures/scheduler_survival-measures-output.txt
+injection_files exit 0  (2026-10-28T01:56:40Z .. 2026-10-28T01:56:41Z)  -> measures/injection_files-output.txt
+assistant_facts exit 0  (2026-10-28T01:56:41Z .. 2026-10-28T01:56:41Z)  -> measures/assistant_facts-output.txt
+score_memos exit 0  (2026-10-28T01:56:41Z .. 2026-10-28T01:56:41Z)  -> measures/score_memos-output.txt
+ambiguity_recall exit 0  (2026-10-28T01:56:41Z .. 2026-10-28T01:56:41Z)  -> measures/ambiguity_recall-output.txt
+prompt_sizes exit 0  (2026-10-28T01:56:41Z .. 2026-10-28T01:56:41Z)  -> measures/prompt_sizes-output.txt
+playbook_attempts exit 0  (2026-10-28T01:56:41Z .. 2026-10-28T01:56:41Z)  -> measures/playbook_attempts-output.txt
+rederive_quality exit 0  (2026-10-28T01:56:41Z .. 2026-10-28T01:56:41Z)  -> rederived/rederive_quality-output.txt
+model_check all exit 0 -> model-checks.txt
+# finish_stream.sh F2 ended 2026-10-28T01:56:42Z; failed steps: 0

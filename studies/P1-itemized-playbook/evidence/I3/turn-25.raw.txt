@@ -1,0 +1,8 @@
+I've recorded your "keep it" as the accept for the 2026-11-09 memo. It stays at `/private/tmp/hirearchy-p1-I3-1793157452/deliverables/memo-2026-11-09.md`, and nothing is running.
+
+For next week, ask me to "write the memo for notes/<file>". The team will apply your rules automatically:
+- A one-line "Summary:" comes first, then the decisions, then the action items table.
+- Owners appear as written in the notes.
+- An owner given only as initials appears as the initials plus "(full name not in the notes)".
+
+The 2026-10-05 and 2026-10-12 memos stay as they are, as you said.

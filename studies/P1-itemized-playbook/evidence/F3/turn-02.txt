@@ -1,0 +1,45 @@
+######## TURN 2  start 02:03:00  end 02:03:41  elapsed 41s  (local, 2026-10-28; UTC wall-clock start 2026-10-28T02:03:00Z end 2026-10-28T02:03:41Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Thanks! Yes, if someone said they'd do something, it counts. Yes, turn vague deadlines into a date when the notes make it clear. The file name each time is fine. Format: a markdown memo, at most 400 words, with the action items as a table with columns Owner | Action | Due (ISO dates, 'none' if there's no date). The rest of your defaults are fine, the deliverables folder too. Please keep it cheap, but I need it right - about 12 runs per memo.
+
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-02.stderr.txt):
+Here is the plan. The one warning is about budget: 12 runs per memo covers a normal pass with one fix-up. It doesn't cover a round of your questions or a rejection, which takes about 5 more.
+
+PLAN FOR YOU
+Goal: After each weekly team meeting, write a short markdown memo from the user's notes file for that meeting: what was decided and who does what.
+What I understood you need:
+- Scope: One memo per request, from the one meeting notes file named in the request: the decisions made and the action items (who does what, by when). Nothing from other meetings' files, no commentary.
+- Your files (read-only): /tmp/hirearchy-p1-F3-1793152805/notes
+- Quality bar: Every decision and every commitment in the named notes file is in the memo, and nothing in the memo is missing from the notes.
+- Sources: Only the files in needs.inputs; no web.
+- Workspace: none (nothing writes files or runs commands)
+- Models: claude-sonnet-5.5 (high effort) for every agent
+Team (3 agents):
+- lead (Manager, model claude-sonnet-5.5): directs the team; does not produce the work itself; can read files only in /private/tmp/hirearchy-p1-F3-1793152805/notes and the organization's own files; cannot change your files
+  - writer (Writer, model claude-sonnet-5.5): can read files only in /private/tmp/hirearchy-p1-F3-1793152805/notes and the organization's own files; cannot change your files
+  - reviewer (Independent Reviewer, model claude-sonnet-5.5): can read files only in /private/tmp/hirearchy-p1-F3-1793152805/notes and the organization's own files; cannot change your files
+Budget: up to 12 runs per request (one run = one working session of one agent), your cap per request is 12; the minimum for one review and rework is 11, and a round of your questions or a rejection takes about 5 more (16 in all). Unspent runs come back to you.
+  lead starts with 12, hands down writer 3, reviewer 2 and keeps 7 for planning, checking and rework.
+If a check still fails after one rework, I'll come back to you with options before spending the reserve; nothing beyond a request's budget is spent without your OK.
+Checking: reviewer reviews the work independently (they did not write it); required changes go back to the author. I then re-check the final result against every service check below.
+Services (kept ready, requested whenever you want):
+- weekly-meeting-memo: One short markdown memo (decisions and action items table) from one weekly meeting notes file.
+  You provide: notes_file (required)
+  Each request: up to 12 runs
+  Checks:
+    1. The memo covers only the meeting in the named notes file.
+    2. The memo is markdown and has at most 400 words as counted by read.
+    3. The memo has a Decisions section listing every decision recorded in the notes file, one line each.
+    4. The memo has the action items as a markdown table with exactly the columns Owner | Action | Due.
+    5. The table contains every commitment in the notes file, including informal ones stated in prose (for example 'X said they would do Y'), whether or not it is labelled ACTION.
+    6. Every Due value is an ISO date (YYYY-MM-DD) or the word none. A vague deadline (for example 'by Friday') becomes a date, worked out from the meeting date, when the notes make it clear; if no date is given, Due is none.
+    7. Every decision and action item is stated in the named notes file; nothing is invented.
+    8. The reviewer's report shows every criterion met (criteria met: n of m with n = m), and the writer applied every required change.
+  Delivered to: /tmp/hirearchy-p1-F3-1793152805/deliverables (I copy each result there after checking it)
+After each request the lead records lessons; before the next one it reviews them with your feedback and may improve how the team works (its playbook). It cannot change these checks: only you can, through me.
+Nothing runs until you ask for a request: approving only creates the team and the services.
+Checkpoints: approval - Plan first; ask before any spend beyond the budget; progress - One line when I ask; any spend beyond the budget needs your OK.
+Warnings (1):
+- 12 runs per request covers one pass and one internal rework (the estimate is 11), not a round of your questions or a rejection, which takes about 5 more (1, plus 2 for each agent below lead): 16 per request covers one such round
+
+Use 16 runs per request (covers one round of your questions or a rejection), or keep 12? Reply "approve" to keep 12, or "approve 16".

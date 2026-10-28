@@ -1,0 +1,28 @@
+# requests-by-turn, re-derived by the scorer from msgs/sent (input name 'notes_file'; manager-decision-memo-input-name.md item 2); the frozen requests-by-turn.txt is not edited
+
+turn 01: root's new requests by notes file: (none); memo 4's request (2026-10-26.md) sent: no  (cut-off 2026-10-28T02:02:04+00:00)
+turn 02: root's new requests by notes file: (none); memo 4's request (2026-10-26.md) sent: no  (cut-off 2026-10-28T02:04:01+00:00)
+turn 03: root's new requests by notes file: 2026-10-05; memo 4's request (2026-10-26.md) sent: no  (cut-off 2026-10-28T02:09:55.832035+00:00)
+turn 04: root's new requests by notes file: 2026-10-05; memo 4's request (2026-10-26.md) sent: no  (cut-off 2026-10-28T02:11:44.698285+00:00)
+turn 05: root's new requests by notes file: 2026-10-05; memo 4's request (2026-10-26.md) sent: no  (cut-off 2026-10-28T02:15:07.833509+00:00)
+turn 06: root's new requests by notes file: 2026-10-05; memo 4's request (2026-10-26.md) sent: no  (cut-off 2026-10-28T02:16:29.632213+00:00)
+turn 07: root's new requests by notes file: 2026-10-05; memo 4's request (2026-10-26.md) sent: no  (cut-off 2026-10-28T02:22:15.071304+00:00)
+turn 08: root's new requests by notes file: 2026-10-05; memo 4's request (2026-10-26.md) sent: no  (cut-off 2026-10-28T02:24:00.432259+00:00)
+turn 09: root's new requests by notes file: 2026-10-05 2026-10-12; memo 4's request (2026-10-26.md) sent: no  (cut-off 2026-10-28T02:28:11.688852+00:00)
+turn 10: root's new requests by notes file: 2026-10-05 2026-10-12; memo 4's request (2026-10-26.md) sent: no  (cut-off 2026-10-28T02:32:23.791411+00:00)
+turn 11: root's new requests by notes file: 2026-10-05 2026-10-12; memo 4's request (2026-10-26.md) sent: no  (cut-off 2026-10-28T02:36:35.721579+00:00)
+turn 12: root's new requests by notes file: 2026-10-05 2026-10-12 2026-10-19; memo 4's request (2026-10-26.md) sent: no  (cut-off 2026-10-28T02:41:00.306718+00:00)
+turn 13: root's new requests by notes file: 2026-10-05 2026-10-12 2026-10-19; memo 4's request (2026-10-26.md) sent: no  (cut-off 2026-10-28T02:45:10.531100+00:00)
+turn 14: root's new requests by notes file: 2026-10-05 2026-10-12 2026-10-19 2026-10-26; memo 4's request (2026-10-26.md) sent: yes  (cut-off 2026-10-28T02:48:46.688859+00:00)
+turn 15: root's new requests by notes file: 2026-10-05 2026-10-12 2026-10-19 2026-10-26; memo 4's request (2026-10-26.md) sent: yes  (cut-off 2026-10-28T02:50:48.438067+00:00)
+turn 16: root's new requests by notes file: 2026-10-05 2026-10-12 2026-10-19 2026-10-26; memo 4's request (2026-10-26.md) sent: yes  (cut-off 2026-10-28T02:51:55.241167+00:00)
+turn 17: root's new requests by notes file: 2026-10-05 2026-10-12 2026-10-19 2026-10-26; memo 4's request (2026-10-26.md) sent: yes  (cut-off 2026-10-28T02:55:49.127240+00:00)
+turn 18: root's new requests by notes file: 2026-10-05 2026-10-12 2026-10-19 2026-10-26 2026-11-02; memo 4's request (2026-10-26.md) sent: yes  (cut-off 2026-10-28T03:00:08.295020+00:00)
+turn 19: root's new requests by notes file: 2026-10-05 2026-10-12 2026-10-19 2026-10-26 2026-11-02; memo 4's request (2026-10-26.md) sent: yes  (cut-off 2026-10-28T03:01:24.219872+00:00)
+turn 20: root's new requests by notes file: 2026-10-05 2026-10-12 2026-10-19 2026-10-26 2026-11-02; memo 4's request (2026-10-26.md) sent: yes  (cut-off 2026-10-28T03:02:30.937216+00:00)
+turn 21: root's new requests by notes file: 2026-10-05 2026-10-12 2026-10-19 2026-10-26 2026-11-02; memo 4's request (2026-10-26.md) sent: yes  (cut-off 2026-10-28T03:06:18.038592+00:00)
+turn 22: root's new requests by notes file: 2026-10-05 2026-10-12 2026-10-19 2026-10-26 2026-11-02 2026-11-09; memo 4's request (2026-10-26.md) sent: yes  (cut-off 2026-10-28T03:09:46.396620+00:00)
+turn 23: root's new requests by notes file: 2026-10-05 2026-10-12 2026-10-19 2026-10-26 2026-11-02 2026-11-09; memo 4's request (2026-10-26.md) sent: yes  (cut-off 2026-10-28T03:11:04.727734+00:00)
+turn 24: root's new requests by notes file: 2026-10-05 2026-10-12 2026-10-19 2026-10-26 2026-11-02 2026-11-09; memo 4's request (2026-10-26.md) sent: yes  (cut-off 2026-10-28T03:12:04.134652+00:00)
+
+requests (id, value, memo): 20261028T020446926323-root-853d 2026-10-05.md 2026-10-05; 20261028T022451461753-root-1315 2026-10-12.md 2026-10-12; 20261028T023724010258-root-60f5 2026-10-19.md 2026-10-19; 20261028T024549764740-root-721e 2026-10-26.md 2026-10-26; 20261028T025708950315-root-7f35 2026-11-02.md 2026-11-02; 20261028T030649064532-root-926f 2026-11-09.md 2026-11-09

@@ -1,0 +1,3 @@
+check 1 (reply): yes
+check 2 (locked: true, version = before + 1): yes
+check 3 (the owner's quiet note): yes

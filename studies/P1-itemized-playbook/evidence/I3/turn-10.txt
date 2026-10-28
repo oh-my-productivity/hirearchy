@@ -1,0 +1,17 @@
+######## TURN 10  start 03:51:03  end 03:54:15  elapsed 192s  (local, 2026-10-28; UTC wall-clock start 2026-10-28T03:51:03Z end 2026-10-28T03:54:15Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Yes, that counts. No need for 'probably'. Sam's 2026-10-21 is right. No, that's an action item, not a decision. Use the words from the notes. No, that's just a status update, leave it out.
+
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-10.stderr.txt):
+The memo for 2026-10-12 is at `/private/tmp/hirearchy-p1-I3-1793157452/deliverables/memo-2026-10-12.md` (177 words).
+
+I checked it against your notes and your answers:
+- **C1, C2, C3:** met. It covers only this meeting, is 177 words, and has 3 decisions in the notes' words. Decision 1 now includes "per API key". Lee's swap is an action item only, not a decision.
+- **C4, C5, C6:** met. There are 5 rows: Dev, Marta, Priya, Sam and Lee. Sam's CI update has no row and Sam's action has no "probably". The Action text comes from the notes.
+- **C7:** met. The dates are Dev 2026-10-14, Marta 2026-10-16, Priya 2026-10-20 and Sam 2026-10-21. Lee is `none`.
+- **C8, C10:** met. Everything traces to the notes. The memo has the title, a one-line "Summary:", the decisions, then the action items. There is no "Source:" line and no Due-column notes section.
+- **C9:** met. The reviewer's score was "criteria met: 11 of 11".
+
+The team used 10 runs, 5 for the draft and 5 for your changes. That is within your 12.
+
+Is this one right, or what should change?

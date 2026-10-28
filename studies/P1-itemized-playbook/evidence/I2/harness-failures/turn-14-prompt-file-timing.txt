@@ -1,0 +1,5 @@
+Facilitator slip, found by the stream-i2 step right after turn 14 (2026-10-27; not an H rule; no effect on the course):
+At turn 14 the step issued run_turn.sh and the call that wrote prompts/t14.txt and the lena-lines.txt entry in ONE block of parallel tool calls. The prompt file and
+lena-lines.txt were both written at 23:38:16 (mtime), the second in which run_turn.sh started (turn-times.txt: utc start 23:38:16Z). The line that was sent is exactly the intended fixed line:
+turn-14.prompt.txt and turn-14.cmd.txt show 'Yes, add it.' (K28, K26 with [owner-crit] none); the row was chosen and recorded before the send was intended, but the file writes and the send
+were not sequenced. Same kind of slip as I1 turn 15 (I1/run-log-notes.txt). From turn 15 on the lena-lines entry and the prompt file are written in their own call, checked, and only then run_turn.sh is called.

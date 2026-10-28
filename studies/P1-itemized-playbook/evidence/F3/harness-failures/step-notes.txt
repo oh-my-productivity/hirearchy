@@ -1,0 +1,3 @@
+F3 stream step: no harness failure, no facilitator slip that could have changed the course. Two step-side notes (also in run-log.md items 11 and 12):
+1. Credential display: the step's first diagnostic (env | grep KIRO) printed the environment's KIRO_* variables, including an API key, into the step's own tool output. Nothing was copied to any file; no evidence file holds it.
+2. Scratch: two helper files in /tmp, outside the study directory (a read-only check of the frozen line parser, and a git-show copy of the design), were created and deleted by the step. No file under ~/.kiro (other than the study's own profile, created and deleted with a record), the user's org or the product was written.

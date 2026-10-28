@@ -1,0 +1,11 @@
+I've recorded your accept of the 9 November memo, and the team has no open work.
+
+The weekly memo service stays set up. For the next meeting, give me the notes file name, for example `2026-11-16.md`, and I'll run it with the current rules:
+- A `Summary:` line comes first, then Decisions, then Action items.
+- Owners are shown as full names.
+- An owner the notes give only as initials is shown as the initials plus "(full name not in the notes)".
+- A dated event gives the Due date.
+
+The 5 October memo in `deliverables` is the version you accepted. It predates the later rules and has no `Summary:` line.
+
+About the 5-run rework on the 5 October memo that you didn't ask for: I couldn't find out what triggered it, and its output never reached `deliverables`. The team counted it as my spend, so I won't ask you to pay for it.

@@ -1,0 +1,223 @@
+# shell writes (protocol 7.2): every execute_bash call of the assistant; facts only
+
+[2026-10-27T23:12:33.147Z] call #23 turn 4 status=completed flags=['touches S/org']
+COMMAND: wc -w /tmp/hirearchy-p1-I2-1793142034/org/lead/writer/work/memo-2026-10-05.md
+RESULT: Output:
+     138 /tmp/hirearchy-p1-I2-1793142034/org/lead/writer/work/memo-2026-10-05.md
+
+
+Exit Code: 0
+
+[2026-10-27T23:12:39.254Z] call #24 turn 4 status=completed flags=['writes into the deliverable folder', 'touches S/org']
+COMMAND: mkdir -p /tmp/hirearchy-p1-I2-1793142034/deliverables && cp /tmp/hirearchy-p1-I2-1793142034/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-p1-I2-1793142034/deliverables/memo-2026-10-05.md && diff /tmp/hirearchy-p1-I2-1793142034/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-p1-I2-1793142034/deliverables/memo-2026-10-05.md && echo identical && ls -l /tmp/hirearchy-p1-I2-1793142034/deliverables
+RESULT: Output:
+identical
+total 8
+-rw-r--r--@ 1 aminalizadeh  wheel  729 Oct 27 23:12 memo-2026-10-05.md
+
+
+Exit Code: 0
+
+[2026-10-27T23:19:28.822Z] call #30 turn 6 status=completed flags=['none']
+COMMAND: cat /tmp/hirearchy-p1-I2-1793142034/deliverables/memo-2026-10-05.md
+RESULT: Output:
+# Platform team weekly memo, 2026-10-05
+
+## Decisions
+
+- Push the API gateway migration to the week of 26 October (not the week of 12 October) and use the extra time for the failing services.
+- Adopt Renovate with a weekly Monday batch of dependency PRs, starting with the three core repos and widening later if the noise is acceptable.
+
+## Actions
+
+| Owner | Action | Due |
+|-------|--------|-----|
+| Priya | Draft the RFC for the new per-key rate limiter | 2026-10-09 |
+| Dev | Enable Renovate on the three core repos | 2026-10-08 |
+| Sam | Look into the flaky CI | 2026-10-09 |
+| Marta | Book the on-call training room | 2026-10-14 |
+| Lee | Ping the identity vendor about the SSO certificate renewal and report back | none |
+
+
+Exit Code: 0
+
+[2026-10-27T23:29:28.126Z] call #40 turn 10 status=completed flags=['writes into the deliverable folder', 'touches S/org']
+COMMAND: cd /tmp/hirearchy-p1-I2-1793142034 && cp org/lead/writer/work/memo-2026-10-05.md deliverables/memo-2026-10-05.md && diff org/lead/writer/work/memo-2026-10-05.md deliverables/memo-2026-10-05.md && echo identical && cat deliverables/memo-2026-10-05.md && wc -w deliverables/memo-2026-10-05.md
+RESULT: Output:
+identical
+# Platform team weekly memo, 2026-10-05
+
+Summary: The API gateway migration is pushed to the week of 26 October, Renovate is adopted, and five actions were assigned.
+
+## Decisions
+
+- Push the API gateway migration to the week of 26 October (not the week of 12 October) and use the extra time for the failing services.
+- Adopt Renovate with a weekly Monday batch of dependency PRs, starting with the three core repos and widening later if the noise is acceptable.
+
+## Actions
+
+| Owner | Action | Due |
+|-------|--------|-----|
+| Priya | Draft the RFC for the new per-key rate limiter | 2026-10-09 |
+| Dev | Enable Renovate on the three core repos | 2026-10-08 |
+| Sam | Look into the flaky CI | 2026-10-09 |
+| Marta | Book the on-call training room | 2026-10-14 |
+| Lee | Ping the identity vendor about the SSO certificate renewal and report back | none |
+     159 deliverables/memo-2026-10-05.md
+
+
+Exit Code: 0
+
+[2026-10-27T23:36:19.039Z] call #48 turn 12 status=completed flags=['writes into the deliverable folder', 'touches S/org']
+COMMAND: cd /tmp/hirearchy-p1-I2-1793142034 && cp org/lead/writer/work/memo-2026-10-12.md deliverables/memo-2026-10-12.md && diff org/lead/writer/work/memo-2026-10-12.md deliverables/memo-2026-10-12.md && echo identical && cat deliverables/memo-2026-10-12.md && wc -w deliverables/memo-2026-10-12.md && ls deliverables
+RESULT: Output:
+identical
+# Platform team weekly memo, 2026-10-12
+
+Summary: The rate limiter RFC is approved with a per-API-key token bucket, the postmortem will be blameless and company-wide, a deploy freeze is set for 22 and 23 October, and five actions were assigned.
+
+## Decisions
+
+- Approve the rate limiter RFC with the token bucket per API key design, and ship it behind a feature flag first.
+- Make the postmortem for the 8 October billing outage blameless and share it with the whole company, not just engineering.
+- Hold a deploy freeze on 22 and 23 October for the customer demo.
+
+## Actions
+
+| Owner | Action | Due |
+|-------|--------|-----|
+| Dev | Write the postmortem for the 8 October outage | 2026-10-14 |
+| Marta | Send the demo agenda to the customer | 2026-10-16 |
+| Priya | Start implementing the rate limiter behind a feature flag | 2026-10-20 |
+| Sam | Update the out-of-date staging test data | 2026-10-21 |
+| Lee | Swap pager shifts with Dev for the demo week | none |
+     178 deliverables/memo-2026-10-12.md
+memo-2026-10-05.md
+memo-2026-10-12.md
+
+
+Exit Code: 0
+
+[2026-10-27T23:43:13.554Z] call #58 turn 15 status=completed flags=['writes into the deliverable folder', 'touches S/org']
+COMMAND: cd /tmp/hirearchy-p1-I2-1793142034 && cp org/lead/writer/work/memo-2026-10-12.md deliverables/memo-2026-10-12.md && diff org/lead/writer/work/memo-2026-10-12.md deliverables/memo-2026-10-12.md && echo identical && cat deliverables/memo-2026-10-12.md && wc -w deliverables/memo-2026-10-12.md
+RESULT: Output:
+identical
+# Platform team weekly memo, 2026-10-12
+
+Summary: The rate limiter RFC is approved with a per-API-key token bucket, the postmortem will be blameless and company-wide, a deploy freeze is set for 22 and 23 October, and five actions were assigned.
+
+## Decisions
+
+- Approve the rate limiter RFC with the token bucket per API key design, and ship it behind a feature flag first.
+- Make the postmortem for the 8 October billing outage blameless and share it with the whole company, not just engineering.
+- Hold a deploy freeze on 22 and 23 October for the customer demo.
+
+## Actions
+
+| Owner | Action | Due |
+|-------|--------|-----|
+| D | Write the postmortem for the 8 October outage | 2026-10-14 |
+| M | Send the demo agenda to the customer | 2026-10-16 |
+| P | Start implementing the rate limiter behind a feature flag | 2026-10-20 |
+| S | Update the out-of-date staging test data | 2026-10-21 |
+| L | Swap pager shifts with Dev for the demo week | none |
+     178 deliverables/memo-2026-10-12.md
+
+
+Exit Code: 0
+
+[2026-10-27T23:50:59.926Z] call #71 turn 17 status=completed flags=['writes into the deliverable folder', 'touches S/org']
+COMMAND: cd /tmp/hirearchy-p1-I2-1793142034 && cp org/lead/writer/work/memo-2026-10-19.md deliverables/memo-2026-10-19.md && diff org/lead/writer/work/memo-2026-10-19.md deliverables/memo-2026-10-19.md && echo identical && wc -w deliverables/memo-2026-10-19.md && ls deliverables
+RESULT: Output:
+identical
+     175 deliverables/memo-2026-10-19.md
+memo-2026-10-05.md
+memo-2026-10-12.md
+memo-2026-10-19.md
+
+
+Exit Code: 0
+
+[2026-10-27T23:55:55.971Z] call #80 turn 19 status=completed flags=['writes into the deliverable folder', 'touches S/org']
+COMMAND: cd /tmp/hirearchy-p1-I2-1793142034 && cp org/lead/writer/work/memo-2026-10-26.md deliverables/memo-2026-10-26.md && diff org/lead/writer/work/memo-2026-10-26.md deliverables/memo-2026-10-26.md && echo identical && wc -w deliverables/memo-2026-10-26.md && ls deliverables
+RESULT: Output:
+identical
+     170 deliverables/memo-2026-10-26.md
+memo-2026-10-05.md
+memo-2026-10-12.md
+memo-2026-10-19.md
+memo-2026-10-26.md
+
+
+Exit Code: 0
+
+[2026-10-28T00:02:04.869Z] call #92 turn 22 status=completed flags=['writes into the deliverable folder', 'touches S/org']
+COMMAND: cd /tmp/hirearchy-p1-I2-1793142034 && cp org/lead/writer/work/memo-2026-10-26.md deliverables/memo-2026-10-26.md && diff org/lead/writer/work/memo-2026-10-26.md deliverables/memo-2026-10-26.md && echo identical && wc -w deliverables/memo-2026-10-26.md && ls deliverables
+RESULT: Output:
+identical
+     170 deliverables/memo-2026-10-26.md
+memo-2026-10-05.md
+memo-2026-10-12.md
+memo-2026-10-19.md
+memo-2026-10-26.md
+
+
+Exit Code: 0
+
+[2026-10-28T00:07:05.568Z] call #100 turn 24 status=completed flags=['writes into the deliverable folder', 'touches S/org']
+COMMAND: cd /tmp/hirearchy-p1-I2-1793142034 && cp org/lead/writer/work/memo-2026-11-02.md deliverables/memo-2026-11-02.md && diff org/lead/writer/work/memo-2026-11-02.md deliverables/memo-2026-11-02.md && echo identical && wc -w deliverables/memo-2026-11-02.md && cat deliverables/memo-2026-11-02.md && ls deliverables
+RESULT: Output:
+identical
+     169 deliverables/memo-2026-11-02.md
+# Platform team weekly memo, 2026-11-02
+
+Summary: The old gateway stays as a fallback until 13 November, the rate limiter goes to all plans on 16 November, the deck goes to the customer this week, and five actions were assigned.
+
+## Decisions
+
+- Keep the old gateway running as a fallback until Friday 13 November, then switch it off.
+- Roll out the rate limiter to all plans from Monday 16 November.
+- Send the customer the quarterly review deck this week rather than wait for the review itself.
+
+## Actions
+
+| Owner | Action | Due |
+|-------|--------|-----|
+| Dev | Switch off the old gateway | 2026-11-13 |
+| Priya | Write the rollout plan for all plans | 2026-11-06 |
+| JD | Send the deck to the customer | 2026-11-05 |
+| Marta | Set up the quarterly review meeting with the customer once they confirm a slot | none |
+| Lee | Check the SSO renewal invoice against the quote | 2026-11-04 |
+memo-2026-10-05.md
+memo-2026-10-12.md
+memo-2026-10-19.md
+memo-2026-10-26.md
+memo-2026-11-02.md
+
+
+Exit Code: 0
+
+[2026-10-28T00:12:16.458Z] call #108 turn 26 status=completed flags=['writes into the deliverable folder', 'touches S/org']
+COMMAND: cd /tmp/hirearchy-p1-I2-1793142034 && cp org/lead/writer/work/memo-2026-11-02.md deliverables/memo-2026-11-02.md && diff org/lead/writer/work/memo-2026-11-02.md deliverables/memo-2026-11-02.md && echo identical && wc -w deliverables/memo-2026-11-02.md
+RESULT: Output:
+identical
+     175 deliverables/memo-2026-11-02.md
+
+
+Exit Code: 0
+
+[2026-10-28T00:17:07.630Z] call #115 turn 28 status=completed flags=['writes into the deliverable folder', 'touches S/org']
+COMMAND: cd /tmp/hirearchy-p1-I2-1793142034 && cp org/lead/writer/work/memo-2026-11-09.md deliverables/memo-2026-11-09.md && diff org/lead/writer/work/memo-2026-11-09.md deliverables/memo-2026-11-09.md && echo identical && wc -w deliverables/memo-2026-11-09.md && ls deliverables
+RESULT: Output:
+identical
+     142 deliverables/memo-2026-11-09.md
+memo-2026-10-05.md
+memo-2026-10-12.md
+memo-2026-10-19.md
+memo-2026-10-26.md
+memo-2026-11-02.md
+memo-2026-11-09.md
+
+
+Exit Code: 0
+

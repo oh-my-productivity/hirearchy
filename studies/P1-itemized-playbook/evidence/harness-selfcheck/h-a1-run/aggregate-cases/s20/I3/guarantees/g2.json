@@ -1,0 +1,1 @@
+{"a": {"verdict": "PASS"}, "b": {"verdict": "FAIL", "late_or_missing": ["R5: no answer at the stream's end (the last request, L10)"], "late_detail": [{"R": "R5", "note": "n-R5", "created": "2026-11-03T05:22:30+00:00", "kind": "end"}]}, "c": {"verdict": "FAIL"}}

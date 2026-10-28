@@ -1,0 +1,88 @@
+# window runs (protocol 5.4): runs that started in the injection window 2026-10-27T19:53:54Z .. 2026-10-27T20:00:10Z; injected task 20261027T195354174379-root-c39b; revised (memo 1) task 20261027T194524332999-root-7536
+
+## run lead@20261027T195354413036 agent=lead model=claude-sonnet-5.5 start=2026-10-27T19:53:54.426823+00:00 end=2026-10-27T19:56:13.843813+00:00 exit=0 secs=139 session=sess_c4753f14-f116-4653-9971-ec89aa3baaae
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 2
+  lead message 20261027T195556716693-lead-58e4 to=lead/writer type=task status=None created=2026-10-27T19:55:56+00:00
+  ## Lessons: (none)
+  org-git commit 13d7a8e MEMORY.md diff:
+    commit 13d7a8ef444d5ef292eacae2f08fab19677d7930
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Tue Oct 27 19:56:13 2026 +0000
+    
+        lead: run ok, 1 message(s) [lead/runs/20261027T195354413036.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index a6e1431..0d12009 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,3 +1,5 @@
+     # Memory
+    -Task 20261027T194524332999-root-7536 (memo 2026-10-05 rework) reported DONE to root with reviewer line 'criteria met: 7 of 7 / 17 of 17 factual claims verified'. Nothing open. Nothing to wait for.
+    -Lessons: tell writer to resolve 'before X' literally and flag ambiguous relative dates (user confirmed 'before Friday' = Friday 2026-10-09). Lee-style 'We agreed X would do Y' = action item only, not a decision (user confirmed). 'for Oct 14' (training date) = Due none.
+    +Previous task (memo 2026-10-05 rework 1) DONE. Open now: root task 20261027T195354174379-root-c39b (rework: unclear due dates; budget 6).
+    +Plan: delegated writer 20261027T195556716693-lead-58e4 (budget 2): Sam Due none + 'before Friday' in Action; Marta none + 14 Oct training date in Action; NO 'Open questions' section (conflicts with C1 'exactly two sections'; contract locked). Next run: read lead/writer/work/memo-2026-10-05.md, then delegate reviewer (budget 2, revises 20261027T194835308946-lead-3563) to re-check EVERY Due value vs notes, same file; copy C1-C7. Then final report to root.
+    +In report, put at top 'Questions for the client': (a) requester asked for an Open questions section; C1 forbids a third section, so the info is in the Action text instead; (b) Sam 'before Friday' left as none (not 2026-10-08) per C6.
+    +Lessons: resolve 'before X' literally/flag it; Lee 'We agreed X would do Y' = action item only; 'for Oct 14' = Due none.
+
+## run lead/writer@20261027T195557649895 agent=lead-writer model=claude-sonnet-5.5 start=2026-10-27T19:55:57.665553+00:00 end=2026-10-27T19:57:04.440485+00:00 exit=0 secs=67 session=sess_95e9aa71-7b57-4ff3-9553-3040fd217c23
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 4
+
+## run lead@20261027T195654307281 agent=lead model=claude-sonnet-5.5 start=2026-10-27T19:56:54.327369+00:00 end=2026-10-27T19:57:51.042946+00:00 exit=0 secs=57 session=sess_cdbe3f53-2b86-4197-a766-57a147237998
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 2
+  lead message 20261027T195736213261-lead-0e6b to=lead/reviewer type=task status=None created=2026-10-27T19:57:36+00:00
+  ## Lessons: (none)
+  org-git commit a5a19c6 MEMORY.md diff:
+    commit a5a19c643090fcbef6adfac6d14f787d0f0ad6e2
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Tue Oct 27 19:57:51 2026 +0000
+    
+        lead: run ok, 1 message(s) [lead/runs/20261027T195654307281.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index 0d12009..71683a5 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,5 +1,6 @@
+     # Memory
+    -Previous task (memo 2026-10-05 rework 1) DONE. Open now: root task 20261027T195354174379-root-c39b (rework: unclear due dates; budget 6).
+    -Plan: delegated writer 20261027T195556716693-lead-58e4 (budget 2): Sam Due none + 'before Friday' in Action; Marta none + 14 Oct training date in Action; NO 'Open questions' section (conflicts with C1 'exactly two sections'; contract locked). Next run: read lead/writer/work/memo-2026-10-05.md, then delegate reviewer (budget 2, revises 20261027T194835308946-lead-3563) to re-check EVERY Due value vs notes, same file; copy C1-C7. Then final report to root.
+    -In report, put at top 'Questions for the client': (a) requester asked for an Open questions section; C1 forbids a third section, so the info is in the Action text instead; (b) Sam 'before Friday' left as none (not 2026-10-08) per C6.
+    +Open: root task 20261027T195354174379-root-c39b (rework: unclear due dates; budget 6).
+    +Writer rework 20261027T195556716693-lead-58e4 DONE; I read lead/writer/work/memo-2026-10-05.md (113 words): Sam none + 'before Friday'; Marta none + '14 October (the date the room is for)'; Priya 2026-10-09; Dev 2026-10-08; Lee none; 2 sections only. Looks OK.
+    +Delegated reviewer re-check (budget 2, revises ...-lead-3563) of same file; waiting. Next run: read reviewer report + file, check C1-C7, then report root done (paste reviewer coverage line verbatim + ledger path) or rework once.
+    +In report, top 'Questions for the client': (a) requester asked for an Open questions section; C1 forbids a third section, so info is in Action text; (b) Sam 'before Friday' left as none (not 2026-10-08) per C6; plus any reviewer 'ambiguous' items.
+     Lessons: resolve 'before X' literally/flag it; Lee 'We agreed X would do Y' = action item only; 'for Oct 14' = Due none.
+
+## run lead/reviewer@20261027T195736869767 agent=lead-reviewer model=claude-sonnet-5.5 start=2026-10-27T19:57:36.883340+00:00 end=2026-10-27T19:58:59.845690+00:00 exit=0 secs=83 session=sess_2e497844-8988-4b0c-b5c9-684ac5019a15
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 4
+
+## run lead@20261027T195851709753 agent=lead model=claude-sonnet-5.5 start=2026-10-27T19:58:51.736822+00:00 end=2026-10-27T20:00:00.503465+00:00 exit=0 secs=69 session=sess_6d366aab-c043-4347-81d6-00d7cefa2121
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 3
+  lead message 20261027T195934231137-lead-a436 to=root type=result status=done created=2026-10-27T19:59:34+00:00
+  ## Lessons: Near miss: Expected C6: Due is a date only when the notes give or imply one. Happened: the first memo resolved 'before Friday' to Friday itself and used Marta's training date as her booking deadline. Caught at: the requester's review, not the reviewer's first check. Cause: C6 does not say how to treat 'before X' or an event date that is not a deadline. Prevent: add a playbook rule to resolve 'before X' as not-resolvable (none, wording kept in Action) and not to read 'for <event date>' as a deadline. Also: the contract should say how to handle 'before X', and the requester's 'Open questions' conflicts with C1.
+  org-git commit 55b32f7 MEMORY.md diff:
+    commit 55b32f7576c9e1c8627e21647ebfc9cb9339702a
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Tue Oct 27 20:00:00 2026 +0000
+    
+        lead: run ok, 1 message(s) [lead/runs/20261027T195851709753.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index 71683a5..e80e291 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,6 +1,3 @@
+     # Memory
+    -Open: root task 20261027T195354174379-root-c39b (rework: unclear due dates; budget 6).
+    -Writer rework 20261027T195556716693-lead-58e4 DONE; I read lead/writer/work/memo-2026-10-05.md (113 words): Sam none + 'before Friday'; Marta none + '14 October (the date the room is for)'; Priya 2026-10-09; Dev 2026-10-08; Lee none; 2 sections only. Looks OK.
+    -Delegated reviewer re-check (budget 2, revises ...-lead-3563) of same file; waiting. Next run: read reviewer report + file, check C1-C7, then report root done (paste reviewer coverage line verbatim + ledger path) or rework once.
+    -In report, top 'Questions for the client': (a) requester asked for an Open questions section; C1 forbids a third section, so info is in Action text; (b) Sam 'before Friday' left as none (not 2026-10-08) per C6; plus any reviewer 'ambiguous' items.
+    -Lessons: resolve 'before X' literally/flag it; Lee 'We agreed X would do Y' = action item only; 'for Oct 14' = Due none.
+    +Task 20261027T195354174379-root-c39b (rework 2026-10-05 due dates) reported DONE (reviewer: criteria met 7 of 7). Nothing open, nothing awaited.
+    +Lessons for future memos: 'before X' = Due none with wording kept in Action (C6 ambiguous; flagged to client); 'for <event date>' is not a deadline; 'We agreed X would do Y' = action row only. Requester asked for an 'Open questions' section but C1 forbids a third section: put such info in Action text and flag in report under 'Questions for the client'.
+

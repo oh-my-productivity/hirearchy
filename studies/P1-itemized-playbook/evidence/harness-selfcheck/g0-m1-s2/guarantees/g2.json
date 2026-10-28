@@ -1,0 +1,29 @@
+{
+ "a": {
+  "rejections": [
+   {
+    "turn": 7,
+    "rule": "H6",
+    "memo": "2026-10-05",
+    "R": "R1",
+    "note": "20261026T071351375906-root-c1f4"
+   }
+  ],
+  "missing": [],
+  "unmapped": [],
+  "verdict": "PASS"
+ },
+ "b": {
+  "late_or_missing": [],
+  "late_detail": [],
+  "verdict": "PASS"
+ },
+ "c": {
+  "REQUEST-UNANSWERED": 0,
+  "FEEDBACK-UNANSWERED": 0,
+  "exception_uses": 0,
+  "relayed_accepts_while_unanswered": 0,
+  "one_off_delegates_while_unanswered": 0,
+  "verdict": "PASS (by construction; the counts are reported)"
+ }
+}

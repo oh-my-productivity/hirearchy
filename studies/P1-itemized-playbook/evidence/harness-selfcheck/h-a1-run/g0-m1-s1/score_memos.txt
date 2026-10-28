@@ -1,0 +1,25 @@
+score_memos m1-s1: 8 versions, 3 final memos; reviewer lead/reviewer (owner lead)
+
+memo       ver sha      D    A    wrong  extra  Summary order words copied  review
+2026-10-05 v1  ca1e8e3  2/2  5/5      2      0  no      yes     156 no      8 of 8 PASS (done)
+    wrong date: Sam due none (expected 2026-10-09)
+    wrong date: Marta due none (expected 2026-10-14)
+2026-10-05 v2  936b037  2/2  5/5      2      0  no      yes     145 no      8 of 8 PASS (done)
+    wrong date: Sam due none (expected 2026-10-09)
+    wrong date: Marta due none (expected 2026-10-14)
+2026-10-05 v3  b981427  2/2  5/5      0      0  no      yes     139 yes     9 of 9 (done)
+2026-10-05 v4  d39640a  2/2  5/5      2      0  no      yes     143 no      8 of 8 (done)
+    wrong date: Sam due none (expected 2026-10-09)
+    wrong date: Marta due none (expected 2026-10-14)
+2026-10-05 v5  003b89f  2/2  5/5      0      0  yes     yes     160 yes     8 of 8 PASS (done)
+2026-10-12 v1  5d74168  3/3  5/5      0      0  yes     yes     194 yes     9 of 9 PASS (done)
+2026-10-19 v1  e915785  3/3  5/5      1      1  yes     yes     211 no      8 of 8 (done)
+    wrong date: Lee due none (expected 2026-10-30)
+    extra row: Marta | Keep the demo agenda as sent | none
+2026-10-19 v2  6399954  3/3  5/5      0      0  yes     yes     199 yes     8 of 8 PASS (done)
+
+final memos: decisions 8 of 8, actions 15 of 15, wrong dates 0, extra rows 0, Summary 3 of 3
+  2026-10-05 md5 41c11ea065fbb1bdce72f24feeb7cc0e = v5 003b89f
+  2026-10-12 md5 893b0535716c6b840f01408d9bd2af0f = v1 5d74168
+  2026-10-19 md5 b3b4da71800fb3f05d1fabcd42953708 = v2 6399954
+delivered (copied) versions: 4 of 8

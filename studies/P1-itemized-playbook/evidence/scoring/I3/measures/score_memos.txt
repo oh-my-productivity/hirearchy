@@ -1,0 +1,33 @@
+score_memos I3: 15 versions, 6 final memos; reviewer lead/reviewer (owner lead)
+
+memo       ver sha      D    A    wrong  extra  Summary order words copied  review
+2026-10-05 v1  e80ce44  2/2  5/5      2      0  no      yes     248 no      8 of 8 PASS (done)
+    wrong date: Sam due none (expected 2026-10-09)
+    wrong date: Marta due none (expected 2026-10-14)
+2026-10-05 v2  00b6a86  2/2  5/5      0      0  no      yes     206 yes     8 of 8 PASS (done)
+2026-10-05 v3  6f7c872  2/2  5/5      2      0  no      yes     234 no      8 of 8 (done)
+    wrong date: Sam due 2026-10-08 (expected 2026-10-09)
+    wrong date: Marta due none (expected 2026-10-14)
+2026-10-05 v4  05b6b11  2/2  5/5      0      0  yes     yes     231 yes     6 of 9 (done)
+2026-10-12 v1  184e78a  3/3  5/5      0      0  yes     yes     169 no      8 of 10 (done)
+2026-10-12 v2  87e5990  3/3  5/5      0      0  yes     yes     177 yes     11 of 11 (done)
+2026-10-12 v3  71c6cb8  3/3  5/5      0      0  yes     yes     177 yes     11 of 11 (done)
+2026-10-19 v1  b8c45a2  2/3  5/5      1      1  yes     yes     194 no      10 of 11 (done)
+    wrong date: Lee due none (expected 2026-10-30)
+    extra row: M | keep the agenda as sent | none
+2026-10-19 v2  626a7fb  2/3  5/5      0      0  yes     yes     183 yes     10 of 10 PASS (done)
+2026-10-26 v1  1380316  3/3  5/5      0      0  yes     yes     194 yes     10 of 10 PASS (done)
+2026-10-26 v2  e82d45c  3/3  5/5      0      0  yes     yes     194 yes     10 of 10 PASS (done)
+2026-11-02 v1  0d2bfa3  3/3  5/5      0      0  yes     yes     193 no      10 of 10 PASS (done)
+2026-11-02 v2  c236ec3  2/3  5/5      0      0  yes     yes     190 yes     10 of 10 PASS (done)
+2026-11-02 v3  0d0ecad  2/3  5/5      0      0  yes     yes     196 yes     10 of 10 PASS (done)
+2026-11-09 v1  7a9bd87  2/3  5/5      0      0  yes     yes     171 yes     10 of 10 PASS (done)
+
+final memos: decisions 14 of 17, actions 30 of 30, wrong dates 0, extra rows 0, Summary 6 of 6
+  2026-10-05 md5 a6a188e8e38f42baf5eed4c5e10c38c1 = v4 05b6b11
+  2026-10-12 md5 635de97a88f07e9ca2b05a75e2985fdb = v3 71c6cb8
+  2026-10-19 md5 2997236efe9ab5e679503e91cc2fa3c2 = v2 626a7fb
+  2026-10-26 md5 083646950ab33a9e1c7100bc21d45637 = v2 e82d45c
+  2026-11-02 md5 58ae7a64bd3e1359fcb9a38f1e4db95b = v3 0d0ecad
+  2026-11-09 md5 818bebaaf6b58955c39c2fd1833dab65 = v1 7a9bd87
+delivered (copied) versions: 10 of 15

@@ -1,0 +1,1 @@
+env -u KIRO_HOME kiro-cli chat --v3 --no-interactive --trust-all-tools --resume --effort high --agent hirearchy-study-p1-F3-assistant D\''s should be 2026-10-24. P'\''s should be 2026-10-26. L'\''s should be 2026-10-30. S'\''s none is right. No, nothing for Marta to do there, leave it out.'

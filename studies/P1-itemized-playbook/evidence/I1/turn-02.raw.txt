@@ -1,0 +1,49 @@
+Here is the plan. I've kept the 12 runs per memo you asked for, and the last line asks whether you want 16 instead.
+
+PLAN FOR YOU
+Goal: Each week, after the platform team's weekly meeting, turn the meeting notes into a short memo that says what was decided and who does what, using the words of the notes.
+What I understood you need:
+- Scope: One memo per meeting, from that meeting's notes file only: the decisions, and every commitment (who does what, by when), including informal ones stated in prose. Things only discussed and not decided are left out.
+- Your files (read-only): /tmp/hirearchy-p1-I1-1793136275/notes
+- Quality bar: Every statement comes from the notes file; wording follows the notes; nothing is invented.
+- Sources: Only the files in the notes folder; no web.
+- Workspace: none (nothing writes files or runs commands)
+- Models: claude-sonnet-5.5 (high effort) for every agent
+Team (3 agents):
+- lead (Manager, model claude-sonnet-5.5): directs the team; does not produce the work itself; can read files only in /private/tmp/hirearchy-p1-I1-1793136275/notes and the organization's own files; cannot change your files
+  - writer (Writer, model claude-sonnet-5.5): can read /private/tmp/hirearchy-p1-I1-1793136275/notes through the organization's read tool; cannot change your files
+  - reviewer (Independent Reviewer, model claude-sonnet-5.5): can read files only in /private/tmp/hirearchy-p1-I1-1793136275/notes and the organization's own files; cannot change your files
+Budget: up to 12 runs per request (one run = one working session of one agent), your cap per request is 12; the minimum for one review and rework is 11, and a round of your questions or a rejection takes about 5 more (16 in all). Unspent runs come back to you.
+  lead starts with 12, hands down writer 3, reviewer 2 and keeps 7 for planning, checking and rework.
+If a check still fails after one rework, I'll come back to you with options before spending the reserve; nothing beyond a request's budget is spent without your OK.
+Checking: reviewer reviews the work independently (they did not write it); required changes go back to the author. I then re-check the final result against every service check below.
+Services (kept ready, requested whenever you want):
+- weekly-meeting-memo: One memo (decisions and action table) from one weekly meeting's notes file.
+  You provide: notes_file (required)
+  Each request: up to 12 runs
+  Checks:
+    1. Covers only the meeting in the requested notes file.
+    2. The memo is markdown and has at most 400 words as counted by read.
+    3. Every decision stated in the notes is listed under a heading "Decisions".
+    4. Every commitment in the notes, including informal ones stated in prose (for example "X said he would ..."), is one row of a table under a heading "Actions".
+    5. The table columns are exactly Owner | Action | Due.
+    6. Due is an ISO date (YYYY-MM-DD) or "none". A relative date such as "by Friday" is converted to an ISO date using the meeting date only when the notes make it clear; if there is no date or it is not clear, Due is "none".
+    7. Decisions and actions use the words of the notes, and nothing appears that is not in the notes.
+    8. Topics that were only discussed and not decided are not listed.
+    9. The memo names the meeting date and the people present.
+    10. The memo gives the next meeting date when the notes give one.
+    ... and 1 more (see the details)
+  Delivered to: /tmp/hirearchy-p1-I1-1793136275/deliverables (I copy each result there after checking it)
+After each request the lead records lessons; before the next one it reviews them with your feedback and may improve how the team works (its playbook). It cannot change these checks: only you can, through me.
+Nothing runs until you ask for a request: approving only creates the team and the services.
+Checkpoints: approval - Plan first; ask before any spend beyond the budget; progress - One line when I ask; any spend beyond the budget needs your OK.
+Warnings (1):
+- 12 runs per request covers one pass and one internal rework (the estimate is 11), not a round of your questions or a rejection, which takes about 5 more (1, plus 2 for each agent below lead): 16 per request covers one such round
+Nothing is created or started until you approve. Reply 'approve', or tell me what to change.
+Use 16 runs per request (covers one round of your questions or a rejection), or keep 12?
+
+Two notes on the plan:
+- **Last check:** the 11th check is that the reviewer's report shows every criterion met and the writer applied every required change.
+- **Models:** every agent runs claude-sonnet-5.5, because nothing cheaper is available.
+
+Reply "approve" to keep 12 runs per memo, or "approve 16" to use 16. I'll build nothing until you answer.

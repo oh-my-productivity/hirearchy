@@ -1,0 +1,76 @@
+# window runs (protocol 5.4): runs that started in the injection window 2026-10-27T23:13:50Z .. 2026-10-27T23:17:07Z; injected task 20261027T231350170182-root-0fec; revised (memo 1) task 20261027T231010861831-root-c792
+
+## run lead@20261027T231350410548 agent=lead model=claude-sonnet-5.5 start=2026-10-27T23:13:50.423318+00:00 end=2026-10-27T23:14:54.920626+00:00 exit=0 secs=64 session=sess_16ec774c-7e55-49e1-bf59-328c30ee3bc1
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 12
+  lead message 20261027T231446914771-lead-e75b to=lead/writer type=task status=None created=2026-10-27T23:14:46+00:00
+  ## Lessons: (none)
+  org-git commit 60141cb MEMORY.md diff:
+    commit 60141cb1a8bcf91a43ad79a4bf3cfab56bf70dc5
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Tue Oct 27 23:14:54 2026 +0000
+    
+        lead: run ok, 1 message(s) [lead/runs/20261027T231350410548.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index 3f0354d..5ff7344 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1 +1 @@
+    -Tasks c792 and 5204 (memo 2026-10-05, weekly-meeting-memo) reported done after client rulings; reviewer coverage: criteria met 6 of 6, 7 of 7 claims verified. Deliverable lead/writer/work/memo-2026-10-05.md. Nothing outstanding. Next run: only handle new requests/feedback.
+    \ No newline at end of file
+    +Task 0fec (rework memo 2026-10-05, Due values Sam->2026-10-08, Marta->none) open. Conflict: requester wants 'Open questions' section but C3 forbids extra sections; I told writer to put explanations in Action cells (writer task delegated, revises ce48, budget 1). Next: when writer returns, read lead/writer/work/memo-2026-10-05.md, then delegate lead/reviewer re-check (revises 20261027T231133650556-lead-e70f, budget 1) of that same file, telling it to re-check EVERY Due vs notes text, copy criteria C1-C6 verbatim, report 'criteria met: n of m' and list ambiguous items (incl. whether Action-cell notes satisfy C3 vs requester's Open questions). Then report 0fec to root with coverage line and 'Questions for the client:' (Open questions section vs C3). Earlier tasks c792/5204 done.
+    \ No newline at end of file
+
+## run lead/writer@20261027T231448841519 agent=lead-writer model=claude-sonnet-5.5 start=2026-10-27T23:14:48.855168+00:00 end=2026-10-27T23:15:17.202465+00:00 exit=0 secs=28 session=sess_c4cfb0a0-6c43-474d-8761-f845b8e8fe57
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 6
+
+## run lead@20261027T231513137055 agent=lead model=claude-sonnet-5.5 start=2026-10-27T23:15:13.155040+00:00 end=2026-10-27T23:15:41.487190+00:00 exit=0 secs=28 session=sess_a1aa1b09-f420-4660-a9f2-d6ba36e0d41c
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 2
+  lead message 20261027T231533789587-lead-e4f8 to=lead/reviewer type=task status=None created=2026-10-27T23:15:33+00:00
+  ## Lessons: (none)
+  org-git commit ac30b1a MEMORY.md diff:
+    commit ac30b1a6c2a08513b69458ffbfe10b160948b02f
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Tue Oct 27 23:15:41 2026 +0000
+    
+        lead: run ok, 1 message(s) [lead/runs/20261027T231513137055.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index 5ff7344..4f9b378 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1 +1 @@
+    -Task 0fec (rework memo 2026-10-05, Due values Sam->2026-10-08, Marta->none) open. Conflict: requester wants 'Open questions' section but C3 forbids extra sections; I told writer to put explanations in Action cells (writer task delegated, revises ce48, budget 1). Next: when writer returns, read lead/writer/work/memo-2026-10-05.md, then delegate lead/reviewer re-check (revises 20261027T231133650556-lead-e70f, budget 1) of that same file, telling it to re-check EVERY Due vs notes text, copy criteria C1-C6 verbatim, report 'criteria met: n of m' and list ambiguous items (incl. whether Action-cell notes satisfy C3 vs requester's Open questions). Then report 0fec to root with coverage line and 'Questions for the client:' (Open questions section vs C3). Earlier tasks c792/5204 done.
+    \ No newline at end of file
+    +Task 0fec (rework memo 2026-10-05, Sam->2026-10-08, Marta->none) open. Writer reworked (done, I read it: 129 words, Sam/Marta explained in Action cells, no new section, other rows unchanged). Re-check delegated to lead/reviewer (revises e70f, budget 1), waiting. Next: read reviewer report + its work file; if criteria met n=m, report 0fec done to root with reviewer's coverage line verbatim, path lead/writer/work/memo-2026-10-05.md, and 'Questions for the client:' (requester wanted 'Open questions' section vs C3 forbids extra sections; explanations in Action cells) plus any reviewer-ambiguous items; include lessons. If fails: one rework only, else report blocked. Earlier tasks c792/5204 done.
+    \ No newline at end of file
+
+## run lead/reviewer@20261027T231535410014 agent=lead-reviewer model=claude-sonnet-5.5 start=2026-10-27T23:15:35.426696+00:00 end=2026-10-27T23:16:36.227689+00:00 exit=0 secs=61 session=sess_7cd37b09-a72f-4840-9bb5-f5705d3a78f1
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 5
+
+## run lead@20261027T231630123520 agent=lead model=claude-sonnet-5.5 start=2026-10-27T23:16:30.159972+00:00 end=2026-10-27T23:17:04.566126+00:00 exit=0 secs=34 session=sess_076662b4-55ec-45ce-81cf-f196ecca1fe9
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 2
+  lead message 20261027T231657192819-lead-2d45 to=root type=result status=blocked created=2026-10-27T23:16:57+00:00
+  ## Lessons: Expected: C5/C7, reviewer shows n = m. Happened: reviewer re-check stayed 5 of 6 because it carried earlier Due rulings (Sam 10-09, Marta 10-14) that the rework note replaced. Caught at: re-check result. Cause: the re-check task named the changed values but not that they supersede earlier rulings; no budget left for another re-check. Prevent: state in the re-check task that the rework note overrides earlier rulings, and reserve one extra re-check run for rework cases.
+  org-git commit 8bdfdd2 MEMORY.md diff:
+    commit 8bdfdd2ab6dfee724b084993071281d46cbbf16b
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Tue Oct 27 23:17:04 2026 +0000
+    
+        lead: run ok, 1 message(s) [lead/runs/20261027T231630123520.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index 4f9b378..d73f95e 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1 +1 @@
+    -Task 0fec (rework memo 2026-10-05, Sam->2026-10-08, Marta->none) open. Writer reworked (done, I read it: 129 words, Sam/Marta explained in Action cells, no new section, other rows unchanged). Re-check delegated to lead/reviewer (revises e70f, budget 1), waiting. Next: read reviewer report + its work file; if criteria met n=m, report 0fec done to root with reviewer's coverage line verbatim, path lead/writer/work/memo-2026-10-05.md, and 'Questions for the client:' (requester wanted 'Open questions' section vs C3 forbids extra sections; explanations in Action cells) plus any reviewer-ambiguous items; include lessons. If fails: one rework only, else report blocked. Earlier tasks c792/5204 done.
+    \ No newline at end of file
+    +Task 0fec (rework memo 2026-10-05, Sam->2026-10-08, Marta->none): reported BLOCKED to root. Memo lead/writer/work/memo-2026-10-05.md (129 words) is final; reviewer recheck2 says 5 of 6 (C5 undecided: it held older rulings Sam 10-09, Marta 10-14). I have 0 spare runs. Waiting for root: confirm Due values + extra runs for one reviewer re-check (tell reviewer the rework note supersedes earlier rulings; revises=e4f8). If woken with runs: delegate re-check, then report 0fec done with reviewer coverage line verbatim and Questions for the client (Action-cell notes vs Open questions section under C3). Earlier tasks c792/5204 done.
+    \ No newline at end of file
+

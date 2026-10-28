@@ -1,0 +1,13 @@
+The 2026-10-26 memo is at `/private/tmp/hirearchy-p1-I3-1793157452/deliverables/memo-2026-10-26.md` (194 words). Your answers matched the draft, so I delivered it unchanged with no extra runs. I also recorded your "keep it" as the accept for the 2026-10-19 memo.
+
+Checks against your criteria:
+- **C1, C2, C3:** met. It covers only this meeting, is 194 words, and has 3 decisions in the notes' words. The Renovate widening and the one-week wait on the rate limiter stay decisions only.
+- **C4, C5, C6:** met. The table has 5 rows with Owner | Action | Due, and the Action text comes from the notes. The customer's audit-log question has no row.
+- **C7:** met. Due dates are D 2026-10-28, P 2026-10-30, M 2026-10-27, S 2026-10-30 and L `none`.
+- **C8:** met. Everything traces to the notes.
+- **C9:** met. The reviewer's score was "criteria met: 10 of 10", and the lead judged C9 as met.
+- **C10, C11:** met. It has the title, a one-line "Summary:", the decisions, then the action items, with initials only for owners. There is no "Source:" line and no notes section.
+
+The team used 5 runs, well inside your 12.
+
+Is this one right, or what should change?

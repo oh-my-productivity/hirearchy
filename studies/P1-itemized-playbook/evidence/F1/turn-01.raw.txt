@@ -1,0 +1,16 @@
+Your notes are a good fit for a standing weekly service. I read the latest one (9 Nov) to see what the team has to handle. Before I draft a plan, I need a few answers.
+
+1. **Which notes file?** I'd make the file for each week the input you give per request, for example `/tmp/hirearchy-p1-F1-1793129193/notes/2026-11-16.md`. The team can read the notes folder but can't change it.
+2. **Do informal commitments count?** Your 9 Nov notes mark some items with "ACTION:". Others are plain prose, like "Sam said he would add Jo to the on-call rotation by Friday" and "Lee said he'd go through the SSO audit log at some point".
+   - I'd include every commitment, labelled or not. Proposed default: yes.
+3. **Vague deadlines:** the notes say things like "by Friday", "at some point" and "next week".
+   - Option A: turn them into a date using the meeting date, and leave the owner's item with no date if none was given.
+   - Option B: copy the wording as written.
+   - Proposed default: A. For example, "by Friday" in the 9 Nov meeting becomes 13 Nov, and Lee's item shows "no date given".
+4. **Memo content:** two sections, "Decisions" and "Actions (who / what / when)". The memo would be at most 1 page (about 400 words), in markdown. I won't add anything else, such as attendees or a summary, unless you ask.
+5. **Where it goes:** a new `deliverables/` folder in `/tmp/hirearchy-p1-F1-1793129193`, with one file per week, for example `deliverables/memo-2026-11-09.md`.
+6. **Checks:** every decision and every commitment in the notes appears in the memo, each action has exactly one owner, and nothing appears that isn't in the notes. A second agent (a reviewer) checks the memo against your notes before it reaches you. Proposed default: yes.
+7. **Budget:** every agent runs claude-sonnet-5.5 at high effort. I'd set a per-request budget of about 8 runs, which covers a writer, a reviewer and one rework. I'll give you the exact number in the plan.
+8. **Approval:** you approve the plan before anything is built, and I ask you before any spending beyond the budget. Should I also run the 9 Nov notes as a first request? Proposed default: yes, so you can see a sample.
+
+Reply "defaults" to accept all of these, or tell me what to change.

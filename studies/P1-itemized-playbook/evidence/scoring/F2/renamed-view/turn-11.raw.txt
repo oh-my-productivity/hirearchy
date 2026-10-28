@@ -1,0 +1,18 @@
+The 2026-10-12 memo is at `/tmp/hirearchy-p1-F2-1793146944/deliverables/2026-10-12-memo.md`. I checked that the copy matches the team's file.
+
+- C1, markdown and at most 400 words: met (212 by the team's count, 242 by `wc`).
+- C2, covers only the 2026-10-12 meeting: met.
+- C3, all three decisions listed and nothing extra: met.
+- C4, table columns Owner | Action | Due: met.
+- C5, all five commitments are rows, including Sam's and Lee's informal ones: met.
+- C6, dates in ISO format or `none`: met. The dates are Dev 2026-10-14, Marta 2026-10-16, Priya 2026-10-20 and Sam 2026-10-21. Lee is `none`, as you ruled.
+- C7, reviewer passed and no required changes: met.
+- C9, title, Summary line, Decisions and action table in that order, nothing else: met. Sam's "probably" quote is gone.
+
+The reviewer asked about two things that I settled without asking you, based on your earlier answers. Lee's shift swap stays an action row only, not a decision, as with the SSO item in the 10-05 memo. The reviewer also called C7 circular, which is about our process and not your memo.
+
+The action table has no "Action items" heading. C9 says "no other lines", so the team left it out. Tell me if you want the heading back.
+
+Runs: 10 of the 12 approved for this memo (5 for the first pass and 5 for the C9 rework). The 2026-10-05 memo is unchanged and doesn't follow the new rule.
+
+Keep it, or what should change?

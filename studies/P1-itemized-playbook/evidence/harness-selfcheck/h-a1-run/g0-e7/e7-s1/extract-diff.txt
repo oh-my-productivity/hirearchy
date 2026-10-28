@@ -1,0 +1,108 @@
+##### s1 deliverables-log.txt
+--- E7 committed deliverables-log.txt
++++ regenerated deliverables-log.txt
+@@ -51,6 +51 @@
+-total 24
+-drwxr-xr-x@ 5 aminalizadeh  wheel   160 Oct 25 07:34 .
+-drwxr-xr-x@ 7 aminalizadeh  wheel   224 Oct 25 07:11 ..
+--rw-r--r--@ 1 aminalizadeh  wheel   832 Oct 25 07:20 memo-2026-10-05.md
+--rw-r--r--@ 1 aminalizadeh  wheel  1065 Oct 25 07:27 memo-2026-10-12.md
+--rw-r--r--@ 1 aminalizadeh  wheel   939 Oct 25 07:34 memo-2026-10-19.md
++(no sandbox: the listing above is of the stream dir's memos/ copy)
+
+##### s1 run-session-map.txt
+--- E7 committed run-session-map.txt
++++ regenerated run-session-map.txt
+@@ -6 +6 @@
+-org kiro sessions copied: 41 (to org-kiro-sessions/<hash>/<session id>/)
++org kiro sessions read from the stream dir copy: 41 (org-kiro-sessions/<hash>/<session id>/)
+
+##### s1 injection/window-runs.txt
+--- E7 committed injection/window-runs.txt
++++ regenerated injection/window-runs.txt
+@@ -8 +8 @@
+-  org-git commit 0dd266f MEMORY.md diff:
++  org-git commit 0dd266f (from org-git-log.txt; the MEMORY.md patch itself is in the org's git, which the stream dir does not hold):
+@@ -11 +11 @@
+-    Date:   Sun Oct 25 07:12:53 2026 +0000
++    Date:   2026-10-25 07:12:53 +0000
+@@ -15,14 +15,6 @@
+-    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+-    index 9f3969e..8487eb3 100644
+-    --- a/lead/MEMORY.md
+-    +++ b/lead/MEMORY.md
+-    @@ -1,4 +1,6 @@
+-     # Memory
+-    -- Memo 2026-10-05: both tasks (5efc, 5e3e) reported done. Reviewer final line 'criteria met: 7 of 7'. Artifact lead/writer/work/memo-2026-10-05.md (103 words).
+-    -- Nothing outstanding. Next run: only if new request/feedback arrives.
+-    -- Playbook idea (no evidence yet): writer should flag relative deadlines for the client instead of choosing a date.
+-    +- Memo 2026-10-05 first pass done earlier (reviewer 7 of 7, 103 words).
+-    +- NOW: root task 20261025T071152630842-root-6920 (rework: Sam + Marta Due -> none). Delegated writer task 20261025T071244716312-lead-7ae7 (revises ed4d, budget 1). Waiting for it.
+-    +- Next: read lead/writer/work/memo-2026-10-05.md; check Sam & Marta Due = none, no extra section (C2 forbids 'Open questions' section though requester asked for one: put the open questions in MY report under 'Questions for the client:'). Then delegate lead/reviewer (revises 20261025T070939541271-lead-8c3d, budget 1) to re-check EVERY Due value vs notes; reviewer writes lead/reviewer/work/review-memo-2026-10-05.md. Then report done on -6920 with reviewer's final line verbatim.
+-    +- Open questions for report: (1) Sam 'before Friday' = none (could be 2026-10-08; Action text keeps 'before Friday'). (2) Marta: 14 Oct is the training date, no booking deadline given = none. (3) C2 vs requested 'Open questions' section conflict.
+-    +- Playbook idea (no evidence yet): writer flags relative deadlines for the client instead of choosing a date.
++     lead/MEMORY.md                                     |  8 +++--
++     lead/read/20261025T071152630842-root-6920.md       | 37 ++++++++++++++++++++++
++     lead/sent/20261025T071244716312-lead-7ae7.md       | 32 +++++++++++++++++++
++     .../inflight/20261025T071244716312-lead-7ae7.md    | 32 +++++++++++++++++++
++     sent/20261025T071152630842-root-6920.md            | 37 ++++++++++++++++++++++
++     5 files changed, 143 insertions(+), 3 deletions(-)
+@@ -39 +31 @@
+-  org-git commit a50f7c3 MEMORY.md diff:
++  org-git commit a50f7c3 (from org-git-log.txt; the MEMORY.md patch itself is in the org's git, which the stream dir does not hold):
+@@ -42 +34 @@
+-    Date:   Sun Oct 25 07:13:39 2026 +0000
++    Date:   2026-10-25 07:13:39 +0000
+@@ -46,14 +38,5 @@
+-    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+-    index 8487eb3..ff7311c 100644
+-    --- a/lead/MEMORY.md
+-    +++ b/lead/MEMORY.md
+-    @@ -1,6 +1,6 @@
+-     # Memory
+-     - Memo 2026-10-05 first pass done earlier (reviewer 7 of 7, 103 words).
+-    -- NOW: root task 20261025T071152630842-root-6920 (rework: Sam + Marta Due -> none). Delegated writer task 20261025T071244716312-lead-7ae7 (revises ed4d, budget 1). Waiting for it.
+-    -- Next: read lead/writer/work/memo-2026-10-05.md; check Sam & Marta Due = none, no extra section (C2 forbids 'Open questions' section though requester asked for one: put the open questions in MY report under 'Questions for the client:'). Then delegate lead/reviewer (revises 20261025T070939541271-lead-8c3d, budget 1) to re-check EVERY Due value vs notes; reviewer writes lead/reviewer/work/review-memo-2026-10-05.md. Then report done on -6920 with reviewer's final line verbatim.
+-    -- Open questions for report: (1) Sam 'before Friday' = none (could be 2026-10-08; Action text keeps 'before Friday'). (2) Marta: 14 Oct is the training date, no booking deadline given = none. (3) C2 vs requested 'Open questions' section conflict.
+-    +- NOW: root task 20261025T071152630842-root-6920 (rework Sam+Marta Due -> none). Writer rework done and I verified: lead/writer/work/memo-2026-10-05.md (108 words), Sam/Marta Due none, two sections only.
+-    +- Delegated re-check to lead/reviewer (revises 20261025T070939541271-lead-8c3d, budget 1). Waiting.
+-    +- Next: read lead/reviewer/work/review-memo-2026-10-05.md; if criteria met 7 of 7 report done on -6920 pasting reviewer's final line verbatim + path. Put in report top 'Questions for the client:' (1) Sam 'before Friday' = none (could be 2026-10-08), criterion C6; (2) Marta: 14 Oct is training date, no booking deadline = none, C6; (3) requester asked for 'Open questions' section but C2 allows only Decisions+Actions. Plus any reviewer 'ambiguous'. Include lessons.
+-     - Playbook idea (no evidence yet): writer flags relative deadlines for the client instead of choosing a date.
++     lead/MEMORY.md                                     |  6 ++---
++     .../20261025T071311623881-lead.writer-4215.md      |  0
++     .../inflight/20261025T071333312750-lead-63cc.md    | 29 ++++++++++++++++++++++
++     lead/sent/20261025T071333312750-lead-63cc.md       | 29 ++++++++++++++++++++++
++     4 files changed, 61 insertions(+), 3 deletions(-)
+@@ -70 +53 @@
+-  org-git commit 057a088 MEMORY.md diff:
++  org-git commit 057a088 (from org-git-log.txt; the MEMORY.md patch itself is in the org's git, which the stream dir does not hold):
+@@ -73 +56 @@
+-    Date:   Sun Oct 25 07:14:34 2026 +0000
++    Date:   2026-10-25 07:14:34 +0000
+@@ -77,14 +60,5 @@
+-    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+-    index ff7311c..e8c14d0 100644
+-    --- a/lead/MEMORY.md
+-    +++ b/lead/MEMORY.md
+-    @@ -1,6 +1,4 @@
+-     # Memory
+-    -- Memo 2026-10-05 first pass done earlier (reviewer 7 of 7, 103 words).
+-    -- NOW: root task 20261025T071152630842-root-6920 (rework Sam+Marta Due -> none). Writer rework done and I verified: lead/writer/work/memo-2026-10-05.md (108 words), Sam/Marta Due none, two sections only.
+-    -- Delegated re-check to lead/reviewer (revises 20261025T070939541271-lead-8c3d, budget 1). Waiting.
+-    -- Next: read lead/reviewer/work/review-memo-2026-10-05.md; if criteria met 7 of 7 report done on -6920 pasting reviewer's final line verbatim + path. Put in report top 'Questions for the client:' (1) Sam 'before Friday' = none (could be 2026-10-08), criterion C6; (2) Marta: 14 Oct is training date, no booking deadline = none, C6; (3) requester asked for 'Open questions' section but C2 allows only Decisions+Actions. Plus any reviewer 'ambiguous'. Include lessons.
+-    -- Playbook idea (no evidence yet): writer flags relative deadlines for the client instead of choosing a date.
+-    +- Memo 2026-10-05: task root-6920 (rework of Due values) reported DONE (reviewer 7 of 7, 108 words). Nothing pending.
+-    +- Lesson/playbook idea (no evidence yet for revise_playbook): when a Due depends on a relative or event date, use none, keep the phrase in the Action text, and raise it to the client as a question.
+-    +- Next request: follow playbook v1 (writer budget 3, reviewer budget 2).
++     inbox/20261025T071427223224-lead-c3d0.md           | 30 ++++++++++++++++++++++
++     lead/MEMORY.md                                     |  8 +++---
++     .../20261025T071406918516-lead.reviewer-2054.md    |  0
++     lead/sent/20261025T071427223224-lead-c3d0.md       | 30 ++++++++++++++++++++++
++     4 files changed, 63 insertions(+), 5 deletions(-)
+
+##### s1 sandbox:run-session-map.txt
+--- E7 committed run-session-map.txt
++++ regenerated run-session-map.txt
+@@ -6 +6 @@
+-org kiro sessions copied: 41 (to org-kiro-sessions/<hash>/<session id>/)
++org kiro sessions read from the stream dir copy: 41 (org-kiro-sessions/<hash>/<session id>/)

@@ -1,0 +1,20 @@
+######## TURN 8  start 03:43:58  end 03:44:31  elapsed 33s  (local, 2026-10-28; UTC wall-clock start 2026-10-28T03:43:58Z end 2026-10-28T03:44:31Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Sam's 2026-10-09 is right. Marta's 2026-10-14 is right. No, just the title, the Summary line, the decisions and the action items. No more spend, please deliver as is.
+
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-08.stderr.txt):
+I delivered the memo as it was, with no further spend. It's at `/private/tmp/hirearchy-p1-I3-1793157452/deliverables/memo-2026-10-05.md` (231 words), replacing the earlier version. Nothing is running.
+
+The memo doesn't fully match what you just described. You asked for only the title, the Summary line, the decisions and the action items, but the file also has two extras:
+- **"Source:" line:** it sits between the Summary and the Decisions.
+- **"Notes on the Due column":** this is a short section at the end.
+
+Deleting those is a quick edit in the file. I didn't change it myself, because I never edit the team's output. I can also send it back to the team, which would cost about 4 more runs, and I'd wait for your OK first.
+
+Checks against your criteria:
+- **C1, C2, C3, C4, C5, C6:** met. That covers one meeting only, 231 words, a Decisions section, the Owner | Action | Due table, one row per commitment (Priya's RFC review left out as you said), and the notes' own words.
+- **C7, C8:** met on your decision. Sam is 2026-10-09 and Marta is 2026-10-14, set by you rather than by the notes alone.
+- **C9:** unmet. The reviewer's final score was "criteria met: 6 of 9". The other three were the open points you resolved, and they were not re-checked.
+- **C10:** met for the Summary line and order, but the Source line is extra.
+
+**Runs.** The team spent 15 runs on your requests against your approved 12 (the extra 3 were your OK). A further 5 runs went to the rework I didn't request, so 20 in total, and I'm counting that 5 as my spend, not yours. That rework's record is rejected. I recorded no accept for this delivery, because "deliver as is" isn't one.

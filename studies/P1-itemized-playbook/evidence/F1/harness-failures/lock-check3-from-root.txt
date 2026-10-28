@@ -1,0 +1,10 @@
+F1 turn 3: the arm-F lock hook printed 'STOP: LOCK FAILED after turn 3 (check 1 yes, check 2 yes, check 3 no ...)'
+recorded 2026-10-27T19:42:36Z by the stream-f1 step; the stream was stopped at the end of turn 3 (Lena's turn 4 line not sent); nothing was edited, retried or re-run.
+
+facts:
+- checks 1 and 2 passed: reply names the lock (exit 0); SERVICE.md v2 'locked: true' (version before the hook 1, + 1 = 2).
+- check 3 (harness/after_turn.sh) requires the owner's note to have 'from: root' and 'wake: false' and the text 'locked: false -> true (you may no longer revise the playbook)'.
+- the note exists (/tmp/hirearchy-p1-F1-1793129193/org/lead/inbox/20261027T194149830288-runtime-c876.md, copied to lock/owner-note.md): text present, 'wake: false' present, but its header is 'from: runtime' (type: note, title: contract of service weekly-memo changed to v2), not 'from: root'. So check 3's 'from: root' clause is what failed.
+- the preflight probe's lock check 3 (harness/probe.sh) passed on the same note form (probe/F1/lock-checks.txt: note ...-runtime-d35b.md), i.e. probe.sh's check 3 does not test 'from: root'; after_turn.sh's does. The probe and the hook share the command line, not the check 3 code.
+- H-LOCK before the lock: ok (no owner playbook version before the lock); lock-held after turn 3: held (v2 locked: true).
+- the lock is applied (contract v2, locked: true). Protocol 1.1 / 8 read: 'A failed hook check is H-LOCK too (the arm was not set up)'. Whether this is a harness defect in the frozen check 3 (the note's sender is 'runtime') or an invalidating H-LOCK is the manager's decision.

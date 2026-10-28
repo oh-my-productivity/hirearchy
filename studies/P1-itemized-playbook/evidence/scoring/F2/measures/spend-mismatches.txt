@@ -1,0 +1,8 @@
+20261028T002628583154-root-8cba: {"case_spend": 20, "user_spend": 15, "user_committed": 30, "user_cost": 15, "user_approved": 12, "ratio": "1.25", "d14_approved": 17, "d14_used": 15, "d14_within": true}
+20261028T004913097440-root-a7ad: {"case_spend": 15, "user_spend": 15, "user_committed": 22, "user_cost": 15, "user_approved": 12, "ratio": "1.25", "d14_approved": 17, "d14_used": 15, "d14_within": true}
+20261028T010810702123-root-4311: {"case_spend": 14, "user_spend": 14, "user_committed": 17, "user_cost": 14, "user_approved": 12, "ratio": "1.17", "d14_approved": 14, "d14_used": 14, "d14_within": true}
+20261028T011833941227-root-2395: {"case_spend": 10, "user_spend": 10, "user_committed": 17, "user_cost": 10, "user_approved": 12, "ratio": "0.83", "d14_approved": 12, "d14_used": 10, "d14_within": true}
+20261028T012748529907-root-f321: {"case_spend": 15, "user_spend": 15, "user_committed": 22, "user_cost": 15, "user_approved": 12, "ratio": "1.25", "d14_approved": 15, "d14_used": 15, "d14_within": true}
+20261028T014937527074-root-ba39: {"case_spend": 9, "user_spend": 9, "user_committed": 12, "user_cost": 9, "user_approved": 12, "ratio": "0.75", "d14_approved": 12, "d14_used": 9, "d14_within": true}
+cases in the mail: 6; missing from the ledger: none; in the ledger, not in the mail: none
+0 mismatches

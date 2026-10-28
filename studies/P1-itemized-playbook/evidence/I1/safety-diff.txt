@@ -1,0 +1,14 @@
+1c1
+< label: I1 before
+---
+> label: I1 after
+18c18
+< drwx------@  3 aminalizadeh  staff      96 Oct 27 21:22 .
+---
+> drwx------@  3 aminalizadeh  staff      96 Oct 27 21:25 .
+23c23
+< drwx------@  9 aminalizadeh  staff   288 Oct 27 21:21 .
+---
+> drwx------@  9 aminalizadeh  staff   288 Oct 27 22:38 .
+105a106
+> hirearchy-p1-I1-1793136275

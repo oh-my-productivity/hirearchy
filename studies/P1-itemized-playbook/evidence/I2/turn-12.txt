@@ -1,0 +1,21 @@
+######## TURN 12  start 23:35:54  end 23:36:25  elapsed 31s  (local, 2026-10-27; UTC wall-clock start 2026-10-27T23:35:54Z end 2026-10-27T23:36:25Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Yes, that counts. No need for 'probably'. Sam's 2026-10-21 is right. No, that's an action item, not a decision. Yes, that's a decision. Lee's none is right.
+
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-12.stderr.txt):
+The memo for 12 Oct is at `/tmp/hirearchy-p1-I2-1793142034/deliverables/memo-2026-10-12.md`. Your answers matched the draft, so nothing needed rework. The copy is identical to the writer's file.
+
+- **C1, based on the 12 Oct notes only:** met.
+- **C2, at most 400 words:** met (178 by `wc`).
+- **C3, Decisions (3 bullets) and Actions table with Owner | Action | Due:** met.
+- **C4, a row for every commitment:** met. There are 5 rows, and Sam's counts.
+- **C5, Due dates:** met. Sam is 2026-10-21 and Lee is none, as you ruled.
+- **C6, nothing invented:** met.
+- **C7, reviewer's report:** met. The reviewer's line reads 8 of 8, with 13 of 13 facts verified.
+- **C8, Summary line first, then Decisions, then Actions:** met.
+
+The request used 5 of the 12 runs planned, so no rework was needed. The 7 runs it didn't spend came back.
+
+I read your "Yes, that's a decision" as keeping the rate limiter RFC approval and feature-flag rollout as one bullet. Say so if you want it split into two.
+
+Keep it, or what should change?

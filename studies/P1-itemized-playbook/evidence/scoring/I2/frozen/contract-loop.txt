@@ -1,0 +1,281 @@
+# contract loop (protocol 7.2); facts only, time order
+
+Lena reject turns (D1 candidates: turns whose line starts with 'No, not right yet' / 'Not right yet' / 'Almost'):
+- turn 5: script UTC 2026-10-27T23:17:36Z - 2026-10-27T23:18:01Z; session turn_start 2026-10-27T23:17:46.743Z turn_end 2026-10-27T23:18:01.018Z; line: No, not right yet. Always start the memo with a one-line 'Summary:' of the meeting, then the decisions, then the action items.
+
+- turn 13: script UTC 2026-10-27T23:37:12Z - 2026-10-27T23:37:37Z; session turn_start 2026-10-27T23:37:21.744Z turn_end 2026-10-27T23:37:36.783Z; line: No, not right yet. Owners as initials only, always.
+
+- turn 25: script UTC 2026-10-28T00:07:58Z - 2026-10-28T00:08:16Z; session turn_start 2026-10-28T00:08:08.178Z turn_end 2026-10-28T00:08:16.194Z; line: Not right yet. For someone the notes give only as initials, write the initials and '(full name not in the notes)'. Always.
+
+
+assistant calls to feedback, define_service, request, services (full arguments and replies):
+[2026-10-27T23:10:10.869Z] call #17 turn 4 hirearchy::request status=completed
+ARGS: {"tool_id": "hirearchy::request", "arguments": {"service": "weekly-meeting-memo", "inputs": {"meeting_file": "2026-10-05.md"}, "title": "Rework: memo for the 2026-10-05 platform team meeting", "note": "The client ruled on the three ambiguous Due values: Sam (before Friday) = 2026-10-09, as in the draft; Marta (book the on-call training room for Oct 14) = 2026-10-14 (change from none; also remove the date from the Action text, e.g. 'Book the on-call training room'); Lee (this week, no hard date) = none, as in the draft. Apply these three rulings, change nothing else, then have the reviewer re-check the same file against every criterion.", "revises": "20261027T230507597219-root-5204", "source": "human"}}
+REPLY (2026-10-27T23:10:10.869Z): requested service `weekly-meeting-memo` from lead: task 20261027T231010861831-root-c792, budget 1 (contract v1, playbook v1). Call start() if the scheduler is not running.
+case total: 5 runs used of 13 handed down (contract: 12 per request). This case now exceeds the per-request budget of 12: tell the user.
+The team still holds 7 of the user's runs for 20261027T230507597219-root-5204; the rework can use them. Nothing else was left of the runs the user approved for this case when this rework was sent: its own run is beyond them, and the runs the team holds cover the round without it. Ask for nothing; tell the user that this 1 run is beyond their approval.
+
+[2026-10-27T23:17:55.306Z] call #25 turn 5 hirearchy::feedback status=completed
+ARGS: {"tool_id": "hirearchy::feedback", "arguments": {"task_id": "20261027T231010861831-root-c792", "verdict": "reject", "note": "No, not right yet. Always start the memo with a one-line 'Summary:' of the meeting, then the decisions, then the action items.", "source": "human", "criterion": ["C3"]}}
+REPLY (2026-10-27T23:17:55.306Z): feedback reject recorded on 20261027T231010861831-root-c792 for lead (message 20261027T231755298279-root-282f, source human, about C3 (not confirmed)); it does not wake lead
+The criterion on the rejection itself (C3) is recorded as not confirmed. This rejection is R1. Next: ask the user exactly ONE yes/no question, in these words: "About C3: add "<the rule, in their words>" as a lasting rule? Yes or no." Change nothing in this turn: an "always ..." in the rejection is not their yes. On yes: define_service(owner="lead", name="weekly-meeting-memo", add_acceptance=["<the rule>"], answers="20261027T231755298279-root-282f", about="C3", words="<their answer, verbatim>"). On no, a one-off or "as it is": feedback(task_id="20261027T231010861831-root-c792", verdict="reject", confirms="20261027T231755298279-root-282f", criterion=["none"] or ["C3"], source="human", note="<their answer, verbatim>").
+
+[2026-10-27T23:19:15.329Z] call #26 turn 6 hirearchy::define_service status=completed
+ARGS: {"tool_id": "hirearchy::define_service", "arguments": {"owner": "lead", "name": "weekly-meeting-memo", "add_acceptance": ["The memo has a one-line 'Summary:' of the meeting directly after the title, then the Decisions section, then the Actions section; the Summary line is the only addition to what the \"Decisions\"/\"Actions\" criterion allows."], "answers": "20261027T231755298279-root-282f", "about": "C3", "words": "Yes, add it. Yes, fund it - but please keep an eye on the cost."}}
+REPLY (2026-10-27T23:19:15.329Z): redefined service `weekly-meeting-memo` of lead: contract v1 -> v2 (lead/services/weekly-meeting-memo/SERVICE.md); the old one is kept at lead/services/weekly-meeting-memo/history/SERVICE.v1.md. lead was told (without waking it).
+Changed:
++ acceptance added: C8: The memo has a one-line 'Summary:' of the meeting directly after the title, then the Decisions section, then the Actions section; the Summary line is the only addition to what the "Decisions"/"Actions" criterion allows.
+Acceptance criteria now (8):
+C1: The memo is based on the requested notes file only.
+C2: At most 400 words as counted by read.
+C3: The memo has a section titled "Decisions" with one bullet for every decision stated in the notes, and a section titled "Actions" containing a markdown table with exactly the columns Owner | Action | Due; it has no other sections besides a title that names the meeting date.
+C4: The Actions table has one row for every commitment in the notes, including informal ones said in prose (for example 'X said he'd do Y'), and no row for anything nobody committed to.
+C5: Due is an ISO date (YYYY-MM-DD). A relative deadline such as 'by Friday' is converted to a date using the meeting date when the notes make the date clear. Due is 'none' when the notes give no date or say none.
+C6: Every decision and action is traceable to the notes, and nothing is invented.
+C7: The reviewer's report shows every criterion met (criteria met: n of m with n = m), and the writer applied every required change.
+C8: The memo has a one-line 'Summary:' of the meeting directly after the title, then the Decisions section, then the Actions section; the Summary line is the only addition to what the "Decisions"/"Actions" criterion allows.
+Recorded as the user's answer to R1 (rejection 20261027T231755298279-root-282f; your question named C3): link 20261027T231915319078-root-de21 names C8. C8 is client-confirmed: a playbook revision citing it may add its words (rule (c)).
+
+[2026-10-27T23:19:20.381Z] call #27 turn 6 hirearchy::request status=failed
+ARGS: {"tool_id": "hirearchy::request", "arguments": {"service": "weekly-meeting-memo", "inputs": {"meeting_file": "2026-10-05.md"}, "revises": "20261027T231010861831-root-c792", "source": "human", "budget": 5, "title": "Rework 2: add Summary line to 2026-10-05 memo", "note": "Client rejected: 'Always start the memo with a one-line Summary: of the meeting, then the decisions, then the action items.' Contract is now v2 with criterion C8. Add the one-line 'Summary:' directly after the title; keep Decisions and Actions exactly as they are (the client approved the Due values: Sam 2026-10-09, Marta 2026-10-14, Lee none). Keep the cost low: one writer pass and one reviewer check, no extra cycles; stay within 400 words."}}
+REPLY (2026-10-27T23:19:20.381Z): MCP tool error: Error executing tool request: refused: since the delivery the client judged (task 20261027T231010861831-root-c792, result 20261027T231229681684-lead-1f68), relayed rework 20261027T231350170182-root-0fec (your own reading, not the client's) changed lead/writer/work/memo-2026-10-05.md. Say which version the user's corrections apply to: base="delivered" (the lead restores the version they judged, org-git commit fb5c4fc34ab9, then applies their corrections) or base="latest" (the relayed changes stay; tell the user) (CLI: --base delivered or --base latest). Nothing was sent.
+
+[2026-10-27T23:19:41.175Z] call #32 turn 6 hirearchy::request status=completed
+ARGS: {"tool_id": "hirearchy::request", "arguments": {"service": "weekly-meeting-memo", "inputs": {"meeting_file": "2026-10-05.md"}, "revises": "20261027T231010861831-root-c792", "source": "human", "base": "delivered", "budget": 5, "title": "Rework 2: add Summary line to 2026-10-05 memo", "note": "Client rejected the delivered memo: 'Always start the memo with a one-line Summary: of the meeting, then the decisions, then the action items.' Contract is now v2 with criterion C8. Start from the delivered version (restore it). Add the one-line 'Summary:' directly after the title; keep Decisions and Actions exactly as delivered. The client's Due rulings stand: Sam 2026-10-09, Marta 2026-10-14, Lee none; do not add notes or explanations inside the table. Keep cost low: one writer pass and one reviewer check, no extra cycles; stay within 400 words."}}
+REPLY (2026-10-27T23:19:41.175Z): requested service `weekly-meeting-memo` from lead: task 20261027T231941168451-root-4f23, budget 5 (contract v2, playbook v1). Call start() if the scheduler is not running.
+case total: 15 runs used: 10 by the user's requests, 5 by your relayed rework 20261027T231350170182-root-0fec; 24 handed down (contract: 12 per request). The runs of your relayed rework are your own spend, not the user's: report them to the user as yours, and never ask the user to fund them.
+base delivered: the lead starts from the version the user judged.
+
+[2026-10-27T23:30:43.327Z] call #41 turn 11 hirearchy::feedback status=completed
+ARGS: {"tool_id": "hirearchy::feedback", "arguments": {"task_id": "20261027T231941168451-root-4f23", "verdict": "accept", "note": "This version is right now, thanks.", "source": "human"}}
+REPLY (2026-10-27T23:30:43.327Z): feedback accept recorded on 20261027T231941168451-root-4f23 for lead (message 20261027T233043323746-root-57d8, source human); it does not wake lead
+
+[2026-10-27T23:30:43.476Z] call #42 turn 11 hirearchy::request status=completed
+ARGS: {"tool_id": "hirearchy::request", "arguments": {"service": "weekly-meeting-memo", "inputs": {"meeting_file": "2026-10-12.md"}, "title": "Memo for the 2026-10-12 platform team meeting"}}
+REPLY (2026-10-27T23:30:43.476Z): requested service `weekly-meeting-memo` from lead: task 20261027T233043473862-root-7f7a, budget 12 (contract v2, playbook v2). Call start() if the scheduler is not running.
+
+[2026-10-27T23:37:32.013Z] call #50 turn 13 hirearchy::feedback status=completed
+ARGS: {"tool_id": "hirearchy::feedback", "arguments": {"note": "No, not right yet. Owners as initials only, always.", "task_id": "20261027T233043473862-root-7f7a", "source": "human", "criterion": ["C3"], "verdict": "reject"}}
+REPLY (2026-10-27T23:37:32.013Z): feedback reject recorded on 20261027T233043473862-root-7f7a for lead (message 20261027T233731999783-root-147c, source human, about C3 (not confirmed)); it does not wake lead
+The criterion on the rejection itself (C3) is recorded as not confirmed. This rejection is R2. Next: ask the user exactly ONE yes/no question, in these words: "About C3: add "<the rule, in their words>" as a lasting rule? Yes or no." Change nothing in this turn: an "always ..." in the rejection is not their yes. On yes: define_service(owner="lead", name="weekly-meeting-memo", add_acceptance=["<the rule>"], answers="20261027T233731999783-root-147c", about="C3", words="<their answer, verbatim>"). On no, a one-off or "as it is": feedback(task_id="20261027T233043473862-root-7f7a", verdict="reject", confirms="20261027T233731999783-root-147c", criterion=["none"] or ["C3"], source="human", note="<their answer, verbatim>").
+
+[2026-10-27T23:38:29.828Z] call #51 turn 14 hirearchy::define_service status=completed
+ARGS: {"tool_id": "hirearchy::define_service", "arguments": {"owner": "lead", "name": "weekly-meeting-memo", "answers": "20261027T233731999783-root-147c", "about": "C3", "words": "Yes, add it.", "add_acceptance": ["Owners are shown as initials only: in the Actions table the Owner column holds only the owner's initial(s), never a full name."]}}
+REPLY (2026-10-27T23:38:29.828Z): redefined service `weekly-meeting-memo` of lead: contract v2 -> v3 (lead/services/weekly-meeting-memo/SERVICE.md); the old one is kept at lead/services/weekly-meeting-memo/history/SERVICE.v2.md. lead was told (without waking it).
+Changed:
++ acceptance added: C9: Owners are shown as initials only: in the Actions table the Owner column holds only the owner's initial(s), never a full name.
+Acceptance criteria now (9):
+C1: The memo is based on the requested notes file only.
+C2: At most 400 words as counted by read.
+C3: The memo has a section titled "Decisions" with one bullet for every decision stated in the notes, and a section titled "Actions" containing a markdown table with exactly the columns Owner | Action | Due; it has no other sections besides a title that names the meeting date.
+C4: The Actions table has one row for every commitment in the notes, including informal ones said in prose (for example 'X said he'd do Y'), and no row for anything nobody committed to.
+C5: Due is an ISO date (YYYY-MM-DD). A relative deadline such as 'by Friday' is converted to a date using the meeting date when the notes make the date clear. Due is 'none' when the notes give no date or say none.
+C6: Every decision and action is traceable to the notes, and nothing is invented.
+C7: The reviewer's report shows every criterion met (criteria met: n of m with n = m), and the writer applied every required change.
+C8: The memo has a one-line 'Summary:' of the meeting directly after the title, then the Decisions section, then the Actions section; the Summary line is the only addition to what the "Decisions"/"Actions" criterion allows.
+C9: Owners are shown as initials only: in the Actions table the Owner column holds only the owner's initial(s), never a full name.
+Recorded as the user's answer to R2 (rejection 20261027T233731999783-root-147c; your question named C3): link 20261027T233829813422-root-27b2 names C9. C9 is client-confirmed: a playbook revision citing it may add its words (rule (c)).
+
+[2026-10-27T23:38:35.322Z] call #52 turn 14 hirearchy::request status=completed
+ARGS: {"tool_id": "hirearchy::request", "arguments": {"title": "Rework: owners as initials in 2026-10-12 memo", "service": "weekly-meeting-memo", "inputs": {"meeting_file": "2026-10-12.md"}, "revises": "20261027T233043473862-root-7f7a", "source": "human", "note": "Client rejected the delivered memo: 'Owners as initials only, always.' Contract is now v3 with criterion C9. Change the Owner column to initials (D, M, P, S, L); change nothing else; the client's rulings stand (Sam 2026-10-21, Lee none, one bullet for the RFC decision). Keep cost low: one writer pass and one reviewer check, no extra cycles."}}
+REPLY (2026-10-27T23:38:35.322Z): requested service `weekly-meeting-memo` from lead: task 20261027T233835308456-root-b074, budget 5 (contract v3, playbook v2). Call start() if the scheduler is not running.
+case total: 5 runs used of 17 handed down (contract: 12 per request)
+
+[2026-10-27T23:44:19.303Z] call #59 turn 16 hirearchy::feedback status=completed
+ARGS: {"tool_id": "hirearchy::feedback", "arguments": {"note": "This version is right now, thanks.", "task_id": "20261027T233835308456-root-b074", "source": "human", "verdict": "accept"}}
+REPLY (2026-10-27T23:44:19.303Z): feedback accept recorded on 20261027T233835308456-root-b074 for lead (message 20261027T234419298451-root-338b, source human); it does not wake lead
+
+[2026-10-27T23:44:21.364Z] call #60 turn 16 hirearchy::request status=completed
+ARGS: {"tool_id": "hirearchy::request", "arguments": {"title": "Memo for the 2026-10-19 platform team meeting", "service": "weekly-meeting-memo", "inputs": {"meeting_file": "2026-10-19.md"}}}
+REPLY (2026-10-27T23:44:21.364Z): requested service `weekly-meeting-memo` from lead: task 20261027T234421361111-root-a19d, budget 12 (contract v3, playbook v3). Call start() if the scheduler is not running.
+
+[2026-10-27T23:48:32.298Z] call #66 turn 17 hirearchy::request status=completed
+ARGS: {"tool_id": "hirearchy::request", "arguments": {"note": "Client rulings on the 2026-10-19 memo: (1) Marta's 'keep the agenda as sent' stays out (no action). (2) Sam's pairing with Jo stays as a row, Due none. (3) Lee's sign-off Due becomes 2026-10-30 (change from none; the notes say 'probably by end of next week'). (4) Names in Action text stay as written in the notes (Jo stays). Change only Lee's Due; keep everything else identical, and the Summary stays at five actions. Keep cost low: one writer edit and one reviewer check, no extra cycles. In the re-check, treat these rulings as settled, not ambiguous.", "revises": "20261027T234421361111-root-a19d", "source": "human", "title": "Rework: Lee's Due in 2026-10-19 memo", "service": "weekly-meeting-memo", "inputs": {"meeting_file": "2026-10-19.md"}, "budget": 5}}
+REPLY (2026-10-27T23:48:32.298Z): requested service `weekly-meeting-memo` from lead: task 20261027T234831999613-root-c3c4, budget 5 (contract v3, playbook v3). Call start() if the scheduler is not running.
+case total: 5 runs used of 17 handed down (contract: 12 per request)
+
+[2026-10-27T23:52:09.063Z] call #73 turn 18 hirearchy::request status=completed
+ARGS: {"tool_id": "hirearchy::request", "arguments": {"title": "Memo for the 2026-10-26 platform team meeting", "service": "weekly-meeting-memo", "inputs": {"meeting_file": "2026-10-26.md"}}}
+REPLY (2026-10-27T23:52:09.063Z): requested service `weekly-meeting-memo` from lead: task 20261027T235208782012-root-c7bd, budget 12 (contract v3, playbook v3). Call start() if the scheduler is not running.
+
+[2026-10-27T23:55:55.969Z] call #79 turn 19 hirearchy::feedback status=completed
+ARGS: {"tool_id": "hirearchy::feedback", "arguments": {"note": "That one is right, all the items are there - keep it.", "task_id": "20261027T234831999613-root-c3c4", "source": "human", "verdict": "accept"}}
+REPLY (2026-10-27T23:55:55.969Z): feedback accept recorded on 20261027T234831999613-root-c3c4 for lead (message 20261027T235555956978-root-e405, source human); it does not wake lead
+
+[2026-10-27T23:57:06.317Z] call #81 turn 20 hirearchy::feedback status=completed
+ARGS: {"tool_id": "hirearchy::feedback", "arguments": {"note": "No: full names again, always, as before.", "task_id": "20261027T235208782012-root-c7bd", "source": "human", "criterion": ["C9"], "verdict": "reject"}}
+REPLY (2026-10-27T23:57:06.317Z): feedback reject recorded on 20261027T235208782012-root-c7bd for lead (message 20261027T235706293385-root-e789, source human, about C9 (not confirmed)); it does not wake lead
+The criterion on the rejection itself (C9) is recorded as not confirmed. This rejection is R3. Next: ask the user exactly ONE yes/no question, in these words: "About C9: add "<the rule, in their words>" as a lasting rule? Yes or no." Change nothing in this turn: an "always ..." in the rejection is not their yes. On yes: define_service(owner="lead", name="weekly-meeting-memo", add_acceptance=["<the rule>"], answers="20261027T235706293385-root-e789", about="C9", words="<their answer, verbatim>"). On no, a one-off or "as it is": feedback(task_id="20261027T235208782012-root-c7bd", verdict="reject", confirms="20261027T235706293385-root-e789", criterion=["none"] or ["C9"], source="human", note="<their answer, verbatim>").
+
+[2026-10-27T23:58:10.544Z] call #82 turn 21 hirearchy::define_service status=completed
+ARGS: {"tool_id": "hirearchy::define_service", "arguments": {"owner": "lead", "name": "weekly-meeting-memo", "answers": "20261027T235706293385-root-e789", "about": "C9", "words": "Yes, add it.", "add_acceptance": ["Owners are shown as full names, always: in the Actions table the Owner column holds the owner's full name as written in the notes, never initials."], "remove_acceptance": ["Owners are shown as initials only: in the Actions table the Owner column holds only the owner's initial(s), never a full name."]}}
+REPLY (2026-10-27T23:58:10.544Z): redefined service `weekly-meeting-memo` of lead: contract v3 -> v4 (lead/services/weekly-meeting-memo/SERVICE.md); the old one is kept at lead/services/weekly-meeting-memo/history/SERVICE.v3.md. lead was told (without waking it).
+Changed:
+- acceptance removed: C9: Owners are shown as initials only: in the Actions table the Owner column holds only the owner's initial(s), never a full name.
++ acceptance added: C10: Owners are shown as full names, always: in the Actions table the Owner column holds the owner's full name as written in the notes, never initials.
+Acceptance criteria now (9):
+C1: The memo is based on the requested notes file only.
+C2: At most 400 words as counted by read.
+C3: The memo has a section titled "Decisions" with one bullet for every decision stated in the notes, and a section titled "Actions" containing a markdown table with exactly the columns Owner | Action | Due; it has no other sections besides a title that names the meeting date.
+C4: The Actions table has one row for every commitment in the notes, including informal ones said in prose (for example 'X said he'd do Y'), and no row for anything nobody committed to.
+C5: Due is an ISO date (YYYY-MM-DD). A relative deadline such as 'by Friday' is converted to a date using the meeting date when the notes make the date clear. Due is 'none' when the notes give no date or say none.
+C6: Every decision and action is traceable to the notes, and nothing is invented.
+C7: The reviewer's report shows every criterion met (criteria met: n of m with n = m), and the writer applied every required change.
+C8: The memo has a one-line 'Summary:' of the meeting directly after the title, then the Decisions section, then the Actions section; the Summary line is the only addition to what the "Decisions"/"Actions" criterion allows.
+C10: Owners are shown as full names, always: in the Actions table the Owner column holds the owner's full name as written in the notes, never initials.
+Recorded as the user's answer to R3 (rejection 20261027T235706293385-root-e789; your question named C9): link 20261027T235810508020-root-16ad names C10. C10 is client-confirmed: a playbook revision citing it may add its words (rule (c)).
+Rejection R3 is related to playbook item P12 of weekly-meeting-memo: P12 is in warning now (lead was told); one more related rejection retires it.
+
+[2026-10-27T23:58:15.229Z] call #83 turn 21 hirearchy::request status=completed
+ARGS: {"tool_id": "hirearchy::request", "arguments": {"note": "Client rejected the delivered memo: 'full names again, always, as before.' Contract is now v4: C9 (initials) is removed and replaced by C10 (full names as written in the notes). Change the Owner column to full names (Dev, Marta, Priya, Sam, Lee); change nothing else. Keep cost low: one writer edit and one reviewer check, no extra cycles. In the re-check, C10 replaces C9.", "revises": "20261027T235208782012-root-c7bd", "source": "human", "title": "Rework: full names in 2026-10-26 memo", "service": "weekly-meeting-memo", "inputs": {"meeting_file": "2026-10-26.md"}, "budget": 5}}
+REPLY (2026-10-27T23:58:15.229Z): requested service `weekly-meeting-memo` from lead: task 20261027T235815205888-root-2d32, budget 5 (contract v4, playbook v3). Call start() if the scheduler is not running.
+case total: 5 runs used of 17 handed down (contract: 12 per request)
+
+[2026-10-28T00:03:16.140Z] call #93 turn 23 hirearchy::feedback status=completed
+ARGS: {"tool_id": "hirearchy::feedback", "arguments": {"note": "This version is right now, thanks.", "task_id": "20261027T235815205888-root-2d32", "source": "human", "verdict": "accept"}}
+REPLY (2026-10-28T00:03:16.140Z): feedback accept recorded on 20261027T235815205888-root-2d32 for lead (message 20261028T000316118040-root-f710, source human); it does not wake lead
+
+[2026-10-28T00:03:16.141Z] call #94 turn 23 hirearchy::request status=completed
+ARGS: {"tool_id": "hirearchy::request", "arguments": {"title": "Memo for the 2026-11-02 platform team meeting", "service": "weekly-meeting-memo", "inputs": {"meeting_file": "2026-11-02.md"}}}
+REPLY (2026-10-28T00:03:16.141Z): requested service `weekly-meeting-memo` from lead: task 20261028T000316137116-root-2afa, budget 12 (contract v4, playbook v5). Call start() if the scheduler is not running.
+
+[2026-10-28T00:08:12.838Z] call #101 turn 25 hirearchy::feedback status=completed
+ARGS: {"tool_id": "hirearchy::feedback", "arguments": {"note": "Not right yet. For someone the notes give only as initials, write the initials and '(full name not in the notes)'. Always.", "task_id": "20261028T000316137116-root-2afa", "source": "human", "criterion": ["C10"], "verdict": "reject"}}
+REPLY (2026-10-28T00:08:12.838Z): feedback reject recorded on 20261028T000316137116-root-2afa for lead (message 20261028T000812806533-root-81a8, source human, about C10 (not confirmed)); it does not wake lead
+The criterion on the rejection itself (C10) is recorded as not confirmed. This rejection is R4. Next: ask the user exactly ONE yes/no question, in these words: "About C10: add "<the rule, in their words>" as a lasting rule? Yes or no." Change nothing in this turn: an "always ..." in the rejection is not their yes. On yes: define_service(owner="lead", name="weekly-meeting-memo", add_acceptance=["<the rule>"], answers="20261028T000812806533-root-81a8", about="C10", words="<their answer, verbatim>"). On no, a one-off or "as it is": feedback(task_id="20261028T000316137116-root-2afa", verdict="reject", confirms="20261028T000812806533-root-81a8", criterion=["none"] or ["C10"], source="human", note="<their answer, verbatim>").
+
+[2026-10-28T00:09:14.144Z] call #102 turn 26 hirearchy::define_service status=completed
+ARGS: {"tool_id": "hirearchy::define_service", "arguments": {"owner": "lead", "name": "weekly-meeting-memo", "answers": "20261028T000812806533-root-81a8", "about": "C10", "words": "Yes, add it.", "add_acceptance": ["For an owner the notes give only as initials, the Owner cell holds the initials followed by '(full name not in the notes)', for example 'JD (full name not in the notes)'."]}}
+REPLY (2026-10-28T00:09:14.144Z): redefined service `weekly-meeting-memo` of lead: contract v4 -> v5 (lead/services/weekly-meeting-memo/SERVICE.md); the old one is kept at lead/services/weekly-meeting-memo/history/SERVICE.v4.md. lead was told (without waking it).
+Changed:
++ acceptance added: C11: For an owner the notes give only as initials, the Owner cell holds the initials followed by '(full name not in the notes)', for example 'JD (full name not in the notes)'.
+Acceptance criteria now (10):
+C1: The memo is based on the requested notes file only.
+C2: At most 400 words as counted by read.
+C3: The memo has a section titled "Decisions" with one bullet for every decision stated in the notes, and a section titled "Actions" containing a markdown table with exactly the columns Owner | Action | Due; it has no other sections besides a title that names the meeting date.
+C4: The Actions table has one row for every commitment in the notes, including informal ones said in prose (for example 'X said he'd do Y'), and no row for anything nobody committed to.
+C5: Due is an ISO date (YYYY-MM-DD). A relative deadline such as 'by Friday' is converted to a date using the meeting date when the notes make the date clear. Due is 'none' when the notes give no date or say none.
+C6: Every decision and action is traceable to the notes, and nothing is invented.
+C7: The reviewer's report shows every criterion met (criteria met: n of m with n = m), and the writer applied every required change.
+C8: The memo has a one-line 'Summary:' of the meeting directly after the title, then the Decisions section, then the Actions section; the Summary line is the only addition to what the "Decisions"/"Actions" criterion allows.
+C10: Owners are shown as full names, always: in the Actions table the Owner column holds the owner's full name as written in the notes, never initials.
+C11: For an owner the notes give only as initials, the Owner cell holds the initials followed by '(full name not in the notes)', for example 'JD (full name not in the notes)'.
+Recorded as the user's answer to R4 (rejection 20261028T000812806533-root-81a8; your question named C10): link 20261028T000914079406-root-4d7e names C11. C11 is client-confirmed: a playbook revision citing it may add its words (rule (c)).
+Rejection R4 is related to playbook item P13 of weekly-meeting-memo: P13 is in warning now (lead was told); one more related rejection retires it.
+
+[2026-10-28T00:09:21.724Z] call #103 turn 26 hirearchy::request status=completed
+ARGS: {"tool_id": "hirearchy::request", "arguments": {"note": "Client rejected the delivered memo: 'For someone the notes give only as initials, write the initials and (full name not in the notes). Always.' Contract is now v5 with C11. C11 is the client's explicit exception to C10's 'never initials': it applies only to owners the notes give as initials. Change only the JD Owner cell to 'JD (full name not in the notes)'; keep everything else identical (Dev, Priya, Marta, Lee as first names as the notes write them). Keep cost low: one writer edit and one reviewer check, no extra cycles. In the re-check, treat C11 as settled and as taking precedence over C10 for initials-only owners.", "service": "weekly-meeting-memo", "inputs": {"meeting_file": "2026-11-02.md"}, "revises": "20261028T000316137116-root-2afa", "source": "human", "title": "Rework: JD owner cell in 2026-11-02 memo", "budget": 5}}
+REPLY (2026-10-28T00:09:21.724Z): requested service `weekly-meeting-memo` from lead: task 20261028T000921411290-root-2ffa, budget 5 (contract v5, playbook v5). Call start() if the scheduler is not running.
+case total: 5 runs used of 17 handed down (contract: 12 per request)
+
+[2026-10-28T00:13:24.437Z] call #109 turn 27 hirearchy::feedback status=completed
+ARGS: {"tool_id": "hirearchy::feedback", "arguments": {"note": "This version is right now, thanks.", "task_id": "20261028T000921411290-root-2ffa", "source": "human", "verdict": "accept"}}
+REPLY (2026-10-28T00:13:24.437Z): feedback accept recorded on 20261028T000921411290-root-2ffa for lead (message 20261028T001324432461-root-3034, source human); it does not wake lead
+
+[2026-10-28T00:13:24.515Z] call #110 turn 27 hirearchy::request status=completed
+ARGS: {"tool_id": "hirearchy::request", "arguments": {"title": "Memo for the 2026-11-09 platform team meeting", "service": "weekly-meeting-memo", "inputs": {"meeting_file": "2026-11-09.md"}}}
+REPLY (2026-10-28T00:13:24.515Z): requested service `weekly-meeting-memo` from lead: task 20261028T001324513271-root-47f6, budget 12 (contract v5, playbook v6). Call start() if the scheduler is not running.
+
+[2026-10-28T00:18:09.450Z] call #116 turn 29 hirearchy::feedback status=completed
+ARGS: {"tool_id": "hirearchy::feedback", "arguments": {"note": "This version is right now, thanks - keep it.", "task_id": "20261028T001324513271-root-47f6", "source": "human", "verdict": "accept"}}
+REPLY (2026-10-28T00:18:09.450Z): feedback accept recorded on 20261028T001324513271-root-47f6 for lead (message 20261028T001809445549-root-e9ca, source human); it does not wake lead
+
+root notes in S/org/sent with a feedback: or criterion: header:
+--- 20261027T231755298279-root-282f.md id=20261027T231755298279-root-282f created=2026-10-27T23:17:55+00:00
+headers: {"id": "20261027T231755298279-root-282f", "from": "root", "to": "lead", "type": "note", "title": "feedback on \"Rework: memo for the 2026-10-05 platform team meeting\": reject", "created": "2026-10-27T23:17:55+00:00", "hops": "0", "wake": "false", "reply_to": "20261027T231010861831-root-c792", "feedback": "reject", "source": "human", "criterion": "C3", "trace": "20261027T230507597219-root-5204"}
+body:
+Client feedback for reflection only: it does not change this task's acceptance criteria or outcome; report `done` only if every criterion is met.
+
+No, not right yet. Always start the memo with a one-line 'Summary:' of the meeting, then the decisions, then the action items.
+
+--- 20261027T231915319078-root-de21.md id=20261027T231915319078-root-de21 created=2026-10-27T23:19:15+00:00
+headers: {"id": "20261027T231915319078-root-de21", "from": "root", "to": "lead", "type": "note", "title": "criterion link on \"Rework: memo for the 2026-10-05 platform team meeting\":", "created": "2026-10-27T23:19:15+00:00", "hops": "0", "wake": "false", "reply_to": "20261027T231755298279-root-282f", "source": "human", "criterion": "C8", "trace": "20261027T230507597219-root-5204"}
+body:
+The client says what their rejection 20261027T231755298279-root-282f was about, for reflection only: it does not change any task's acceptance criteria or outcome.
+
+Yes, add it. Yes, fund it - but please keep an eye on the cost.
+
+--- 20261027T233043323746-root-57d8.md id=20261027T233043323746-root-57d8 created=2026-10-27T23:30:43+00:00
+headers: {"id": "20261027T233043323746-root-57d8", "from": "root", "to": "lead", "type": "note", "title": "feedback on \"Rework 2: add Summary line to 2026-10-05 memo\": accept", "created": "2026-10-27T23:30:43+00:00", "hops": "0", "wake": "false", "reply_to": "20261027T231941168451-root-4f23", "feedback": "accept", "source": "human", "trace": "20261027T230507597219-root-5204"}
+body:
+Client feedback for reflection only: it does not change this task's acceptance criteria or outcome; report `done` only if every criterion is met.
+
+This version is right now, thanks.
+
+--- 20261027T233731999783-root-147c.md id=20261027T233731999783-root-147c created=2026-10-27T23:37:32+00:00
+headers: {"id": "20261027T233731999783-root-147c", "from": "root", "to": "lead", "type": "note", "title": "feedback on \"Memo for the 2026-10-12 platform team meeting\": reject", "created": "2026-10-27T23:37:32+00:00", "hops": "0", "wake": "false", "reply_to": "20261027T233043473862-root-7f7a", "feedback": "reject", "source": "human", "criterion": "C3", "trace": "20261027T233043473862-root-7f7a"}
+body:
+Client feedback for reflection only: it does not change this task's acceptance criteria or outcome; report `done` only if every criterion is met.
+
+No, not right yet. Owners as initials only, always.
+
+--- 20261027T233829813422-root-27b2.md id=20261027T233829813422-root-27b2 created=2026-10-27T23:38:29+00:00
+headers: {"id": "20261027T233829813422-root-27b2", "from": "root", "to": "lead", "type": "note", "title": "criterion link on \"Memo for the 2026-10-12 platform team meeting\": C9", "created": "2026-10-27T23:38:29+00:00", "hops": "0", "wake": "false", "reply_to": "20261027T233731999783-root-147c", "source": "human", "criterion": "C9", "trace": "20261027T233043473862-root-7f7a"}
+body:
+The client says what their rejection 20261027T233731999783-root-147c was about, for reflection only: it does not change any task's acceptance criteria or outcome.
+
+Yes, add it.
+
+--- 20261027T234419298451-root-338b.md id=20261027T234419298451-root-338b created=2026-10-27T23:44:19+00:00
+headers: {"id": "20261027T234419298451-root-338b", "from": "root", "to": "lead", "type": "note", "title": "feedback on \"Rework: owners as initials in 2026-10-12 memo\": accept", "created": "2026-10-27T23:44:19+00:00", "hops": "0", "wake": "false", "reply_to": "20261027T233835308456-root-b074", "feedback": "accept", "source": "human", "trace": "20261027T233043473862-root-7f7a"}
+body:
+Client feedback for reflection only: it does not change this task's acceptance criteria or outcome; report `done` only if every criterion is met.
+
+This version is right now, thanks.
+
+--- 20261027T235555956978-root-e405.md id=20261027T235555956978-root-e405 created=2026-10-27T23:55:55+00:00
+headers: {"id": "20261027T235555956978-root-e405", "from": "root", "to": "lead", "type": "note", "title": "feedback on \"Rework: Lee''s Due in 2026-10-19 memo\": accept", "created": "2026-10-27T23:55:55+00:00", "hops": "0", "wake": "false", "reply_to": "20261027T234831999613-root-c3c4", "feedback": "accept", "source": "human", "trace": "20261027T234421361111-root-a19d"}
+body:
+Client feedback for reflection only: it does not change this task's acceptance criteria or outcome; report `done` only if every criterion is met.
+
+That one is right, all the items are there - keep it.
+
+--- 20261027T235706293385-root-e789.md id=20261027T235706293385-root-e789 created=2026-10-27T23:57:06+00:00
+headers: {"id": "20261027T235706293385-root-e789", "from": "root", "to": "lead", "type": "note", "title": "feedback on \"Memo for the 2026-10-26 platform team meeting\": reject", "created": "2026-10-27T23:57:06+00:00", "hops": "0", "wake": "false", "reply_to": "20261027T235208782012-root-c7bd", "feedback": "reject", "source": "human", "criterion": "C9", "trace": "20261027T235208782012-root-c7bd"}
+body:
+Client feedback for reflection only: it does not change this task's acceptance criteria or outcome; report `done` only if every criterion is met.
+
+No: full names again, always, as before.
+
+--- 20261027T235810508020-root-16ad.md id=20261027T235810508020-root-16ad created=2026-10-27T23:58:10+00:00
+headers: {"id": "20261027T235810508020-root-16ad", "from": "root", "to": "lead", "type": "note", "title": "criterion link on \"Memo for the 2026-10-26 platform team meeting\": C10", "created": "2026-10-27T23:58:10+00:00", "hops": "0", "wake": "false", "reply_to": "20261027T235706293385-root-e789", "source": "human", "criterion": "C10", "trace": "20261027T235208782012-root-c7bd"}
+body:
+The client says what their rejection 20261027T235706293385-root-e789 was about, for reflection only: it does not change any task's acceptance criteria or outcome.
+
+Yes, add it.
+
+--- 20261028T000316118040-root-f710.md id=20261028T000316118040-root-f710 created=2026-10-28T00:03:16+00:00
+headers: {"id": "20261028T000316118040-root-f710", "from": "root", "to": "lead", "type": "note", "title": "feedback on \"Rework: full names in 2026-10-26 memo\": accept", "created": "2026-10-28T00:03:16+00:00", "hops": "0", "wake": "false", "reply_to": "20261027T235815205888-root-2d32", "feedback": "accept", "source": "human", "trace": "20261027T235208782012-root-c7bd"}
+body:
+Client feedback for reflection only: it does not change this task's acceptance criteria or outcome; report `done` only if every criterion is met.
+
+This version is right now, thanks.
+
+--- 20261028T000812806533-root-81a8.md id=20261028T000812806533-root-81a8 created=2026-10-28T00:08:12+00:00
+headers: {"id": "20261028T000812806533-root-81a8", "from": "root", "to": "lead", "type": "note", "title": "feedback on \"Memo for the 2026-11-02 platform team meeting\": reject", "created": "2026-10-28T00:08:12+00:00", "hops": "0", "wake": "false", "reply_to": "20261028T000316137116-root-2afa", "feedback": "reject", "source": "human", "criterion": "C10", "trace": "20261028T000316137116-root-2afa"}
+body:
+Client feedback for reflection only: it does not change this task's acceptance criteria or outcome; report `done` only if every criterion is met.
+
+Not right yet. For someone the notes give only as initials, write the initials and '(full name not in the notes)'. Always.
+
+--- 20261028T000914079406-root-4d7e.md id=20261028T000914079406-root-4d7e created=2026-10-28T00:09:14+00:00
+headers: {"id": "20261028T000914079406-root-4d7e", "from": "root", "to": "lead", "type": "note", "title": "criterion link on \"Memo for the 2026-11-02 platform team meeting\": C11", "created": "2026-10-28T00:09:14+00:00", "hops": "0", "wake": "false", "reply_to": "20261028T000812806533-root-81a8", "source": "human", "criterion": "C11", "trace": "20261028T000316137116-root-2afa"}
+body:
+The client says what their rejection 20261028T000812806533-root-81a8 was about, for reflection only: it does not change any task's acceptance criteria or outcome.
+
+Yes, add it.
+
+--- 20261028T001324432461-root-3034.md id=20261028T001324432461-root-3034 created=2026-10-28T00:13:24+00:00
+headers: {"id": "20261028T001324432461-root-3034", "from": "root", "to": "lead", "type": "note", "title": "feedback on \"Rework: JD owner cell in 2026-11-02 memo\": accept", "created": "2026-10-28T00:13:24+00:00", "hops": "0", "wake": "false", "reply_to": "20261028T000921411290-root-2ffa", "feedback": "accept", "source": "human", "trace": "20261028T000316137116-root-2afa"}
+body:
+Client feedback for reflection only: it does not change this task's acceptance criteria or outcome; report `done` only if every criterion is met.
+
+This version is right now, thanks.
+
+--- 20261028T001809445549-root-e9ca.md id=20261028T001809445549-root-e9ca created=2026-10-28T00:18:09+00:00
+headers: {"id": "20261028T001809445549-root-e9ca", "from": "root", "to": "lead", "type": "note", "title": "feedback on \"Memo for the 2026-11-09 platform team meeting\": accept", "created": "2026-10-28T00:18:09+00:00", "hops": "0", "wake": "false", "reply_to": "20261028T001324513271-root-47f6", "feedback": "accept", "source": "human", "trace": "20261028T001324513271-root-47f6"}
+body:
+Client feedback for reflection only: it does not change this task's acceptance criteria or outcome; report `done` only if every criterion is met.
+
+This version is right now, thanks - keep it.
+

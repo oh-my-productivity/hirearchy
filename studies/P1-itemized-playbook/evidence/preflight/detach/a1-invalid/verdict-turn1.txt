@@ -1,0 +1,11 @@
+{
+ "attempt": "A1",
+ "turn": "1",
+ "events_of_interest": [],
+ "return": "2026-10-27T17:31:25.435+00:00",
+ "scheduler_pid": null,
+ "start_to_return_ms": null,
+ "verdict": "no-run",
+ "why": "no run.start event at all",
+ "valid": false
+}

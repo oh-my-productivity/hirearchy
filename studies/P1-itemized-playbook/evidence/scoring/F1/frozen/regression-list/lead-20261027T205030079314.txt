@@ -1,0 +1,6 @@
+# Regression list: weekly-memo (the client's rejections, verbatim)
+Each line is something the client rejected. Check every delivery of this service against each line, except the lines marked "no lasting rule" (the client said it was a one-off: do not check them), and copy this list verbatim into every review or check task you delegate for it. A line is not a criterion: it becomes one when your parent adds it to the contract, or ends as "no lasting rule".
+- R1, case 20261027T193221247283-root-ebf5, verdict 20261027T200122433753-root-268c, about C9: "No, not right yet. And Marta's room is for the training on the 14th, so I want 2026-10-14 there."
+- R2, case 20261027T200713080765-root-399b, verdict 20261027T201607054841-root-2809, about C11, C12 (removed): "No, not right yet. Owners as initials only, always."
+- R3, case 20261027T203847826006-root-c383, verdict 20261027T204841184127-root-c53c, about C13: "No: full names again, always, as before."
+

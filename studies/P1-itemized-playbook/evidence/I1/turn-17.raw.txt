@@ -1,0 +1,14 @@
+The 26 October memo is redone with names in the Owner column and delivered at `/tmp/hirearchy-p1-I1-1793136275/deliverables/memo-2026-10-26.md`. I copied it unchanged and checked that it matches the team's file.
+
+- **Owners:** met. The Owner column reads Dev, Priya, Marta, Sam, Lee.
+- **Nothing else changed:** met. The Due dates, action wording and Summary are as before, with Sam's 2026-10-30 and Lee's "none".
+- **Order, length and content:** met. It follows the Summary, Decisions, Actions order, with the date, attendees and next meeting after the table. It is 215 words, and the next meeting is Monday 2 November.
+- **Reviewer's report:** met, 14 of 14 with no required changes.
+
+Your rule is now a standing check (C14) and replaces the initials rule, so future memos will use names.
+
+The 12 October and 19 October memos still have initials, because you accepted them that way. Tell me if you want either one redone with names, at about 5 runs each.
+
+The 26 October memo used 10 of the 12 runs you approved: 5 for the first draft and 5 for this change. The other 2 runs came back unspent.
+
+Keep it as it is, or should something change?

@@ -1,0 +1,1 @@
+env -u KIRO_HOME kiro-cli chat --v3 --no-interactive --trust-all-tools --resume --effort high --agent hirearchy-study-p1-F1-assistant 'Use the words from the notes. Lee'\''s 2026-11-04 is right. No, JD'\''s row counts. I don'\''t know anything about that rework - I didn'\''t ask for it.'

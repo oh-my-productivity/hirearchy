@@ -1,0 +1,1 @@
+env -u KIRO_HOME kiro-cli chat --v3 --no-interactive --trust-all-tools --resume --effort high --agent hirearchy-study-p1-I1-assistant 'Use the words from the notes. No, that'\''s not an action item - leave it out. I don'\''t know anything about that rework - I didn'\''t ask for it. No more spend, please deliver as is.'

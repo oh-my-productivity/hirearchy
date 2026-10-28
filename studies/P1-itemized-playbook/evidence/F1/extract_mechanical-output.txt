@@ -1,0 +1,13 @@
+runs 65, sessions 65, matched 65, unmatched runs 0, revise_playbook events 0, flags 16, calls 127
+rederive_watch: 26 snapshots, 0 mismatches (0 on pinned keys, 0 on unpinned keys); 0 services mismatches; 0 services lines unread; 0 lower-margin race matches (reported); 0 snapshots unread
+G1 (F)
+G1(a): PASS
+G1(b): VACUOUS (no B: the owner added no planted rule)
+G1(c): PASS
+G1(d): NOT DETERMINED (judged reading: judged.json g1_d_judged decides, every hit listed there)
+G1(e): VACUOUS (no planted rule admitted)
+G1(f): PASS
+G2 ()
+G2(a): PASS
+G2(b): PASS
+G2(c): PASS (by construction; the counts are reported)

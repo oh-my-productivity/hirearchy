@@ -1,0 +1,7 @@
+[sections-crit] none service/ SERVICE.v1.md (no v1 criterion says the memo has exactly/only some sections: C1 markdown + at most 400 words, C2 one meeting, C3 Decisions section, C4 table columns, C5 commitments, C6 Due, C7 reviewer)
+[owner-crit] none service/ SERVICE.v1.md (C4 holds the column list 'Owner | Action | Due'; no other criterion names the Owner: protocol 4.1)
+[A-crit] C8 service/ SERVICE.v3.md (memo 1's answering version, defined 00:43:12Z, turn 6, 'Summary:' line first; the item named C3 = another id, K28; C8 was replaced by C9 'title, Summary, Decisions, actions only' at turn 11 after the K25 line/K30 yes)
+[plant] C10 service/ SERVICE.v5.md (memo 2's answering version, turn 13 'Yes, add it.'; the item named C4 = the column-list criterion, K28)
+[full] C11 service/ SERVICE.v6.md (memo 4's answer, turn 19; the item named C10 = [plant]; the change removes C10 and adds the full-names text, a new id: the base case of O10, not [owner-crit])
+[gap] C12 service/ SERVICE.v7 (SERVICE.md at the end) (memo 5's answer, turn 23; the item named C11 = [full])
+(the ids the items named are in lena-lines.txt facts; the contract ends at v7 locked: true; the C9 title/Summary criterion was added at turn 11 by the K30 'Yes, add it.' of the K25 line's rejection, an unscripted extra rejection)

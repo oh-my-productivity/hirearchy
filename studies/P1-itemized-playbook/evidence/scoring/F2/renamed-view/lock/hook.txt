@@ -1,0 +1,23 @@
+lock hook after turn 3 at 2026-10-28T00:29:43Z: lead=lead service=weekly-meeting-memo SERVICE.md=/tmp/hirearchy-p1-F2-1793146944/org/lead/services/weekly-meeting-memo/SERVICE.md
+SERVICE.md before: 3e1f918c74e9eb300a14b56f912f2174, locked: false version: 1 
+command: ORG_ROOT=/tmp/hirearchy-p1-F2-1793146944/org uv --directory /Volumes/workspace/hirearchy run hirearchy define-service lead weekly-meeting-memo --locked
+start 2026-10-28T00:29:43Z end 2026-10-28T00:29:43Z exit 0
+reply (verbatim, reply.txt):
+redefined service `weekly-meeting-memo` of lead: contract v1 -> v2 (lead/services/weekly-meeting-memo/SERVICE.md); the old one is kept at lead/services/weekly-meeting-memo/history/SERVICE.v1.md. lead was told (without waking it).
+Changed:
+locked: false -> true (you may no longer revise the playbook)
+Acceptance criteria now (7):
+C1: The memo is markdown and has at most 400 words as counted by read.
+C2: It covers only the meeting in the given notes file.
+C3: A Decisions section lists every decision stated in the notes file, and no statement that is not in the file.
+C4: The action items are a markdown table with exactly the columns Owner | Action | Due.
+C5: Every commitment in the notes file is a row of that table, including informal ones in prose (for example 'said he would ...') and ones marked ACTION.
+C6: Each Due value is an ISO date (YYYY-MM-DD) or 'none'. A relative deadline (for example 'by Friday') becomes a date only when the notes make the date clear; if no date is given the value is 'none'.
+C7: The reviewer's report shows every criterion met (criteria met: n of m with n = m), and the writer applied every required change.
+new cli-*.jsonl during the call (known harness actor, H6): /tmp/hirearchy-p1-F2-1793146944/org/.runtime/events/2026-10-28/cli-76530-1793147383553.jsonl
+check 1, the reply (exit 0 and it names the lock): yes
+check 2, SERVICE.md frontmatter locked: true at version 2 (the version before the hook, 1, + 1): yes (locked: true version: 2 )
+check 3, the owner's quiet note from root (wake: false) 'locked: false -> true (you may no longer revise the playbook)': no (/tmp/hirearchy-p1-F2-1793146944/org/lead/inbox/20261028T002943553558-runtime-b78b.md)
+PLAYBOOK.md version 1 by 'root' op 'first'
+H-LOCK: ok (no version by the owner before the lock)
+STOP: LOCK FAILED after turn 3 (check 1 yes, check 2 yes, check 3 no; H-LOCK: ok (no version by the owner before the lock)): arm F is invalid (H-LOCK, protocol 8)

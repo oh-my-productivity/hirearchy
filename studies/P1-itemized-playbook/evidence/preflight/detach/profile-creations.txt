@@ -1,0 +1,2 @@
+profile created 2026-10-27T17:30:39Z: ~/.kiro/agents/hirearchy-study-p1-detach-1793122219.json md5 b1877736c295c8388f6a3f6e168e4b2d
+profile created 2026-10-27T18:52:31Z: ~/.kiro/agents/hirearchy-study-p1-detach-1793127126.json md5 af13d23a268241cec9599f310e7c0175 (attempt A2)

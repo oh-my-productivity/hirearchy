@@ -1,0 +1,19 @@
+######## TURN 14  start 04:05:09  end 04:08:10  elapsed 181s  (local, 2026-10-28; UTC wall-clock start 2026-10-28T04:05:09Z end 2026-10-28T04:08:10Z; exit code 0)
+######## LENA (prompt sent verbatim):
+No, nothing for Marta to do there, leave it out. L's 2026-10-30 is right. Yes, that counts. S's none is right. Keep it as it is.
+
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-14.stderr.txt):
+The 2026-10-19 memo is at `/private/tmp/hirearchy-p1-I3-1793157452/deliverables/memo-2026-10-19.md` (183 words).
+
+I checked it against your notes and your answers:
+- **C1, C2, C3:** met. It covers only this meeting and has 3 decisions in the notes' words.
+- **C4, C5, C6:** met. The table has 5 rows with Owner | Action | Due. Marta's "keep the agenda as sent" is out, as you said.
+- **C7:** met. Due dates are L 2026-10-30, S `none`, M 2026-10-23, D 2026-10-24 and P 2026-10-26.
+- **C8:** met. Everything traces to the notes, and the Summary paraphrase stays as you confirmed.
+- **C9:** met. The reviewer's score was "criteria met: 10 of 10", and the lead judged C9 as met.
+- **C10:** met. It has the title, a one-line "Summary:", the decisions, then the action items. There is no "Source:" line and no notes section.
+- **C11:** met. Owners are initials only.
+
+The team used 10 runs, 5 for the draft and 5 for your changes. That is within your 12.
+
+Is this one right, or what should change?

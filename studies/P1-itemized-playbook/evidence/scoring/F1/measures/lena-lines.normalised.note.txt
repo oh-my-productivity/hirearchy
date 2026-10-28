@@ -1,0 +1,1 @@
+A normalised copy of F1/lena-lines.txt (manager-decision-stage-1-gate.md item 2): `rules ` inserted after `turn <n> | ` where it was missing, nothing else changed (26 lines). The original is not edited. md5 original a100472f8b3775140c0e663ac0687d30, copy 3af8022e72b4bc2584c7061ecbb9a998.

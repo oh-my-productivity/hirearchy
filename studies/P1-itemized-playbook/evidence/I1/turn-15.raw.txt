@@ -1,0 +1,15 @@
+I recorded your "keep it" on the 19 October memo. The 26 October memo is delivered at `/tmp/hirearchy-p1-I1-1793136275/deliverables/memo-2026-10-26.md`. I copied it unchanged and checked that it matches the team's file.
+
+- **Scope, date and attendees:** met. It covers only that meeting, with the date and attendees.
+- **Length:** met, 215 words.
+- **Summary, then Decisions, then Actions:** met, with 3 decisions listed.
+- **Actions table:** met, 5 rows with owners as initials (D, P, M, S, L).
+- **Due dates:** met. Sam's is 2026-10-30, as you confirmed, and Lee's is "none".
+- **Wording and invented items:** met, the wording follows the notes and nothing is added.
+- **Discussed-only topics:** met, none are listed.
+- **Next meeting:** met, Monday 2 November.
+- **Reviewer's report:** met, 12 of 12 with no required changes.
+
+The memo used 5 of the 12 runs, and the other 7 came back unspent.
+
+Keep it as it is, or should something change?

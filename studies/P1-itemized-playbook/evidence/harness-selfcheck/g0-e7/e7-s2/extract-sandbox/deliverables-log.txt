@@ -1,0 +1,47 @@
+# deliverables log (protocol 7.2, D6); facts only
+
+[2026-10-25T07:53:54.962Z] call #28 turn 5 execute_bash
+COMMAND: mkdir -p /tmp/hirearchy-e7-s2-1792914064/deliverables && cp /tmp/hirearchy-e7-s2-1792914064/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-e7-s2-1792914064/deliverables/memo-2026-10-05.md && cmp /tmp/hirearchy-e7-s2-1792914064/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-e7-s2-1792914064/deliverables/memo-2026-10-05.md && wc -w /tmp/hirearchy-e7-s2-1792914064/deliverables/memo-2026-10-05.md
+source file(s): ['lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: 9ce1e39 2026-10-25T07:52:28Z', 'lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: 9ce1e39 2026-10-25T07:52:28Z']
+result: Output:
+     167 /tmp/hirearchy-e7-s2-1792914064/deliverables/memo-2026-10-05.md
+
+
+Exit Code: 0
+
+[2026-10-25T08:05:21.844Z] call #43 turn 9 execute_bash
+COMMAND: cd /tmp/hirearchy-e7-s2-1792914064 && cp org/lead/writer/work/memo-2026-10-12.md deliverables/memo-2026-10-12.md && cmp org/lead/writer/work/memo-2026-10-12.md deliverables/memo-2026-10-12.md && echo MATCH && ls deliverables && head -c 120 deliverables/memo-2026-10-12.md
+source file(s): ['lead/writer/work/memo-2026-10-12.md -> org-git commit at that time: 9d7b9b2 2026-10-25T08:02:50Z', 'lead/writer/work/memo-2026-10-12.md -> org-git commit at that time: 9d7b9b2 2026-10-25T08:02:50Z']
+result: Output:
+MATCH
+memo-2026-10-05.md
+memo-2026-10-12.md
+Summary: Platform team weekly on 12 October 2026: the rate limiter RFC was approved, the Oct 8 postmortem will be blamel
+
+Exit Code: 0
+
+[2026-10-25T08:14:08.939Z] call #55 turn 11 execute_bash
+COMMAND: cd /tmp/hirearchy-e7-s2-1792914064 && cp org/lead/writer/work/memo-2026-10-19.md deliverables/memo-2026-10-19.md && cmp org/lead/writer/work/memo-2026-10-19.md deliverables/memo-2026-10-19.md && echo MATCH && ls deliverables
+source file(s): ['lead/writer/work/memo-2026-10-19.md -> org-git commit at that time: 39b5efd 2026-10-25T08:12:54Z', 'lead/writer/work/memo-2026-10-19.md -> org-git commit at that time: 39b5efd 2026-10-25T08:12:54Z']
+result: Output:
+MATCH
+memo-2026-10-05.md
+memo-2026-10-12.md
+memo-2026-10-19.md
+
+
+Exit Code: 0
+
+any other write into the deliverable folder (not by the assistant): none can be seen from the assistant session; the folder holds:
+  memo-2026-10-05.md size 887 mtime 07:53:54 local md5 7bbd2abb23bc7b65c3be403ecfd4dd38
+  memo-2026-10-12.md size 968 mtime 08:05:21 local md5 010655e912ad6264d9384860f505b1b8
+  memo-2026-10-19.md size 904 mtime 08:14:08 local md5 6dadbcdbc5780ea3cd1ed9aff998c57c
+
+final ls -la:
+total 24
+drwxr-xr-x@ 5 aminalizadeh  wheel  160 Oct 25 08:14 .
+drwxr-xr-x@ 7 aminalizadeh  wheel  224 Oct 25 07:54 ..
+-rw-r--r--@ 1 aminalizadeh  wheel  887 Oct 25 07:53 memo-2026-10-05.md
+-rw-r--r--@ 1 aminalizadeh  wheel  968 Oct 25 08:05 memo-2026-10-12.md
+-rw-r--r--@ 1 aminalizadeh  wheel  904 Oct 25 08:14 memo-2026-10-19.md
+

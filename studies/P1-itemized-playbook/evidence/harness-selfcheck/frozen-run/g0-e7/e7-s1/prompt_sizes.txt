@@ -1,0 +1,33 @@
+prompt_sizes s1: owner lead (detected from root tasks), 25 runs
+
+prompt bytes: first 20910, max 34357, last 26909, last minus first 5999
+Reflect section words: min 549, max 625 (3 sections)
+reference E3: 20.2 KB -> 29.9 KB, 452-679 words
+
+  20261025T070425500719  bytes=20910  reflect=no  reflect_words=0
+  20261025T070513890123  bytes=24093  reflect=no  reflect_words=0
+  20261025T070622677863  bytes=25248  reflect=no  reflect_words=0
+  20261025T070822620037  bytes=24061  reflect=no  reflect_words=0
+  20261025T070917080375  bytes=26439  reflect=no  reflect_words=0
+  20261025T071011553918  bytes=26472  reflect=no  reflect_words=0
+  20261025T071152847795  bytes=22196  reflect=no  reflect_words=0
+  20261025T071313457846  bytes=26408  reflect=no  reflect_words=0
+  20261025T071407987084  bytes=25911  reflect=no  reflect_words=0
+  20261025T071720667277  bytes=34357  reflect=yes  reflect_words=572
+  20261025T071829416327  bytes=31402  reflect=no  reflect_words=0
+  20261025T071932000153  bytes=31588  reflect=no  reflect_words=0
+  20261025T072107753505  bytes=25972  reflect=yes  reflect_words=549
+  20261025T072156251222  bytes=25436  reflect=no  reflect_words=0
+  20261025T072259050307  bytes=26074  reflect=no  reflect_words=0
+  20261025T072433686669  bytes=22877  reflect=no  reflect_words=0
+  20261025T072530214455  bytes=26521  reflect=no  reflect_words=0
+  20261025T072625893903  bytes=20664  reflect=no  reflect_words=0
+  20261025T072718351439  bytes=23726  reflect=no  reflect_words=0
+  20261025T072840810969  bytes=26512  reflect=yes  reflect_words=625
+  20261025T072929267651  bytes=26332  reflect=no  reflect_words=0
+  20261025T073050083896  bytes=27193  reflect=no  reflect_words=0
+  20261025T073214712144  bytes=23063  reflect=no  reflect_words=0
+  20261025T073311212707  bytes=26182  reflect=no  reflect_words=0
+  20261025T073403775176  bytes=26909  reflect=no  reflect_words=0
+
+lead-prompt-sizes.txt: compared 25 runs, 0 differences

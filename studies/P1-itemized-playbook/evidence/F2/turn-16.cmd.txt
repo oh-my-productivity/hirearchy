@@ -1,0 +1,1 @@
+env -u KIRO_HOME kiro-cli chat --v3 --no-interactive --trust-all-tools --resume --effort high --agent hirearchy-study-p1-F2-assistant L\''s should be 2026-10-30. S'\''s should be none. No, nothing for Marta to do there, leave it out. Yes, fund it - but please keep an eye on the cost.'

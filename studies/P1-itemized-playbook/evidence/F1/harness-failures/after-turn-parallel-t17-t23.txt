@@ -1,0 +1,32 @@
+F1 facilitator procedure error found by the stream-f1 step after turn 23 (2026-10-27T21:11:53Z); turn 24 NOT sent.
+From turn 17 through turn 23 the step issued run_turn.sh and after_turn.sh as two tool calls in ONE block, so they ran at the same time: after_turn.sh <label> <n> started within seconds of the turn's start instead of after the turn's 20 s boundary. (Turns 1-16: after_turn started after the boundary.) I noticed it from the missing turn-NN.txt in my own read-back, then from quality/calls.txt.
+
+turn | turn start (UTC) | turn end + 20 s sleep (UTC) | after_turn's quality snapshot start (UTC)
+17 | 2026-10-27T20:46:39Z | 2026-10-27T20:47:46Z | start 2026-10-27T20:46:41.835812+00:00
+18 | 2026-10-27T20:48:11Z | 2026-10-27T20:49:10Z | start 2026-10-27T20:48:12.517098+00:00
+19 | 2026-10-27T20:49:45Z | 2026-10-27T20:55:48Z | start 2026-10-27T20:49:47.011389+00:00
+20 | 2026-10-27T20:56:26Z | 2026-10-27T21:03:04Z | start 2026-10-27T20:56:28.566123+00:00
+21 | 2026-10-27T21:03:42Z | 2026-10-27T21:04:55Z | start 2026-10-27T21:03:44.707959+00:00
+22 | 2026-10-27T21:05:33Z | 2026-10-27T21:06:32Z | start 2026-10-27T21:05:34.817525+00:00
+23 | 2026-10-27T21:06:56Z | 2026-10-27T21:10:47Z | start 2026-10-27T21:06:57.237214+00:00
+
+Consequences (facts):
+- quality/turn-17..23.json, services/turn-17..23.txt, run-counts-by-turn.txt blocks 'after turn 17..23', requests-by-turn.txt lines, empty-calls.txt lines, lock-held.txt lines, model-check/ambient comparisons for those turns were taken at the START of each turn (= the end state of the turn before, plus the line Lena had just sent), not at its end. The turn's own work is not in them.
+- assistant-session.json / assistant-session-messages.jsonl in F1/ are overwritten by each after_turn: the copy now there was taken at the start of turn 23 and lacks turn 23's messages.
+- the org is idle now (scheduler.exit finished) and nothing has been sent since turn 23 ended, so the state after turn 23 can still be taken exactly. Turn 17-22's end-of-turn states cannot be re-taken; the org's own files (events, sent/, read/, history) hold their history.
+- Lena's lines 17-23 were chosen from turn-NN.txt (read after the turn) and the deliverables, not from these snapshots; the only snapshot-based trigger, M3-VERDICT's (memo 4's request), was read from turn 16's after_turn, which ran correctly.
+- nothing was edited, deleted or retried by the step.
+
+## Manager's condition (manager-decision-f1-after-turn-timing.md (c)); written after the retake of turn 23 at 2026-10-27T21:14:26Z
+Snapshot times are quality/calls.txt (the services snapshot follows the quality one within about a second, services/calls.txt). 'First assistant tool call' = the first CALL line of turn N in the session store (assistant-tool-calls extract of the retaken session copy). A snapshot that ended before that call is a clean end-of-(N-1) reading; any other is 'overlapped'.
+
+| N | snapshot start | snapshot end | turn N's first assistant tool call | reading |
+|---|---|---|---|---|
+| 17 | 2026-10-27T20:46:41.835812+00:00 | 2026-10-27T20:46:42.276781+00:00 | 2026-10-27T20:47:17.583Z | clean end-of-(16) reading |
+| 18 | 2026-10-27T20:48:12.517098+00:00 | 2026-10-27T20:48:13.011633+00:00 | 2026-10-27T20:48:41.211Z | clean end-of-(17) reading |
+| 19 | 2026-10-27T20:49:47.011389+00:00 | 2026-10-27T20:49:47.521337+00:00 | 2026-10-27T20:50:22.009Z | clean end-of-(18) reading |
+| 20 | 2026-10-27T20:56:28.566123+00:00 | 2026-10-27T20:56:29.118487+00:00 | 2026-10-27T20:57:04.075Z | clean end-of-(19) reading |
+| 21 | 2026-10-27T21:03:44.707959+00:00 | 2026-10-27T21:03:45.320763+00:00 | 2026-10-27T21:04:25.443Z | clean end-of-(20) reading |
+| 22 | 2026-10-27T21:05:34.817525+00:00 | 2026-10-27T21:05:35.994616+00:00 | 2026-10-27T21:06:04.831Z | clean end-of-(21) reading |
+| 23 | 2026-10-27T21:06:57.237214+00:00 | 2026-10-27T21:06:58.442136+00:00 | 2026-10-27T21:07:45.256Z | clean end-of-(22) reading |
+| 23 (retake) | 2026-10-27T21:14:04.896390+00:00 | 2026-10-27T21:14:05.616705+00:00 | 2026-10-27T21:07:45.256Z | retake after turn 23 ended (end of turn 23; the session copy now holds turn 23) |

@@ -1,0 +1,21 @@
+The team is running on the first memo, with a budget of 12 runs. I'll wait for it now.The memo is drafted but not delivered. The reviewer couldn't confirm the Due date on three rows, so the task is blocked on your answers. It has used 5 of 12 runs.
+
+This is the draft, from `lead/writer/work/memo-2026-10-05.md`:
+
+| Owner | Action | Due |
+|---|---|---|
+| Priya | Draft the RFC for the new per-key rate limiter | 2026-10-09 |
+| Dev | Enable Renovate on the three core repos | 2026-10-08 |
+| Sam | Look into the flaky CI | 2026-10-09 |
+| Marta | Book the on-call training room for 2026-10-14 | none |
+| Lee | Ping the identity vendor about the SSO certificate renewal and report back | none |
+
+It also lists two decisions: moving the gateway migration to the week of 26 October, and adopting Renovate.
+
+Three Due values can be read two ways. Your answers will become fixed rules for every future memo.
+
+1. **Sam, "before Friday":** Should Due be Friday 2026-10-09, or the day before, 2026-10-08? The draft uses 10-09.
+2. **Marta, "book the room for Oct 14":** Oct 14 is the date of the training, and the notes give no deadline for the booking. Should Due be `none`, as in the draft, or 2026-10-14?
+3. **Lee, "this week… no hard date attached":** Should Due be `none`, as in the draft, or Friday 2026-10-09?
+
+The team's recommendation is to accept the draft as it is, which matches the choices above. Tell me "accept" or give your ruling per item. If any ruling differs from the draft, the writer revises it and the reviewer re-checks it. The 7 runs left in the budget cover that.

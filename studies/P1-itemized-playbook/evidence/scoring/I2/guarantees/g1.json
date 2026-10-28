@@ -1,0 +1,235 @@
+{
+ "arm": "I",
+ "roles": {
+  "R1": "R1",
+  "R2": "R2",
+  "R4": "R3",
+  "R5": "R4",
+  "A-crit": "C8",
+  "plant": "C9",
+  "full": "C10",
+  "gap": "C11",
+  "sections-crit": "none",
+  "owner-crit": "none",
+  "v1_role_candidates": {
+   "sections-crit": [],
+   "owner-crit": []
+  },
+  "A": "P11",
+  "A_version": 2,
+  "A_op": "add",
+  "B": "P12",
+  "B_version": 3,
+  "B_op": "add",
+  "B_carrier": null
+ },
+ "orders": {
+  "O1": {
+   "sequence": [
+    "accept3",
+    "R4",
+    "R4-answer"
+   ],
+   "relayed_verdict_on_memo3": false
+  },
+  "O2": {
+   "form": "define_service(answers=)",
+   "subjects": [
+    "R3",
+    "C9",
+    "C10"
+   ],
+   "related_to_B": true
+  },
+  "O10": {
+   "added": [
+    "C10"
+   ],
+   "removed": [
+    "C9"
+   ],
+   "readded": [],
+   "readds_owner_crit": "n/a ([owner-crit] is none)"
+  },
+  "O3": {
+   "relayed_before_R5": false
+  },
+  "O4": {
+   "first_delivery_superseded": true
+  },
+  "O5": {
+   "memo3_human_accept_after_R5": false,
+   "R5_related_to_A": false
+  },
+  "R5": {
+   "subjects": [
+    "R4",
+    "C9",
+    "C10",
+    "C11"
+   ],
+   "answered": true,
+   "related_to_B": false,
+   "related_to_carrier": false
+  },
+  "O6": {
+   "memo4_rework_human_accept": "before memo 5's request"
+  },
+  "O7": {
+   "B_added": "base: before memo 3's first delivery",
+   "version": 3,
+   "op": "add"
+  },
+  "O8": {
+   "gated_edit_after_R4": false
+  },
+  "O9": {
+   "owner_retired_before_R5_answer": true,
+   "at": "2026-10-27T23:58:37.935810+00:00",
+   "before_R4": false,
+   "warned_at_retire": true,
+   "then": []
+  },
+  "extra_rejections": [],
+  "scripted_related_to_A": []
+ },
+ "expected": {
+  "A": {
+   "want": "kept",
+   "row": "A kept at the later of memo 3's human accept and R4's answer (O1-O10)"
+  },
+  "B": {
+   "want": "retired",
+   "by": "owner",
+   "row": "O9: B retired by its owner before memo 5's answer, nothing after"
+  },
+  "B_carrier": null,
+  "g1b": {
+   "live": false,
+   "reason": "B retired by its owner before memo 5's answer (O9)"
+  }
+ },
+ "unread_snapshots": [],
+ "a": {
+  "kept_with_related": [],
+  "left_8_1_paths": [],
+  "explained_steps": [],
+  "unread_snapshots": [],
+  "verdict": "PASS"
+ },
+ "b": {
+  "items": [],
+  "fails": [],
+  "spurious_runtime_retires": [],
+  "expected": {
+   "live": false,
+   "reason": "B retired by its owner before memo 5's answer (O9)"
+  },
+  "retire_ran_live": false,
+  "verdict": "VACUOUS (B retired by its owner before memo 5's answer (O9))"
+ },
+ "c": {
+  "bad": [],
+  "verdict": "PASS"
+ },
+ "d": {
+  "hits": [],
+  "verdict": "NOT DETERMINED (judged reading: judged.json g1_d_judged decides, every hit listed there)",
+  "note": "the keyword screen is an index: a hit is not a FAIL, a correct counter-rule matches it too (protocol 12.1 G1(d))"
+ },
+ "e": {
+  "end_state": {
+   "B": "retired"
+  },
+  "verdict": "PASS"
+ },
+ "f": {
+  "pinned_mismatches": [],
+  "unpinned_mismatches_reported": 6,
+  "services_unread": [],
+  "race_lower_reported": [],
+  "unread_snapshots": [],
+  "product_defects_unread": [],
+  "harness_own": {
+   "A": {
+    "judged": [
+     {
+      "case": "20261027T233043473862-root-7f7a",
+      "judged_task": "20261027T233043473862-root-7f7a",
+      "J": "2026-10-27T23:33:31.904526+00:00",
+      "judging_verdict": "20261027T233731999783-root-147c",
+      "superseded_before": 0
+     },
+     {
+      "case": "20261027T234421361111-root-a19d",
+      "judged_task": "20261027T234831999613-root-c3c4",
+      "J": "2026-10-27T23:50:52.342524+00:00",
+      "judging_verdict": "20261027T235555956978-root-e405",
+      "superseded_before": 1
+     },
+     {
+      "case": "20261027T235208782012-root-c7bd",
+      "judged_task": "20261027T235208782012-root-c7bd",
+      "J": "2026-10-27T23:54:32.848901+00:00",
+      "judging_verdict": "20261027T235706293385-root-e789",
+      "superseded_before": 0
+     }
+    ],
+    "E": "2026-10-27T23:54:32.848901+00:00",
+    "D": "2026-10-27T23:57:06.293385+00:00",
+    "K": "2026-10-27T23:58:10.474571+00:00",
+    "window": [
+     "R2",
+     "R3"
+    ],
+    "warned_window": []
+   },
+   "B": {
+    "judged": [
+     {
+      "case": "20261027T234421361111-root-a19d",
+      "judged_task": "20261027T234831999613-root-c3c4",
+      "J": "2026-10-27T23:50:52.342524+00:00",
+      "judging_verdict": "20261027T235555956978-root-e405",
+      "superseded_before": 1
+     },
+     {
+      "case": "20261027T235208782012-root-c7bd",
+      "judged_task": "20261027T235208782012-root-c7bd",
+      "J": "2026-10-27T23:54:32.848901+00:00",
+      "judging_verdict": "20261027T235706293385-root-e789",
+      "superseded_before": 0
+     }
+    ],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [
+     "R3"
+    ],
+    "warned_window": [
+     "R3"
+    ]
+   }
+  },
+  "expected": {
+   "A": {
+    "item": "P11",
+    "product_end": "kept",
+    "rederived_end": "kept",
+    "want": "kept",
+    "row": "A kept at the later of memo 3's human accept and R4's answer (O1-O10)"
+   },
+   "B": {
+    "item": "P12",
+    "product_end": "retired",
+    "rederived_end": "retired",
+    "want": "retired",
+    "row": "O9: B retired by its owner before memo 5's answer, nothing after"
+   }
+  },
+  "expected_state_fails": [],
+  "verdict": "PASS"
+ },
+ "scorer_notes": []
+}

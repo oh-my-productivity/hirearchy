@@ -1,0 +1,29 @@
+######## TURN 27  start 00:13:08  end 00:16:04  elapsed 176s  (local, 2026-10-28; UTC wall-clock start 2026-10-28T00:13:08Z end 2026-10-28T00:16:04Z; exit code 0)
+######## LENA (prompt sent verbatim):
+This version is right now, thanks. Please do 2026-11-09.md. I'll wait.
+
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-27.stderr.txt):
+The memo for 9 Nov is drafted but not delivered. It passed all 8 checks, and the reviewer verified 8 of 8 facts. It used 5 of 12 runs. One reading is open.
+
+**Question:** Sam said he'd add Jo to the on-call rotation "by Friday." I used Friday 2026-11-13, the Friday of the meeting week. That is the same reading you accepted for Sam's "by Friday" in the 26 Oct memo. The reviewer noted that 2026-11-20 is a possible alternative. Is 2026-11-13 right?
+
+This is the memo as it stands:
+
+| Owner | Action | Due |
+|---|---|---|
+| Marta | Circulate the quarterly review notes | 2026-11-11 |
+| Dev | Switch off the old gateway | 2026-11-20 |
+| Priya | Start the rate limiter rollout to all plans | 2026-11-16 |
+| Sam | Add Jo to the on-call rotation | 2026-11-13 |
+| Lee | Go through the SSO audit log to check for old service accounts | none |
+
+It also has the Summary line and 3 decisions:
+- Move the old gateway switch-off to Friday 20 November.
+- Approve Priya's rate limiter rollout plan as written.
+- Jo joins the on-call rotation from Monday 16 November.
+
+The reviewer also asked again whether "full name" means the names as the notes write them. I'm not re-asking, because you settled that earlier: names as the notes give them.
+
+Reply "yes" to deliver it as it is. If you say 2026-11-20, a rework costs about 5 runs, and 7 are left in the budget.
+
+I recorded your approval of the 2 Nov memo.

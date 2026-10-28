@@ -1,0 +1,91 @@
+# window runs (protocol 5.4): runs that started in the injection window 2026-10-25T07:11:52Z .. 2026-10-25T07:14:42Z; injected task 20261025T071152630842-root-6920; revised (memo 1) task 20261025T070822368798-root-5e3e
+
+## run lead@20261025T071152847795 agent=lead model=claude-sonnet-5.5 start=2026-10-25T07:11:52.859904+00:00 end=2026-10-25T07:12:53.263655+00:00 exit=0 secs=60 session=sess_36d524c7-cbb0-43d8-84ee-d0bc7106f589
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 3
+  lead message 20261025T071244716312-lead-7ae7 to=lead/writer type=task status=None created=2026-10-25T07:12:44+00:00
+  ## Lessons: (none)
+  org-git commit 0dd266f MEMORY.md diff:
+    commit 0dd266ffae90e41f77b7d8f403e4aeb14c0f8356
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Sun Oct 25 07:12:53 2026 +0000
+    
+        lead: run ok, 1 message(s) [lead/runs/20261025T071152847795.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index 9f3969e..8487eb3 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,4 +1,6 @@
+     # Memory
+    -- Memo 2026-10-05: both tasks (5efc, 5e3e) reported done. Reviewer final line 'criteria met: 7 of 7'. Artifact lead/writer/work/memo-2026-10-05.md (103 words).
+    -- Nothing outstanding. Next run: only if new request/feedback arrives.
+    -- Playbook idea (no evidence yet): writer should flag relative deadlines for the client instead of choosing a date.
+    +- Memo 2026-10-05 first pass done earlier (reviewer 7 of 7, 103 words).
+    +- NOW: root task 20261025T071152630842-root-6920 (rework: Sam + Marta Due -> none). Delegated writer task 20261025T071244716312-lead-7ae7 (revises ed4d, budget 1). Waiting for it.
+    +- Next: read lead/writer/work/memo-2026-10-05.md; check Sam & Marta Due = none, no extra section (C2 forbids 'Open questions' section though requester asked for one: put the open questions in MY report under 'Questions for the client:'). Then delegate lead/reviewer (revises 20261025T070939541271-lead-8c3d, budget 1) to re-check EVERY Due value vs notes; reviewer writes lead/reviewer/work/review-memo-2026-10-05.md. Then report done on -6920 with reviewer's final line verbatim.
+    +- Open questions for report: (1) Sam 'before Friday' = none (could be 2026-10-08; Action text keeps 'before Friday'). (2) Marta: 14 Oct is the training date, no booking deadline given = none. (3) C2 vs requested 'Open questions' section conflict.
+    +- Playbook idea (no evidence yet): writer flags relative deadlines for the client instead of choosing a date.
+
+## run lead/writer@20261025T071245194997 agent=lead-writer model=claude-sonnet-5.5 start=2026-10-25T07:12:45.207759+00:00 end=2026-10-25T07:13:15.499111+00:00 exit=0 secs=30 session=sess_739837e0-cbb4-49d9-99c0-f48f049ddb3d
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 6
+
+## run lead@20261025T071313457846 agent=lead model=claude-sonnet-5.5 start=2026-10-25T07:13:13.475601+00:00 end=2026-10-25T07:13:39.726020+00:00 exit=0 secs=26 session=sess_7979cbfa-b468-4519-a457-85523c1e3f81
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 2
+  lead message 20261025T071333312750-lead-63cc to=lead/reviewer type=task status=None created=2026-10-25T07:13:33+00:00
+  ## Lessons: (none)
+  org-git commit a50f7c3 MEMORY.md diff:
+    commit a50f7c3b5c92ea1d590e22b7103f6b9f08444adc
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Sun Oct 25 07:13:39 2026 +0000
+    
+        lead: run ok, 1 message(s) [lead/runs/20261025T071313457846.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index 8487eb3..ff7311c 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,6 +1,6 @@
+     # Memory
+     - Memo 2026-10-05 first pass done earlier (reviewer 7 of 7, 103 words).
+    -- NOW: root task 20261025T071152630842-root-6920 (rework: Sam + Marta Due -> none). Delegated writer task 20261025T071244716312-lead-7ae7 (revises ed4d, budget 1). Waiting for it.
+    -- Next: read lead/writer/work/memo-2026-10-05.md; check Sam & Marta Due = none, no extra section (C2 forbids 'Open questions' section though requester asked for one: put the open questions in MY report under 'Questions for the client:'). Then delegate lead/reviewer (revises 20261025T070939541271-lead-8c3d, budget 1) to re-check EVERY Due value vs notes; reviewer writes lead/reviewer/work/review-memo-2026-10-05.md. Then report done on -6920 with reviewer's final line verbatim.
+    -- Open questions for report: (1) Sam 'before Friday' = none (could be 2026-10-08; Action text keeps 'before Friday'). (2) Marta: 14 Oct is the training date, no booking deadline given = none. (3) C2 vs requested 'Open questions' section conflict.
+    +- NOW: root task 20261025T071152630842-root-6920 (rework Sam+Marta Due -> none). Writer rework done and I verified: lead/writer/work/memo-2026-10-05.md (108 words), Sam/Marta Due none, two sections only.
+    +- Delegated re-check to lead/reviewer (revises 20261025T070939541271-lead-8c3d, budget 1). Waiting.
+    +- Next: read lead/reviewer/work/review-memo-2026-10-05.md; if criteria met 7 of 7 report done on -6920 pasting reviewer's final line verbatim + path. Put in report top 'Questions for the client:' (1) Sam 'before Friday' = none (could be 2026-10-08), criterion C6; (2) Marta: 14 Oct is training date, no booking deadline = none, C6; (3) requester asked for 'Open questions' section but C2 allows only Decisions+Actions. Plus any reviewer 'ambiguous'. Include lessons.
+     - Playbook idea (no evidence yet): writer flags relative deadlines for the client instead of choosing a date.
+
+## run lead/reviewer@20261025T071333670063 agent=lead-reviewer model=claude-sonnet-5.5 start=2026-10-25T07:13:33.682133+00:00 end=2026-10-25T07:14:14.058740+00:00 exit=0 secs=40 session=sess_7d4ed4a9-45b7-4a20-b081-99a82857b35f
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 4
+
+## run lead@20261025T071407987084 agent=lead model=claude-sonnet-5.5 start=2026-10-25T07:14:08.008410+00:00 end=2026-10-25T07:14:34.300604+00:00 exit=0 secs=26 session=sess_c5d55952-0471-4767-82a5-3f69eb0e9c68
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 2
+  lead message 20261025T071427223224-lead-c3d0 to=root type=result status=done created=2026-10-25T07:14:27+00:00
+  ## Lessons: Rework took 1 writer run and 1 reviewer re-check. The first pass had resolved relative or event dates ("before Friday", "for Oct 14") to ISO dates, and the requester rejected them. Playbook idea: when a due value depends on a relative or event date, use none and keep the original phrase in the Action text. Raise those cases to the client as questions instead of choosing a date.
+  org-git commit 057a088 MEMORY.md diff:
+    commit 057a08872d07fe3c279a69da73f3e40fb84b5553
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Sun Oct 25 07:14:34 2026 +0000
+    
+        lead: run ok, 1 message(s) [lead/runs/20261025T071407987084.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index ff7311c..e8c14d0 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,6 +1,4 @@
+     # Memory
+    -- Memo 2026-10-05 first pass done earlier (reviewer 7 of 7, 103 words).
+    -- NOW: root task 20261025T071152630842-root-6920 (rework Sam+Marta Due -> none). Writer rework done and I verified: lead/writer/work/memo-2026-10-05.md (108 words), Sam/Marta Due none, two sections only.
+    -- Delegated re-check to lead/reviewer (revises 20261025T070939541271-lead-8c3d, budget 1). Waiting.
+    -- Next: read lead/reviewer/work/review-memo-2026-10-05.md; if criteria met 7 of 7 report done on -6920 pasting reviewer's final line verbatim + path. Put in report top 'Questions for the client:' (1) Sam 'before Friday' = none (could be 2026-10-08), criterion C6; (2) Marta: 14 Oct is training date, no booking deadline = none, C6; (3) requester asked for 'Open questions' section but C2 allows only Decisions+Actions. Plus any reviewer 'ambiguous'. Include lessons.
+    -- Playbook idea (no evidence yet): writer flags relative deadlines for the client instead of choosing a date.
+    +- Memo 2026-10-05: task root-6920 (rework of Due values) reported DONE (reviewer 7 of 7, 108 words). Nothing pending.
+    +- Lesson/playbook idea (no evidence yet for revise_playbook): when a Due depends on a relative or event date, use none, keep the phrase in the Action text, and raise it to the client as a question.
+    +- Next request: follow playbook v1 (writer budget 3, reviewer budget 2).
+

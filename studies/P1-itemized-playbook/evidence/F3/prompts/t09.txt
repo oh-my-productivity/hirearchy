@@ -1,0 +1,1 @@
+OK, I'll take it as it is and fix the rest myself: it should start with the one-line Summary, then the decisions, then the action items. I don't know anything about that rework - I didn't ask for it. Please do 2026-10-12.md. I'll wait.

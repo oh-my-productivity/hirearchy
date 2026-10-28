@@ -1,0 +1,25 @@
+Services you can request (from your direct reports):
+- weekly-meeting-memo (offered by lead; contract v5, playbook v5): One memo (decisions and action table) from one weekly meeting's notes file.
+  inputs: notes_file* (File name of the meeting notes in the notes folder, for example 2026-11-16.md)   (* required)
+  each request: 12 runs; acceptance criteria (lead/services/weekly-meeting-memo/SERVICE.md):
+    C1: Covers only the meeting in the requested notes file.
+    C2: The memo is markdown and has at most 400 words as counted by read.
+    C3: Every decision stated in the notes is listed under a heading "Decisions".
+    C4: Every commitment in the notes, including informal ones stated in prose (for example "X said he would ..."), is one row of a table under a heading "Actions".
+    C5: The table columns are exactly Owner | Action | Due.
+    C6: Due is an ISO date (YYYY-MM-DD) or "none". A relative date such as "by Friday" is converted to an ISO date using the meeting date only when the notes make it clear; if there is no date or it is not clear, Due is "none".
+    C7: Decisions and actions use the words of the notes, and nothing appears that is not in the notes.
+    C8: Topics that were only discussed and not decided are not listed.
+    C9: The memo names the meeting date and the people present.
+    C10: The memo gives the next meeting date when the notes give one.
+    C11: The reviewer's report shows every criterion met (criteria met: n of m with n = m), and the writer applied every required change.
+    C12: The first line of the memo is one line starting "Summary:" that summarises the meeting, in the team's own words and using only facts from the notes (this is the one exception to "use the words of the notes"). After it come "Decisions", then "Actions". The meeting date, the people present and the next meeting date go after the Actions table.
+    C14: In the Actions table, the Owner column holds the owner's name as written in the notes (for example Priya), not an initial.
+    C15: In the Actions table, when the notes give an owner only as initials, the Owner cell reads those initials followed by "(full name not in the notes)", for example "JD (full name not in the notes)". Names given in full stay as written.
+  record: 6 request(s): 6 done, 0 failed, 0 open; 5 reworked; avg 11.7 runs; feedback 5 accept (4 after a reject), 0 reject
+  regression list (the client's rejections):
+    R1 (case 20261027T213102025357-root-7ca1, about C12): "No, not right yet. Always start the memo with a one-line 'Summary:' of the meeting, then the decisions, then the action items." (items citing it: P11)
+    R2 (case 20261027T215102682492-root-e5c1, about C13 (removed)): "No, not right yet. Owners as initials only, always."
+    R3 (case 20261027T221245662290-root-c26e, about C14): "No: full names again, always, as before."
+    R4 (case 20261027T222309545850-root-da6a, about C15): "Not right yet. For someone the notes give only as initials, write the initials and '(full name not in the notes)'. Always."
+  playbook v5 (2026-10-27): "the client rejected R3 and R4, which are about R3, C14"; 11 items (0 rules), none watched

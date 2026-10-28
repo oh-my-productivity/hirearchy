@@ -2005,6 +2005,7 @@ playbook, 14.9), **the warning and retire notes**, and the effect of
 
 ### 21.6 Open questions for the owner
 
+Resolved by the owner on 2026-10-27: Q1, Q2 and Q4 as recommended; Q3 approved in two stages (the manager's record: `docs/research/org-growth/phase-1/build/manager-decision-design-loop.md`).
 The deviations D1-D14 (21.2) and the backlog decisions (17) are decided in this design; the owner may override any of them before the plan.
 **The questions stay open with the owner; the plan assumes the recommended answers (B10):** Q1, both refusals approved; Q2, P2-UNRATED kept as it
 is; Q4, root's acknowledgement path approved. Q3 (the study's cost) does not affect the build. Each FEAT of the plan whose commits carry a Q1,

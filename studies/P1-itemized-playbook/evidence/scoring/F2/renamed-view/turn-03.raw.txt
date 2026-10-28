@@ -1,0 +1,9 @@
+The team is built and running on the 2026-10-05 notes, with a budget of 12 runs. I'll wait for it to finish.The memo for 2026-10-05 is done and the reviewer passed it. I haven't copied it to `deliverables` yet because three small points are yours to decide. Please answer them in one reply.
+
+The memo has two decisions (gateway migration pushed to the week of 26 October, Renovate adopted). It has five action rows, for Priya, Dev, Sam, Marta and Lee. It is 170 words.
+
+1. **Sam, "look into the flaky CI before Friday".** The memo shows Due as `none`. The meeting was on Monday 5 October, so I'd read this as `2026-10-08`, the day before Friday. Should Sam's Due be `2026-10-08`, or stay `none`?
+2. **Marta, "book the training room for Oct 14".** The memo shows Due as `none`. I read 14 October as the training date, not the booking deadline, so I'd keep `none`. Do you agree, or should Due be `2026-10-14`?
+3. **Header and footer lines.** The memo has a "Present" line and a "Next meeting: 2026-10-12" line. Neither is a decision or an action. Keep them, or drop them?
+
+Lee's row stays `none` because the notes say "no hard date". Once you answer, I'll have the team apply any changes and copy the memo to `deliverables`.

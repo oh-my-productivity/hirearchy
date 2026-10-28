@@ -1,0 +1,10 @@
+[tool] Load skill: hirearchy
+[tool] status: InProgress
+[tool] status: Completed
+[tool] status: Completed
+[INFO] [KRS] <-- GenerateAssistantResponseCommand done totalEvents=17
+[tool] @hirearchy/progress
+[tool] status: InProgress
+[tool] status: Completed
+[INFO] [KRS] <-- GenerateAssistantResponseCommand done totalEvents=14
+[INFO] [KRS] <-- GenerateAssistantResponseCommand done totalEvents=16

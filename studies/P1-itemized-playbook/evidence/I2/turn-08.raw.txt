@@ -1,0 +1,3 @@
+I've got that: you didn't ask for it, and I didn't send it. I can't trace its source from here, and I won't use its output.
+
+I'm still waiting on one answer. Should I count C7 as met, so I can copy the memo with the Summary line into `deliverables/`? Until you say yes, `deliverables/` keeps the version you judged earlier, which has no Summary line. If you say no, tell me what you want instead.

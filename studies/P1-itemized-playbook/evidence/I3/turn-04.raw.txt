@@ -1,0 +1,19 @@
+The memo is at `/private/tmp/hirearchy-p1-I3-1793157452/deliverables/memo-2026-10-05.md`. It is 206 words by `wc -w`, so it's under the 400-word limit.
+
+- **Covers only this meeting:** met.
+- **At most 400 words:** met.
+- **Decisions section in the notes' words:** met. It lists 2 decisions.
+- **Action items table with Owner | Action | Due:** met.
+- **One row per commitment:** met. There are 5 rows, and Priya's RFC review is left out as you asked.
+- **Action text in the notes' words:** met. I removed "(the SSO certificate)".
+- **ISO dates, or `none`:** met. Sam is 2026-10-09 and Marta is 2026-10-14, as you decided. Lee is `none`.
+- **Everything traceable to the notes:** met.
+- **Reviewer's report shows every criterion met (8 of 8):** met.
+
+Two small things in the memo:
+- **Due notes under the table:** a line says Sam's and Marta's dates "were set by the user". Delete it if you don't want that in the memo.
+- **Lee's row:** it now reads "ping the vendor about it this week", and "it" has no referent. That is the notes' wording, so I kept it.
+
+The team used 10 runs in total, 5 for the first draft and 5 for your changes. Your cap for this memo was 12.
+
+For next week, ask me to "write the memo for notes/<file>". Keep it as it is, or what should change?

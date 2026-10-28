@@ -1,0 +1,51 @@
+{
+  "schemaVersion": "1.0.0",
+  "dataModelVersion": 1,
+  "id": "sess_1d8d17f5-9e37-4867-9a5d-5ad114b49729",
+  "title": "Run the hirearchy whoami tool and show me its reply",
+  "agentMode": "hirearchy-study-p1-probe-I1-assistant",
+  "workspacePaths": [
+    "/private/tmp/hirearchy-p1-probe-I1-1793127561"
+  ],
+  "rootPaths": [
+    "/private/tmp/hirearchy-p1-probe-I1-1793127561"
+  ],
+  "createdAt": "2026-10-27T18:59:43.315Z",
+  "lastModifiedAt": "2026-10-27T19:01:07.713Z",
+  "modelId": "claude-sonnet-5.5",
+  "autopilot": true,
+  "effortLevel": "high",
+  "contextSnapshotModelDisplay": {
+    "modelId": "claude-sonnet-5.5",
+    "display": "Claude Sonnet 5.5"
+  },
+  "semanticReviewEnabled": true,
+  "disableAutoCompaction": false,
+  "ftaEnabled": false,
+  "workflowsEnabled": false,
+  "specPlanEnabled": false,
+  "specWorkflow": "quick",
+  "specSkipClarificationEnabled": true,
+  "memoryConfig": {
+    "mode": "read_write",
+    "reflection": true
+  },
+  "memoryConfigSource": "explicit",
+  "status": "idle",
+  "_meta": {
+    "kiro": {
+      "settings": {
+        "memory": {
+          "mode": "read_write",
+          "reflection": true
+        },
+        "workflows": {
+          "enabled": false
+        },
+        "goal": {
+          "enabled": false
+        }
+      }
+    }
+  }
+}

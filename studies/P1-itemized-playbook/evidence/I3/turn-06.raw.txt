@@ -1,0 +1,10 @@
+The "Summary:" rule is now a lasting check (C10). The delivered memo hasn't changed yet, and the rework needs a budget decision from you first.
+
+**Budget decision.** This memo has used 10 of its 12 runs, and a rework like your last one cost 5. So the rework would take the case to about 15 runs, 3 over your cap. Can I spend those 3 extra runs to send the memo back for the "Summary:" line?
+
+**A rework I didn't request.** The team's record shows a second rework, "Rework memo 2026-10-05: unclear due dates", sent from my seat (`root`), and it used 5 more runs. I didn't send it in this conversation, and I can't tell from the record who or what did. It produced a version that contradicts your answers (Sam 2026-10-08, Marta `none`).
+
+- **Runs:** I'm counting those 5 runs as mine, not yours, and I haven't charged them to your 12.
+- **Deliverable:** I checked, and `deliverables/memo-2026-10-05.md` still holds the version you judged (Sam 2026-10-09, Marta 2026-10-14, Lee `none`).
+- **Team's working copy:** it now holds the stray version, so I'll tell the team to restore the delivered one before applying the summary line.
+- **Verdict:** I recorded a relayed reject on that rework, saying it was never requested by you and contradicts your answers.

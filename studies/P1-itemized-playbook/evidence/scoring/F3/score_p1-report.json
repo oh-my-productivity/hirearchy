@@ -1,0 +1,57 @@
+{
+ "label": "F3",
+ "memo_input": {
+  "first_request": "20261028T020446926323-root-853d",
+  "name": "notes_file",
+  "value": "2026-10-05.md",
+  "service_v1_inputs": [
+   "notes_file"
+  ],
+  "name_in_v1": true,
+  "frozen_reader_reads_it": true,
+  "reader": "frozen (notes_file, bare file name)"
+ },
+ "lena_lines": "F3/lena-lines.txt (frozen form)",
+ "since": {
+  "frozen_total": "0 mismatches (0 on pinned keys, 0 on unpinned keys); 0 services mismatches; 0 services lines unread; 0 lower-margin race matches (reported); 0 snapshots unread",
+  "ruled_total": "0 mismatches (0 on pinned keys, 0 on unpinned keys); 0 services mismatches; 0 services lines unread; 0 lower-margin race matches (reported); 0 snapshots unread",
+  "cleared": 0,
+  "cleared_pinned": 0
+ },
+ "lena_parse": {
+  "turn_lines": 24,
+  "parsed": 24
+ },
+ "memo_map": {
+  "requested": [
+   "2026-10-05",
+   "2026-10-12",
+   "2026-10-19",
+   "2026-10-26",
+   "2026-11-02",
+   "2026-11-09"
+  ],
+  "mapped": {
+   "2026-10-05": "20261028T020446926323-root-853d",
+   "2026-10-12": "20261028T022451461753-root-1315",
+   "2026-10-19": "20261028T023724010258-root-60f5",
+   "2026-10-26": "20261028T024549764740-root-721e",
+   "2026-11-02": "20261028T025708950315-root-7f35",
+   "2026-11-09": "20261028T030649064532-root-926f"
+  },
+  "missing": []
+ },
+ "g1": {
+  "a": "PASS",
+  "b": "VACUOUS (no B: the owner added no planted rule)",
+  "c": "PASS",
+  "d": "NOT DETERMINED (judged reading: judged.json g1_d_judged decides, every hit listed there)",
+  "e": "VACUOUS (no planted rule admitted)",
+  "f": "PASS"
+ },
+ "g2": {
+  "a": "PASS",
+  "b": "PASS",
+  "c": "PASS (by construction; the counts are reported)"
+ }
+}

@@ -1,0 +1,10 @@
+######## TURN 9  start 23:27:50  end 23:28:06  elapsed 16s  (local, 2026-10-27; UTC wall-clock start 2026-10-27T23:27:50Z end 2026-10-27T23:28:06Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Ok. I don't know anything about that rework - I didn't ask for it.
+
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-09.stderr.txt):
+Nothing is running, and no more runs will be spent. The scheduler has stopped.
+
+I'll treat that rework as unrequested and ignore it. It is the only thing I can do about it.
+
+The new memo with the Summary line is still waiting for one answer from you. Should C7 count as met? Reply "yes" and I'll copy it to `deliverables/memo-2026-10-05.md`. Reply "no" and tell me what you'd want instead. Until then, `deliverables/` holds the earlier version without the Summary line.

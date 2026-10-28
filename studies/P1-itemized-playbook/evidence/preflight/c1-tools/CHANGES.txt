@@ -1,0 +1,148 @@
+# C1 tools copied for P1 preflight check (a), M1 form (no dedicated kiro home; KIRO_HOME unset). Source: /Volumes/workspace/hirearchy/docs/research/org-growth/phase-0a4/c1-tools
+
+## diff -u setup.sh
+--- /Volumes/workspace/hirearchy/docs/research/org-growth/phase-0a4/c1-tools/setup.sh	2026-10-25 05:55:36
++++ c1-tools/setup.sh	2026-10-27 17:30:05
+@@ -1,16 +1,23 @@
+ #!/bin/zsh
+-# C1 per-attempt setup (design 6.1 Setup 1-2 + the sandbox kiro-cli-chat symlink). Usage: setup.sh <variant> [mkprofile.py extra args...]; prints EPOCH.
+-WT=/Volumes/workspace/hirearchy/.worktrees/org-growth-0a4
++# C1 per-attempt setup, P1 M1 form (design 6.1 Setup 1-2 + the sandbox kiro-cli-chat symlink). Usage: setup.sh <variant> [mkprofile.py extra args...]; prints EPOCH.
++# P1 changes from C1's: WT = the merged repo; sandbox prefix /tmp/hirearchy-p1-detach-; NO dedicated kiro home (no SB/kiro-home, no KIRO_HOME):
++# the profile is the study's own ~/.kiro/agents/hirearchy-study-p1-detach-<epoch>.json (mkprofile.py), validated with the owner's kiro home.
++WT=/Volumes/workspace/hirearchy
++TOOLS=/Volumes/workspace/hirearchy/studies/P1-itemized-playbook/evidence/preflight/c1-tools
+ VARIANT=$1; shift
+-EPOCH=$(date +%s); SB=/tmp/hirearchy-0a4-c1-$EPOCH; echo "EPOCH=$EPOCH"
+-mkdir -p $SB/home/.local/bin $SB/kiro-home/agents $SB/kiro-state $SB/logs $SB/samples $SB/out
++EPOCH=$(date +%s); SB=/tmp/hirearchy-p1-detach-$EPOCH; echo "EPOCH=$EPOCH"
++mkdir -p $SB/home/.local/bin $SB/profile $SB/kiro-state $SB/logs $SB/samples $SB/out
+ ln -s /Users/aminalizadeh/.local/bin/kiro-cli-chat $SB/home/.local/bin/kiro-cli-chat
+-cp $WT/.agents/tasks/c1-tools/*.py $SB/
++cp $TOOLS/*.py $SB/
++# the streams' workspace bytes (protocol 3): the settings file, so that the check runs under the same chat settings as a stream
++mkdir -p $SB/.kiro/settings $SB/.kiro/skills/hirearchy
++cp -p /Volumes/workspace/hirearchy/studies/P1-itemized-playbook/evidence/harness/workspace-cli.json $SB/.kiro/settings/cli.json
++cp -p $WT/skills/hirearchy/SKILL.md $SB/.kiro/skills/hirearchy/SKILL.md
+ cd $SB
+ h() { HIREARCHY_STATE_DIR=$SB/kiro-state $WT/.venv/bin/hirearchy "$@"; }
+-h init $SB/org --mission "0a.4 C1 reproduction (throwaway)" --model claude-sonnet-5.5 >/dev/null 2>&1; echo init $?
++h init $SB/org --mission "P1 preflight scheduler check (throwaway)" --model claude-sonnet-5.5 >/dev/null 2>&1; echo init $?
+ h --root $SB/org hire root ceo --role CEO --charter "Throwaway reproduction agent." >/dev/null 2>&1; echo hire $?
+ h --root $SB/org task ceo --title "Reproduction" --goal "Write a 300-word note about rivers into ceo/MEMORY.md with the write tool, then report done." --acceptance "the note exists" --budget 2 >/dev/null 2>&1; echo task $?
+ $WT/.venv/bin/python -I $SB/mkprofile.py --sb $SB --epoch $EPOCH --variant $VARIANT "$@" | python3 -c "import json,sys; d=json.load(sys.stdin); s=d['mcpServers']['hirearchy']; print('server:', s['command'], s['args'], 'env keys:', sorted(s['env'])); print('tools:', d['tools'])"
+-KIRO_HOME=$SB/kiro-home kiro-cli agent validate --path $SB/kiro-home/agents/c1-$EPOCH.json >/dev/null 2>&1; echo "validate $?"
+-HOME=$SB/home kiro-cli chat --help </dev/null >/dev/null 2>&1; echo "chat-help $?"
++env -u KIRO_HOME kiro-cli agent validate --path $HOME/.kiro/agents/hirearchy-study-p1-detach-$EPOCH.json >/dev/null 2>&1; echo "validate $?"
++HOME=$SB/home env -u KIRO_HOME kiro-cli chat --help </dev/null >/dev/null 2>&1; echo "chat-help $?"
+
+## diff -u after.sh
+--- /Volumes/workspace/hirearchy/docs/research/org-growth/phase-0a4/c1-tools/after.sh	2026-10-25 05:55:36
++++ c1-tools/after.sh	2026-10-27 17:29:54
+@@ -1,13 +1,28 @@
+ #!/bin/zsh
+-# C1 verdict call: after.sh <SB> <ID> <turn> [--c1b]. Waits for .done, runs verdict/summary/allowed/timeline, archives the sandbox data under c1-tools/samples/<ID>/.
++# C1 verdict call, P1 M1 form: after.sh <SB> <ID> <turn> [--c1b]. Waits for .done, copies the attempt's own session record out of the owner's ~/.kiro/sessions
++# (read only, matched by agentMode = the attempt's profile and workspacePaths[0] = SB/home's cwd SB), runs verdict/summary/allowed/timeline, archives under preflight/detach/samples/<ID>/.
+ SB=$1; ID=$2; T=$3; shift 3
+-WT=/Volumes/workspace/hirearchy/.worktrees/org-growth-0a4; PY="$WT/.venv/bin/python -I"; A=$WT/.agents/tasks/c1-tools/samples/$ID
++WT=/Volumes/workspace/hirearchy; PY="$WT/.venv/bin/python -I"; A=/Volumes/workspace/hirearchy/studies/P1-itemized-playbook/evidence/preflight/detach/samples/$ID
++PROFILE=hirearchy-study-p1-detach-${SB##*-}
+ for i in {1..60}; do [[ -f $SB/samples/$ID-turn$T.done ]] && break; sleep 1; done
+-mkdir -p $A
++mkdir -p $A $SB/session-record
++python3 - "$SB" "$PROFILE" <<'PYS'
++import glob, json, os, shutil, sys
++sb, prof = sys.argv[1:3]
++real = os.path.realpath(sb)
++for p in glob.glob(os.path.expanduser('~/.kiro/sessions/*/sess_*/session.json')):
++    try: j = json.load(open(p))
++    except Exception: continue
++    if j.get('agentMode') == prof and (j.get('workspacePaths') or [''])[0] in (real, sb):
++        d = os.path.join(sb, 'session-record', os.path.basename(os.path.dirname(p)))
++        os.makedirs(d, exist_ok=True)
++        shutil.copy2(p, d + '/session.json'); shutil.copy2(os.path.dirname(p) + '/messages.jsonl', d + '/messages.jsonl')
++        print('session record copied:', p)
++PYS
+ $=PY $SB/verdict.py --sb $SB --attempt $ID --turn $T "$@" > /dev/null
+ $=PY $SB/summary.py --sb $SB --attempt $ID --turn $T > $A/summary-turn$T.md
+-$=PY $SB/allowed.py --kiro-home $SB/kiro-home > $A/allowed.txt
+-python3 $WT/.agents/tasks/c1-tools/timeline.py $SB/samples/$ID-turn$T.jsonl > $A/timeline-turn$T.txt
++$=PY $SB/allowed.py --kiro-home $SB/session-record > $A/allowed.txt
++python3 /Volumes/workspace/hirearchy/studies/P1-itemized-playbook/evidence/preflight/c1-tools/timeline.py $SB/samples/$ID-turn$T.jsonl > $A/timeline-turn$T.txt
+ cp $SB/samples/$ID-turn$T* $SB/out/$ID-turn$T* $SB/logs/$ID-turn$T* $A/ 2>/dev/null
+ tail -1 $A/allowed.txt
+ python3 - <<P
+
+## diff -u mkprofile.py
+--- /Volumes/workspace/hirearchy/docs/research/org-growth/phase-0a4/c1-tools/mkprofile.py	2026-10-25 05:55:36
++++ c1-tools/mkprofile.py	2026-10-27 17:29:54
+@@ -10,7 +10,7 @@
+ import os
+ import subprocess
+ 
+-WT = "/Volumes/workspace/hirearchy/.worktrees/org-growth-0a4"
++WT = "/Volumes/workspace/hirearchy"
+ 
+ 
+ def main() -> int:
+@@ -22,7 +22,7 @@
+     ap.add_argument("--choice", default="default", choices=["default", "a", "b"])
+     ap.add_argument("--stub-bin", default="")
+     a = ap.parse_args()
+-    name = f"c1-{a.epoch}"
++    name = f"hirearchy-study-p1-detach-{a.epoch}"
+     cache = subprocess.run(["uv", "cache", "dir"], capture_output=True, text=True, check=True).stdout.strip()
+     env = {"ORG_ROOT": f"{a.sb}/org", "HIREARCHY_STATE_DIR": f"{a.sb}/kiro-state", "HOME": f"{a.sb}/home", "UV_CACHE_DIR": cache}
+     if a.choice == "b":
+@@ -38,7 +38,7 @@
+         server = {"command": f"{WT}/.venv/bin/hirearchy", "args": ["mcp"], "env": env}
+     if a.variant == "v4":
+         env["PATH"] = a.stub_bin + ":" + os.environ["PATH"]
+-    prof = {"name": name, "description": "internal: hirearchy 0a.4 C1 reproduction; deleted after the attempt",
++    prof = {"name": name, "description": "internal: hirearchy usability study P1 preflight scheduler check (a); deleted after the attempt",
+             "mcpServers": {"hirearchy": server}, "tools": ["*"], "permissions": {"rules": [{"capability": "all", "effect": "allow"}]},
+             "resources": [f"skill://{WT}/skills/hirearchy/SKILL.md", "skill://.kiro/skills/*/SKILL.md"], "hooks": [],
+             "includeMcpJson": False, "model": "claude-sonnet-5.5"}
+@@ -48,10 +48,14 @@
+         prof["tools"] = ["@hirearchy"]
+         prof["permissions"] = {"rules": [{"capability": "tool", "effect": "allow", "tool": "hirearchy/progress"},
+                                           {"capability": "tool", "effect": "allow", "tool": "hirearchy/start"}]}
+-    path = f"{a.sb}/kiro-home/agents/{name}.json"
+-    os.makedirs(os.path.dirname(path), exist_ok=True)
++    # P1 M1 form: no dedicated kiro home. The study's own profile goes to the owner's ~/.kiro/agents (created and deleted with a record by the
++    # facilitator); a copy goes to SB/profile/ (the sampler reads the profile's env key names there).
++    path = os.path.expanduser(f"~/.kiro/agents/{name}.json")
++    os.makedirs(f"{a.sb}/profile", exist_ok=True)
+     with open(path, "w") as fh:
+         json.dump(prof, fh, indent=2)
++    with open(f"{a.sb}/profile/{name}.json", "w") as fh:
++        json.dump(prof, fh, indent=2)
+     shown = json.loads(json.dumps(prof))
+     shown["mcpServers"]["hirearchy"]["env"].pop("KIRO_API_KEY", None)
+     print(json.dumps(shown, indent=2))
+
+## diff -u sampler.py
+--- /Volumes/workspace/hirearchy/docs/research/org-growth/phase-0a4/c1-tools/sampler.py	2026-10-25 05:55:36
++++ c1-tools/sampler.py	2026-10-27 17:29:54
+@@ -157,7 +157,7 @@
+                   "ps_sess_note": "SESS reads 0 on macOS; sessions are inferred from pgid/ppid only (DR-0a4-10)"}
+     profile_keys: list[str] = []
+     try:
+-        prof = json.load(open(os.path.join(sb, "kiro-home", "agents", f"{a.agent}.json")))
++        prof = json.load(open(os.path.join(sb, "profile", f"{a.agent}.json")))
+         profile_keys = sorted(prof["mcpServers"]["hirearchy"].get("env", {}))
+     except (OSError, ValueError, KeyError):
+         pass
+
+## unchanged: allowed.py logfilter.py summary.py timeline.py verdict.py (md5s equal to the source and to G0's copies)
+## md5 of the copies (md5 -r)
+61739fe70bbddaa077a300d1d2fef334 allowed.py
+1bab40813be21c4520b01ac7eb564aa4 logfilter.py
+c5247bdf712da18c1acbcfa95d51d88c mkprofile.py
+6d842c2a9631e6ad61b7054c308947e9 sampler.py
+ddcdb0c711ef9a1b6a47e9f20407f38b summary.py
+e5d4fd364a260f35046142fa0991cfce timeline.py
+cfa0c14791d058a730e7ebe0c88d5f40 verdict.py
+03f46011a815691a7df237968335f7af after.sh
+bcd81cbf87096457d24bdd226b8eb66c setup.sh

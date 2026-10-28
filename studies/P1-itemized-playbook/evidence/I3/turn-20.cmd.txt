@@ -1,0 +1,1 @@
+env -u KIRO_HOME kiro-cli chat --v3 --no-interactive --trust-all-tools --resume --effort high --agent hirearchy-study-p1-I3-assistant 'Use the words from the notes. Lee'\''s 2026-11-04 is right. Marta'\''s none is right. No, that'\''s a decision, not an action item. Use the words from the notes.'

@@ -1,0 +1,16 @@
+{
+ "_about": "P1 protocol 6.3 and 13.2: one entry per case (key: the head task's message id). The stream step creates `cases.<head task id>` when root's first request of that memo exists (requests-by-turn.txt lists it after the turn; the head task is that request's file in S/org/sent/), with lena_plan_budget = the per-request budget Lena approved (H5, or the H4 raise in force at that request), and writes each lena_grants entry as it happens (G0's 'D14' ledger of Lena's own approvals); the scorer adds the other facts by hand from the raw files, each with the file it came from in `_files`. rederive_watch.py --spend <this file> --stream <stream dir> reads it and lists every case of the mail without an entry in `missing_cases` (D14 is then NOT DETERMINED, never a pass) and every entry that names no case in `extra_cases`. An entry whose key starts with '<' (this template's placeholder) is skipped.",
+ "cases": {
+  "<head task id>": {
+   "memo": "2026-10-05",
+   "state": "done | failed | open | blocked (the case's final state)",
+   "runs": 0, "relayed_runs": 0,
+   "budget": 0, "user_budget": 0, "user_granted": 0, "returned": 0, "user_returned": 0, "relayed_overlap": 0,
+   "contract_budget": 12, "ceilings": [],
+   "lena_plan_budget": 12,
+   "lena_grants": [{"turn": 0, "runs": 0, "line": "L-FUND", "request": "<the spend request quoted, D-SPEND>"}],
+   "d14_used": 0,
+   "_files": {"runs": "run-logs/... (charged, credited excluded)", "budget": "msgs/sent/<task>.md budget headers", "user_granted": "msgs/sent/<grant note>", "returned": "msgs/read/<result> budget headers", "d14_used": "final-services-progress-status-health.txt case total"}
+  }
+ }
+}

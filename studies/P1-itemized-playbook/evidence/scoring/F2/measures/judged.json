@@ -1,0 +1,86 @@
+{
+ "_about": "P1 judged keys for F2 (harness/p1-judged-template.json), written by the scoring step from the raw files; STUDY.md.",
+ "g1_d_judged": {
+  "value": true,
+  "files": [
+   "F2/playbook/",
+   "scoring/F2/guarantees/g1.json"
+  ],
+  "hits_decided": [],
+  "note": "Arm F: playbook v1 only; the lock held from contract v2; no owner version. No item states either. The keyword screen of guarantees.py found 0 hits, so hits_decided is empty."
+ },
+ "d8_presented_deliveries": {
+  "value": [],
+  "files": [
+   "F2/lena-lines.txt",
+   "F2/deliverables-log.txt",
+   "F2/turn-*.txt"
+  ],
+  "note": "Every version a Lena verdict judged was delivered by copy (deliverables-log.txt); every version shown before its copy was stated as not delivered yet (a D8 draft). No version was delivered by presentation only."
+ },
+ "regression_causes": {
+  "value": [
+   {
+    "part": "mechanical, G0's gate-able measures (score_memos p1_no_regression)",
+    "memo": "all",
+    "cause": "The frozen score_memos.py finds memos only as memo-<date>.md; F2's team named them <date>-memo.md (allowed by K3), so the frozen reading has 0 versions and 0 final memos (harness assumption, F-P1-9). On the renamed view (scoring/F2/measures-renamed/) every decision is present (17 of 17) and no delivered version has a wrong date or an extra row; memos 2-6 read 0 of 5 actions because their action table sits under the Decisions heading with no Action items heading of its own (the contract's C9 names 'the Decisions section, and the action items table'); by hand all 25 rows are present with the key's owners and Dues.",
+    "mechanism": "team",
+    "finding": null
+   },
+   {
+    "part": "Summary first and order, owner form (reported)",
+    "memo": "2026-10-12 to 2026-11-09",
+    "cause": "No Action items heading after the Decisions (the same layout); the frozen reading has no memo at all.",
+    "mechanism": "team",
+    "finding": null
+   }
+  ],
+  "files": [
+   "scoring/F2/measures/score_memos.json",
+   "F2/memos/",
+   "F2/service/",
+   "F2/lena-lines.txt",
+   "scoring/F2/measures/spend-rederived.json"
+  ],
+  "note": "one entry per regression line (aggregate.py's part names)"
+ },
+ "scripted_item_ids": {
+  "value": "memo 1: About C3 (K28); memo 2: About C4 (K28; the unscripted R2 before it: About C8, K30 by rule 15); memo 4: About C10 = [plant] (K26); memo 5: About C11 = [full] (K26)",
+  "files": [
+   "F2/lena-lines.txt",
+   "F2/service/"
+  ],
+  "note": "the id each scripted rejection's item named"
+ },
+ "warned_at_end": {
+  "value": [],
+  "files": [
+   "F2/quality/end.json",
+   "scoring/F2/frozen/watch/watch-items.txt"
+  ],
+  "note": "items still warning at the end with the reason (B1)"
+ },
+ "d_offer": {
+  "value": "no",
+  "files": [
+   "F2/turn-03.txt",
+   "F2/lena-lines.txt"
+  ],
+  "note": "the plan's T-BUDGETQ was the product's text; the assistant recommended no number of its own (L-BUDGET-Q and H5 at turn 3, no K7)"
+ },
+ "d_spend": {
+  "value": "memo 1: turn 6 yes (5), turn 7 declined; memo 2: turn 13 yes (5), turn 14 declined; memo 3: turn 16 yes (2); memo 5: turn 23 yes (3)",
+  "files": [
+   "F2/lena-lines.txt",
+   "F2/measures/spend-ledger.json"
+  ],
+  "note": "every K9 row of lena-lines.txt with Lena's line; the product's figures in STUDY.md's spend table"
+ },
+ "harness_trace": {
+  "value": null,
+  "files": [
+   "scoring/F2/watch-ruled/since-cleared.txt"
+  ],
+  "note": "none: the only (f1) mismatches were `since` at sub-second precision, cleared by manager-decision-stage-1-gate.md item 1 (a harness defect read by ruling, not a trace that makes G1(f) NOT DETERMINED)"
+ }
+}

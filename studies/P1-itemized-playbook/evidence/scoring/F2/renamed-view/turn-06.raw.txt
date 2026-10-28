@@ -1,0 +1,15 @@
+Now the contract change.The Summary rework is finished and the reviewer passed it on all 8 criteria. I haven't copied it to `deliverables` yet because of two questions. Your approved cost is also affected by a run I didn't expect.
+
+**Questions**
+1. **Lee and the SSO certificate.** The notes say "We agreed Lee would ping the vendor…". The memo lists it only as an action row, not under Decisions. Should it also be a decision, or is the row enough? I recommend the row only.
+2. **"Present" line.** The Summary has to come first, so the "Present: Priya, Sam, Lee, Marta, Dev." line now sits near the bottom, above "Next meeting". Is that fine, or should it go elsewhere?
+
+Sam (2026-10-09) and Marta (2026-10-14) are as you ruled, even though the reviewer noted both as ambiguous. The Summary line reads: "Summary: The team pushed the API gateway migration to the week of 26 October, adopted Renovate for weekly dependency PRs, and assigned five action items." At 188 words, it's under the limit.
+
+**Cost**
+- Your approved runs for this memo were 12, plus the 5 you added: 17. This memo has used 15 of them, which leaves 2.
+- There was also a 5-run rework that I didn't request in this conversation. It appears under the root seat in the log (task `…root-2753`, "unclear due dates"). It had undone your Sam and Marta dates. I marked it superseded, restored the version you judged, and am not charging it to you. If you didn't ask for it either, tell me and I'll look into where it came from.
+- The `deliverables` folder still has the earlier version, before the Summary line.
+- The new Summary rule is now a lasting check (C8) on every future memo.
+
+Once you answer, I'll copy the new version to `deliverables`. If you want anything changed, it will need about 5 more runs, and I'll ask first.

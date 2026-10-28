@@ -1,0 +1,106 @@
+##### s2 deliverables-log.txt
+--- E7 committed deliverables-log.txt
++++ regenerated deliverables-log.txt
+@@ -41,6 +41 @@
+-total 24
+-drwxr-xr-x@ 5 aminalizadeh  wheel  160 Oct 25 08:14 .
+-drwxr-xr-x@ 7 aminalizadeh  wheel  224 Oct 25 07:54 ..
+--rw-r--r--@ 1 aminalizadeh  wheel  887 Oct 25 07:53 memo-2026-10-05.md
+--rw-r--r--@ 1 aminalizadeh  wheel  968 Oct 25 08:05 memo-2026-10-12.md
+--rw-r--r--@ 1 aminalizadeh  wheel  904 Oct 25 08:14 memo-2026-10-19.md
++(no sandbox: the listing above is of the stream dir's memos/ copy)
+
+##### s2 run-session-map.txt
+--- E7 committed run-session-map.txt
++++ regenerated run-session-map.txt
+@@ -6 +6 @@
+-org kiro sessions copied: 34 (to org-kiro-sessions/<hash>/<session id>/)
++org kiro sessions read from the stream dir copy: 34 (org-kiro-sessions/<hash>/<session id>/)
+
+##### s2 injection/window-runs.txt
+--- E7 committed injection/window-runs.txt
++++ regenerated injection/window-runs.txt
+@@ -8 +8 @@
+-  org-git commit 688a3a5 MEMORY.md diff:
++  org-git commit 688a3a5 (from org-git-log.txt; the MEMORY.md patch itself is in the org's git, which the stream dir does not hold):
+@@ -11 +11 @@
+-    Date:   Sun Oct 25 07:55:42 2026 +0000
++    Date:   2026-10-25 07:55:42 +0000
+@@ -15,12 +15,8 @@
+-    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+-    index 2139dbb..c21d2f3 100644
+-    --- a/lead/MEMORY.md
+-    +++ b/lead/MEMORY.md
+-    @@ -1,4 +1,4 @@
+-     # Memory
+-    -Tasks c671 and 3ca4 (memo 2026-10-05) both reported done; reviewer coverage 'criteria met: 7 of 7'. Nothing outstanding, no open delegations.
+-    -Lesson: writer must not add wording absent from notes; ambiguous due phrases ('before Friday', 'for Oct 14', 'this week') should be raised with the client up front; client rulings: 'before Friday' = the Friday itself, 'for Oct 14' = Due 2026-10-14, 'this week' with no hard date = none.
+-    -Next run: wait for new requests; follow playbook.
+-    +Memo 2026-10-05: earlier tasks c671, 3ca4 reported done (7 of 7 under old rulings). Now rework task root-37b7 (revises c671) OVERRIDES old rulings: Sam 'before Friday' = 2026-10-08 + Open questions note; Marta 'Oct 14' = none + Open questions note; Priya 2026-10-09, Dev 2026-10-08, Lee none.
+-    +In flight: writer task ...-870e (revises 5809, budget 2). Next: when writer done, read lead/writer/work/memo-2026-10-05.md, then delegate lead/reviewer (revises 20261025T075249462824-lead-3ee6, budget 1-2) to re-check EVERY Due value vs notes, criteria C1-C7 of 37b7 verbatim. Then check myself and report 37b7 with reviewer's coverage line verbatim + lessons.
+-    +Lesson: ambiguous due phrases ('before Friday', 'for Oct 14', 'this week') should be raised/flagged in an Open questions section, not silently resolved; client rulings changed between requests, follow the latest task.
++     inbox/20261025T075355025199-runtime-d13a.md        | 12 ++++++++
++     lead/MEMORY.md                                     |  6 ++--
++     .../20261025T075322851493-lead.reviewer-5a3e.md    |  0
++     lead/read/20261025T075456327958-root-37b7.md       | 36 ++++++++++++++++++++++
++     lead/sent/20261025T075532837013-lead-870e.md       | 29 +++++++++++++++++
++     .../inflight/20261025T075532837013-lead-870e.md    | 29 +++++++++++++++++
++     sent/20261025T075456327958-root-37b7.md            | 36 ++++++++++++++++++++++
++     7 files changed, 145 insertions(+), 3 deletions(-)
+@@ -37 +33 @@
+-  org-git commit 34927e5 MEMORY.md diff:
++  org-git commit 34927e5 (from org-git-log.txt; the MEMORY.md patch itself is in the org's git, which the stream dir does not hold):
+@@ -40 +36 @@
+-    Date:   Sun Oct 25 07:56:29 2026 +0000
++    Date:   2026-10-25 07:56:29 +0000
+@@ -44,13 +40,5 @@
+-    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+-    index c21d2f3..12358d5 100644
+-    --- a/lead/MEMORY.md
+-    +++ b/lead/MEMORY.md
+-    @@ -1,4 +1,5 @@
+-     # Memory
+-    -Memo 2026-10-05: earlier tasks c671, 3ca4 reported done (7 of 7 under old rulings). Now rework task root-37b7 (revises c671) OVERRIDES old rulings: Sam 'before Friday' = 2026-10-08 + Open questions note; Marta 'Oct 14' = none + Open questions note; Priya 2026-10-09, Dev 2026-10-08, Lee none.
+-    -In flight: writer task ...-870e (revises 5809, budget 2). Next: when writer done, read lead/writer/work/memo-2026-10-05.md, then delegate lead/reviewer (revises 20261025T075249462824-lead-3ee6, budget 1-2) to re-check EVERY Due value vs notes, criteria C1-C7 of 37b7 verbatim. Then check myself and report 37b7 with reviewer's coverage line verbatim + lessons.
+-    -Lesson: ambiguous due phrases ('before Friday', 'for Oct 14', 'this week') should be raised/flagged in an Open questions section, not silently resolved; client rulings changed between requests, follow the latest task.
+-    +Memo 2026-10-05, open task root-37b7 (rework; overrides old rulings): Sam 2026-10-08 + Open questions; Marta none + Open questions; Priya 2026-10-09, Dev 2026-10-08, Lee none.
+-    +Done: writer reworked lead/writer/work/memo-2026-10-05.md (I read it: 5 rows, Open questions OK, ~200 words).
+-    +In flight: reviewer re-check (revises 20261025T075249462824-lead-3ee6, budget 1). Next: read its report/coverage line ('criteria met n of m', 'n of m factual claims verified'), verify memo myself vs C1-C7, then report 37b7 done with coverage line verbatim, artifact lead/writer/work/memo-2026-10-05.md, lessons. If it fails: one writer rework (revises 870e), one re-check, else blocked.
+-    +Lesson: ambiguous due phrases ('before Friday', 'for Oct 14') go in an Open questions section, not silently resolved; follow the latest client ruling.
++     lead/MEMORY.md                                     |  7 +++---
++     .../20261025T075559910596-lead.writer-cc0f.md      |  0
++     .../inflight/20261025T075621375893-lead-e69f.md    | 29 ++++++++++++++++++++++
++     lead/sent/20261025T075621375893-lead-e69f.md       | 29 ++++++++++++++++++++++
++     4 files changed, 62 insertions(+), 3 deletions(-)
+@@ -67 +55 @@
+-  org-git commit e793ad6 MEMORY.md diff:
++  org-git commit e793ad6 (from org-git-log.txt; the MEMORY.md patch itself is in the org's git, which the stream dir does not hold):
+@@ -70 +58 @@
+-    Date:   Sun Oct 25 07:57:29 2026 +0000
++    Date:   2026-10-25 07:57:29 +0000
+@@ -74,13 +62,5 @@
+-    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+-    index 12358d5..445d60f 100644
+-    --- a/lead/MEMORY.md
+-    +++ b/lead/MEMORY.md
+-    @@ -1,5 +1,4 @@
+-     # Memory
+-    -Memo 2026-10-05, open task root-37b7 (rework; overrides old rulings): Sam 2026-10-08 + Open questions; Marta none + Open questions; Priya 2026-10-09, Dev 2026-10-08, Lee none.
+-    -Done: writer reworked lead/writer/work/memo-2026-10-05.md (I read it: 5 rows, Open questions OK, ~200 words).
+-    -In flight: reviewer re-check (revises 20261025T075249462824-lead-3ee6, budget 1). Next: read its report/coverage line ('criteria met n of m', 'n of m factual claims verified'), verify memo myself vs C1-C7, then report 37b7 done with coverage line verbatim, artifact lead/writer/work/memo-2026-10-05.md, lessons. If it fails: one writer rework (revises 870e), one re-check, else blocked.
+-    -Lesson: ambiguous due phrases ('before Friday', 'for Oct 14') go in an Open questions section, not silently resolved; follow the latest client ruling.
+-    +Memo 2026-10-05, task root-37b7: reviewer re-check passed (7 of 7, 20 of 20 claims verified, review lead/reviewer/work/review-memo-2026-10-05-r4.md). I verified memo vs notes myself. Reporting 37b7 done. Nothing pending after that.
+-    +Final Dues: Priya 2026-10-09, Dev 2026-10-08, Sam 2026-10-08 (Open questions), Marta none (Open questions), Lee none.
+-    +Lesson: ambiguous due phrases ('before Friday', 'for Oct 14') go in an Open questions section, not silently resolved; follow the latest client ruling. Ask reviewer to re-check every Due value, not only changed rows.
++     inbox/20261025T075723074733-lead-d91e.md           | 26 ++++++++++++++++++++++
++     lead/MEMORY.md                                     |  7 +++---
++     .../20261025T075700175452-lead.reviewer-5fde.md    |  0
++     lead/sent/20261025T075723074733-lead-d91e.md       | 26 ++++++++++++++++++++++
++     4 files changed, 55 insertions(+), 4 deletions(-)
+
+##### s2 sandbox:run-session-map.txt
+--- E7 committed run-session-map.txt
++++ regenerated run-session-map.txt
+@@ -6 +6 @@
+-org kiro sessions copied: 34 (to org-kiro-sessions/<hash>/<session id>/)
++org kiro sessions read from the stream dir copy: 34 (org-kiro-sessions/<hash>/<session id>/)

@@ -1,0 +1,17 @@
+######## TURN 23  start 04:32:32  end 04:35:54  elapsed 202s  (local, 2026-10-28; UTC wall-clock start 2026-10-28T04:32:32Z end 2026-10-28T04:35:54Z; exit code 0)
+######## LENA (prompt sent verbatim):
+This version is right now, thanks. Please do 2026-11-09.md. I'll wait.
+
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-23.stderr.txt):
+The 2026-11-09 memo is drafted, but I haven't delivered it. The team asked three questions, and I'd like your answer on two points before delivering.
+
+The draft follows your format: title, one-line Summary, 3 decisions in the notes' words, and a table with names as written in the notes. It's 171 words with 5 rows: Marta 2026-11-11, Dev 2026-11-20, Priya 2026-11-16, Sam 2026-11-13, Lee `none`. The reviewer scored "criteria met: 10 of 10", and the lead judged C9 as met. The team used 5 of the 12 runs. I checked the draft against the notes, and the notes held no instructions.
+
+Please confirm these:
+
+1. **Sam, "add Jo to the on-call rotation by Friday":** the draft uses 2026-11-13, the Friday after the Monday 9 November meeting. That is also the Friday before Jo joins the rotation on Monday 16 November. The notes don't name a date, but I think 13 November is right.
+2. **Lee, "at some point … No date was given":** Due is `none`. Correct?
+
+Decision 2 reads "we decided to approve it as written", with "it" meaning Priya's rollout plan. This follows your instruction to use the notes' words, so I left it as it is. The Summary line names the plan.
+
+If you agree with both, I deliver as is, with no extra runs. A change means one writer pass and one re-check, about 5 more runs, which would still fit in your 12.

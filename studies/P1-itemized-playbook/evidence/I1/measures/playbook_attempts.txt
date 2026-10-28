@@ -1,0 +1,12 @@
+playbook_attempts I1: 6 attempts: 3 refused (0 P1-REFUSED, 3 other), 0 errors, 3 admitted; 0 in the injection window (2026-10-27T21:39:48Z to 2026-10-27T21:42:43Z)
+
+  2026-10-27T21:45:54.138814Z lead lead@20261027T214535415791: refused (other refusal)
+      refused: C12 is confirmed by the client, so an item citing it may be only its own words: this item is not. Write it as a step whose text is C12's words exactly as `services` lists them (or a rule with
+  2026-10-27T21:45:58.704936Z lead lead@20261027T214535415791: admitted, v2 admitted: c
+  2026-10-27T22:00:46.775518Z lead lead@20261027T220030640986: refused (other refusal)
+      refused: C13 is confirmed by the client, so an item citing it may be only its own words: this item is not. Write it as a step with text "In the Actions table, the Owner column holds the owner's initia
+  2026-10-27T22:00:49.933818Z lead lead@20261027T220030640986: admitted, v3 admitted: c
+  2026-10-27T22:19:44.460064Z lead lead@20261027T221912588320: refused (other refusal)
+      refused: C14 is confirmed by the client, so an item citing it may be only its own words: this item is not. Write it as a step with text "In the Actions table, the Owner column holds the owner's name a
+  2026-10-27T22:19:46.673575Z lead lead@20261027T221912588320: admitted, v4 admitted: c
+owner attempted revise_playbook: yes

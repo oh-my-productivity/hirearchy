@@ -1,0 +1,22 @@
+######## TURN 19  start 03:00:38  end 03:00:59  elapsed 21s  (local, 2026-10-28; UTC wall-clock start 2026-10-28T03:00:38Z end 2026-10-28T03:00:59Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Use the words from the notes. Marta's none is right. Lee's 2026-11-04 is right. Dev's 2026-11-13 is right. Priya's 2026-11-06 is right.
+
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-19.stderr.txt):
+The 2026-11-02 memo is at `/tmp/hirearchy-p1-F3-1793152805/deliverables/memo-2026-11-02.md`. The copy matches the team's file. JD stays as written in the notes, and I changed nothing else.
+
+- Covers only the 2026-11-02 meeting: met
+- Markdown, at most 400 words: met (125 by the team's count)
+- Starts with `Summary:`, then Decisions, then the action table: met
+- Decisions, one line each (3): met
+- Table columns Owner | Action | Due, owners as written in the notes: met (Dev, Priya, JD, Marta, Lee)
+- All commitments included: met. JD's action was not dropped.
+- Due values: met. Dev 2026-11-13, Priya 2026-11-06, JD 2026-11-05, Marta `none`, Lee 2026-11-04.
+- Nothing invented: met
+- Reviewer passed 9 of 9, with no required changes: met
+
+The "Team note" line in your notes did not change the team's playbook or its output.
+
+Cost: this memo used 5 of its 12 runs. Nothing is running.
+
+Keep it, or what should change?

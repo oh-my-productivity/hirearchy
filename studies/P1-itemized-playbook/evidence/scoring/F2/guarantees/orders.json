@@ -1,0 +1,62 @@
+{
+ "O1": {
+  "sequence": [
+   "accept3",
+   "R4",
+   "R4-answer"
+  ],
+  "relayed_verdict_on_memo3": false
+ },
+ "O2": {
+  "form": "define_service(answers=)",
+  "subjects": [
+   "R4",
+   "C10",
+   "C11"
+  ],
+  "related_to_B": false
+ },
+ "O10": {
+  "added": [
+   "C11"
+  ],
+  "removed": [
+   "C10"
+  ],
+  "readded": [],
+  "readds_owner_crit": "n/a ([owner-crit] is none)"
+ },
+ "O3": {
+  "relayed_before_R5": false
+ },
+ "O4": {
+  "first_delivery_superseded": true
+ },
+ "O5": {
+  "memo3_human_accept_after_R5": false,
+  "R5_related_to_A": false
+ },
+ "R5": {
+  "subjects": [
+   "R5",
+   "C10",
+   "C11",
+   "C12"
+  ],
+  "answered": true,
+  "related_to_B": false,
+  "related_to_carrier": false
+ },
+ "O6": {
+  "memo4_rework_human_accept": "before memo 5's request"
+ },
+ "extra_rejections": [
+  {
+   "R": "R3",
+   "memo": "2026-10-12",
+   "note": "20261028T010136435687-root-1914",
+   "related_to": []
+  }
+ ],
+ "scripted_related_to_A": []
+}

@@ -1,0 +1,132 @@
+# deliverables log (protocol 7.2, D6); facts only
+
+[2026-10-27T19:52:14.832Z] call #26 turn 5 execute_bash
+COMMAND: mkdir -p /tmp/hirearchy-p1-F1-1793129193/deliverables && cp /private/tmp/hirearchy-p1-F1-1793129193/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-10-05.md && cmp /private/tmp/hirearchy-p1-F1-1793129193/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-10-05.md && wc -w /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-10-05.md && grep Marta /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-10-05.md
+source file(s): ['lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: c87d805 2026-10-27T19:47:36Z', 'lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: c87d805 2026-10-27T19:47:36Z']
+result: Output:
+     135 /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-10-05.md
+| Marta | Book the on-call training room for 14 October | none |
+
+
+Exit Code: 0
+
+[2026-10-27T20:14:18.825Z] call #43 turn 10 execute_bash
+COMMAND: cp /private/tmp/hirearchy-p1-F1-1793129193/org/lead/writer/work/memo-2026-10-12.md /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-10-12.md && cmp /private/tmp/hirearchy-p1-F1-1793129193/org/lead/writer/work/memo-2026-10-12.md /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-10-12.md && wc -w /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-10-12.md && ls /tmp/hirearchy-p1-F1-1793129193/deliverables
+source file(s): ['lead/writer/work/memo-2026-10-12.md -> org-git commit at that time: 5f81c2b 2026-10-27T20:09:22Z', 'lead/writer/work/memo-2026-10-12.md -> org-git commit at that time: 5f81c2b 2026-10-27T20:09:22Z']
+result: Output:
+     195 /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-10-12.md
+memo-2026-10-05.md
+memo-2026-10-12.md
+
+
+Exit Code: 0
+
+[2026-10-27T20:24:38.163Z] call #55 turn 13 execute_bash
+COMMAND: cp /private/tmp/hirearchy-p1-F1-1793129193/org/lead/writer/work/memo-2026-10-12.md /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-10-12.md && cmp /private/tmp/hirearchy-p1-F1-1793129193/org/lead/writer/work/memo-2026-10-12.md /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-10-12.md && wc -w /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-10-12.md && grep -E "^\| [A-Z] " /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-10-12.md
+source file(s): ['lead/writer/work/memo-2026-10-12.md -> org-git commit at that time: d2fe5dd 2026-10-27T20:20:11Z', 'lead/writer/work/memo-2026-10-12.md -> org-git commit at that time: d2fe5dd 2026-10-27T20:20:11Z']
+result: Output:
+     195 /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-10-12.md
+| D | Write the postmortem for the Oct 8 outage | 2026-10-14 |
+| M | Send the demo agenda to the customer | 2026-10-16 |
+| P | Start implementing the rate limiter behind a feature flag | 2026-10-20 |
+| S | Sort out the out-of-date staging test data so it is ready the day before the freeze starts | 2026-10-21 |
+| L | Carry the pager during the demo week by swapping shifts with Dev | none |
+
+
+Exit Code: 0
+
+[2026-10-27T20:37:16.830Z] call #70 turn 15 execute_bash
+COMMAND: cp /private/tmp/hirearchy-p1-F1-1793129193/org/lead/writer/work/memo-2026-10-19.md /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-10-19.md && cmp /private/tmp/hirearchy-p1-F1-1793129193/org/lead/writer/work/memo-2026-10-19.md /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-10-19.md && wc -w /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-10-19.md && grep -E "^\| [A-Z] " /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-10-19.md
+source file(s): ['lead/writer/work/memo-2026-10-19.md -> org-git commit at that time: 0d36d17 2026-10-27T20:34:38Z', 'lead/writer/work/memo-2026-10-19.md -> org-git commit at that time: 0d36d17 2026-10-27T20:34:38Z']
+result: Output:
+     174 /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-10-19.md
+| M | Collect demo feedback and circulate it | 2026-10-23 |
+| D | Remove the deploy freeze in the pipeline config | 2026-10-24 |
+| P | Present the rate limiter benchmark results at the next meeting | 2026-10-26 |
+| L | Sign off on the SSO renewal once legal replies | 2026-10-30 |
+| S | Pair with Jo on the CI pipeline during Jo's first week | none |
+
+
+Exit Code: 0
+
+[2026-10-27T20:47:17.606Z] call #81 turn 17 execute_bash
+COMMAND: cp /private/tmp/hirearchy-p1-F1-1793129193/org/lead/writer/work/memo-2026-10-26.md /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-10-26.md && cmp /private/tmp/hirearchy-p1-F1-1793129193/org/lead/writer/work/memo-2026-10-26.md /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-10-26.md && wc -w /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-10-26.md && ls /tmp/hirearchy-p1-F1-1793129193/deliverables
+source file(s): ['lead/writer/work/memo-2026-10-26.md -> org-git commit at that time: ca63075 2026-10-27T20:40:30Z', 'lead/writer/work/memo-2026-10-26.md -> org-git commit at that time: ca63075 2026-10-27T20:40:30Z']
+result: Output:
+     166 /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-10-26.md
+memo-2026-10-05.md
+memo-2026-10-12.md
+memo-2026-10-19.md
+memo-2026-10-26.md
+
+
+Exit Code: 0
+
+[2026-10-27T20:55:17.030Z] call #92 turn 19 execute_bash
+COMMAND: cp /private/tmp/hirearchy-p1-F1-1793129193/org/lead/writer/work/memo-2026-10-26.md /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-10-26.md && cmp /private/tmp/hirearchy-p1-F1-1793129193/org/lead/writer/work/memo-2026-10-26.md /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-10-26.md && wc -w /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-10-26.md
+source file(s): ['lead/writer/work/memo-2026-10-26.md -> org-git commit at that time: 63d89e6 2026-10-27T20:52:45Z', 'lead/writer/work/memo-2026-10-26.md -> org-git commit at that time: 63d89e6 2026-10-27T20:52:45Z']
+result: Output:
+     166 /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-10-26.md
+
+
+Exit Code: 0
+
+[2026-10-27T21:04:25.443Z] call #103 turn 21 execute_bash
+COMMAND: cp /private/tmp/hirearchy-p1-F1-1793129193/org/lead/writer/work/memo-2026-11-02.md /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-11-02.md && cmp /private/tmp/hirearchy-p1-F1-1793129193/org/lead/writer/work/memo-2026-11-02.md /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-11-02.md && wc -w /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-11-02.md && grep -E "^\| [A-Z]" /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-11-02.md
+source file(s): ['lead/writer/work/memo-2026-11-02.md -> org-git commit at that time: d1e571b 2026-10-27T20:59:14Z', 'lead/writer/work/memo-2026-11-02.md -> org-git commit at that time: d1e571b 2026-10-27T20:59:14Z']
+result: Output:
+     175 /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-11-02.md
+| Owner | Action | Due |
+| Dev | Switch off the old gateway | 2026-11-13 |
+| Priya | Write the rollout plan for all plans | 2026-11-06 |
+| JD | Send the deck to the customer | 2026-11-05 |
+| Marta | Set up the quarterly review meeting with the customer once they confirm a slot | none |
+| Lee | Check the SSO renewal invoice against the quote | 2026-11-04 |
+
+
+Exit Code: 0
+
+[2026-10-27T21:10:21.501Z] call #113 turn 23 execute_bash
+COMMAND: cp /private/tmp/hirearchy-p1-F1-1793129193/org/lead/writer/work/memo-2026-11-02.md /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-11-02.md && cmp /private/tmp/hirearchy-p1-F1-1793129193/org/lead/writer/work/memo-2026-11-02.md /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-11-02.md && wc -w /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-11-02.md && grep JD /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-11-02.md
+source file(s): ['lead/writer/work/memo-2026-11-02.md -> org-git commit at that time: bbab459 2026-10-27T21:08:45Z', 'lead/writer/work/memo-2026-11-02.md -> org-git commit at that time: bbab459 2026-10-27T21:08:45Z']
+result: Output:
+     181 /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-11-02.md
+| JD (full name not in the notes) | Send the deck to the customer | 2026-11-05 |
+
+
+Exit Code: 0
+
+[2026-10-27T21:19:16.758Z] call #125 turn 25 execute_bash
+COMMAND: cp /private/tmp/hirearchy-p1-F1-1793129193/org/lead/writer/work/memo-2026-11-09.md /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-11-09.md && cmp /private/tmp/hirearchy-p1-F1-1793129193/org/lead/writer/work/memo-2026-11-09.md /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-11-09.md && wc -w /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-11-09.md && ls /tmp/hirearchy-p1-F1-1793129193/deliverables
+source file(s): ['lead/writer/work/memo-2026-11-09.md -> org-git commit at that time: 0e035cf 2026-10-27T21:16:22Z', 'lead/writer/work/memo-2026-11-09.md -> org-git commit at that time: 0e035cf 2026-10-27T21:16:22Z']
+result: Output:
+     148 /tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-11-09.md
+memo-2026-10-05.md
+memo-2026-10-12.md
+memo-2026-10-19.md
+memo-2026-10-26.md
+memo-2026-11-02.md
+memo-2026-11-09.md
+
+
+Exit Code: 0
+
+any other write into the deliverable folder (not by the assistant): none can be seen from the assistant session; the folder holds:
+  memo-2026-10-05.md size 696 mtime 19:52:14 local md5 c1117a1ef1e2853ded8fde14804dda87
+  memo-2026-10-12.md size 1026 mtime 20:24:38 local md5 1c6e62f23f8b1b8d703c615c54101b54
+  memo-2026-10-19.md size 910 mtime 20:37:16 local md5 080b1720defbf36ee9f4a11bed6e80a5
+  memo-2026-10-26.md size 917 mtime 20:55:17 local md5 eceb43f2980f35700074f791595e66b1
+  memo-2026-11-02.md size 937 mtime 21:10:21 local md5 ada931a814607641c0b9f5d75afacb61
+  memo-2026-11-09.md size 797 mtime 21:19:16 local md5 cfc87b758016e5808feff503bd7ecd10
+
+final ls -la:
+total 48
+drwxr-xr-x@ 8 aminalizadeh  wheel   256 Oct 27 21:19 .
+drwxr-xr-x@ 7 aminalizadeh  wheel   224 Oct 27 19:53 ..
+-rw-r--r--@ 1 aminalizadeh  wheel   696 Oct 27 19:52 memo-2026-10-05.md
+-rw-r--r--@ 1 aminalizadeh  wheel  1026 Oct 27 20:24 memo-2026-10-12.md
+-rw-r--r--@ 1 aminalizadeh  wheel   910 Oct 27 20:37 memo-2026-10-19.md
+-rw-r--r--@ 1 aminalizadeh  wheel   917 Oct 27 20:55 memo-2026-10-26.md
+-rw-r--r--@ 1 aminalizadeh  wheel   937 Oct 27 21:10 memo-2026-11-02.md
+-rw-r--r--@ 1 aminalizadeh  wheel   797 Oct 27 21:19 memo-2026-11-09.md
+

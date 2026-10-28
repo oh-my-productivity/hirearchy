@@ -1,0 +1,1 @@
+the manager's record

@@ -1,0 +1,22 @@
+######## TURN 22  start 00:01:46  end 00:02:11  elapsed 25s  (local, 2026-10-28; UTC wall-clock start 2026-10-28T00:01:46Z end 2026-10-28T00:02:11Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Full names, as the notes give them.
+
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-22.stderr.txt):
+The memo for 26 Oct is updated at `/tmp/hirearchy-p1-I2-1793142034/deliverables/memo-2026-10-26.md`. The Owner column shows Dev, Priya, Marta, Sam and Lee, as the notes give them. I checked the copy against the writer's file and they are identical.
+
+- **C1, based on the 26 Oct notes only:** met.
+- **C2, at most 400 words:** met (170 by `wc`).
+- **C3, Decisions (3 bullets) and Actions table with Owner | Action | Due:** met.
+- **C4, a row for every commitment:** met (5 rows).
+- **C5, Due dates:** met. Dev is 2026-10-28, Priya is 2026-10-30, Marta is 2026-10-27, Sam is 2026-10-30, and Lee is none.
+- **C6, nothing invented:** met.
+- **C7, reviewer's report:** met. The reviewer's line reads 8 of 8, with 12 of 12 facts verified.
+- **C8, Summary line first, then Decisions, then Actions:** met.
+- **C10, full names as written in the notes:** met.
+
+This case used 10 of the 12 approved runs, and nothing is running.
+
+The memos for 12 Oct and 19 Oct still show initials, because they were delivered under the earlier rule. Say so if you want them redone with names. Each redo costs about 5 runs.
+
+Keep this one, or what should change?

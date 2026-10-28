@@ -1,0 +1,20 @@
+######## TURN 14  start 01:06:52  end 01:07:12  elapsed 20s  (local, 2026-10-28; UTC wall-clock start 2026-10-28T01:06:52Z end 2026-10-28T01:07:12Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Use the words from the notes. No more spend, please deliver as is.
+
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-14.stderr.txt):
+I copied the memo as it is to `/tmp/hirearchy-p1-F2-1793146944/deliverables/2026-10-12-memo.md`. I checked that the copy matches the team's file. "Deliver as is" isn't an accept, so I haven't recorded a verdict.
+
+- C1, at most 400 words: met (212 by the team's count, 242 by `wc`).
+- C2, covers only the 2026-10-12 meeting: met.
+- C3, all three decisions listed and nothing extra: met.
+- C4, table columns Owner | Action | Due: met.
+- C5, all five commitments are rows, including Sam's and Lee's informal ones: met.
+- C6, ISO dates or `none`: met (Sam 2026-10-21, Lee `none`).
+- C7, reviewer passed with no required changes: met.
+- C9, title, Summary line, Decisions and action table, nothing else: met.
+- C10, Owner column shows initials only: met (D, M, P, S, L). Lee's Action text still says "Dev", as you chose.
+
+The first pass used 5 runs, the C9 rework 5, and the initials rework 5, so 15 of the 17 you approved for this memo. The unrequested rework on the 10-05 memo is not counted.
+
+The 2026-10-05 memo in `deliverables` is the version you accepted. It has no title and its Owner column uses full names, so it doesn't follow the newer rules. I haven't touched it.

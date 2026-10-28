@@ -1,0 +1,9 @@
+I've replaced `/tmp/hirearchy-p1-F3-1793152805/deliverables/memo-2026-10-12.md` with the reworked memo, and the copy matches the team's file. The Owner column now has initials only: D, M, P, S, L. Nothing else changed, and the reviewer passed it 9 of 9.
+
+Cost: the case used 15 runs. That is the 12 approved plus the 5 you just funded, minus the 2 that came back unspent. Nothing is running now.
+
+The four open questions the team listed are ones you already answered, so I didn't ask them again.
+
+One question is still open. About C4: add "In the action table, the Owner column shows initials only" as a lasting rule? Yes or no.
+
+On yes, it applies to every future memo. On no, it applies to this memo only.

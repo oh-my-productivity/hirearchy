@@ -1,0 +1,7 @@
+G1 (F)
+G1(a): PASS
+G1(b): VACUOUS (no B: the owner added no planted rule)
+G1(c): PASS
+G1(d): NOT DETERMINED (judged reading: judged.json g1_d_judged decides, every hit listed there)
+G1(e): VACUOUS (no planted rule admitted)
+G1(f): PASS

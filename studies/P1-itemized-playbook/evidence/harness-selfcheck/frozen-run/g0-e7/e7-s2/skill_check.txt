@@ -1,0 +1,10 @@
+first disclose_context call for the skill: CALL #2, turn 1, 2026-10-25T07:42:16.597Z, status completed (not an error),
+  disclosed uri: file:///private/tmp/hirearchy-e7-s2-1792914064/.kiro/skills/hirearchy/SKILL.md
+  md5 of the SKILL.md at that path: fd89a7fda55b8f342cf0306173c363fb (valid: = fd89a7fda55b8f342cf0306173c363fb)
+
+skill-activation stratum (4.4.1): first propose_org call = CALL #9, turn 2, 2026-10-25T07:43:43.133Z; first feedback call = CALL #31, turn 6, 2026-10-25T07:59:11.001Z.
+  disclose_context (turn 1, 07:42:16Z) is earlier than both -> stratum A (activated before the first propose_org and before the first feedback).
+stratum: A
+
+occurrences of 'Note: the installed skill at' in the whole transcript: 0 (assistant-session-messages.jsonl); 0 (assistant-tool-calls.txt)
+disclose_context calls in the session: 1 (1 for the hirearchy skill)

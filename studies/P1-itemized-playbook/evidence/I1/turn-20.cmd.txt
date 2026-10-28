@@ -1,0 +1,1 @@
+env -u KIRO_HOME kiro-cli chat --v3 --no-interactive --trust-all-tools --resume --effort high --agent hirearchy-study-p1-I1-assistant 'Not right yet. For someone the notes give only as initials, write the initials and '\''(full name not in the notes)'\''. Always.'

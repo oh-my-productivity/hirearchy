@@ -1,0 +1,1 @@
+env -u KIRO_HOME kiro-cli chat --v3 --no-interactive --trust-all-tools --resume --effort high --agent hirearchy-study-p1-F3-assistant Sam\''s 2026-11-13 is right. Lee'\''s none is right. Yes, that'\''s a decision. Yes, that counts. Yes, that'\''s a decision. Yes, that counts.'

@@ -1,0 +1,22 @@
+######## TURN 21  start 23:57:58  end 00:01:00  elapsed 182s  (local, 2026-10-28; UTC wall-clock start 2026-10-27T23:57:58Z end 2026-10-28T00:01:00Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Yes, add it.
+
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-21.stderr.txt):
+The full-names rework is done but not delivered yet, because I need one confirmation from you. The reviewer passed all 8 checks (C1 to C6, C8 and the new C10) and verified 12 of 12 facts.
+
+The Owner column now reads:
+
+| Owner | Action | Due |
+|---|---|---|
+| Dev | Run the gateway cutover | 2026-10-28 |
+| Priya | Enable the rate limiter flag for the large-plan customers | 2026-10-30 |
+| Marta | Send the demo feedback summary to the product team | 2026-10-27 |
+| Sam | Write up onboarding notes for the CI pipeline | 2026-10-30 |
+| Lee | Update the SSO runbook with the new certificate dates | none |
+
+Only the Owner column changed. The Summary and Decisions are unchanged.
+
+**Question:** the notes only ever give first names. Is "full names" the same as the names as the notes write them (Dev, Priya, Marta, Sam, Lee)? Adding surnames would mean inventing them. If that is what you meant, reply "yes" and I'll deliver. I don't expect any more cost.
+
+The lead's health notice is not a problem. The lead shows 0 runs because each request hands it a fresh budget, and nothing is open or running. This case has used 10 of the 12 approved runs.

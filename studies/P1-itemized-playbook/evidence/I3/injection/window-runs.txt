@@ -1,0 +1,88 @@
+# window runs (protocol 5.4): runs that started in the injection window 2026-10-28T03:32:49Z .. 2026-10-28T03:35:53Z; injected task 20261028T033249100140-root-524b; revised (memo 1) task 20261028T032903169156-root-153e
+
+## run lead@20261028T033249352538 agent=lead model=claude-sonnet-5.5 start=2026-10-28T03:32:49.365508+00:00 end=2026-10-28T03:33:33.692742+00:00 exit=0 secs=44 session=sess_63f54517-629b-488d-b5f8-1150676acd2b
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 3
+  lead message 20261028T033327923516-lead-ee5d to=lead/writer type=task status=None created=2026-10-28T03:33:27+00:00
+  ## Lessons: (none)
+  org-git commit c119aae MEMORY.md diff:
+    commit c119aae26fc7674f178f13df6409ba80c6e3774f
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Wed Oct 28 03:33:33 2026 +0000
+    
+        lead: run ok, 1 message(s) [lead/runs/20261028T033249352538.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index c11de7a..4037481 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,3 +1,4 @@
+     # Memory
+    -Request 1 (memo 2026-10-05) done earlier (writer ...bdfc, reviewer ...d919 'criteria met: 8 of 8').
+    -Rework request 20261028T032903169156-root-153e: writer rework applied, reviewer re-review (…7c54) 'criteria met: 8 of 8', I read memo (lead/writer/work/memo-2026-10-05.md, 174 words) and review. Reported done. Nothing outstanding.
+    +Request 1 (memo 2026-10-05) done twice earlier (reviewer 'criteria met: 8 of 8').
+    +Current: task 20261028T033249100140-root-524b (rework: Sam due 2026-10-08 + Open questions, Marta due none + Open questions). Delegated to lead/writer (revises ...5374, budget 1). 
+    +Next: when writer reports, read memo, then delegate lead/reviewer (revises 20261028T033034928941-lead-20f2, budget 1) to re-check EVERY Due value vs notes (copy C1-C8 verbatim + requester note). Then read review, report done to root with coverage line verbatim, lessons. Runs left ~4.
+
+## run lead/writer@20261028T033329651280 agent=lead-writer model=claude-sonnet-5.5 start=2026-10-28T03:33:29.661865+00:00 end=2026-10-28T03:34:02.048776+00:00 exit=0 secs=32 session=sess_3b5a2353-787b-48a8-8113-df49e00c3b70
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 6
+
+## run lead@20261028T033355980911 agent=lead model=claude-sonnet-5.5 start=2026-10-28T03:33:56.005154+00:00 end=2026-10-28T03:34:24.254058+00:00 exit=0 secs=28 session=sess_ecc820a0-53b8-440e-adb6-d5f17067881c
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 2
+  lead message 20261028T033418667052-lead-74cd to=lead/reviewer type=task status=None created=2026-10-28T03:34:18+00:00
+  ## Lessons: (none)
+  org-git commit 1773632 MEMORY.md diff:
+    commit 17736324086ad8e6edfd40630a45352deec3f2a7
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Wed Oct 28 03:34:24 2026 +0000
+    
+        lead: run ok, 1 message(s) [lead/runs/20261028T033355980911.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index 4037481..5986988 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,4 +1,5 @@
+     # Memory
+     Request 1 (memo 2026-10-05) done twice earlier (reviewer 'criteria met: 8 of 8').
+    -Current: task 20261028T033249100140-root-524b (rework: Sam due 2026-10-08 + Open questions, Marta due none + Open questions). Delegated to lead/writer (revises ...5374, budget 1). 
+    -Next: when writer reports, read memo, then delegate lead/reviewer (revises 20261028T033034928941-lead-20f2, budget 1) to re-check EVERY Due value vs notes (copy C1-C8 verbatim + requester note). Then read review, report done to root with coverage line verbatim, lessons. Runs left ~4.
+    +Current: root task 20261028T033249100140-root-524b (rework Due values). Writer finished rework (lead/writer/work/memo-2026-10-05.md, 200 words, Sam 2026-10-08, Marta none, Open questions section; I read it, looks right).
+    +Delegated re-check to lead/reviewer (revises ...20f2, budget 1), waiting.
+    +Next: read review under lead/reviewer/work, confirm every Due vs notes, report done to root with reviewer coverage line verbatim + lessons. If it fails: report blocked (rework already used).
+    \ No newline at end of file
+
+## run lead/reviewer@20261028T033420213611 agent=lead-reviewer model=claude-sonnet-5.5 start=2026-10-28T03:34:20.220741+00:00 end=2026-10-28T03:35:12.680391+00:00 exit=0 secs=52 session=sess_688f96bb-0494-4895-a1f7-7a9ab5c6e14d
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 4
+
+## run lead@20261028T033506603655 agent=lead model=claude-sonnet-5.5 start=2026-10-28T03:35:06.632011+00:00 end=2026-10-28T03:35:44.981612+00:00 exit=0 secs=38 session=sess_96ddc90d-e2a2-4ac5-8234-ca6132b6bef7
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 3
+  lead message 20261028T033536147407-lead-cae5 to=root type=result status=done created=2026-10-28T03:35:36+00:00
+  ## Lessons: Near miss: the first memo gave Sam's "before Friday" as Friday itself and took Marta's "for Oct 14" (the training date) as a booking deadline. Both passed the first review. Cause: the writer brief and review checklist did not separate a stated deadline from a date that is only mentioned. Prevent: add a check that each Due is a deadline the notes state, and put every derived or unstated Due in Open questions.
+  org-git commit 118c810 MEMORY.md diff:
+    commit 118c810afe4daef41be111bee371e90875522789
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Wed Oct 28 03:35:45 2026 +0000
+    
+        lead: run ok, 1 message(s) [lead/runs/20261028T033506603655.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index 5986988..a5d51e0 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,5 +1,5 @@
+     # Memory
+    -Request 1 (memo 2026-10-05) done twice earlier (reviewer 'criteria met: 8 of 8').
+    -Current: root task 20261028T033249100140-root-524b (rework Due values). Writer finished rework (lead/writer/work/memo-2026-10-05.md, 200 words, Sam 2026-10-08, Marta none, Open questions section; I read it, looks right).
+    -Delegated re-check to lead/reviewer (revises ...20f2, budget 1), waiting.
+    -Next: read review under lead/reviewer/work, confirm every Due vs notes, report done to root with reviewer coverage line verbatim + lessons. If it fails: report blocked (rework already used).
+    \ No newline at end of file
+    +Request 1 (memo 2026-10-05) done three times. Latest: root task 20261028T033249100140-root-524b (Due-value rework) reported done; reviewer 'criteria met: 8 of 8' (lead/reviewer/work/review-2026-10-05-rev3.md); memo lead/writer/work/memo-2026-10-05.md (200 words).
+    +Questions for the client were passed up (Sam before Friday, RFC review omission, Lee 'about it').
+    +Nothing open. Next run: only if root sends new feedback or request.
+    +Lesson for playbook: check that each Due is a stated deadline, not a mentioned date; derived/unstated Dues go in Open questions.
+

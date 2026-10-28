@@ -1,0 +1,9 @@
+exit 0
+redefined service `probe-memo` of lead: contract v1 -> v2 (lead/services/probe-memo/SERVICE.md); the old one is kept at lead/services/probe-memo/history/SERVICE.v1.md. lead was told (without waking it).
+Changed:
+locked: false -> true (you may no longer revise the playbook)
+Acceptance criteria now (1):
+C1: At most 400 words.
+check 1 (reply): yes
+check 2 (locked: true, version = before + 1 = 2): yes
+check 3 (the owner's quiet note): yes /tmp/hirearchy-p1-probe-F1-1793128368/org/lead/inbox/20261027T191249000132-runtime-d35b.md

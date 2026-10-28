@@ -1,0 +1,10 @@
+F2 harness note (stream-f2 step, 2026-10-28T00:31Z): the frozen request readers cannot read this stream's memo requests.
+- Root's first request (S/org/sent/20261028T002628583154-root-8cba.md) has `## Request` `- notes_file: /tmp/hirearchy-p1-F2-1793146944/notes/2026-10-05.md`:
+  the input is named notes_file (SERVICE.md v1 input `notes_file`), but its value is an ABSOLUTE PATH.
+- after_turn.sh's reader (`notes_file:\s*(\d{4}-\d{2}-\d{2})`), guarantees.py memo_of_task (same regex) and assistant_facts.py:238 take a bare date at the start
+  of the value, as in F1 ("notes_file: 2026-10-05.md"). requests-by-turn.txt therefore reads "(none)" for turn 3 although the request exists.
+- Same class as manager-decision-memo-input-name.md (the team's input is not what the frozen reader assumes): the rule of that ruling is applied
+  (standing rule 10): every live trigger the protocol takes from requests-by-turn.txt is read from root's sent mail, and each reading is recorded
+  in lena-lines.txt as `memo <n> request read from sent mail: <message id> (notes_file: <file>)`. requests-by-turn.txt is not edited.
+- It cannot have changed the course (nothing here depends on that file; the facilitator reads the mail). The scorer needs the substitution of
+  the value form as the ruling's item 2 gives for the name (memo-input.txt / requests-by-turn.rederived.txt). No ruling is awaited.

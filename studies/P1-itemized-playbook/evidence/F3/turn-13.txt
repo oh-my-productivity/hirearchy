@@ -1,0 +1,22 @@
+######## TURN 13  start 02:41:42  end 02:44:44  elapsed 182s  (local, 2026-10-28; UTC wall-clock start 2026-10-28T02:41:42Z end 2026-10-28T02:44:44Z; exit code 0)
+######## LENA (prompt sent verbatim):
+D's should be 2026-10-24. P's should be 2026-10-26. L's should be 2026-10-30. S's none is right. No, nothing for Marta to do there, leave it out.
+
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-13.stderr.txt):
+The memo is at `/tmp/hirearchy-p1-F3-1793152805/deliverables/memo-2026-10-19.md`. The copy matches the team's file.
+
+- Covers only the 2026-10-19 meeting: met
+- Markdown, at most 400 words: met (142 by the team's count)
+- Starts with `Summary:`, then Decisions, then the action table: met
+- Decisions, one line each (3): met
+- Table columns Owner | Action | Due, owners as initials only: met
+- All commitments included, informal ones too: met. Marta's agenda row is gone, as you asked.
+- Due values as you gave them: met (L 2026-10-30, M 2026-10-23, D 2026-10-24, P 2026-10-26, S `none`)
+- Nothing invented: met
+- Reviewer passed 11 of 11, with no required changes: met
+
+The team's three open questions were already answered by you, so I didn't ask them again.
+
+Cost: the case used 10 runs of the 12 approved, so no extra funding was needed.
+
+Keep it, or what should change?

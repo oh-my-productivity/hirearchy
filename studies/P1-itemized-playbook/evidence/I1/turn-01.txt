@@ -1,0 +1,27 @@
+######## TURN 1  start 21:25:17  end 21:25:55  elapsed 38s  (local, 2026-10-27; UTC wall-clock start 2026-10-27T21:25:17Z end 2026-10-27T21:25:55Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Hi! After each of our weekly team meetings I want a short memo from my notes: what we decided and who does what. My notes are in /tmp/hirearchy-p1-I1-1793136275/notes (one file per meeting). Can you set up a team that does this for me every week?
+
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-01.stderr.txt):
+This is recurring work, so I'll set it up as a standing service: you ask for a memo after each meeting and the team writes it. Before I draft the plan I need a few answers. I read one of your notes (9 Nov) so the questions fit them. Reply "defaults" to accept everything I've proposed.
+
+1. **Input that changes each week:** the notes file for that meeting, for example `notes/2026-11-16.md`. Everything else stays fixed. The team can only read your notes folder (`/tmp/hirearchy-p1-I1-1793136275/notes`) and can't change it.
+2. **Informal commitments:** your notes have `ACTION:` lines, but also commitments in plain prose (Sam "would add Jo to the on-call rotation by Friday", Lee "at some point" with no date). Should the memo include those?
+   - Proposed default: yes, include every commitment, labelled or not.
+3. **Vague dates:** how should "by Friday" or "next week" appear?
+   - Proposed default: convert them to a calendar date using the meeting date (9 Nov meeting, "by Friday" becomes 13 Nov). If there is no date or it's too vague, write "no date given" and don't invent one.
+4. **Memo contents:** two sections, **Decisions** and **Who does what** (owner, task, due date). The memo should also cover:
+   - the attendees and the meeting date
+   - the next meeting date, if the notes give one
+   - anything that was only discussed and not decided (default: leave it out)
+5. **Where it goes:** a new folder called `deliverables` here, with one file per meeting, for example `deliverables/memo-2026-11-16.md`. Format is markdown, at most 300 words.
+6. **Checks (proposed acceptance criteria):**
+   - Every decision in the notes is listed.
+   - Every commitment, including informal ones, appears under "Who does what" with an owner and a due date or "no date given".
+   - Nothing appears that isn't in the notes.
+   - The memo is at most 300 words.
+7. **Review:** a second agent checks the memo against your notes before you see it. Default: yes.
+8. **Budget:** about 6 runs per memo, which is my estimate plus 25%. Every agent runs claude-sonnet-5.5 at high effort, since nothing cheaper is available. I'll confirm the exact number in the plan.
+9. **Approval:** I show you the plan first and build nothing until you approve. After that, each week you ask me for the memo and the request runs within the per-request budget. I can't start it by myself, because I only act when you message me.
+
+Three questions need your own answers, since I can't pick defaults for them. Is the team always the same people, or should the memo be free to name anyone in the notes (including someone like Jo who isn't present)? Should the memo be in English? Do you want a short "open items from earlier weeks" section? Default: no, each memo covers only its own meeting.

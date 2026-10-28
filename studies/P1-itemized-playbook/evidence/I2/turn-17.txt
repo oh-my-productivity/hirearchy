@@ -1,0 +1,26 @@
+######## TURN 17  start 23:48:12  end 23:51:04  elapsed 172s  (local, 2026-10-27; UTC wall-clock start 2026-10-27T23:48:12Z end 2026-10-27T23:51:04Z; exit code 0)
+######## LENA (prompt sent verbatim):
+No, nothing for Marta to do there, leave it out. Yes, that counts. L's should be 2026-10-30. Use the words from the notes.
+
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-17.stderr.txt):
+The memo for 19 Oct is at `/tmp/hirearchy-p1-I2-1793142034/deliverables/memo-2026-10-19.md`. I checked the copy against the writer's file and they are identical.
+
+The only change from the draft is Lee's Due, which is now 2026-10-30. Marta's "keep the agenda as sent" is left out, and Sam's pairing with Jo stays as a row.
+
+I read "Use the words from the notes" as keeping names in the Action text as the notes write them, so "Jo" stays. Tell me if you meant something else.
+
+- **C1, based on the 19 Oct notes only:** met.
+- **C2, at most 400 words:** met (175 by `wc`).
+- **C3, Decisions (3 bullets) and Actions table with Owner | Action | Due:** met.
+- **C4, a row for every commitment:** met (5 rows, with Sam's included).
+- **C5, Due dates:** met. M is 2026-10-23, D is 2026-10-24, P is 2026-10-26, L is 2026-10-30, and S is none.
+- **C6, nothing invented:** met.
+- **C7, reviewer's report:** met. The reviewer's line reads 8 of 8, with 13 of 13 facts verified.
+- **C8, Summary line first, then Decisions, then Actions:** met.
+- **C9, Owners as initials only:** met.
+
+The reviewer noted that 2026-10-24 falls on a Saturday. I kept it because the notes say Oct 24.
+
+The case used 10 of the 12 runs planned, and nothing is running.
+
+Keep it, or what should change?

@@ -1,0 +1,18 @@
+Services you can request (from your direct reports):
+- weekly-meeting-memo (offered by lead; contract v4, playbook v1): One markdown memo (decisions and action-item table) from one weekly meeting notes file
+  inputs: notes_file* (Absolute path of the meeting notes file in the notes folder, e.g. /tmp/hirearchy-p1-F2-1793146944/notes/2026-11-16.md)   (* required)
+  each request: 12 runs; acceptance criteria (lead/services/weekly-meeting-memo/SERVICE.md):
+    C1: The memo is markdown and has at most 400 words as counted by read.
+    C2: It covers only the meeting in the given notes file.
+    C3: A Decisions section lists every decision stated in the notes file, and no statement that is not in the file.
+    C4: The action items are a markdown table with exactly the columns Owner | Action | Due.
+    C5: Every commitment in the notes file is a row of that table, including informal ones in prose (for example 'said he would ...') and ones marked ACTION.
+    C6: Each Due value is an ISO date (YYYY-MM-DD) or 'none'. A relative deadline (for example 'by Friday') becomes a date only when the notes make the date clear; if no date is given the value is 'none'.
+    C7: The reviewer's report shows every criterion met (criteria met: n of m with n = m), and the writer applied every required change.
+    C9: The memo contains only, in this order: a one-line title, a line beginning 'Summary:' that summarizes the meeting, the Decisions section, and the action items table, with no other lines (no 'Present' or 'Next meeting' lines).
+  record: 2 request(s): 2 done, 0 failed, 0 open; 2 reworked; avg 15 runs; feedback 1 accept (1 after a reject), 1 reject
+  regression list (the client's rejections):
+    R1 (case 20261028T002628583154-root-8cba, about C8 (removed)): "No, not right yet. Always start the memo with a one-line 'Summary:' of the meeting, then the decisions, then the action items."
+    R2 (case 20261028T004913097440-root-a7ad, about C9): "No, just the title, the Summary line, the decisions and the action items."
+    R3 (case 20261028T004913097440-root-a7ad, about C4 (not confirmed)): "No, not right yet. Owners as initials only, always."
+  playbook v1 (2026-10-28): "initial playbook"; 10 items (0 rules), none watched

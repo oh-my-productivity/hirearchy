@@ -1,0 +1,9 @@
+The memo is written and reviewed (7 of 7 checks), but I can't deliver it yet. One item contradicts your answer, and one question needs you.
+
+**Sam's due date is wrong.** The memo says 2026-10-08, but you said 2026-10-09. I can't edit the team's file myself, so the writer has to redo it.
+
+**Question for you (yes/no):** The notes say "We agreed Lee would ping the vendor about the SSO certificate". The reviewer thinks this could also count as a decision. Should it also appear under Decisions, in addition to the action table row?
+
+**Budget:** The team has used 9 of the 12 runs. A fix and re-check takes about 5 more, so about 14 in total, 2 over your 12. Can I spend those 2 extra runs?
+
+Reply with your yes/no on Lee and on the extra runs, and I'll send it back to the team.

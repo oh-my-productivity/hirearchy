@@ -1,0 +1,1 @@
+env -u KIRO_HOME kiro-cli chat --v3 --no-interactive --trust-all-tools --resume --effort high --agent hirearchy-study-p1-F1-assistant 'Yes, that'\''s a decision. Yes, that counts. Sam'\''s 2026-11-13 is right. Keep it as it is. I don'\''t know anything about that rework - I didn'\''t ask for it.'

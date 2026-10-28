@@ -1,0 +1,39 @@
+Here is the plan. The one warning is about budget, and the question at the end covers it.
+
+PLAN FOR YOU
+Goal: Every week, after the team meeting, turn the user's meeting notes file into a short markdown memo that says what was decided and who does what, for the platform team.
+What I understood you need:
+- Scope: One memo per request, from the one notes file given. It covers the decisions made and the action items (who does what, by when) in that meeting, and nothing else.
+- Your files (read-only): /tmp/hirearchy-p1-F2-1793146944/notes
+- Quality bar: Every statement comes from the notes file; nothing is invented. Every commitment is included, also informal ones in prose ("said he would").
+- Sources: Only the files in the notes folder; no web.
+- Workspace: none (nothing writes files or runs commands)
+- Models: claude-sonnet-5.5 (high effort) for every agent
+Team (3 agents):
+- lead (Manager, model claude-sonnet-5.5): directs the team; does not produce the work itself; can read files only in /private/tmp/hirearchy-p1-F2-1793146944/notes and the organization's own files; cannot change your files
+  - writer (Writer, model claude-sonnet-5.5): can read /private/tmp/hirearchy-p1-F2-1793146944/notes through the organization's read tool; cannot change your files
+  - reviewer (Independent Reviewer, model claude-sonnet-5.5): can read files only in /private/tmp/hirearchy-p1-F2-1793146944/notes and the organization's own files; cannot change your files
+Budget: up to 12 runs per request (one run = one working session of one agent), your cap per request is 12; the minimum for one review and rework is 11, and a round of your questions or a rejection takes about 5 more (16 in all). Unspent runs come back to you.
+  lead starts with 12, hands down writer 3, reviewer 2 and keeps 7 for planning, checking and rework.
+If a check still fails after one rework, I'll come back to you with options before spending the reserve; nothing beyond a request's budget is spent without your OK.
+Checking: reviewer reviews the work independently (they did not write it); required changes go back to the author. I then re-check the final result against every service check below.
+Services (kept ready, requested whenever you want):
+- weekly-meeting-memo: One markdown memo (decisions and action-item table) from one weekly meeting notes file
+  You provide: notes_file (required)
+  Each request: up to 12 runs
+  Checks:
+    1. The memo is markdown and has at most 400 words as counted by read.
+    2. It covers only the meeting in the given notes file.
+    3. A Decisions section lists every decision stated in the notes file, and no statement that is not in the file.
+    4. The action items are a markdown table with exactly the columns Owner | Action | Due.
+    5. Every commitment in the notes file is a row of that table, including informal ones in prose (for example 'said he would ...') and ones marked ACTION.
+    6. Each Due value is an ISO date (YYYY-MM-DD) or 'none'. A relative deadline (for example 'by Friday') becomes a date only when the notes make the date clear; if no date is given the value is 'none'.
+    7. The reviewer's report shows every criterion met (criteria met: n of m with n = m), and the writer applied every required change.
+  Delivered to: /tmp/hirearchy-p1-F2-1793146944/deliverables (I copy each result there after checking it)
+After each request the lead records lessons; before the next one it reviews them with your feedback and may improve how the team works (its playbook). It cannot change these checks: only you can, through me.
+Nothing runs until you ask for a request: approving only creates the team and the services.
+Checkpoints: approval - Plan first; ask before any spend beyond the budget; progress - One line when I ask; any spend beyond the budget needs your OK.
+Warnings (1):
+- 12 runs per request covers one pass and one internal rework (the estimate is 11), not a round of your questions or a rejection, which takes about 5 more (1, plus 2 for each agent below lead): 16 per request covers one such round
+
+Use 16 runs per request (covers one round of your questions or a rejection), or keep 12? Reply 'approve' to build the team with your 12, or tell me to use 16.

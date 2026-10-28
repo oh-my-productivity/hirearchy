@@ -1,0 +1,12 @@
+grep: /tmp/hirearchy-p1-probe-F1-1793127427/org/lead/services/probe-memo/SERVICE.md: No such file or directory
+grep: /tmp/hirearchy-p1-probe-F1-1793127427/org/lead/services/probe-memo/SERVICE.md: No such file or directory
+session copied from /Users/aminalizadeh/.kiro/sessions/3fe79c4ead4bafa8/sess_c48fbce9-9860-43c7-94b9-199926370ea6/session.json
+session copied from /Users/aminalizadeh/.kiro/sessions/6d52ba0b685ea0da/sess_1d8d17f5-9e37-4867-9a5d-5ad114b49729/session.json
+session copied from /Users/aminalizadeh/.kiro/sessions/db61d05266a10cdc/sess_34c12a0a-11a6-4308-8ef6-b6816e6d4912/session.json
+grep: /tmp/hirearchy-p1-probe-F2-1793127813/org/lead/services/probe-memo/SERVICE.md: No such file or directory
+grep: /tmp/hirearchy-p1-probe-F2-1793127813/org/lead/services/probe-memo/SERVICE.md: No such file or directory
+session copied from /Users/aminalizadeh/.kiro/sessions/fa2654b673b0b884/sess_7cfe31e3-9d12-43c4-9bd2-7f7ae3689d9c/session.json
+lock checks F1: NOT all yes
+lock checks F2: NOT all yes
+PROBE: STOP: positive control failed in F1 (want contract v2); positive control failed in F2 (want contract v2); positive control failed in I1 (want contract v1); positive control failed in I2 (want contract v1); the lock checks of F1 failed; the lock checks of F2 failed
+probe.sh exit 1

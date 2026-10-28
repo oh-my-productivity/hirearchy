@@ -1,0 +1,38 @@
+1,3c1,3
+< label: preflight-before
+< date: Tue Oct 27 17:23:27 WET 2026
+< date_utc: 2026-10-27T17:23:27Z  epoch: 1793121807
+---
+> label: teardown-after
+> date: Wed Oct 28 04:42:28 WET 2026
+> date_utc: 2026-10-28T04:42:28Z  epoch: 1793162548
+20c20
+< drwx------@  3 aminalizadeh  staff      96 Oct 27 17:21 .
+---
+> drwx------@  3 aminalizadeh  staff      96 Oct 28 04:41 .
+25c25
+< drwx------@  9 aminalizadeh  staff   288 Oct 27 03:50 .
+---
+> drwx------@  9 aminalizadeh  staff   288 Oct 28 04:39 .
+74c74
+< drwxr-x---+ 145 aminalizadeh  staff  4640 Oct 27 06:25 ..
+---
+> drwxr-x---+ 145 aminalizadeh  staff  4640 Oct 28 03:46 ..
+101c101
+< drwxr-xr-x@ 23 aminalizadeh  staff   736 Oct 21 01:17 ..
+---
+> drwxr-xr-x@ 23 aminalizadeh  staff   736 Oct 27 19:03 ..
+106c106,116
+< (none)
+---
+> hirearchy-p1-ambient-1793121877
+> hirearchy-p1-F1-1793129193
+> hirearchy-p1-F2-1793146944
+> hirearchy-p1-F3-1793152805
+> hirearchy-p1-I1-1793136275
+> hirearchy-p1-I2-1793142034
+> hirearchy-p1-I3-1793157452
+> hirearchy-p1-probe-F1-1793128368
+> hirearchy-p1-probe-F2-1793128740
+> hirearchy-p1-probe-I1-1793128490
+> hirearchy-p1-probe-I2-1793128614

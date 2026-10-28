@@ -1,0 +1,11 @@
+10 of 10 matching event(s), oldest first
+17:26:17.538 mcp root tool.call progress ok 4ms args=task_id=20261027T172605582083-root-4686,wait_seconds=119 trace=20261027T172605582083-root-4686
+17:26:22.558 mcp root tool.call progress ok 8ms args=task_id=20261027T172605582083-root-4686,wait_seconds=114 trace=20261027T172605582083-root-4686
+17:26:32.574 mcp root tool.call progress ok 6ms args=task_id=20261027T172605582083-root-4686,wait_seconds=104 trace=20261027T172605582083-root-4686
+17:26:52.592 mcp root tool.call progress ok 8ms args=task_id=20261027T172605582083-root-4686,wait_seconds=84 trace=20261027T172605582083-root-4686
+17:27:32.615 mcp root tool.call progress ok 11ms args=task_id=20261027T172605582083-root-4686,wait_seconds=44 trace=20261027T172605582083-root-4686
+17:28:35.978 mcp lead tool.call org_write ok 2ms args=path=lead/work/preflight.txt,content_chars=15,append=False run=lead@20261027T172821991848 trace=20261027T172605582083-root-4686
+17:28:41.499 mcp lead tool.call org_read ok 1ms args=path=lead/work/preflight.txt run=lead@20261027T172821991848 trace=20261027T172605582083-root-4686
+17:28:44.497 mcp lead tool.call org_read ok 1ms args=path=lead/work/preflight.txt run=lead@20261027T172821991848 trace=20261027T172605582083-root-4686
+17:28:46.349 mcp lead tool.call org_write ok 1ms args=path=lead/MEMORY.md,content_chars=116,append=False run=lead@20261027T172821991848 trace=20261027T172605582083-root-4686
+17:28:46.930 mcp lead tool.call report ok 6ms args=task_id=20261027T172605582083-root-4686,status=done,summary_chars=71,artifacts=['lead/work/preflight.txt'] run=lead@20261027T172821991848 trace=20261027T172605582083-root-4686

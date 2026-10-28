@@ -1,0 +1,155 @@
+{
+ "_about": "P1 spend ledger of F1 (protocol 6.3), created late by the step; see each entry's _added_late.",
+ "cases": {
+  "20261027T193221247283-root-ebf5": {
+   "memo": "2026-10-05",
+   "lena_plan_budget": 12,
+   "lena_grants": [
+    {
+     "turn": 4,
+     "runs": 2,
+     "line": "L-FUND",
+     "request": "The team has used 9 of the 12 runs. A fix and re-check takes about 5 more, so about 14 in total, 2 over your 12. Can I spend those 2 extra runs?"
+    }
+   ],
+   "_added_late": "added by the stream-f1 step at the end of turn 23 (21:15Z), not when root's first request of the memo existed (the step had not created the ledger); the values come from lena-lines.txt (H5 adjustment at turn 3 approved the plan at 12 per request) and the head task's file in S/org/sent/. The scorer adds the case facts (state, runs, budget, d14_used ...) from the raw files.",
+   "_declined": [
+    {
+     "turn": 5,
+     "line": "No more spend, please deliver as is.",
+     "request": "Changing it to 2026-10-14 would need another fix and re-check, about 3 more runs (conditional cost sentence, D-SPEND 6.2)"
+    },
+    {
+     "turn": 7,
+     "line": "No more spend, please deliver as is.",
+     "request": "Redoing the memo with both changes would take about 5 more runs ... I won't send anything back without your OK on that number"
+    },
+    {
+     "turn": 8,
+     "line": "No more spend, please deliver as is.",
+     "request": "If you want 5 October redone under the new rules, it would take about 5 runs. Tell me and I'll ask the team."
+    }
+   ],
+   "state": "done",
+   "runs": 19,
+   "relayed_runs": 5,
+   "budget": 23,
+   "contract_budget": 12,
+   "ceilings": [],
+   "d14_used": 14,
+   "_files": {
+    "state": "F1/final-services-progress-status-health.txt (the case's latest task 20261027T195354174379-root-c39b)",
+    "runs, relayed_runs, budget, d14_used": "F1/final-services-progress-status-health.txt (task 20261027T193221247283-root-ebf5)",
+    "contract_budget": "F1/msgs/sent/20261027T193221247283-root-ebf5.md budget header",
+    "ceilings": "not derived by hand (STUDY.md, declared limit)"
+   },
+   "_progress_line": "\"Memo for the 2026-10-05 weekly meeting\" [service weekly-memo v1]: done. runs 9 of 12 (3 returned). last activity 40s ago. artifacts: lead/writer/work/memo-2026-10-05.md, lead/reviewer/work/rereview-2026-10-05.md. case total: 19 runs used: 14 by the user's requests, 5 by your relayed rework 20261027T195354174379-root-c39b; 23 handed down (contract: 12 per request). The runs of your relayed rework "
+  },
+  "20261027T200713080765-root-399b": {
+   "memo": "2026-10-12",
+   "lena_plan_budget": 12,
+   "lena_grants": [],
+   "_added_late": "added by the stream-f1 step at the end of turn 23 (21:15Z), not when root's first request of the memo existed (the step had not created the ledger); the values come from lena-lines.txt (H5 adjustment at turn 3 approved the plan at 12 per request) and the head task's file in S/org/sent/. The scorer adds the case facts (state, runs, budget, d14_used ...) from the raw files.",
+   "_declined": [],
+   "state": "done",
+   "runs": 11,
+   "relayed_runs": 0,
+   "budget": 17,
+   "contract_budget": 12,
+   "ceilings": [],
+   "d14_used": 11,
+   "_files": {
+    "state": "F1/final-services-progress-status-health.txt (the case's latest task 20261027T201755288707-root-5196)",
+    "runs, relayed_runs, budget, d14_used": "F1/final-services-progress-status-health.txt (task 20261027T200713080765-root-399b)",
+    "contract_budget": "F1/msgs/sent/20261027T200713080765-root-399b.md budget header",
+    "ceilings": "not derived by hand (STUDY.md, declared limit)"
+   },
+   "_progress_line": "\"Memo for the 2026-10-12 weekly meeting\" [service weekly-memo v1]: done. runs 5 of 12 (7 returned). last activity 40s ago. artifacts: lead/writer/work/memo-2026-10-12.md, lead/reviewer/work/review-2026-10-12.md. case total: 11 runs used of 17 handed down (contract: 12 per request). (task 20261027T200713080765-root-399b)"
+  },
+  "20261027T202608080707-root-6eab": {
+   "memo": "2026-10-19",
+   "lena_plan_budget": 12,
+   "lena_grants": [],
+   "_added_late": "added by the stream-f1 step at the end of turn 23 (21:15Z), not when root's first request of the memo existed (the step had not created the ledger); the values come from lena-lines.txt (H5 adjustment at turn 3 approved the plan at 12 per request) and the head task's file in S/org/sent/. The scorer adds the case facts (state, runs, budget, d14_used ...) from the raw files.",
+   "_declined": [],
+   "state": "done",
+   "runs": 10,
+   "relayed_runs": 0,
+   "budget": 17,
+   "contract_budget": 12,
+   "ceilings": [],
+   "d14_used": 10,
+   "_files": {
+    "state": "F1/final-services-progress-status-health.txt (the case's latest task 20261027T203235669836-root-5863)",
+    "runs, relayed_runs, budget, d14_used": "F1/final-services-progress-status-health.txt (task 20261027T202608080707-root-6eab)",
+    "contract_budget": "F1/msgs/sent/20261027T202608080707-root-6eab.md budget header",
+    "ceilings": "not derived by hand (STUDY.md, declared limit)"
+   },
+   "_progress_line": "\"Memo for the 2026-10-19 weekly meeting\" [service weekly-memo v1]: done. runs 5 of 12 (7 returned). last activity 40s ago. artifacts: lead/writer/work/memo-2026-10-19.md, lead/reviewer/work/review-2026-10-19.md. case total: 10 runs used of 17 handed down (contract: 12 per request). (task 20261027T202608080707-root-6eab)"
+  },
+  "20261027T203847826006-root-c383": {
+   "memo": "2026-10-26",
+   "lena_plan_budget": 12,
+   "lena_grants": [],
+   "_added_late": "added by the stream-f1 step at the end of turn 23 (21:15Z), not when root's first request of the memo existed (the step had not created the ledger); the values come from lena-lines.txt (H5 adjustment at turn 3 approved the plan at 12 per request) and the head task's file in S/org/sent/. The scorer adds the case facts (state, runs, budget, d14_used ...) from the raw files.",
+   "_declined": [],
+   "state": "done",
+   "runs": 10,
+   "relayed_runs": 0,
+   "budget": 17,
+   "contract_budget": 12,
+   "ceilings": [],
+   "d14_used": 10,
+   "_files": {
+    "state": "F1/final-services-progress-status-health.txt (the case's latest task 20261027T205029718512-root-c1d5)",
+    "runs, relayed_runs, budget, d14_used": "F1/final-services-progress-status-health.txt (task 20261027T203847826006-root-c383)",
+    "contract_budget": "F1/msgs/sent/20261027T203847826006-root-c383.md budget header",
+    "ceilings": "not derived by hand (STUDY.md, declared limit)"
+   },
+   "_progress_line": "\"Memo for the 2026-10-26 weekly meeting\" [service weekly-memo v1]: done. runs 5 of 12 (7 returned). last activity 40s ago. artifacts: lead/writer/work/memo-2026-10-26.md, lead/reviewer/work/review-2026-10-26.md. case total: 10 runs used of 17 handed down (contract: 12 per request). (task 20261027T203847826006-root-c383)"
+  },
+  "20261027T205704463919-root-cf49": {
+   "memo": "2026-11-02",
+   "lena_plan_budget": 12,
+   "lena_grants": [],
+   "_added_late": "added by the stream-f1 step at the end of turn 23 (21:15Z), not when root's first request of the memo existed (the step had not created the ledger); the values come from lena-lines.txt (H5 adjustment at turn 3 approved the plan at 12 per request) and the head task's file in S/org/sent/. The scorer adds the case facts (state, runs, budget, d14_used ...) from the raw files.",
+   "_declined": [],
+   "state": "done",
+   "runs": 10,
+   "relayed_runs": 0,
+   "budget": 17,
+   "contract_budget": 12,
+   "ceilings": [],
+   "d14_used": 10,
+   "_files": {
+    "state": "F1/final-services-progress-status-health.txt (the case's latest task 20261027T210746092643-root-f6f7)",
+    "runs, relayed_runs, budget, d14_used": "F1/final-services-progress-status-health.txt (task 20261027T205704463919-root-cf49)",
+    "contract_budget": "F1/msgs/sent/20261027T205704463919-root-cf49.md budget header",
+    "ceilings": "not derived by hand (STUDY.md, declared limit)"
+   },
+   "_progress_line": "\"Memo for the 2026-11-02 weekly meeting\" [service weekly-memo v1]: blocked: Questions for the client:. runs 5 of 12. last activity 40s ago. case total: 10 runs used of 17 handed down (contract: 12 per request). (task 20261027T205704463919-root-cf49)"
+  },
+  "20261027T211521519263-root-2f47": {
+   "memo": "2026-11-09",
+   "lena_plan_budget": 12,
+   "lena_grants": [],
+   "_declined": [],
+   "_added": "created by the stream-f1 step after turn 24, when root's first request of memo 6 appeared (requests-by-turn.txt turn 24), before Lena's turn-25 line",
+   "state": "done",
+   "runs": 5,
+   "relayed_runs": 0,
+   "budget": 12,
+   "contract_budget": 12,
+   "ceilings": [],
+   "d14_used": 5,
+   "_files": {
+    "state": "F1/final-services-progress-status-health.txt (the case's latest task 20261027T211521519263-root-2f47)",
+    "runs, relayed_runs, budget, d14_used": "F1/final-services-progress-status-health.txt (task 20261027T211521519263-root-2f47)",
+    "contract_budget": "F1/msgs/sent/20261027T211521519263-root-2f47.md budget header",
+    "ceilings": "not derived by hand (STUDY.md, declared limit)"
+   },
+   "_progress_line": "\"Memo for the 2026-11-09 weekly meeting\" [service weekly-memo v1]: done. runs 5 of 12 (7 returned). last activity 40s ago. artifacts: lead/writer/work/memo-2026-11-09.md, lead/reviewer/work/review-2026-11-09.md. (task 20261027T211521519263-root-2f47)"
+  }
+ },
+ "_about_scorer": "Completed by the scoring step (scoring/complete_ledger.py) from the raw files; the stream step's ledger F1/measures/spend-ledger.json is unchanged."
+}

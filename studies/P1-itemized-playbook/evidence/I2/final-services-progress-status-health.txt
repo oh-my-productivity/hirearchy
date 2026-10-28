@@ -1,0 +1,53 @@
+######## hirearchy --root /tmp/hirearchy-p1-I2-1793142034/org services
+Services you can request (from your direct reports):
+- weekly-meeting-memo (offered by lead; contract v5, playbook v6): One memo of decisions and action items from one meeting's notes file.
+  inputs: meeting_file* (File name of the meeting notes in the notes folder, e.g. 2026-10-05.md)   (* required)
+  each request: 12 runs; acceptance criteria (lead/services/weekly-meeting-memo/SERVICE.md):
+    C1: The memo is based on the requested notes file only.
+    C2: At most 400 words as counted by read.
+    C3: The memo has a section titled "Decisions" with one bullet for every decision stated in the notes, and a section titled "Actions" containing a markdown table with exactly the columns Owner | Action | Due; it has no other sections besides a title that names the meeting date.
+    C4: The Actions table has one row for every commitment in the notes, including informal ones said in prose (for example 'X said he'd do Y'), and no row for anything nobody committed to.
+    C5: Due is an ISO date (YYYY-MM-DD). A relative deadline such as 'by Friday' is converted to a date using the meeting date when the notes make the date clear. Due is 'none' when the notes give no date or say none.
+    C6: Every decision and action is traceable to the notes, and nothing is invented.
+    C7: The reviewer's report shows every criterion met (criteria met: n of m with n = m), and the writer applied every required change.
+    C8: The memo has a one-line 'Summary:' of the meeting directly after the title, then the Decisions section, then the Actions section; the Summary line is the only addition to what the "Decisions"/"Actions" criterion allows.
+    C10: Owners are shown as full names, always: in the Actions table the Owner column holds the owner's full name as written in the notes, never initials.
+    C11: For an owner the notes give only as initials, the Owner cell holds the initials followed by '(full name not in the notes)', for example 'JD (full name not in the notes)'.
+  record: 6 request(s): 5 done, 0 failed, 1 open; 5 reworked; avg 9.2 runs; feedback 6 accept (4 after a reject), 0 reject
+  regression list (the client's rejections):
+    R1 (case 20261027T230507597219-root-5204, about C8): "No, not right yet. Always start the memo with a one-line 'Summary:' of the meeting, then the decisions, then the action items." (items citing it: P11)
+    R2 (case 20261027T233043473862-root-7f7a, about C9 (removed)): "No, not right yet. Owners as initials only, always."
+    R3 (case 20261027T235208782012-root-c7bd, about C10): "No: full names again, always, as before." (items citing it: P13)
+    R4 (case 20261028T000316137116-root-2afa, about C11): "Not right yet. For someone the notes give only as initials, write the initials and '(full name not in the notes)'. Always." (items citing it: P14)
+  playbook v6 (2026-10-28): "Client confirmed C11 (R4, link note 4d7e): add its own words as a step."; 13 items (0 rules); watched: P13 warning (R4; the next related rejection retires it), P14 new (1 of 3 clean cases, k 3)
+
+######## hirearchy --root /tmp/hirearchy-p1-I2-1793142034/org progress
+"Memo for the 2026-10-05 platform team meeting" [service weekly-meeting-memo v1]: done. runs 5 of 12. 0 returned (kept by lead). last activity 41s ago. artifacts: lead/writer/work/memo-2026-10-05.md, lead/reviewer/work/recheck-memo-2026-10-05.md. case total: 20 runs used: 15 by the user's requests, 5 by your relayed rework 20261027T231350170182-root-0fec; 24 handed down (contract: 12 per request). The runs of your relayed rework are your own spend, not the user's: report them to the user as yours, and never ask the user to fund them. (task 20261027T230507597219-root-5204)
+"Rework: memo for the 2026-10-05 platform team meeting" [service weekly-meeting-memo v1]: done. runs 5 of 1 (3 returned). last activity 41s ago. artifacts: lead/writer/work/memo-2026-10-05.md, lead/reviewer/work/recheck-memo-2026-10-05.md. case total: 20 runs used: 15 by the user's requests, 5 by your relayed rework 20261027T231350170182-root-0fec; 24 handed down (contract: 12 per request). The runs of your relayed rework are your own spend, not the user's: report them to the user as yours, and never ask the user to fund them. (task 20261027T231010861831-root-c792)
+"Rework memo 2026-10-05: unclear due dates" [service weekly-meeting-memo v1]: blocked: Questions for the client:. runs 5 of 6. last activity 41s ago. case total: 20 runs used: 15 by the user's requests, 5 by your relayed rework 20261027T231350170182-root-0fec; 24 handed down (contract: 12 per request). The runs of your relayed rework are your own spend, not the user's: report them to the user as yours, and never ask the user to fund them. (task 20261027T231350170182-root-0fec)
+"Rework 2: add Summary line to 2026-10-05 memo" [service weekly-meeting-memo v1]: blocked: Questions for the client:. runs 5 of 5. last activity 41s ago. case total: 20 runs used: 15 by the user's requests, 5 by your relayed rework 20261027T231350170182-root-0fec; 24 handed down (contract: 12 per request). The runs of your relayed rework are your own spend, not the user's: report them to the user as yours, and never ask the user to fund them. (task 20261027T231941168451-root-4f23)
+"Memo for the 2026-10-12 platform team meeting" [service weekly-meeting-memo v2]: done. runs 5 of 12 (5 returned). last activity 41s ago. artifacts: lead/writer/work/memo-2026-10-12.md, lead/reviewer/work/review-memo-2026-10-12.md. case total: 11 runs used of 17 handed down (contract: 12 per request). (task 20261027T233043473862-root-7f7a)
+"Rework: owners as initials in 2026-10-12 memo" [service weekly-meeting-memo v2]: done. runs 6 of 5 (1 returned). last activity 41s ago. artifacts: lead/writer/work/memo-2026-10-12.md, lead/reviewer/work/review-memo-2026-10-12-v2.md. case total: 11 runs used of 17 handed down (contract: 12 per request). (task 20261027T233835308456-root-b074)
+"Memo for the 2026-10-19 platform team meeting" [service weekly-meeting-memo v3]: done. runs 5 of 12 (6 returned). last activity 41s ago. artifacts: lead/writer/work/memo-2026-10-19.md, lead/reviewer/work/review-memo-2026-10-19.md. case total: 10 runs used of 17 handed down (contract: 12 per request). (task 20261027T234421361111-root-a19d)
+"Rework: Lee's Due in 2026-10-19 memo" [service weekly-meeting-memo v3]: done. runs 5 of 5. last activity 41s ago. artifacts: lead/writer/work/memo-2026-10-19.md, lead/reviewer/work/review-memo-2026-10-19-v2.md. case total: 10 runs used of 17 handed down (contract: 12 per request). (task 20261027T234831999613-root-c3c4)
+"Memo for the 2026-10-26 platform team meeting" [service weekly-meeting-memo v3]: done. runs 5 of 12 (6 returned). last activity 41s ago. artifacts: lead/writer/work/memo-2026-10-26.md, lead/reviewer/work/review-memo-2026-10-26.md. case total: 10 runs used of 17 handed down (contract: 12 per request). (task 20261027T235208782012-root-c7bd)
+"Rework: full names in 2026-10-26 memo" [service weekly-meeting-memo v3]: done. runs 5 of 5. last activity 41s ago. artifacts: lead/writer/work/memo-2026-10-26.md, lead/reviewer/work/review-memo-2026-10-26-fullnames.md. case total: 10 runs used of 17 handed down (contract: 12 per request). (task 20261027T235815205888-root-2d32)
+"Memo for the 2026-11-02 platform team meeting" [service weekly-meeting-memo v5]: done. runs 5 of 12. 0 returned (kept by lead). last activity 41s ago. artifacts: lead/writer/work/memo-2026-11-02.md, lead/reviewer/work/review-memo-2026-11-02-recheck.md. case total: 10 runs used of 17 handed down (contract: 12 per request). (task 20261028T000316137116-root-2afa)
+"Rework: JD owner cell in 2026-11-02 memo" [service weekly-meeting-memo v5]: done. runs 5 of 5 (5 returned). last activity 41s ago. artifacts: lead/writer/work/memo-2026-11-02.md, lead/reviewer/work/review-memo-2026-11-02-recheck.md. case total: 10 runs used of 17 handed down (contract: 12 per request). (task 20261028T000921411290-root-2ffa)
+"Memo for the 2026-11-09 platform team meeting" [service weekly-meeting-memo v6]: done. runs 5 of 12 (6 returned). last activity 41s ago. artifacts: lead/writer/work/memo-2026-11-09.md, lead/reviewer/work/review-memo-2026-11-09.md. (task 20261028T001324513271-root-47f6)
+scheduler: stopped (finished: no open tasks)
+
+######## hirearchy --root /tmp/hirearchy-p1-I2-1793142034/org status
+root (human): unread 0, delegated 0
+  lead [Manager] idle  budget=0 open=0 delegated=0 unread=0 services: weekly-meeting-memo
+    reviewer [Independent Reviewer] idle  budget=6 open=0 delegated=0 unread=0
+    writer [Writer] idle  budget=0 open=0 delegated=0 unread=0
+
+scheduler: stopped (finished: no open tasks)
+
+######## hirearchy --root /tmp/hirearchy-p1-I2-1793142034/org health
+3 agents, 0 flagged
+lead idle, budget 0/118, runs 40, open 0, done 11 failed 0 blocked 2 rework 2 (+5 by the client), escapes 0 of 8 judged (+3 not its: 3 contract-gap), re-checks after a FAIL 0 (author rework runs 0), runs/task 3.1, empty 1, last activity 2m ago | branch: runs 66, open 0, done 34, failed 0, blocked 5, rework 6, worst none
+  reviewer idle, budget 6/20, runs 13, open 0, done 10 failed 0 blocked 3 rework 2 (+4 by the client), escapes 0 of 8 judged (+3 not its: 3 contract-gap), re-checks after a FAIL 0 (author rework runs 0), runs/task 1.0, empty 0, last activity 3m ago
+  writer idle, budget 0/26, runs 13, open 0, done 13 failed 0 blocked 0 rework 2 (+2 by the client), runs/task 1.0, empty 0, last activity 4m ago
+

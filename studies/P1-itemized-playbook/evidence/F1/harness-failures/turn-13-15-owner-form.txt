@@ -1,0 +1,13 @@
+F1 facilitator deviation found by the stream-f1 step at the end of turn 16 (2026-10-27T20:44:31Z), before turn 17's line was sent.
+Table rows K12 and K13 (protocol 5) write the Owner "in the owner form in force (4.1)". L-PLANT (turn 11) put form I (initials only) in force until L-MIND.
+- turn 13 (form I in force): the line was "Use the words from the notes. Marta's 2026-10-16 is right." The K12 form would have been "M's 2026-10-16 is right." (Marta -> M, key owner initials).
+- turn 15 (form I in force): the line was "Lee's should be 2026-10-30. Sam's should be none. No, nothing for Marta to do there, leave it out. I don't know anything about that rework - I didn't ask for it." The K13 form would have been "L's should be 2026-10-30. S's should be none. ..." (the K15 and K10 parts are not owner lines).
+- Turn 10 (before L-PLANT, form N) was correct. turn 3 (form N) correct.
+What followed: in both turns the assistant understood the answers as meant (turn 13: it kept Marta 2026-10-16 and delivered; turn 15: Lee 2026-10-30, Sam none, no Marta row, delivered, accepted by the key under form I). No visible change in the course. owner-forms.json has the form I from turn 11.
+The step did not change anything, retry or edit. Turn 17 not sent; waiting for the manager. From turn 17 on the step writes K12/K13 in the form in force.
+
+## Manager's condition (checked 2026-10-27T20:46:26Z, before turn 17; manager-decision-f1-owner-form.md)
+Window: turn 13's start (2026-10-27T20:24:03Z) to now.
+- Contract versions / criterion changes in the window: none. The newest contract version is v5 (defined 2026-10-27T20:17:46Z, before the window; lead/services/weekly-memo/history/SERVICE.v1-v4.md plus SERVICE.md = v5); v5 holds the initials rule ("Owners are shown as initials only, always (for example P for Priya), never as full names" -- C11/C12 added by the turn-12 'Yes, add it.'). No define_service call by root after 20:17:46Z.
+- Root's sent mail in the window (sent/): 20261027T202602525203-root-b644 (accept note for memo 2: 'This version is right now, thanks.'), ...202608080707-root-6eab (memo 3 request, contract 5), ...203235669836-root-5863 (memo 3 rework: 'Required change, one only: in the action table, Lee's Due must be 2026-10-30 ... Sam's Due stays none, and no table row for Marta's ...'), ...203847826006-root-c383 (memo 4 request, contract 5). None asks for full names as owners or cites a full name as an owner; the rework note names Lee, Sam and Marta in prose, as the people whose Dues/rows it talks about (a name in prose, not an Owner cell); the contract text it carries says initials, never full names.
+Result: the condition is TRUE (no full-name owner cited or asked for, no contract/criterion change in the window). Continue from turn 17.

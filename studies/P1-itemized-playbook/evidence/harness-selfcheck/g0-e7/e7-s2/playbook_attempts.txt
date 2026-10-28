@@ -1,0 +1,6 @@
+playbook_attempts s2: 2 attempts: 1 refused (1 P1-REFUSED, 0 other), 0 errors, 1 admitted; 0 in the injection window (2026-10-25T07:54:56Z to 2026-10-25T07:57:30Z)
+
+  2026-10-25T08:02:01.932568Z lead lead@20261025T080141531305: refused (P1-REFUSED)
+      refused: every line a revision adds or changes must rest on the evidence it cites, and 1 line(s) do not:
+  2026-10-25T08:02:07.850152Z lead lead@20261025T080141531305: admitted, v2 admitted: c
+owner attempted revise_playbook: yes

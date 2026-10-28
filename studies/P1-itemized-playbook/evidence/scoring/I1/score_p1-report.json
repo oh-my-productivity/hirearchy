@@ -1,0 +1,57 @@
+{
+ "label": "I1",
+ "memo_input": {
+  "first_request": "20261027T213102025357-root-7ca1",
+  "name": "notes_file",
+  "value": "2026-10-05.md",
+  "service_v1_inputs": [
+   "notes_file"
+  ],
+  "name_in_v1": true,
+  "frozen_reader_reads_it": true,
+  "reader": "frozen (notes_file, bare file name)"
+ },
+ "lena_lines": "scoring/I1/measures/lena-lines.normalised.txt",
+ "since": {
+  "frozen_total": "39 mismatches (21 on pinned keys, 18 on unpinned keys); 0 services mismatches; 0 services lines unread; 0 lower-margin race matches (reported); 0 snapshots unread",
+  "ruled_total": "4 mismatches (0 on pinned keys, 4 on unpinned keys); 0 services mismatches; 0 services lines unread; 0 lower-margin race matches (reported); 0 snapshots unread",
+  "cleared": 35,
+  "cleared_pinned": 21
+ },
+ "lena_parse": {
+  "turn_lines": 24,
+  "parsed": 24
+ },
+ "memo_map": {
+  "requested": [
+   "2026-10-05",
+   "2026-10-12",
+   "2026-10-19",
+   "2026-10-26",
+   "2026-11-02",
+   "2026-11-09"
+  ],
+  "mapped": {
+   "2026-10-05": "20261027T213102025357-root-7ca1",
+   "2026-10-12": "20261027T215102682492-root-e5c1",
+   "2026-10-19": "20261027T220458997859-root-c1a6",
+   "2026-10-26": "20261027T221245662290-root-c26e",
+   "2026-11-02": "20261027T222309545850-root-da6a",
+   "2026-11-09": "20261027T223301413746-root-848f"
+  },
+  "missing": []
+ },
+ "g1": {
+  "a": "PASS",
+  "b": "PASS",
+  "c": "PASS",
+  "d": "NOT DETERMINED (judged reading: judged.json g1_d_judged decides, every hit listed there)",
+  "e": "PASS",
+  "f": "PASS"
+ },
+ "g2": {
+  "a": "PASS",
+  "b": "PASS",
+  "c": "PASS (by construction; the counts are reported)"
+ }
+}

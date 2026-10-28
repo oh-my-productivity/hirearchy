@@ -1,0 +1,98 @@
+# P1 F1 setup (recorded before turn 1)
+date: Tue Oct 27 19:27:10 WET 2026; utc: 2026-10-27T19:27:10Z
+arm: F
+kiro home for the chat: the owner's ~/.kiro (run_turn.sh: env -u KIRO_HOME, both arms); KIRO_HOME set in this shell? no
+memories.db md5 before this stream: f0aaf02a8a216c3a291a253d2c52d461
+== protocol.md vs protocol.md5
+md5 -q protocol.md: 70237b0f3a829795a89d81c8eba7a7d6
+protocol.md5: 70237b0f3a829795a89d81c8eba7a7d6
+== amendments:
+/Volumes/workspace/hirearchy/studies/P1-itemized-playbook/evidence/protocol-amendment-1.md md5 8a203c5efd7445c55096858320ef46e5
+/Volumes/workspace/hirearchy/studies/P1-itemized-playbook/evidence/protocol-amendment-1.md5 md5 1f9e77120a865140d2ed80375fcdb874
+== manager-decision files:
+/Volumes/workspace/hirearchy/studies/P1-itemized-playbook/evidence/manager-decision-prereg-loop.md
+/Volumes/workspace/hirearchy/studies/P1-itemized-playbook/evidence/manager-decision-probe-define.md
+== harness/MD5SUMS check (prints MISMATCH lines only)
+(done, 64 lines)
+MD5SUMS md5: d21508978d71e6d805f1760b25acb1b6
+global SKILL.md md5: b10238639f48ab351fa44a06aed03ffb (required b10238639f48ab351fa44a06aed03ffb)
+repo SKILL.md md5: b10238639f48ab351fa44a06aed03ffb
+injection script md5: 1c4e7824e448a3a34e24a7b759a59fcd
+== HIREARCHY_STATE_DIR set? no
+== processes referencing any P1 sandbox
+(none)
+== ~/.kiro/agents
+agent_config.json.example
+claude-opus-5.5.json
+claude-sonnet-5.5.json
+evolve.json
+explainer.json
+hirearchy-organization-9d66c1-web-fetch-web-search.json
+hirearchy-study-p1-F1-assistant.json
+telegram_bot.json
+== repo checks (4.1) BEFORE turn 1
+git rev-parse HEAD: 8bf7c69bb933bf2e1ecda5dc4ddbefde41eba565
+git status --porcelain:
+ M docs/design/org-growth-phase-1.md
+?? docs/research/
+?? studies/P1-itemized-playbook/
+git diff --stat 8bf7c69b HEAD -- src skills pyproject.toml uv.lock: []
+== kiro-cli --version: kiro-cli 2.33.0
+== S: /tmp/hirearchy-p1-F1-1793129193  epoch: 1793129193 (sandbox created at epoch 1793129193)
+== model_check.sh listed F1: RESULT: F1 listed: OK (2026-10-27T19:27:10Z) (exit 0)
+== assistant profile (/Users/aminalizadeh/.kiro/agents/hirearchy-study-p1-F1-assistant.json; copy in profiles/)
+MD5 (/Users/aminalizadeh/.kiro/agents/hirearchy-study-p1-F1-assistant.json) = 8e817d4ca52fe13d7dcc1fc45de993a2
+kiro-cli agent validate --path: exit 0 (output in profiles/validate.txt)
+(diff against the study's first profile copy: this is the first stream, no reference)
+== workspace settings
+MD5 (/tmp/hirearchy-p1-F1-1793129193/.kiro/settings/cli.json) = 05d30ccbfd35530747c8a542eb67985c
+{"chat.disableInheritingDefaultResources": true, "chat.enableWorkflows": false}MD5 (/Volumes/workspace/hirearchy/studies/P1-itemized-playbook/evidence/harness/workspace-cli.json) = 05d30ccbfd35530747c8a542eb67985c
+== skill copies
+MD5 (/Volumes/workspace/hirearchy/skills/hirearchy/SKILL.md) = b10238639f48ab351fa44a06aed03ffb
+MD5 (/tmp/hirearchy-p1-F1-1793129193/.kiro/skills/hirearchy/SKILL.md) = b10238639f48ab351fa44a06aed03ffb
+global: md5 b10238639f48ab351fa44a06aed03ffb (/Users/aminalizadeh/.kiro/skills/hirearchy/SKILL.md)
+     125 /Volumes/workspace/hirearchy/skills/hirearchy/SKILL.md
+     125 /tmp/hirearchy-p1-F1-1793129193/.kiro/skills/hirearchy/SKILL.md
+     250 total
+== notes
+MD5 (/tmp/hirearchy-p1-F1-1793129193/notes/2026-10-05.md) = 903e3bbf5f35df2c17444f3313c12395
+MD5 (/tmp/hirearchy-p1-F1-1793129193/notes/2026-10-12.md) = 3893bd637c87760b43be4894b47fdb53
+MD5 (/tmp/hirearchy-p1-F1-1793129193/notes/2026-10-19.md) = 9976a7653a6346b0976c3c38b1c697dd
+MD5 (/tmp/hirearchy-p1-F1-1793129193/notes/2026-10-26.md) = 78cd76ede0804ffdc126f9fb1a8c1bc6
+MD5 (/tmp/hirearchy-p1-F1-1793129193/notes/2026-11-02.md) = 93240174a95598e6b848b0bc6e9dd780
+MD5 (/tmp/hirearchy-p1-F1-1793129193/notes/2026-11-09.md) = f9f8b4249f461bf14fa2bb4b9b1545b0
+== org dir exists before turn 1? no
+== ps: processes referencing the sandbox
+(none)
+== other P1 streams running: 0 processes
+== safety-before.txt taken: date_utc: 2026-10-27T19:26:33Z  epoch: 1793129193; ambient/setup.txt taken
+
+== step 4 (stream-f1) additions before turn 1 (2026-10-27T19:27:25Z)
+freeze check (facilitator, before setup): protocol.md md5 70237b0f3a829795a89d81c8eba7a7d6 = protocol.md5; harness/MD5SUMS 64 lines, 0 mismatches; git diff --stat 8bf7c69b HEAD -- src skills pyproject.toml uv.lock: empty; HEAD 8bf7c69bb933bf2e1ecda5dc4ddbefde41eba565
+preflight.md: Result: PASS (probe attempt 2 PROBE: PASS, after amendment H-A1; MD5SUMS md5 now d21508978d71e6d805f1760b25acb1b6)
+last recorded memories.db md5 (preflight.md section 2, preflight/memories-md5-end.txt): f0aaf02a8a216c3a291a253d2c52d461 
+memories.db md5 now: f0aaf02a8a216c3a291a253d2c52d461 -> EQUAL to the last recorded
+safety-before.txt: 5575 bytes, taken date_utc: 2026-10-27T19:26:33Z  epoch: 1793129193
+KIRO_HOME in this shell: unset
+
+== AFTER the last turn (2026-10-27T21:21:10Z) (protocol 4.1, 6 item 5)
+git rev-parse HEAD: 8bf7c69bb933bf2e1ecda5dc4ddbefde41eba565
+git status --porcelain:
+ M docs/design/org-growth-phase-1.md
+?? docs/research/
+?? studies/P1-itemized-playbook/
+git diff --stat 8bf7c69b HEAD -- src skills pyproject.toml uv.lock: []
+kiro-cli --version: kiro-cli 2.33.0
+protocol.md md5: 70237b0f3a829795a89d81c8eba7a7d6 (protocol.md5 70237b0f3a829795a89d81c8eba7a7d6); harness/MD5SUMS mismatches: 0
+global SKILL.md md5: b10238639f48ab351fa44a06aed03ffb
+processes referencing the sandbox: 0
+~/.kiro/agents: agent_config.json.example claude-opus-5.5.json claude-sonnet-5.5.json evolve.json explainer.json hirearchy-organization-9d66c1-web-fetch-web-search.json telegram_bot.json 
+
+== AFTER the stream: stream-f1 step additions (2026-10-27T21:21:52Z)
+freeze check after the stream: see the block above ('AFTER the last turn'); repeated here: protocol.md md5 70237b0f3a829795a89d81c8eba7a7d6 = 70237b0f3a829795a89d81c8eba7a7d6; HEAD 8bf7c69bb933bf2e1ecda5dc4ddbefde41eba565; git diff --stat 8bf7c69b HEAD -- src skills pyproject.toml uv.lock: []
+harness/MD5SUMS: 64 lines, 0 mismatches
+memories.db md5 before F1: f0aaf02a8a216c3a291a253d2c52d461; after F1: f0aaf02a8a216c3a291a253d2c52d461 -> UNCHANGED; file now: f0aaf02a8a216c3a291a253d2c52d461
+safety snapshots: safety-before.txt (19:26:33Z), safety-after.txt, safety-diff.txt (only the label line, directory mtimes of ~/.kiro/memories, ~/.kiro/agents and /tmp, and the new /tmp/hirearchy-p1-F1-... sandbox listing)
+profile: created 19:26Z, deleted 21:21:09Z (profiles/creations.txt, profiles/deletions.txt); ~/.kiro/agents holds the seven pre-existing entries
+owner's ~/.kiro skill md5: b10238639f48ab351fa44a06aed03ffb
+credits: stream total credits: 100.23 (assistant 39.93 + org runs 60.30)

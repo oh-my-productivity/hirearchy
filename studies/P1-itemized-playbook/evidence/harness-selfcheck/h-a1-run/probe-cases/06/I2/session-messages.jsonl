@@ -1,0 +1,5 @@
+{"payload": {"type": "session_start", "content": {"memories": "the owner's index", "cwd": "/tmp/hirearchy-p1-probe-I2-1792000000"}}}
+{"payload": {"type": "tool_call", "toolCallId": "c1", "toolName": "tool_load", "args": {"tool_ids": ["hirearchy::whoami", "hirearchy::services"]}, "status": "completed"}}
+{"payload": {"type": "tool_result", "toolCallId": "c1", "content": "{\"loaded\": [{\"tool_id\": \"hirearchy::whoami\", \"description\": \"Your address, role, budget.\", \"input_schema\": {\"type\": \"object\", \"properties\": {}}}, {\"tool_id\": \"hirearchy::services\", \"description\": \"The standing services.\", \"input_schema\": {\"type\": \"object\", \"properties\": {}}}], \"note\": \"These tools are now loaded.\"}"}}
+{"payload": {"type": "tool_call", "toolCallId": "s1", "toolName": "tool_call", "args": {"tool_id": "hirearchy::services"}, "status": "completed"}}
+{"payload": {"type": "tool_result", "toolCallId": "s1", "content": "- probe-memo (offered by lead; contract v1, playbook v1)"}}

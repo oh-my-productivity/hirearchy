@@ -1,0 +1,8 @@
+# Regression list: weekly-meeting-memo (the client's rejections, verbatim)
+Each line is something the client rejected. Check every delivery of this service against each line, except the lines marked "no lasting rule" (the client said it was a one-off: do not check them), and copy this list verbatim into every review or check task you delegate for it. A line is not a criterion: it becomes one when your parent adds it to the contract, or ends as "no lasting rule".
+- R1, case 20261028T002628583154-root-8cba, verdict 20261028T004125902123-root-a854, about C8 (removed): "No, not right yet. Always start the memo with a one-line 'Summary:' of the meeting, then the decisions, then the action items."
+- R2, case 20261028T004913097440-root-a7ad, verdict 20261028T005558538773-root-f9f7, about C9: "No, just the title, the Summary line, the decisions and the action items."
+- R3, case 20261028T004913097440-root-a7ad, verdict 20261028T010136435687-root-1914, about C10 (removed): "No, not right yet. Owners as initials only, always."
+- R4, case 20261028T011833941227-root-2395, verdict 20261028T012241851922-root-07b5, about C11: "No: full names again, always, as before."
+- R5, case 20261028T012748529907-root-f321, verdict 20261028T013517140358-root-b0a8, about C12: "Not right yet. For someone the notes give only as initials, write the initials and '(full name not in the notes)'. Always."
+

@@ -1,0 +1,5 @@
+ambiguity_recall pooled over s1, s2, s3
+
+AMB-1: 2 of 3   [D21's literal timing: 1 of 2]
+AMB-2: n/a (0 of 0)   [D21's literal timing: n/a (0 of 0)]
+all items: 2 of 3   [D21's literal timing: 1 of 2]

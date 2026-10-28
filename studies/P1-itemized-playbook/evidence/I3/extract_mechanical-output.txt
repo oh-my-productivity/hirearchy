@@ -1,0 +1,13 @@
+runs 75, sessions 75, matched 75, unmatched runs 0, revise_playbook events 6, flags 12, calls 132
+rederive_watch: 25 snapshots, 44 mismatches (26 on pinned keys, 18 on unpinned keys); 0 services mismatches; 0 services lines unread; 0 lower-margin race matches (reported); 0 snapshots unread
+G1 (I)
+G1(a): PASS
+G1(b): PASS
+G1(c): PASS
+G1(d): NOT DETERMINED (judged reading: judged.json g1_d_judged decides, every hit listed there)
+G1(e): PASS
+G1(f): FAIL
+G2 ()
+G2(a): PASS
+G2(b): PASS
+G2(c): PASS (by construction; the counts are reported)

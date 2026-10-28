@@ -1,0 +1,9 @@
+record: /tmp/hirearchy-p1-detach-1793127126/session-record/sess_b777e1fc-c3a3-408b-95f3-4f79cd13f836/messages.jsonl
+session: sess_b777e1fc-c3a3-408b-95f3-4f79cd13f836
+  2026-10-27T18:53:11.028Z disclose_context {"name": "hirearchy"}
+  2026-10-27T18:53:11.147Z tool_load {"tool_ids": ["hirearchy::progress"]}
+  2026-10-27T18:53:15.349Z tool_call {"tool_id": "hirearchy::progress", "arguments": {}}
+  2026-10-27T18:54:44.058Z tool_load {"tool_ids": ["hirearchy::start"]}
+  2026-10-27T18:54:44.111Z tool_call {"tool_id": "hirearchy::progress", "arguments": {}}
+  2026-10-27T18:54:49.322Z tool_call {"tool_id": "hirearchy::start", "arguments": {"until_done": false}}
+ALLOWED

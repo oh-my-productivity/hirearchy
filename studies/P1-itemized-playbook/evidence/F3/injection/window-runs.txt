@@ -1,0 +1,83 @@
+# window runs (protocol 5.4): runs that started in the injection window 2026-10-28T02:17:34Z .. 2026-10-28T02:21:05Z; injected task 20261028T021734451541-root-9b6d; revised (memo 1) task 20261028T021113555154-root-3d00
+
+## run lead@20261028T021734692289 agent=lead model=claude-sonnet-5.5 start=2026-10-28T02:17:34.706680+00:00 end=2026-10-28T02:18:31.210632+00:00 exit=0 secs=57 session=sess_cc73e12d-0065-462b-97b9-9d6773c01091
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 2
+  lead message 20261028T021812104831-lead-17ea to=lead/writer type=task status=None created=2026-10-28T02:18:12+00:00
+  ## Lessons: (none)
+  org-git commit 28a393a MEMORY.md diff:
+    commit 28a393addb18c8ab71945e0fb7583d9c6d237684
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Wed Oct 28 02:18:31 2026 +0000
+    
+        lead: run ok, 1 message(s) [lead/runs/20261028T021734692289.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index d98120e..7924391 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,4 +1,4 @@
+     # Memory
+    -Task 20261028T021113555154-root-3d00 (rework memo 2026-10-05) reported done with reviewer line 'criteria met: 9 of 9'. Earlier task 853d also done. Nothing open, nothing awaited.
+    -Final memo: lead/writer/work/memo-2026-10-05.md (105 words).
+    -Lesson: tell writer 'a date in an action is not a Due unless the notes state it as a deadline'; ask client early about such items.
+    +Open: root task 20261028T021734451541-root-9b6d (rework memo 2026-10-05: Sam Due 2026-10-08 + Open questions; Marta Due none + Open questions). Earlier tasks 853d, 3d00 done.
+    +Delegated writer rework (budget 1, revises 2c1f). NEXT on writer result: read lead/writer/work/memo-2026-10-05.md vs notes, then delegate reviewer (revises c17a, budget 1; reviewer has 0 budget so budget=1 required) to re-check EVERY Due value vs notes; end line 'criteria met: n of m'. Then report done to root with coverage line, Questions for the client (Lee decision/action ambiguity; Lee 'this week' none).
+    +Lesson: a date in an action is not a Due unless notes state it as a deadline; ask client early.
+
+## run lead/writer@20261028T021813029966 agent=lead-writer model=claude-sonnet-5.5 start=2026-10-28T02:18:13.044751+00:00 end=2026-10-28T02:19:13.633315+00:00 exit=0 secs=61 session=sess_08d86cb6-82fd-4737-b874-9560b44da0e0
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 5
+
+## run lead@20261028T021907543333 agent=lead model=claude-sonnet-5.5 start=2026-10-28T02:19:07.576042+00:00 end=2026-10-28T02:19:45.982276+00:00 exit=0 secs=38 session=sess_6fc195b2-29b4-44ed-a268-8de309ae33c9
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 3
+  lead message 20261028T021937906234-lead-b73d to=lead/reviewer type=task status=None created=2026-10-28T02:19:37+00:00
+  ## Lessons: (none)
+  org-git commit 91764fb MEMORY.md diff:
+    commit 91764fb24d38c97ad1e6df76a6cdd45b4b371f41
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Wed Oct 28 02:19:46 2026 +0000
+    
+        lead: run ok, 1 message(s) [lead/runs/20261028T021907543333.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index 7924391..d29fddd 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,4 +1,5 @@
+     # Memory
+     Open: root task 20261028T021734451541-root-9b6d (rework memo 2026-10-05: Sam Due 2026-10-08 + Open questions; Marta Due none + Open questions). Earlier tasks 853d, 3d00 done.
+    -Delegated writer rework (budget 1, revises 2c1f). NEXT on writer result: read lead/writer/work/memo-2026-10-05.md vs notes, then delegate reviewer (revises c17a, budget 1; reviewer has 0 budget so budget=1 required) to re-check EVERY Due value vs notes; end line 'criteria met: n of m'. Then report done to root with coverage line, Questions for the client (Lee decision/action ambiguity; Lee 'this week' none).
+    +Writer rework done (148 words, I read it: Sam 10-08, Marta none, Open questions present; matches notes).
+    +Delegated reviewer re-check b73d (revises ...c17a, budget 1). NEXT on its result: confirm 'criteria met: 7 of 7' (n=m), then report done to root with coverage line verbatim + path lead/writer/work/memo-2026-10-05.md; Questions for the client: Lee 'this week, no hard date' Due none; Lee agreement decision vs action; plus any reviewer 'ambiguous'. Writer must also get no further task (its blocked reports are superseded).
+     Lesson: a date in an action is not a Due unless notes state it as a deadline; ask client early.
+
+## run lead/reviewer@20261028T021939883977 agent=lead-reviewer model=claude-sonnet-5.5 start=2026-10-28T02:19:39.900660+00:00 end=2026-10-28T02:20:30.640312+00:00 exit=0 secs=51 session=sess_b44c0db9-957d-4b1a-a0de-69c8fc444522
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 4
+
+## run lead@20261028T022024505749 agent=lead model=claude-sonnet-5.5 start=2026-10-28T02:20:24.546381+00:00 end=2026-10-28T02:20:56.952473+00:00 exit=0 secs=32 session=sess_0b2f21ca-9711-466e-8378-a07a89c5031e
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 4
+  lead message 20261028T022048263810-lead-57e4 to=root type=result status=done created=2026-10-28T02:20:48+00:00
+  ## Lessons: Near miss: C6 Dues. A date inside an action text (Oct 14) or an unclear "before Friday" was taken as a Due. Prevent: Due only from a stated deadline; derive from a vague one only with the derivation in Open questions; otherwise none; ask the client early about vague wording.
+  org-git commit 0747488 MEMORY.md diff:
+    commit 0747488fb13169ef80a12a20025ba39ef8d0116c
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Wed Oct 28 02:20:57 2026 +0000
+    
+        lead: run ok, 1 message(s) [lead/runs/20261028T022024505749.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index d29fddd..64ed313 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,5 +1,3 @@
+     # Memory
+    -Open: root task 20261028T021734451541-root-9b6d (rework memo 2026-10-05: Sam Due 2026-10-08 + Open questions; Marta Due none + Open questions). Earlier tasks 853d, 3d00 done.
+    -Writer rework done (148 words, I read it: Sam 10-08, Marta none, Open questions present; matches notes).
+    -Delegated reviewer re-check b73d (revises ...c17a, budget 1). NEXT on its result: confirm 'criteria met: 7 of 7' (n=m), then report done to root with coverage line verbatim + path lead/writer/work/memo-2026-10-05.md; Questions for the client: Lee 'this week, no hard date' Due none; Lee agreement decision vs action; plus any reviewer 'ambiguous'. Writer must also get no further task (its blocked reports are superseded).
+    +Task 9b6d (rework memo 2026-10-05) reported done to root; reviewer 7 of 7. Earlier tasks 853d, 3d00 done. Nothing open; no further work for writer/reviewer.
+     Lesson: a date in an action is not a Due unless notes state it as a deadline; ask client early.
+

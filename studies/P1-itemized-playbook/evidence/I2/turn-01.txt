@@ -1,0 +1,26 @@
+######## TURN 1  start 23:01:28  end 23:01:59  elapsed 31s  (local, 2026-10-27; UTC wall-clock start 2026-10-27T23:01:28Z end 2026-10-27T23:01:59Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Hi! After each of our weekly team meetings I want a short memo from my notes: what we decided and who does what. My notes are in /tmp/hirearchy-p1-I2-1793142034/notes (one file per meeting). Can you set up a team that does this for me every week?
+
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-01.stderr.txt):
+I read your latest notes (9 Nov) to see what the memo has to handle. This is recurring work, so I'd set it up as a standing service. Each week you ask for it and name the meeting file, and nothing runs in between. I can't schedule it to start on its own.
+
+I need a few answers before I draft the plan. Reply "defaults" to accept the proposed ones.
+
+1. **Which file each week:** you'd give me the meeting file (e.g. `2026-11-16.md`) with each request, and the notes folder stays fixed. Is that right?
+2. **What counts as an item:**
+   - Your notes mix labelled lines ("ACTION: …", "we decided …") with informal ones in prose. Examples are "Sam said he would add Jo to the on-call rotation by Friday" and "Lee said he'd go through the SSO audit log at some point."
+   - *Proposed default:* include every decision and every commitment, labelled or not. Items without a date are listed as "no date given."
+3. **Vague dates:** "by Friday" or "next week" could be turned into a calendar date from the meeting date, or kept as written.
+   - *Proposed default:* convert to a date (e.g. "by Friday" in the 9 Nov meeting becomes 13 Nov). Where no date was given, I'd write "no date given" and not guess.
+4. **Memo contents:**
+   - *Proposed default:* a "Decisions" section and an "Actions" table (who, what, due date). Nothing else, such as discussion summaries.
+   - *Length:* at most 300 words.
+   - *Format:* markdown.
+5. **Where it goes:** a new `deliverables/` folder here, at `/tmp/hirearchy-p1-I2-1793142034/deliverables/memo-<meeting date>.md`. Is that OK?
+6. **Sources:** only your notes, no web.
+7. **Review:** a second agent checks every decision and action in the memo against the notes. That uses more runs. *Proposed default:* yes.
+8. **Budget:** I'll give a per-request number in the plan, covering the estimate plus 25%. Every agent runs on claude-sonnet-5.5 at high effort.
+9. **First run:** should I also create the memo for the 9 Nov meeting as the first request once you approve? *Proposed default:* yes.
+
+I'll show you the plan to approve before anything is created.

@@ -1,0 +1,7 @@
+MISMATCH turn-25 P12 pending unpinned: re-derived [], product ['R4']
+MISMATCH turn-26 P12 waiting unpinned: re-derived 0, product 1
+MISMATCH turn-27 P12 clean unpinned: re-derived 1, product 2
+MISMATCH turn-28 P12 clean unpinned: re-derived 1, product 2
+MISMATCH turn-29 P12 clean unpinned: re-derived 1, product 2
+MISMATCH end P12 clean unpinned: re-derived 1, product 2
+6 mismatches (0 on pinned keys, 6 on unpinned keys); 0 services mismatches; 0 services lines unread; 0 lower-margin race matches (reported); 0 snapshots unread

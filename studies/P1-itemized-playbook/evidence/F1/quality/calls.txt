@@ -1,0 +1,54 @@
+turn-01 2026-10-27T19:29:27Z: no org yet, quality not run
+turn-02 2026-10-27T19:31:16Z: no org yet, quality not run
+turn-03 start 2026-10-27T19:41:49.963167+00:00 end 2026-10-27T19:41:50.163478+00:00 exit 0 bytes 9920 json ok
+  new cli-*.jsonl: 2026-10-27/cli-96314-1793130110133.jsonl  command: quality 
+turn-04 start 2026-10-27T19:51:09.687417+00:00 end 2026-10-27T19:51:09.894946+00:00 exit 0 bytes 10354 json ok
+  new cli-*.jsonl: 2026-10-27/cli-97910-1793130669867.jsonl  command: quality 
+turn-05 start 2026-10-27T19:52:52.929582+00:00 end 2026-10-27T19:52:53.170961+00:00 exit 0 bytes 10354 json ok
+  new cli-*.jsonl: 2026-10-27/cli-98319-1793130773142.jsonl  command: quality 
+turn-06 start 2026-10-27T20:02:08.088400+00:00 end 2026-10-27T20:02:08.374276+00:00 exit 0 bytes 11354 json ok
+  new cli-*.jsonl: 2026-10-27/cli-99895-1793131328346.jsonl  command: quality 
+turn-07 start 2026-10-27T20:04:43.853597+00:00 end 2026-10-27T20:04:44.142344+00:00 exit 0 bytes 12280 json ok
+  new cli-*.jsonl: 2026-10-27/cli-408-1793131484114.jsonl  command: quality 
+turn-08 start 2026-10-27T20:06:13.228804+00:00 end 2026-10-27T20:06:13.517127+00:00 exit 0 bytes 12280 json ok
+  new cli-*.jsonl: 2026-10-27/cli-897-1793131573489.jsonl  command: quality 
+turn-09 start 2026-10-27T20:13:11.370184+00:00 end 2026-10-27T20:13:11.762986+00:00 exit 0 bytes 13049 json ok
+  new cli-*.jsonl: 2026-10-27/cli-2536-1793131991735.jsonl  command: quality 
+turn-10 start 2026-10-27T20:15:06.888353+00:00 end 2026-10-27T20:15:07.257878+00:00 exit 0 bytes 13049 json ok
+  new cli-*.jsonl: 2026-10-27/cli-2965-1793132107225.jsonl  command: quality 
+turn-11 start 2026-10-27T20:16:51.165065+00:00 end 2026-10-27T20:16:51.561911+00:00 exit 0 bytes 13589 json ok
+  new cli-*.jsonl: 2026-10-27/cli-3382-1793132211532.jsonl  command: quality 
+turn-12 start 2026-10-27T20:23:42.919142+00:00 end 2026-10-27T20:23:43.326628+00:00 exit 0 bytes 15277 json ok
+  new cli-*.jsonl: 2026-10-27/cli-5049-1793132623297.jsonl  command: quality 
+turn-13 start 2026-10-27T20:25:17.294432+00:00 end 2026-10-27T20:25:17.676864+00:00 exit 0 bytes 15135 json ok
+  new cli-*.jsonl: 2026-10-27/cli-5466-1793132717649.jsonl  command: quality 
+turn-14 start 2026-10-27T20:31:42.050797+00:00 end 2026-10-27T20:31:42.423001+00:00 exit 0 bytes 15851 json ok
+  new cli-*.jsonl: 2026-10-27/cli-6920-1793133102394.jsonl  command: quality 
+turn-15 start 2026-10-27T20:37:53.428010+00:00 end 2026-10-27T20:37:53.941073+00:00 exit 0 bytes 16285 json ok
+  new cli-*.jsonl: 2026-10-27/cli-8361-1793133473910.jsonl  command: quality 
+turn-16 start 2026-10-27T20:44:02.274890+00:00 end 2026-10-27T20:44:02.725322+00:00 exit 0 bytes 17046 json ok
+  new cli-*.jsonl: 2026-10-27/cli-9917-1793133842696.jsonl  command: quality 
+turn-17 start 2026-10-27T20:46:41.835812+00:00 end 2026-10-27T20:46:42.276781+00:00 exit 0 bytes 17046 json ok
+  new cli-*.jsonl: 2026-10-27/cli-10339-1793134002247.jsonl  command: quality 
+turn-18 start 2026-10-27T20:48:12.517098+00:00 end 2026-10-27T20:48:13.011633+00:00 exit 0 bytes 17267 json ok
+  new cli-*.jsonl: 2026-10-27/cli-10770-1793134092980.jsonl  command: quality 
+turn-19 start 2026-10-27T20:49:47.011389+00:00 end 2026-10-27T20:49:47.521337+00:00 exit 0 bytes 17733 json ok
+  new cli-*.jsonl: 2026-10-27/cli-11181-1793134187486.jsonl  command: quality 
+turn-20 start 2026-10-27T20:56:28.566123+00:00 end 2026-10-27T20:56:29.118487+00:00 exit 0 bytes 18759 json ok
+  new cli-*.jsonl: 2026-10-27/cli-12645-1793134589088.jsonl  command: quality 
+turn-21 start 2026-10-27T21:03:44.707959+00:00 end 2026-10-27T21:03:45.320763+00:00 exit 0 bytes 19259 json ok
+  new cli-*.jsonl: 2026-10-27/cli-14156-1793135025289.jsonl  command: quality 
+turn-22 start 2026-10-27T21:05:34.817525+00:00 end 2026-10-27T21:05:35.994616+00:00 exit 0 bytes 19259 json ok
+  new cli-*.jsonl: 2026-10-27/cli-14650-1793135135961.jsonl  command: quality 
+turn-23 start 2026-10-27T21:06:57.237214+00:00 end 2026-10-27T21:06:58.442136+00:00 exit 0 bytes 19312 json ok
+  new cli-*.jsonl: 2026-10-27/cli-15089-1793135218411.jsonl  command: quality 
+turn-23 start 2026-10-27T21:14:04.896390+00:00 end 2026-10-27T21:14:05.616705+00:00 exit 0 bytes 20544 json ok
+  new cli-*.jsonl: 2026-10-27/cli-16774-1793135645584.jsonl  command: quality 
+turn-24 start 2026-10-27T21:18:37.303673+00:00 end 2026-10-27T21:18:37.902474+00:00 exit 0 bytes 21145 json ok
+  new cli-*.jsonl: 2026-10-27/cli-18237-1793135917872.jsonl  command: quality 
+turn-25 start 2026-10-27T21:19:50.814340+00:00 end 2026-10-27T21:19:51.439609+00:00 exit 0 bytes 21145 json ok
+  new cli-*.jsonl: 2026-10-27/cli-18687-1793135991409.jsonl  command: quality 
+turn-26 start 2026-10-27T21:20:50.260073+00:00 end 2026-10-27T21:20:50.885203+00:00 exit 0 bytes 21096 json ok
+  new cli-*.jsonl: 2026-10-27/cli-19111-1793136050855.jsonl  command: quality 
+end start 2026-10-27T21:21:07.060632+00:00 end 2026-10-27T21:21:07.706998+00:00 exit 0 bytes 21096 json ok
+  new cli-*.jsonl: 2026-10-27/cli-19491-1793136067676.jsonl  command: quality 

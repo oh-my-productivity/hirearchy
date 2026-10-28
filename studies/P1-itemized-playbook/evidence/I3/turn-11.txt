@@ -1,0 +1,12 @@
+######## TURN 11  start 03:55:00  end 03:55:27  elapsed 27s  (local, 2026-10-28; UTC wall-clock start 2026-10-28T03:55:00Z end 2026-10-28T03:55:27Z; exit code 0)
+######## LENA (prompt sent verbatim):
+No, not right yet. Owners as initials only, always.
+
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-11.stderr.txt):
+I've recorded your rejection. The delivered memo is unchanged for now.
+
+One thing to know first. Every owner in your notes is a first name, so their initials would be single letters: P for Priya, S for Sam, L for Lee, M for Marta, D for Dev. One owner, "JD", is already initials.
+
+About C4: add "Owners in the action-items table are shown as initials only" as a lasting rule? Yes or no.
+
+If yes, I'll send this memo back for the Owner column. That is one writer pass and one re-check, about 3 more runs. Your cap for this memo is 12, and 10 are used. So I'm asking you now to approve going slightly over, to about 13. Please say that in your answer as well.

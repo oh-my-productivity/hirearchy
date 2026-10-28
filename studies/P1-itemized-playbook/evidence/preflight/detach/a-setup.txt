@@ -1,0 +1,8 @@
+EPOCH=1793122219
+init 0
+hire 0
+task 0
+server: uv ['--directory', '/Volumes/workspace/hirearchy', 'run', 'hirearchy', 'mcp'] env keys: ['HIREARCHY_STATE_DIR', 'HOME', 'ORG_ROOT', 'UV_CACHE_DIR']
+tools: ['*']
+validate 0
+chat-help 0

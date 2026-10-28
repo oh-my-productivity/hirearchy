@@ -1,0 +1,3 @@
+I've recorded the 2026-11-09 memo as kept, in your words. It stays at `/tmp/hirearchy-p1-F3-1793152805/deliverables/memo-2026-11-09.md`.
+
+For next week's meeting, ask me for the memo and name the notes file, for example `2026-11-16.md`.

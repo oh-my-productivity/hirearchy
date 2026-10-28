@@ -1,0 +1,13 @@
+The memo is at `/tmp/hirearchy-p1-F2-1793146944/deliverables/2026-10-05-memo.md`. I checked that the copy matches the team's file.
+
+- Markdown, at most 400 words: met (200 by `wc`, 170 by the team's count).
+- Covers only the 2026-10-05 meeting: met.
+- Decisions section lists both decisions in the notes, nothing extra: met.
+- Action table has columns Owner | Action | Due: met.
+- All five commitments are rows, including the informal ones from Sam and Lee: met.
+- Due dates are ISO or `none`: met. Sam is 2026-10-09 and Marta is 2026-10-14, as you ruled. Lee is `none`.
+- The reviewer passed it (6 of 6 criteria, 31 of 31 claims verified) and the writer applied the changes: met.
+
+Runs: 10 of the 12 approved for this memo. The first pass used 5, and applying your answers used 5 more.
+
+Keep it, or what should change?

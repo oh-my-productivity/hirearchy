@@ -1,0 +1,21 @@
+######## TURN 7  start 00:47:19  end 00:47:56  elapsed 37s  (local, 2026-10-28; UTC wall-clock start 2026-10-28T00:47:19Z end 2026-10-28T00:47:56Z; exit code 0)
+######## LENA (prompt sent verbatim):
+No, that's an action item, not a decision. No, just the title, the Summary line, the decisions and the action items. I don't know anything about that rework - I didn't ask for it. No more spend, please deliver as is.
+
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-07.stderr.txt):
+The memo is delivered at `/tmp/hirearchy-p1-F2-1793146944/deliverables/2026-10-05-memo.md`, exactly as the team produced it. I checked that the copy matches their file. I haven't edited it and haven't recorded a verdict, since "deliver as is" isn't an accept.
+
+It does not match your last instruction. You wanted just the title, the Summary line, the decisions and the action items. It has no title, and it still has the "Present" and "Next meeting" lines near the bottom. Fixing that is a rework of about 5 runs. You can also delete those two lines by hand. If you want the team to do it, I'll ask first.
+
+- C1, at most 400 words: met (188 by the team's count, 217 by `wc`).
+- C2, covers only the 2026-10-05 meeting: met.
+- C3, both decisions listed and nothing extra: met.
+- C4, table columns Owner | Action | Due: met.
+- C5, all five commitments are rows, including Sam's and Lee's informal ones: met.
+- C6, ISO dates or `none`: met, with Sam 2026-10-09 and Marta 2026-10-14 as you ruled.
+- C7, reviewer passed 8 of 8 and the writer applied the changes: met.
+- C8, the new rule that the memo opens with a "Summary:" line, then Decisions, then the action table: met.
+
+Runs: 15 of the 17 you approved for this memo. Another 5 came from the "unclear due dates" rework that you didn't ask for. It was sent from the root seat, but the logs don't show who or what sent it. I've marked it superseded and am not charging it to you.
+
+The new Summary-first rule now applies to every future weekly memo.

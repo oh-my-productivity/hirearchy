@@ -1,0 +1,27 @@
+######## TURN 18  start 23:51:50  end 23:54:42  elapsed 172s  (local, 2026-10-27; UTC wall-clock start 2026-10-27T23:51:50Z end 2026-10-27T23:54:42Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Thanks, I'll look at that one later. Now 2026-10-26.md please. I'll wait.
+
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-18.stderr.txt):
+The memo for 26 Oct is drafted but not delivered. It passed all 8 checks, and the reviewer verified 8 of 8 facts. It used 5 of 12 runs. There is one open question.
+
+The notes end with "Next meeting Monday 2 November." I left that out because it's a scheduling fact and nobody committed to anything. Is that right, or should it appear somewhere in the memo?
+
+This is the memo as it stands:
+
+| Owner | Action | Due |
+|---|---|---|
+| D | Run the gateway cutover | 2026-10-28 |
+| P | Enable the rate limiter flag for the large-plan customers | 2026-10-30 |
+| M | Send the demo feedback summary to the product team | 2026-10-27 |
+| S | Write up onboarding notes for the CI pipeline | 2026-10-30 |
+| L | Update the SSO runbook with the new certificate dates | none |
+
+It also has the Summary line and 3 decisions:
+- Cut over to the new gateway on Wednesday 28 October.
+- Turn the rate limiter on for large-plan customers first.
+- Widen the Renovate batch to all repos in November.
+
+I converted Sam's "by Friday" to 2026-10-30, the same way as your earlier rulings. Lee's "when he gets a chance" is none.
+
+Reply "accept" to deliver it as it is. Any change would cost about 5 runs, and 7 are left in the budget.

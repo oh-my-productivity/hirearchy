@@ -1,0 +1,23 @@
+session record copied: /Users/aminalizadeh/.kiro/sessions/4e1fc30e1f43c1e2/sess_b777e1fc-c3a3-408b-95f3-4f79cd13f836/session.json
+ALLOWED
+return 2026-10-27T18:54:56.914+00:00
+scheduler_pid 82714
+run_start_to_return_ms 7593
+scheduler_alive_at_plus_5s True
+run_alive_at_plus_5s True
+scheduler_last_sample_alive 2026-10-27T18:55:21.992+00:00
+scheduler_first_sample_gone None
+scheduler_gone_relative_to_return_ms None
+scheduler_last_alive_stat_ppid_pgid ['Ss', 1, 82714]
+run_last_sample_alive 2026-10-27T18:55:21.992+00:00
+run_first_sample_gone None
+scheduler.exit []
+scheduler.signal []
+run.end []
+verdict survived
+valid True
+run started in run logs:
+1
+--- stdout:
+The hirearchy skill is already active in this session, so I won't load it again. I still need to load the `start` tool.scheduler started (pid 82714; it runs until stop()); log: /private/tmp/hirearchy-p1-detach-1793127126/org/.runtime/scheduler.log
+

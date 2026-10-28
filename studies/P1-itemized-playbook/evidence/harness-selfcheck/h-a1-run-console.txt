@@ -1,0 +1,19 @@
+watch_cases: exit 0: watch_cases: 83 of 83 checks OK
+g1_cases: exit 0: g1_cases: 342 of 342 checks OK
+kept_mail: exit 0: kept_mail: 135 of 135 checks OK
+p1_scoring: exit 0: p1_scoring_check: 22 of 22 OK
+aggregate_check: exit 0: aggregate_check: 236 of 236 checks OK
+cost_total: exit 0: cost_total: 13 of 13 checks OK
+next_stream: exit 0: next_stream_check: 23 of 23 checks OK
+empty_calls: exit 0: empty_calls: 6 of 6 checks OK
+probe_check: exit 0: probe_check: 6 of 6 checks OK
+g0_e7_rederive: exit 0: selfcheck rederive: 372 of 372 OK
+g0_e7_score_memos: exit 0: selfcheck score_memos: 334 of 334 OK
+g0_e7_ambiguity_recall: exit 0: selfcheck ambiguity_recall: 59 of 59 OK
+g0_e7_prompt_sizes: exit 0: selfcheck prompt_sizes: 15 of 15 OK
+g0_e7_playbook_attempts: exit 0: selfcheck playbook_attempts: 34 of 34 OK
+g0_e7_assistant_facts: exit 0: selfcheck assistant: 281 of 281 OK
+g0_e7_skill_check: exit 0: selfcheck skill_check: 21 of 21 OK
+g0_replay: exit 0: g0_replay: 24 of 24 OK
+tests: exit 0: 206 passed in 9.76s
+selfcheck: 17 of 17 parts OK; tests exit 0

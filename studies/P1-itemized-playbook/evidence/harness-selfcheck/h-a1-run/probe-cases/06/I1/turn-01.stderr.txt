@@ -1,0 +1,2 @@
+[tool] whoami
+Warning: something else 3

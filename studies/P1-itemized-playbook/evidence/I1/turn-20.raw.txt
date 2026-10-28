@@ -1,0 +1,9 @@
+I've logged your rejection. I need a yes or no from you before it becomes a standing rule.
+
+**About C14:** add "In the Actions table, when the notes give an owner only as initials, the Owner cell reads those initials followed by '(full name not in the notes)', for example 'JD (full name not in the notes)'" as a lasting rule? Yes or no.
+
+This applies only to owners the notes give as initials. Names like Priya or Dev stay as they are. Only the Owner column changes, so the "Present:" line and the action text stay as written.
+
+If you say yes, I'll rework the 2 November memo with one change, the JD row. That takes about 5 runs, which would put it at about 10 of the 12 you approved, so it needs no extra approval.
+
+I haven't changed anything yet. The delivered file stays as it is until you answer.

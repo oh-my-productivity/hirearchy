@@ -1,0 +1,14 @@
+The memo is at `/tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-10-05.md`, but Marta's row still has Due set to `none`, not the `2026-10-14` you asked for. You said no more spend, so I delivered it as the team wrote it. I didn't edit it myself, because the team's files stay unchanged. You can change that one cell by hand, or I can send it back to the team for about 3 more runs.
+
+- Title and sections, "Decisions" and "Action items" only: met.
+- At most 400 words: met. `wc -w` gives 135, and the team's own count is 105.
+- Every decision listed, none invented: met. There are two decisions, and Lee's vendor ping is an action row only, as you said.
+- Every commitment is a table row, informal ones included: met. There are five rows.
+- Table columns Owner | Action | Due, one owner per row: met.
+- Due dates in ISO format or `none`: unmet for Marta's row (Sam's is 2026-10-09 as you said).
+- Everything traceable to the 2026-10-05 notes: met.
+- Reviewer shows every criterion met: met, 7 of 7 at the last re-check. That check was done before your answer on Marta.
+
+The team used 14 runs, against the 12 you set. That includes the 2 extra runs you approved.
+
+The weekly memo service stays set up. For next week, ask me to run it with the notes file name.

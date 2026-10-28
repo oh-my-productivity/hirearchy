@@ -1,0 +1,32 @@
+{
+ "O6": {
+  "memo4_rework_human_accept": "none"
+ },
+ "extra_rejections": [
+  {
+   "R": "R1",
+   "memo": "",
+   "note": "20261027T231755298279-root-282f",
+   "related_to": []
+  },
+  {
+   "R": "R2",
+   "memo": "",
+   "note": "20261027T233731999783-root-147c",
+   "related_to": []
+  },
+  {
+   "R": "R3",
+   "memo": "",
+   "note": "20261027T235706293385-root-e789",
+   "related_to": []
+  },
+  {
+   "R": "R4",
+   "memo": "",
+   "note": "20261028T000812806533-root-81a8",
+   "related_to": []
+  }
+ ],
+ "scripted_related_to_A": []
+}

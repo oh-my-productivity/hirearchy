@@ -1,0 +1,16 @@
+######## TURN 17  start 02:52:17  end 02:55:23  elapsed 186s  (local, 2026-10-28; UTC wall-clock start 2026-10-28T02:52:17Z end 2026-10-28T02:55:23Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Yes, add it.
+
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-17.stderr.txt):
+I've added the new rule and replaced `/tmp/hirearchy-p1-F3-1793152805/deliverables/memo-2026-10-26.md` with the reworked memo. The copy matches the team's file.
+
+**The rule.** The contract is now v5. The initials-only rule (C10) is replaced by C11: the Owner column shows each person's name as written in the notes.
+
+**The memo.** Only the Owner column changed: Dev, Priya, Marta, Sam, Lee. Everything else is as you confirmed. The reviewer passed it 9 of 9, with no required changes. The team's three open questions were ones you already answered.
+
+**Earlier memos.** `memo-2026-10-12.md` and `memo-2026-10-19.md` still have initials, because you accepted them in that form. I haven't touched them. If you want names in those two as well, tell me. Each would be a rework of about 5 runs, and I'd need your OK for the spend.
+
+**Cost.** This memo used 10 of the 12 runs approved, because a rework adds about 5 to the first pass of 5. Nothing is running.
+
+Keep it, or what should change?

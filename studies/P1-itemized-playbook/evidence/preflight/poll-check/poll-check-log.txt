@@ -1,0 +1,33 @@
+## POLL CHECK (protocol 4.14; progress(task_id) only), script md5 1c4e7824e448a3a34e24a7b759a59fcd, org /private/tmp/hirearchy-p1-preflight-1793121965/org, task 20261027T172605582083-root-4686, max 120s, 2026-10-27T17:26:17Z (local 17:26:17 WET)
+--- progress at 2026-10-27T17:26:17Z (local 17:26:17 WET) -> reply at 2026-10-27T17:26:17Z (local 17:26:17 WET)
+args: {"task_id": "20261027T172605582083-root-4686", "wait_seconds": 119}
+reply:
+Not waiting: no scheduler is running, so nothing will change. "Preflight note": working. unread work: lead. runs 0 of 2. last activity 11s ago. (task 20261027T172605582083-root-4686)
+scheduler: stopped - open tasks do not move until it is started (start() or `hirearchy run`)
+poll 1: reply after 0.0s (did not wait); pausing 5.0s before the next poll
+--- progress at 2026-10-27T17:26:22Z (local 17:26:22 WET) -> reply at 2026-10-27T17:26:22Z (local 17:26:22 WET)
+args: {"task_id": "20261027T172605582083-root-4686", "wait_seconds": 114}
+reply:
+Not waiting: no scheduler is running, so nothing will change. "Preflight note": working. unread work: lead. runs 0 of 2. last activity 16s ago. (task 20261027T172605582083-root-4686)
+scheduler: stopped - open tasks do not move until it is started (start() or `hirearchy run`)
+poll 2: reply after 0.0s (did not wait); pausing 10.0s before the next poll
+--- progress at 2026-10-27T17:26:32Z (local 17:26:32 WET) -> reply at 2026-10-27T17:26:32Z (local 17:26:32 WET)
+args: {"task_id": "20261027T172605582083-root-4686", "wait_seconds": 104}
+reply:
+Not waiting: no scheduler is running, so nothing will change. "Preflight note": working. unread work: lead. runs 0 of 2. last activity 26s ago. (task 20261027T172605582083-root-4686)
+scheduler: stopped - open tasks do not move until it is started (start() or `hirearchy run`)
+poll 3: reply after 0.0s (did not wait); pausing 20.0s before the next poll
+--- progress at 2026-10-27T17:26:52Z (local 17:26:52 WET) -> reply at 2026-10-27T17:26:52Z (local 17:26:52 WET)
+args: {"task_id": "20261027T172605582083-root-4686", "wait_seconds": 84}
+reply:
+Not waiting: no scheduler is running, so nothing will change. "Preflight note": working. unread work: lead. runs 0 of 2. last activity 47s ago. (task 20261027T172605582083-root-4686)
+scheduler: stopped - open tasks do not move until it is started (start() or `hirearchy run`)
+poll 4: reply after 0.0s (did not wait); pausing 40.0s before the next poll
+--- progress at 2026-10-27T17:27:32Z (local 17:27:32 WET) -> reply at 2026-10-27T17:27:32Z (local 17:27:32 WET)
+args: {"task_id": "20261027T172605582083-root-4686", "wait_seconds": 44}
+reply:
+Not waiting: no scheduler is running, so nothing will change. "Preflight note": working. unread work: lead. runs 0 of 2. last activity 1m ago. (task 20261027T172605582083-root-4686)
+scheduler: stopped - open tasks do not move until it is started (start() or `hirearchy run`)
+poll 5: reply after 0.0s (did not wait); pausing 44.9s before the next poll
+window cap: 120 seconds passed
+polling ended (window cap: 120 seconds passed): progress(task_id) polls 5, quick replies 5, paused 119.9s in all

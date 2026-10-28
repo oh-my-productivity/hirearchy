@@ -1,0 +1,14 @@
+The team is set up. I'm requesting the memo for `2026-10-05.md` now, with a budget of 12 runs.The memo is written and checked, but I haven't copied it to `deliverables/` yet. The team left some judgment calls open, and they are yours to decide.
+
+The draft is 214 words. It has 2 decisions and 5 action rows. The reviewer reported "criteria met: 8 of 8", and I checked the draft against your notes myself. The team used 5 of the 12 runs.
+
+Please answer these:
+
+1. **Sam, "look into the flaky CI before Friday":** Friday is 9 October. Should Due be 2026-10-08 (the day before Friday) or 2026-10-09? The draft says `none`. I'd suggest 2026-10-09, because the notes also say "before Friday" without clearly excluding Friday.
+2. **Marta, "book the on-call training room for Oct 14":** Oct 14 is when the room is needed, not clearly the deadline for booking it. Should Due be `none` (the draft) or 2026-10-14?
+3. **Lee, "ping the vendor … this week":** The notes say "no hard date attached", so the draft has `none`. Should "this week" become a date, such as 2026-10-09, or stay `none`?
+4. **Reviewing Priya's RFC at the following meeting:** Nobody is named as owner, so the draft has no row for it. It appears in the Due notes instead. Is that OK?
+
+There is also a small wording fix. In Lee's row, the draft adds "(the SSO certificate)", which isn't in the notes' sentence. I'd remove it so the Action uses only the notes' words.
+
+Once you answer, I'll send the memo back to the team for any changes and copy the final version into `deliverables/`. Changes may use a few of the remaining runs.

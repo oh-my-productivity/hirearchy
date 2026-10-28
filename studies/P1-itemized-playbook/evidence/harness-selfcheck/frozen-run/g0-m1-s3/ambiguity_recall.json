@@ -1,0 +1,122 @@
+{
+  "could_not_derive": [],
+  "items": {
+    "AMB-1": {
+      "memo": "2026-10-19",
+      "owner": "Marta",
+      "recall": {
+        "k": 0,
+        "n": 1
+      },
+      "recall_literal_timing": {
+        "k": 0,
+        "n": 1
+      },
+      "versions": [
+        {
+          "commit_time": "2026-10-26T09:07:24Z",
+          "contains": true,
+          "lead_forwarded": true,
+          "lead_item": "C5/C3: 'Marta will keep the agenda as sent' is listed as both a decision and an action row. Reviewer: 'is it a decision (C3), a commitment (C5), both, or neither?'",
+          "lead_item_names_criterion": true,
+          "lead_result": "20261026T090853030156-lead-1474",
+          "listed_ambiguous": false,
+          "listed_by": null,
+          "listed_line": null,
+          "literal_listed_ambiguous": false,
+          "literal_reviewed": true,
+          "next_version": 2,
+          "progress_call": 62,
+          "progress_flagged": true,
+          "progress_source": "assistant-tool-calls.txt",
+          "progress_time": "2026-10-26T09:08:54.761Z",
+          "review_result": "20261026T090831515010-lead.reviewer-c9d8",
+          "review_sent_before_commit_s": 0,
+          "review_task": "20261026T090742781825-lead-745a",
+          "reviewed": true,
+          "row": "Marta | Keep the agenda as sent | none",
+          "sha": "134a7f5",
+          "version": 1,
+          "writer_left_out": true
+        }
+      ],
+      "versions_containing": 1,
+      "versions_of_the_memo": 2
+    },
+    "AMB-2": {
+      "memo": "2026-10-12",
+      "owner": "Sam",
+      "recall": {
+        "k": 0,
+        "n": 0
+      },
+      "recall_literal_timing": {
+        "k": 0,
+        "n": 0
+      },
+      "versions": [],
+      "versions_containing": 0,
+      "versions_of_the_memo": 2
+    }
+  },
+  "label": "m1-s3",
+  "recall": {
+    "k": 0,
+    "n": 1
+  },
+  "recall_literal_timing": {
+    "k": 0,
+    "n": 1
+  },
+  "roles": {
+    "children": [
+      "lead/reviewer",
+      "lead/writer"
+    ],
+    "detected_by": "charter",
+    "owner": "lead",
+    "reviewer": "lead/reviewer",
+    "reviewer_dir": "lead-reviewer",
+    "roles": {
+      "lead/reviewer": "Independent Reviewer",
+      "lead/writer": "Writer"
+    }
+  },
+  "script": {
+    "md5": "92b67f74a38c04895402803e9388e718",
+    "name": "ambiguity_recall.py"
+  },
+  "source_files": [
+    "assistant-tool-calls.txt",
+    "injection/injection-log.txt",
+    "memos/versions/INDEX.txt",
+    "memos/versions/memo-2026-10-05.v1.773f302.md",
+    "memos/versions/memo-2026-10-05.v2.58da0b9.md",
+    "memos/versions/memo-2026-10-05.v3.7f22547.md",
+    "memos/versions/memo-2026-10-05.v4.e6ca726.md",
+    "memos/versions/memo-2026-10-12.v1.dc703f3.md",
+    "memos/versions/memo-2026-10-12.v2.ff1b0e2.md",
+    "memos/versions/memo-2026-10-19.v1.134a7f5.md",
+    "memos/versions/memo-2026-10-19.v2.1da384e.md",
+    "msgs/lead-read/20261026T083656451971-lead.reviewer-bc85.md",
+    "msgs/lead-read/20261026T083936372586-lead.reviewer-d79b.md",
+    "msgs/lead-read/20261026T084416048419-lead.reviewer-fed2.md",
+    "msgs/lead-read/20261026T084910122709-lead.reviewer-fd59.md",
+    "msgs/lead-read/20261026T085635061667-lead.reviewer-c416.md",
+    "msgs/lead-read/20261026T090355001200-lead.reviewer-477e.md",
+    "msgs/lead-read/20261026T090831515010-lead.reviewer-c9d8.md",
+    "msgs/lead-read/20261026T091231220872-lead.reviewer-654b.md",
+    "msgs/lead-reviewer-read/20261026T083611435408-lead-5a75.md",
+    "msgs/lead-reviewer-read/20261026T083823776544-lead-d640.md",
+    "msgs/lead-reviewer-read/20261026T084339646151-lead-1bb9.md",
+    "msgs/lead-reviewer-read/20261026T084827908513-lead-65fe.md",
+    "msgs/lead-reviewer-read/20261026T085542094820-lead-b439.md",
+    "msgs/lead-reviewer-read/20261026T090246214027-lead-9b7a.md",
+    "msgs/lead-reviewer-read/20261026T090742781825-lead-745a.md",
+    "msgs/lead-reviewer-read/20261026T091144401864-lead-6f68.md",
+    "msgs/lead-sent/20261026T090853030156-lead-1474.md",
+    "org-files/lead-reviewer-AGENT.md",
+    "org-files/lead-writer-AGENT.md",
+    "org-git-log.txt"
+  ]
+}

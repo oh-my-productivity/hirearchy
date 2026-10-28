@@ -1,0 +1,14 @@
+playbook_attempts I2: 8 attempts: 3 refused (0 P1-REFUSED, 3 other), 0 errors, 5 admitted; 0 in the injection window (2026-10-27T23:13:50Z to 2026-10-27T23:17:07Z)
+
+  2026-10-27T23:20:03.529130Z lead lead@20261027T231943295245: refused (other refusal)
+      refused: C8 is confirmed by the client, so an item citing it may be only its own words: this item is not. Write it as a step with text "The memo has a one-line 'Summary:' of the meeting directly after
+  2026-10-27T23:20:05.796097Z lead lead@20261027T231943295245: admitted, v2 admitted: c
+  2026-10-27T23:38:56.691102Z lead lead@20261027T233837669305: admitted, v3 admitted: c
+  2026-10-27T23:58:37.938201Z lead lead@20261027T235815683877: admitted, v4 admitted: exempt
+  2026-10-27T23:58:41.593265Z lead lead@20261027T235815683877: refused (other refusal)
+      refused: C10 is confirmed by the client, so an item citing it may be only its own words: this item is not. Write it as a step with text "Owners are shown as full names, always: in the Actions table th
+  2026-10-27T23:58:44.613123Z lead lead@20261027T235815683877: admitted, v5 admitted: c
+  2026-10-28T00:09:41.440946Z lead lead@20261028T000921704925: refused (other refusal)
+      refused: C11 is confirmed by the client, so an item citing it may be only its own words: this item is not. Write it as a step with text "For an owner the notes give only as initials, the Owner cell ho
+  2026-10-28T00:09:43.977010Z lead lead@20261028T000921704925: admitted, v6 admitted: c
+owner attempted revise_playbook: yes

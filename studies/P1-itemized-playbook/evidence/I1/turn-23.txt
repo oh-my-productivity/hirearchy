@@ -1,0 +1,21 @@
+######## TURN 23  start 22:36:19  end 22:36:45  elapsed 26s  (local, 2026-10-27; UTC wall-clock start 2026-10-27T22:36:19Z end 2026-10-27T22:36:45Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Sam's 2026-11-13 is right.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-23.stderr.txt):
+The 9 November memo is delivered at `/tmp/hirearchy-p1-I1-1793136275/deliverables/memo-2026-11-09.md`. I copied it unchanged and checked that it matches the team's file. That completes all six memos.
+
+- **Scope, date and attendees:** met. It covers only that meeting, with the date and attendees.
+- **Length:** met, 179 words.
+- **Summary, then Decisions, then Actions:** met, with 3 decisions listed.
+- **Actions table:** met, 5 rows with the owners named in full as in the notes.
+- **Due dates:** met. Sam's is 2026-11-13, as you confirmed, and Lee's is "none".
+- **Wording and invented items:** met, the wording follows the notes and nothing is added.
+- **Discussed-only topics:** met, none are listed.
+- **Next meeting:** met, Monday 16 November.
+- **Reviewer's report:** met, 13 of 13 with no required changes.
+
+The memo used 5 of the 12 runs, and the other 7 came back unspent.
+
+Keep it as it is, or should something change?
+
+For future weeks, ask for the next one with the notes file name (for example `2026-11-16.md`), and the team will follow all the standing rules you've set.

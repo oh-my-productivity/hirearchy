@@ -1,0 +1,20 @@
+ok: copy_org_evidence
+ok: copy injection folder
+ok: quality_snapshot end
+ok: services_snapshot end
+ok: extract_tool_calls
+ok: extract_proposals
+ok: extract_mechanical
+ok: scheduler_survival
+ok: scheduler_survival (measures/)
+ok: injection_files
+ok: assistant_facts
+ok: score_memos
+ok: ambiguity_recall
+ok: prompt_sizes
+ok: playbook_attempts
+ok: rederive_quality
+ok: profile hirearchy-study-p1-F3-assistant deleted
+credits: stream total credits: 114.05 (assistant 44.04 + org runs 70.01)
+H-LOCK after the stream: H-LOCK: ok
+finished F3: 0 failed step(s); see /Volumes/workspace/hirearchy/studies/P1-itemized-playbook/evidence/F3/finish-steps.txt

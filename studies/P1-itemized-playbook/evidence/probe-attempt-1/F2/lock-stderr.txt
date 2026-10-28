@@ -1,0 +1,2 @@
+org: /private/tmp/hirearchy-p1-probe-F2-1793127813/org
+error: a first definition of `probe-memo` needs description, acceptance, deliverable, budget (it does not exist yet, so there is nothing to keep)

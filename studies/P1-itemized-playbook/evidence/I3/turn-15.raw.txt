@@ -1,0 +1,12 @@
+The 2026-10-26 memo is drafted, but I haven't delivered it. I'd like your answer on four points first, and it hasn't been changed.
+
+The draft follows your format: title, one-line Summary, 3 decisions in the notes' words, and a table with initials only. It's 194 words with 5 rows: D 2026-10-28, P 2026-10-30, M 2026-10-27, S 2026-10-30, L `none`. The reviewer scored it "criteria met: 10 of 10" and the lead judged C9 as met, so no rework ran. That's 5 of the 12 runs. I checked the dates against the notes, and Sam's "by Friday" correctly becomes 2026-10-30.
+
+The team asked four things. My recommendations:
+
+1. **Renovate widened to all repos in November:** no owner in the notes, so no row. Is that right?
+2. **Rate limiter: "wait a week before anyone else gets it":** no owner or date, so no row. Is that right?
+3. **The customer "asked about audit logs":** nobody is assigned, so no row. Is that right?
+4. **Sam's "he'd write up onboarding notes … by Friday" and Lee's "will update the SSO runbook … when he gets a chance":** both are in prose with no recorded team response. The draft has a row for each (Sam 2026-10-30, Lee `none`). Keep both?
+
+I'd answer yes to all four, which matches how you handled the earlier memos. If you agree, I deliver the memo as it is, with no extra runs. If any answer differs, that's one writer pass and one re-check, about 5 more runs, which would still fit in your 12.

@@ -1,0 +1,16 @@
+OK s1 bytes.first = 20910
+OK s1 bytes.max = 34357
+OK s1 bytes.last = 26909
+OK s1 reflect_words.min = 549
+OK s1 reflect_words.max = 625
+OK s2 bytes.first = 20476
+OK s2 bytes.max = 29905
+OK s2 bytes.last = 26263
+OK s2 reflect_words.min = 506
+OK s2 reflect_words.max = 573
+OK s3 bytes.first = 20814
+OK s3 bytes.max = 33012
+OK s3 bytes.last = 31201
+OK s3 reflect_words.min = 535
+OK s3 reflect_words.max = 609
+selfcheck prompt_sizes: 15 of 15 OK

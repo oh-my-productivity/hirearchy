@@ -1,0 +1,9 @@
+# F2 skill check (design 20.1; protocol 4.4) mode setup at 2026-10-28T00:22:39Z
+arm: F
+repo skill:      b10238639f48ab351fa44a06aed03ffb  lines 125  (/Volumes/workspace/hirearchy/skills/hirearchy/SKILL.md)
+workspace copy:  b10238639f48ab351fa44a06aed03ffb  lines 125  (/tmp/hirearchy-p1-F2-1793146944/.kiro/skills/hirearchy/SKILL.md)
+global (md5 only): b10238639f48ab351fa44a06aed03ffb
+required: b10238639f48ab351fa44a06aed03ffb
+rule: the workspace copy = the repo file = required; the global copy = the workspace copy or absent; the same in both arms (one kiro home)
+
+verdict: OK

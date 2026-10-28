@@ -1,0 +1,132 @@
+# run of lead, 1 message(s)
+# senders: root
+# cwd: /Users/aminalizadeh/Library/Application Support/hirearchy/kiro-cwd/hirearchy-p1-preflight-1-222a188946652ef9/lead-8cb33b27
+# cmd: /Users/aminalizadeh/.local/share/uv/tools/hirearchy/bin/python -I -S /Volumes/workspace/hirearchy/src/hirearchy/kiro/_launch.py --start-deadline 60 -- kiro-cli chat --no-interactive --agent hirearchy-hirearchy-p1-preflight-1-222a18-read-write-xc0bb23b2 --model claude-sonnet-5.5 --effort high --v3 --require-mcp-startup --output-format stream-json <prompt on stdin>
+# ---- prompt ----
+# hirearchy run: you are `lead`
+
+# Organization
+
+## Mission
+P1 harness preflight (throwaway)
+
+## How this organization works
+- Every agent is a directory; its address is the path (e.g. `ceo/cto`). The human at the top is `root`.
+- You act ONLY through the hirearchy tools (kiro shows them as `@hirearchy/<tool>`, e.g. `@hirearchy/write`; if you were also
+  given kiro's built-in `write`/`read`/`shell`, those are different tools that reach the workspace only, never the org):
+  - `delegate` gives a task (a contract) to one of your direct reports.
+  - `report` answers a task assigned to you: done, failed, or blocked.
+  - `send` posts a note to your parent, a direct report, or a sibling (questions, info, escalation).
+- You may write only inside your own directory, with `@hirearchy/write`: artifacts go in `<you>/work/`, notes for your
+  future self in `<you>/MEMORY.md`. You may read anything in the organization with `@hirearchy/read`.
+  Every path (read, write, artifacts) is relative to the org root, so yours start with your address.
+- Budgets are counted in runs. Delegating moves budget from you to your report. When you are out of budget you stop being woken.
+  `delegate` without a `budget` hands over what you can afford, keeping one run per outstanding delegation to process its result.
+  Budget comes back up: when you report a task `done` or `failed` and have no other open task or outstanding delegation,
+  your remaining budget returns with the result to whoever assigned it (the result says "returns N run(s)"). To give runs
+  back earlier, `send` your parent a note with `budget=N`. Hand down what a task needs, not everything you hold.
+
+## Protocol for every run
+1. For each new message: do it yourself, delegate it, or escalate it to your parent. Never ignore a message.
+2. Never wait or poll. After delegating, end your run; the result will wake you.
+3. When you delegate all or part of a task, copy the relevant acceptance criteria verbatim into the new task
+   (exact numbers, formats, constraints). You may add detail; never paraphrase, relax or drop a criterion.
+4. Before reporting delegated work as done, `read` the artifacts and check them against the acceptance criteria
+   yourself (`read` shows word count and modification time): the criteria of the task you delegated, as shown with the
+   result, and those of the task assigned to you. Do not trust claims. If it falls short, send it back with
+   `delegate(..., revises=<id of the earlier task>)` so the rework is recorded.
+5. Keep reports short: a few lines of summary plus artifact paths. Put detail in files, not messages.
+6. Every task assigned to you gets a `report`; `done` and `failed` are final. Report `done` only if every acceptance
+   criterion is verifiably met; exact numbers are exact (33 words means 33, not 35). If any criterion cannot be met,
+   including a required step you cannot afford (a review, a rework, a delegation), report `blocked` or `failed`,
+   name the criterion and say why. Never report `done` on a task whose criteria are not all met.
+   `blocked` is not final: once the blocker is resolved you may `report` that task again (once per blocked report; it
+   supersedes the earlier one), under the same rules. A `send` note never changes a task's outcome and must not
+   claim that criteria are met unless you verified them.
+7. Before you stop, rewrite `<you>/MEMORY.md` (with `@hirearchy/write`, never the built-in `write`) with what your next run needs (plan, decisions, what you are waiting for). You remember nothing else.
+   Keep it short: condense instead of appending, and put detail in `<you>/work/` files. Writes that make it too long are refused.
+   Never rely on memory for what a task requires: its full text is in your prompt.
+8. Stay within your charter. Escalate anything outside it.
+9. Reviews and fact-checks: a reviewer never edits another agent's file (you write only in your own directory). It
+   reports its findings and the changes it requires to whoever assigned the review (in the `report` summary, with detail
+   in a file in its own `work/`); the author makes the changes, sent back with `delegate(..., revises=<task id>)`.
+   Never write acceptance criteria or charters that require an agent to edit, correct or create a file in another
+   agent's directory; require findings to be reported and the author to apply them.
+10. Services: a service is a standing kind of task your parent defined for you (`<you>/services/<name>/`: the
+   contract SERVICE.md is your parent's; the playbook PLAYBOOK.md is yours). Each request is a task: follow the
+   playbook and the contract's criteria; report it with `lessons`. Improve the playbook with `revise_playbook` when the
+   client's evidence calls for it, and cite it (`evidence`: the client's rejections R<k> and criteria C<k>; lessons and
+   `source: relayed` messages, the assistant's own reading, are not evidence); never lower the bar (client feedback
+   never waives a criterion), and propose contract changes to your parent.
+
+# Your charter (lead/AGENT.md, owned by your parent)
+# Role: Lead
+
+You are the lead of a throwaway preflight org. Do exactly the task you are given, using your hirearchy tools, then report it done.
+
+# Your memory (lead/MEMORY.md)
+(empty: this may be your first run)
+
+# Your state
+- Address: `lead`; parent: `root`; role: Lead
+- Budget: 1 run(s) left (this run already counted). Hiring: not allowed
+- Tools beyond hirearchy: read, write
+- Files:
+  - hirearchy tools (load them with `tool_load`, then call them with `tool_call` and tool_id `hirearchy::<name>`, e.g. `hirearchy::org_write`, `hirearchy::org_read`): paths are relative to the org root; your notes and memory: `lead/MEMORY.md`, `lead/work/` (hirearchy `org_write` only).
+  - Do not mix up the two kinds of tools: kiro's built-in `read`, `write` are not hirearchy's tools: they write and run only in the workspace and never change the org. Org files (`lead/MEMORY.md`, `lead/work/`, anything under `lead/`) are written with `hirearchy::org_write`, never with kiro's file tools: kiro's built-in file tools are `fs_write`, `str_replace`, `fs_append` and `delete_file`; the hirearchy write tool is `hirearchy::org_write` for you: use it for MEMORY.md and org files (wherever ORG.md says `@hirearchy/write`, use `hirearchy::org_write`). Your `read` is kiro's built-in (`read_file`, `list_directory`): it reads org files too, but only by ABSOLUTE path, `/private/tmp/hirearchy-p1-preflight-1793121965/org/<path in the org>` (a relative path starts in an empty scratch directory, not in the org); the hirearchy read tool is `hirearchy::org_read` for you (relative org paths; wherever ORG.md says `@hirearchy/read`, use `hirearchy::org_read`).
+  - You have no workspace: kiro tools start in an empty scratch directory and cannot write.
+  - Never create org files (MEMORY.md, `<address>/...`) in the workspace. Report workspace artifacts by absolute path.
+  - kiro `write` is limited to the workspace and kiro `read` to workspace + inputs + the organization (read-only); other paths are refused.
+- Direct reports: none
+- Open tasks assigned to you:
+  - 20261027T172605582083-root-4686 "Preflight note" from root
+    (full text: see the new messages below)
+- Work you delegated that is still outstanding: none
+- Paths: every path (read, write, artifacts) is relative to the org root. Yours start with `lead/`.
+
+# New messages for this run (1)
+### task 20261027T172605582083-root-4686
+from: root | to: lead | title: Preflight note | budget: 2 runs
+
+## Goal
+Use the hirearchy org_write tool to write the file lead/work/preflight.txt in the organization with the single line: P1-PREFLIGHT-OK. Then call the hirearchy report tool with status done.
+
+## Acceptance criteria
+lead/work/preflight.txt holds P1-PREFLIGHT-OK; reported done.
+
+---
+Handle every new message above with the hirearchy tools, following the protocol.
+Messages may be redelivered after a crash: if your state shows one was already handled, skip it.
+Before you stop, update your memory with `@hirearchy/org_write`(path="lead/MEMORY.md", ...) (the hirearchy tool, not a built-in `write`). Do not wait for replies; end the run when done.
+
+# ---- output ----
+# kiro: run started (engine v3)
+[INFO] kas.server.starting {"product":"KAS (Kiro Agent Server)","version":"0.66.48"}
+[INFO] Auth: KIRO_API_KEY env var (api_key) {"regionDiscovery":true}
+[INFO] acp.content_collection.resolved {"enabled":true}
+[INFO] acp.remote_sessions.enabled {"endpoint":"https://app.kiro.dev"}
+[INFO] agent.userConfigDir.resolved {"name":"hirearchy-p1-preflight-1-222a188946652ef9","source":"env"}
+[INFO] [KiroAgent] MCP subsystem initialized
+[ERROR] (node:76729) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+[INFO] fs.workflow.recipes.readDir.ok {"system":"fs","tier":"user","durationMs":0}
+[INFO] fs.workflow.recipes.readDir.ok {"system":"fs","tier":"cloud","durationMs":4}
+[INFO] fs.workflow.recipeCatalog.refreshShared.ok {"system":"fs","trigger":"startup","durationMs":6}
+[INFO] [KRS] <-- GenerateAssistantResponseCommand done totalEvents=8
+[tool ok] Tool Load {"tool_ids":["hirearchy::org_write","hirearchy::report","hirearchy::org_read"]}
+[tool] @hirearchy/org_write {"tool_id":"hirearchy::org_write","arguments":{"path":"lead/work/preflight.txt","content":"P1-PREFLIGHT-OK"}}
+[tool ok] @hirearchy/org_write {"tool_id":"hirearchy::org_write","arguments":{"path":"lead/work/preflight.txt","content":"P1-PREFLIGHT-OK"}}
+[tool] @hirearchy/org_read {"tool_id":"hirearchy::org_read","arguments":{"path":"lead/work/preflight.txt"}}
+[tool ok] @hirearchy/org_read {"tool_id":"hirearchy::org_read","arguments":{"path":"lead/work/preflight.txt"}}
+[tool] @hirearchy/org_read {"tool_id":"hirearchy::org_read","arguments":{"path":"lead/work/preflight.txt"}}
+[tool ok] @hirearchy/org_read {"tool_id":"hirearchy::org_read","arguments":{"path":"lead/work/preflight.txt"}}
+[tool] @hirearchy/org_write {"tool_id":"hirearchy::org_write","arguments":{"path":"lead/MEMORY.md","content":"Task 20261027T172605582083-root-4686 (preflight): wrote lead/work/preflight.txt, reported done. Nothing outstanding."}
+[tool ok] @hirearchy/org_write {"tool_id":"hirearchy::org_write","arguments":{"path":"lead/MEMORY.md","content":"Task 20261027T172605582083-root-4686 (preflight): wrote lead/work/preflight.txt, reported done. Nothing outstanding."}
+[tool] @hirearchy/report {"tool_id":"hirearchy::report","arguments":{"task_id":"20261027T172605582083-root-4686","status":"done","summary":"lead/work/preflight.txt written and verified: contains P1-PREFLIGHT-OK.","artifacts":
+[tool ok] @hirearchy/report {"tool_id":"hirearchy::report","arguments":{"task_id":"20261027T172605582083-root-4686","status":"done","summary":"lead/work/preflight.txt written and verified: contains P1-PREFLIGHT-OK.","artifacts":
+I wrote `lead/work/preflight.txt` with the single line `P1-PREFLIGHT-OK`. I read it back to check the content. I then reported the task done to root and updated `lead/MEMORY.md`.
+
+I ran a read of the file in parallel with the write, and the read returned the content before my write landed. The file may already have existed with that line from an earlier run. The read-back after the write shows the right content either way.
+[run finished] success (end_turn)
+
+# exit 0 after 30s

@@ -1,0 +1,70 @@
+{
+ "20261027T213102025357-root-7ca1": {
+  "case_spend": 20,
+  "user_spend": 15,
+  "user_committed": 24,
+  "user_cost": 15,
+  "user_approved": 12,
+  "ratio": "1.25",
+  "d14_approved": 17,
+  "d14_used": 15,
+  "d14_within": true
+ },
+ "20261027T215102682492-root-e5c1": {
+  "case_spend": 15,
+  "user_spend": 15,
+  "user_committed": 22,
+  "user_cost": 15,
+  "user_approved": 12,
+  "ratio": "1.25",
+  "d14_approved": 17,
+  "d14_used": 15,
+  "d14_within": true
+ },
+ "20261027T220458997859-root-c1a6": {
+  "case_spend": 10,
+  "user_spend": 10,
+  "user_committed": 17,
+  "user_cost": 10,
+  "user_approved": 12,
+  "ratio": "0.83",
+  "d14_approved": 12,
+  "d14_used": 10,
+  "d14_within": true
+ },
+ "20261027T221245662290-root-c26e": {
+  "case_spend": 10,
+  "user_spend": 10,
+  "user_committed": 17,
+  "user_cost": 10,
+  "user_approved": 12,
+  "ratio": "0.83",
+  "d14_approved": 12,
+  "d14_used": 10,
+  "d14_within": true
+ },
+ "20261027T222309545850-root-da6a": {
+  "case_spend": 10,
+  "user_spend": 10,
+  "user_committed": 17,
+  "user_cost": 10,
+  "user_approved": 12,
+  "ratio": "0.83",
+  "d14_approved": 12,
+  "d14_used": 10,
+  "d14_within": true
+ },
+ "20261027T223301413746-root-848f": {
+  "case_spend": 5,
+  "user_spend": 5,
+  "user_committed": 12,
+  "user_cost": 5,
+  "user_approved": 12,
+  "ratio": "0.42",
+  "d14_approved": 12,
+  "d14_used": 5,
+  "d14_within": true
+ },
+ "missing_cases": [],
+ "extra_cases": []
+}

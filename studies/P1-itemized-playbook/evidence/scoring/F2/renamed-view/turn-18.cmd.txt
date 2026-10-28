@@ -1,0 +1,1 @@
+env -u KIRO_HOME kiro-cli chat --v3 --no-interactive --trust-all-tools --resume --effort high --agent hirearchy-study-p1-F2-assistant 'About the 2026-10-19 memo: That one is right, all the items are there - keep it. No: full names again, always, as before.'

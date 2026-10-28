@@ -1,0 +1,23 @@
+OK   2026-10-05 form N: the key as a memo scores perfect: got (True, True, 0, 0, 0, True, True)
+OK   2026-10-05 form I: the key as a memo scores perfect: got (True, True, 0, 0, 0, True, True)
+OK   2026-10-12 form N: the key as a memo scores perfect: got (True, True, 0, 0, 0, True, True)
+OK   2026-10-12 form I: the key as a memo scores perfect: got (True, True, 0, 0, 0, True, True)
+OK   2026-10-19 form N: the key as a memo scores perfect: got (True, True, 0, 0, 0, True, True)
+OK   2026-10-19 form I: the key as a memo scores perfect: got (True, True, 0, 0, 0, True, True)
+OK   2026-10-26 form N: the key as a memo scores perfect: got (True, True, 0, 0, 0, True, True)
+OK   2026-10-26 form I: the key as a memo scores perfect: got (True, True, 0, 0, 0, True, True)
+OK   2026-11-02 form N+J: the key as a memo scores perfect: got (True, True, 0, 0, 0, True, True)
+OK   2026-11-09 form N: the key as a memo scores perfect: got (True, True, 0, 0, 0, True, True)
+OK   2026-11-09 form I: the key as a memo scores perfect: got (True, True, 0, 0, 0, True, True)
+OK   memo 3 with full names under the initials rule: 5 owner-form errors, 5/5 actions: got (5, 5)
+OK   memo 5 with 'JD' only after Lena's memo-5 line: 1 owner-form error: got 1
+OK   memo 5 under N (before her line): JD's row has no right form (the contract gap): got 1
+OK   memo 6 with a wrong Due and an extra row: got (1, 1)
+OK   no regression: the keys as final memos pass, nothing reported: got (True, True)
+OK   no regression: memo 1 kept without a Summary (L-ASIS) and memo 2 with full names under I: reported, not a FAIL: got (True, False, 'Summary first / order', True)
+OK   no regression: a wrong Due in the final memo 6 fails: got (False, '1 wrong dates')
+OK   no regression: one delivered version with a wrong date fails the stream (21.1 item 3): got (False, 1)
+OK   no regression: memo 6 never delivered fails (E7 10.4): got (False, None)
+OK   answer-key-p1.md matches the frozen tables of memos 4-6 (owners, Dues, counts): got True
+OK   answer-key.md (E7's) matches the frozen tables of memos 1-3: got True
+p1_scoring_check: 22 of 22 OK

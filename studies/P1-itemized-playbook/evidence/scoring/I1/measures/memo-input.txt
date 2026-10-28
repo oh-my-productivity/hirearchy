@@ -1,0 +1,7 @@
+memo input of I1 (manager-decision-memo-input-name.md, item 2; addendum for a path value)
+root's first request: 20261027T213102025357-root-7ca1
+name: notes_file
+value: 2026-10-05.md
+SERVICE.md v1 inputs: notes_file; the name is in v1: True
+frozen reader (notes_file: <date>) reads it: True
+reader used: frozen (notes_file, bare file name)

@@ -1,0 +1,21 @@
+Services you can request (from your direct reports):
+- weekly-meeting-memo (offered by lead; contract v6, playbook v1): One markdown memo (decisions and action-item table) from one weekly meeting notes file
+  inputs: notes_file* (Absolute path of the meeting notes file in the notes folder, e.g. /tmp/hirearchy-p1-F2-1793146944/notes/2026-11-16.md)   (* required)
+  each request: 12 runs; acceptance criteria (lead/services/weekly-meeting-memo/SERVICE.md):
+    C1: The memo is markdown and has at most 400 words as counted by read.
+    C2: It covers only the meeting in the given notes file.
+    C3: A Decisions section lists every decision stated in the notes file, and no statement that is not in the file.
+    C4: The action items are a markdown table with exactly the columns Owner | Action | Due.
+    C5: Every commitment in the notes file is a row of that table, including informal ones in prose (for example 'said he would ...') and ones marked ACTION.
+    C6: Each Due value is an ISO date (YYYY-MM-DD) or 'none'. A relative deadline (for example 'by Friday') becomes a date only when the notes make the date clear; if no date is given the value is 'none'.
+    C7: The reviewer's report shows every criterion met (criteria met: n of m with n = m), and the writer applied every required change.
+    C9: The memo contains only, in this order: a one-line title, a line beginning 'Summary:' that summarizes the meeting, the Decisions section, and the action items table, with no other lines (no 'Present' or 'Next meeting' lines).
+    C11: In the action items table, the Owner column shows each person's name as written in the notes (for example 'Dev', 'Priya'), never initials.
+  record: 5 request(s): 5 done, 0 failed, 0 open; 5 reworked; avg 13.8 runs; feedback 4 accept (3 after a reject), 1 reject
+  regression list (the client's rejections):
+    R1 (case 20261028T002628583154-root-8cba, about C8 (removed)): "No, not right yet. Always start the memo with a one-line 'Summary:' of the meeting, then the decisions, then the action items."
+    R2 (case 20261028T004913097440-root-a7ad, about C9): "No, just the title, the Summary line, the decisions and the action items."
+    R3 (case 20261028T004913097440-root-a7ad, about C10 (removed)): "No, not right yet. Owners as initials only, always."
+    R4 (case 20261028T011833941227-root-2395, about C11): "No: full names again, always, as before."
+    R5 (case 20261028T012748529907-root-f321, about C11 (not confirmed)): "Not right yet. For someone the notes give only as initials, write the initials and '(full name not in the notes)'. Always."
+  playbook v1 (2026-10-28): "initial playbook"; 10 items (0 rules), none watched

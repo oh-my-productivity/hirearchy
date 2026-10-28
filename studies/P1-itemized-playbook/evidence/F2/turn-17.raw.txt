@@ -1,0 +1,17 @@
+The 2026-10-26 memo is at `/tmp/hirearchy-p1-F2-1793146944/deliverables/2026-10-26-memo.md`. I checked that the copy matches the team's file.
+
+- C1, at most 400 words: met (157 by the team's count, 187 by `wc`).
+- C2, covers only the 2026-10-26 meeting: met.
+- C3, all three decisions listed and nothing extra: met.
+- C4, table columns Owner | Action | Due: met.
+- C5, all five commitments are rows, including Sam's and Lee's prose ones: met.
+- C6, ISO dates or `none`: met. Dev is 2026-10-28, Priya 2026-10-30 and Marta 2026-10-27. Sam is 2026-10-30, because "by Friday" is the Friday after Monday 26 October. Lee is `none`, since no date was set.
+- C7, reviewer passed 11 of 11 with no required changes: met.
+- C9, title, Summary line, Decisions and action table, nothing else: met.
+- C10, Owner column shows initials only: met (D, P, M, S, L).
+
+The team asked whether "took five action items" in the Summary is fine, since the notes don't state a count. It matches the five table rows, and you accepted the same line in the 10-12 memo, so I left it.
+
+Runs: 5 of the 12 approved.
+
+I haven't recorded a verdict on the 2026-10-19 memo, since you said you'd look at it later. Keep this one, or what should change?

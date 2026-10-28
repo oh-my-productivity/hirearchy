@@ -1,0 +1,84 @@
+OK   18.6 a rule with two related rejections: warning after the first: got 'warning'
+OK   18.6 a rule with two related rejections: retire due after the second: got True
+OK   18.6 a rule with two related rejections: retired once the runtime wrote it: got 'retired'
+OK   18.6 pending then an unrelated answer: new while pending: got 'new'
+OK   18.6 pending then an unrelated answer: pending listed: got ['R2']
+OK   18.6 pending then an unrelated answer: new at E with a pending rejection (8.7): got 'new'
+OK   18.6 pending then an unrelated answer: kept at the unrelated answer (K): got 'kept'
+OK   18.6 a corrected link (8.1 row xix): kept before: got 'kept'
+OK   18.6 a corrected link (8.1 row xix): warning after the corrected link (the exception): got 'warning'
+OK   18.6 a corrected link unrelates the only related rejection (8.1's exception): after D: warning, warning at D, kept at the corrected link (K = the link): got ('warning', 'warning', 'kept', True)
+OK   18.6 a corrected link unrelates the only related rejection (8.1's exception): before D: warning, new after the corrected link, kept at D: got ('warning', 'new', 'kept')
+OK   18.6 a delayed verdict (rows i, ii), related: new and waiting while c2 has no verdict (row ii): got ('new', 1)
+OK   18.6 a delayed verdict (rows i, ii), related: after c2's verdict: got 'warning'
+OK   18.6 a delayed verdict (rows i, ii), not related: new and waiting while c2 has no verdict (row ii): got ('new', 1)
+OK   18.6 a delayed verdict (rows i, ii), not related: after c2's verdict: got 'kept'
+OK   18.6 a related rejection on a result after E (row iii): kept at K: got 'kept'
+OK   18.6 a related rejection on a result after E (row iii): still kept: outside the window: got 'kept'
+OK   18.6 a link on an old rejection after the watch start (8.4): r and k unchanged: got (22, [1, 10])
+OK   8.4 r known (10 judged, 2 about C10's text): k from r: k, r: got (11, [2, 10])
+OK   18.6 an answering version of an old rejection defined after the watch start (B3, row xxii): r and k unchanged: got (22, [1, 10])
+OK   18.6 B1 (row xx), order kth-answer-rej: retire due: got ('warning', True)
+OK   18.6 B1 (row xx), order rej-kth-answer: retire due: got ('warning', True)
+OK   18.6 B1 (row xx), order answer-rej-kth: retire due: got ('warning', True)
+OK   18.6 B2 (row xxi): P2 warning before: got 'warning'
+OK   18.6 B2 (row xxi): the edited item carries P2's warning: got ('warning', 'P3')
+OK   18.6 B2 (row xxi): one more related rejection: retire due: got True
+OK   B4 (row xxiii): the re-added text keeps its id: got 'C6'
+OK   B4 (row xxiii): C6's lineage as of the re-add: got ['C10']
+OK   B4 (row xxiv): a rejection answered before the re-add keeps its subjects: got ['C6', 'R2']
+OK   B4 (row xxiii): a rejection about C6 after the re-add relates to the rule citing the removed id: got True
+OK   B4 (row xxiii): the rule: retire due (R3 at the re-add removed its criterion; R4 about C6): got True
+OK   B4 (row xxv): the cycle ends, each id once: got (['C6'], ['C10'])
+OK   B3 (section 3: K at an equal microsecond): kept, K = the answering version's defined: got ('kept', '2026-11-01T00:00:21+00:00')
+OK   18.6 row v: clean through the rework; kept: got ('kept', '20261101T000014000000-root-000e', 1)
+OK   18.6 row vi: related: got 'warning'
+OK   18.6 row vii: related inside the window: got 'warning'
+OK   18.6 row viii: judged(c), E unchanged; kept: got ([{'case': '20261101T000012000000-root-000c', 'judged_task': '20261101T000014000000-root-000e', 'J': '2026-11-01T00:00:15+00:00', 'judging_verdict': '20261101T000016000000-root-0010', 'superseded_before': 1}, {'case': '20261101T000017000000-root-0011', 'judged_task': '20261101T000017000000-root-0011', 'J': '2026-11-01T00:00:18+00:00', 'judging_verdict': '20261101T000019000000-root-0013', 'superseded_before': 0}, {'case': '20261101T000020000000-root-0014', 'judged_task': '20261101T000020000000-root-0014', 'J': '2026-11-01T00:00:21+00:00', 'judging_verdict': '20261101T000022000000-root-0016', 'superseded_before': 0}], '2026-11-01T00:00:21+00:00', 'kept')
+OK   18.6 row xiii: warning, and still warning after c3's verdict: got ('warning', 'warning')
+OK   18.6 row xiv: kept: got 'kept'
+OK   18.6 row xv: warning: got 'warning'
+OK   18.6 row xvi: kept stays: got 'kept'
+OK   8.1 row xvii: warning: got 'warning'
+OK   8.1 row xviii: both pending: got ['R2', 'R3']
+OK   8.1 row xviii: both related in one call: retire due: got True
+OK   8.1 row ix: retire due after W1: got ('warning', True)
+OK   8.1 row x: warning after the exempt restore, clean 0: got ('warning', 0)
+OK   8.1 row x: the next related rejection: retire due: got True
+OK   8.1 row xi (restore): warning, carried: got ('warning', 'P3')
+OK   8.1 row xi (add): warning, carried: got ('warning', 'P3')
+OK   8.1 row xii (repair migration): the repaired item: warning, carried from the old id; the old id retired: got ('warning', 'P3', 'retired', True)
+OK   8.1 row xii (repair migration): the untouched v1 steps come back kept: got ('kept', 'kept')
+OK   8.1 row xii (repair migration): one more related rejection: retire due: got True
+OK   18.4.1 O1(a): A at the end; B at R4's answer; B at the end (retire due): got ('kept', 'warning', 'warning', True)
+OK   18.4.1 O1(a): A's K = the later of memo 3's human accept and R4's answer: got '2026-11-01T00:00:27+00:00'
+OK   18.4.1 O1(b): A at the end; B at R4's answer; B at the end (retire due): got ('kept', 'warning', 'warning', True)
+OK   18.4.1 O1(b): A's K = the later of memo 3's human accept and R4's answer: got '2026-11-01T00:00:27+00:00'
+OK   18.4.1 O1(c): A at the end; B at R4's answer; B at the end (retire due): got ('kept', 'warning', 'warning', True)
+OK   18.4.1 O1(c): A's K = the later of memo 3's human accept and R4's answer: got '2026-11-01T00:00:29+00:00'
+OK   18.4.1 O2 (R4 answered by feedback(confirms=..., criterion=[C11])): A at the end; B at R4's answer; B at the end (retire due): got ('kept', 'warning', 'warning', True)
+OK   18.4.1 O3 (a relayed verdict on memo 5 before Lena's): A at the end; B at R4's answer; B at the end (retire due): got ('kept', 'warning', 'warning', True)
+OK   18.4.1 O4 (memo 5's first delivery superseded): A at the end; B at R4's answer; B at the end (retire due): got ('kept', 'warning', 'warning', True)
+OK   18.4.1 O5 (memo 3's human accept after R5): A at the end; B at R4's answer; B at the end (retire due): got ('kept', 'warning', 'warning', True)
+OK   18.4.1 O5: A new before memo 3's human accept (R5 in A's window, unrelated, waiting): got 'new'
+OK   18.4.1 O5: A kept at memo 3's late human accept: got 'kept'
+OK   18.4.1 O6 (memo 4's rework accepted before memo 5's request: the base): A at the end; B at R4's answer; B at the end (retire due): got ('kept', 'warning', 'warning', True)
+OK   18.4.1 O6 (memo 4's rework accepted after memo 5's request and R5's answer): A at the end; B at R4's answer; B at the end (retire due): got ('kept', 'warning', 'warning', True)
+OK   18.4.1 O7 (B added in memo 3's run before memo 3's delivery): A at the end; B at R4's answer; B at the end (retire due): got ('kept', 'warning', 'warning', True)
+OK   18.4.1 O7 (B added in memo 4's run before its first delivery): A at the end; B at R4's answer; B at the end (retire due): got ('kept', 'warning', 'warning', True)
+OK   18.4.1 O7 (B added after memo 4's first delivery): A at the end; B at R4's answer; B at the end (retire due): got ('kept', 'new', 'warning', False)
+OK   18.4.1 O8 (B edited after R4): A at the end; B at R4's answer; B at the end (retire due): got ('kept', 'warning', 'warning', True)
+OK   18.4.1 O9 (B retired after R4, then readd): the carrying item: warning, carried, retire due at R5's answer: got ('warning', True, True)
+OK   18.4.1 O9 (B retired after R4, then restore): the carrying item: warning, carried, retire due at R5's answer: got ('warning', True, True)
+OK   18.4.1 O9 (B retired after R4, then edit-other): the carrying item: warning, carried, retire due at R5's answer: got ('warning', True, True)
+OK   18.4.1 O9 (B retired after R4, nothing after): B retired; G1(b) vacuous: got 'retired'
+OK   18.4.1 O10 (memo 4's answer re-adds C6's exact text): A at the end; B at R4's answer; B at the end (retire due): got ('kept', 'warning', 'warning', True)
+OK   18.4.1 O10: memo 5's question names C6: C6's lineage as of R5's answer holds C11: got True
+OK   18.6 a held grant on a blocked case (m0-s1 6c7a): user_cost, case_spend, user_approved, ratio: got (14, 14, 14, '1.00')
+OK   0b.1 3.3 a done case holds nothing: user_cost, case_spend: got (13, 13)
+OK   8.4 k values: r = 0.5, 0.3, 0.2, 0.1: got {0.5: 4, 0.3: 7, 0.2: 11, 0.1: 22}
+OK   8.7 a v1 item, never watched: kept, k 0, r [0, 0], since None: got ('kept', 0, [0, 0], None)
+OK   8.7 a watched item with 0 deliveries: new, clean 0 of k 3: got ('new', 0, 3)
+OK   8.7 a blocked result never rejected: holds nothing: got 'new'
+OK   8.2 a rejection of a blocked result relates: warning: got 'warning'
+watch_cases: 83 of 83 checks OK

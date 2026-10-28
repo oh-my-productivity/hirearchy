@@ -1,0 +1,751 @@
+{
+  "counts": {
+    "assistant_started": 11,
+    "injection_stop": false,
+    "pairs": 1,
+    "reasons": [
+      "finished: no open tasks"
+    ],
+    "run_end_killed": 0,
+    "run_orphan": 0,
+    "scheduler_signals": 0,
+    "schedulers": 13,
+    "script_started": 1,
+    "stop_calls": 0,
+    "unknown_starter": 1,
+    "with_exit": 13
+  },
+  "m_c_1": {
+    "k": 1,
+    "n": 11
+  },
+  "m_c_2_pairs": {
+    "k": 1,
+    "n": 1
+  },
+  "m_c_2_runs": {
+    "k": 1,
+    "n": 1
+  },
+  "m_c_4": {
+    "k": 13,
+    "n": 13
+  },
+  "m_c_6": {
+    "k": 0,
+    "n": 0
+  },
+  "m_c_7": {
+    "k": 0,
+    "n": 0
+  },
+  "m_c_8": {
+    "boundary_failure_files": [],
+    "k": 24,
+    "n": 24,
+    "turns": [
+      {
+        "chat_end": "2026-10-28T02:01:44Z",
+        "ok": true,
+        "seconds": 20.0,
+        "sleep_end": "2026-10-28T02:02:04Z",
+        "turn": 1
+      },
+      {
+        "chat_end": "2026-10-28T02:03:41Z",
+        "ok": true,
+        "seconds": 20.0,
+        "sleep_end": "2026-10-28T02:04:01Z",
+        "turn": 2
+      },
+      {
+        "chat_end": "2026-10-28T02:09:29Z",
+        "ok": true,
+        "seconds": 20.0,
+        "sleep_end": "2026-10-28T02:09:49Z",
+        "turn": 3
+      },
+      {
+        "chat_end": "2026-10-28T02:11:19Z",
+        "ok": true,
+        "seconds": 20.0,
+        "sleep_end": "2026-10-28T02:11:39Z",
+        "turn": 4
+      },
+      {
+        "chat_end": "2026-10-28T02:14:42Z",
+        "ok": true,
+        "seconds": 20.0,
+        "sleep_end": "2026-10-28T02:15:02Z",
+        "turn": 5
+      },
+      {
+        "chat_end": "2026-10-28T02:15:58Z",
+        "ok": true,
+        "seconds": 20.0,
+        "sleep_end": "2026-10-28T02:16:18Z",
+        "turn": 6
+      },
+      {
+        "chat_end": "2026-10-28T02:21:49Z",
+        "ok": true,
+        "seconds": 20.0,
+        "sleep_end": "2026-10-28T02:22:09Z",
+        "turn": 7
+      },
+      {
+        "chat_end": "2026-10-28T02:23:35Z",
+        "ok": true,
+        "seconds": 20.0,
+        "sleep_end": "2026-10-28T02:23:55Z",
+        "turn": 8
+      },
+      {
+        "chat_end": "2026-10-28T02:27:47Z",
+        "ok": true,
+        "seconds": 20.0,
+        "sleep_end": "2026-10-28T02:28:07Z",
+        "turn": 9
+      },
+      {
+        "chat_end": "2026-10-28T02:31:59Z",
+        "ok": true,
+        "seconds": 20.0,
+        "sleep_end": "2026-10-28T02:32:19Z",
+        "turn": 10
+      },
+      {
+        "chat_end": "2026-10-28T02:36:11Z",
+        "ok": true,
+        "seconds": 20.0,
+        "sleep_end": "2026-10-28T02:36:31Z",
+        "turn": 11
+      },
+      {
+        "chat_end": "2026-10-28T02:40:35Z",
+        "ok": true,
+        "seconds": 20.0,
+        "sleep_end": "2026-10-28T02:40:55Z",
+        "turn": 12
+      },
+      {
+        "chat_end": "2026-10-28T02:44:44Z",
+        "ok": true,
+        "seconds": 20.0,
+        "sleep_end": "2026-10-28T02:45:04Z",
+        "turn": 13
+      },
+      {
+        "chat_end": "2026-10-28T02:48:21Z",
+        "ok": true,
+        "seconds": 20.0,
+        "sleep_end": "2026-10-28T02:48:41Z",
+        "turn": 14
+      },
+      {
+        "chat_end": "2026-10-28T02:50:22Z",
+        "ok": true,
+        "seconds": 20.0,
+        "sleep_end": "2026-10-28T02:50:42Z",
+        "turn": 15
+      },
+      {
+        "chat_end": "2026-10-28T02:51:30Z",
+        "ok": true,
+        "seconds": 20.0,
+        "sleep_end": "2026-10-28T02:51:50Z",
+        "turn": 16
+      },
+      {
+        "chat_end": "2026-10-28T02:55:23Z",
+        "ok": true,
+        "seconds": 20.0,
+        "sleep_end": "2026-10-28T02:55:43Z",
+        "turn": 17
+      },
+      {
+        "chat_end": "2026-10-28T02:59:42Z",
+        "ok": true,
+        "seconds": 20.0,
+        "sleep_end": "2026-10-28T03:00:02Z",
+        "turn": 18
+      },
+      {
+        "chat_end": "2026-10-28T03:00:59Z",
+        "ok": true,
+        "seconds": 20.0,
+        "sleep_end": "2026-10-28T03:01:19Z",
+        "turn": 19
+      },
+      {
+        "chat_end": "2026-10-28T03:02:05Z",
+        "ok": true,
+        "seconds": 20.0,
+        "sleep_end": "2026-10-28T03:02:25Z",
+        "turn": 20
+      },
+      {
+        "chat_end": "2026-10-28T03:05:51Z",
+        "ok": true,
+        "seconds": 20.0,
+        "sleep_end": "2026-10-28T03:06:11Z",
+        "turn": 21
+      },
+      {
+        "chat_end": "2026-10-28T03:09:20Z",
+        "ok": true,
+        "seconds": 20.0,
+        "sleep_end": "2026-10-28T03:09:40Z",
+        "turn": 22
+      },
+      {
+        "chat_end": "2026-10-28T03:10:39Z",
+        "ok": true,
+        "seconds": 20.0,
+        "sleep_end": "2026-10-28T03:10:59Z",
+        "turn": 23
+      },
+      {
+        "chat_end": "2026-10-28T03:11:37Z",
+        "ok": true,
+        "seconds": 20.0,
+        "sleep_end": "2026-10-28T03:11:57Z",
+        "turn": 24
+      }
+    ]
+  },
+  "schedulers": [
+    {
+      "began_in_turn": 3,
+      "exit": {
+        "reason": "finished: no open tasks",
+        "ts": "2026-10-28T02:09:42.421087+00:00"
+      },
+      "exit_to_next_turn_end": [
+        4,
+        96.767913
+      ],
+      "pid": 5310,
+      "running_at_turn_ends": [
+        {
+          "class": "survived",
+          "extension": false,
+          "in_flight": [
+            "lead@20261028T020918173491"
+          ],
+          "runs": [
+            {
+              "kill_ok": true,
+              "killed": false,
+              "ok": true,
+              "run": "lead@20261028T020918173491",
+              "run_end": "2026-10-28T02:09:42.354691+00:00"
+            }
+          ],
+          "scheduler_exit_reason": "finished: no open tasks",
+          "survived": true,
+          "turn": 3,
+          "turn_end": "2026-10-28T02:09:28.613000+00:00"
+        }
+      ],
+      "runs": {
+        "run_end": 10,
+        "run_end_killed": 0,
+        "run_start": 10,
+        "start_without_end": []
+      },
+      "start_ts": "2026-10-28T02:04:48.790156+00:00",
+      "starter": {
+        "file": "mcp-5296-1793153077583.jsonl",
+        "kind": "assistant",
+        "mcp_pid": 5296,
+        "tool_call_ts": "2026-10-28T02:04:48.807335+00:00"
+      }
+    },
+    {
+      "began_in_turn": 5,
+      "exit": {
+        "reason": "finished: no open tasks",
+        "ts": "2026-10-28T02:14:35.228632+00:00"
+      },
+      "exit_to_next_turn_end": [
+        5,
+        6.648368
+      ],
+      "pid": 8050,
+      "running_at_turn_ends": [],
+      "runs": {
+        "run_end": 5,
+        "run_end_killed": 0,
+        "run_start": 5,
+        "start_without_end": []
+      },
+      "start_ts": "2026-10-28T02:12:19.575680+00:00",
+      "starter": {
+        "file": "mcp-8042-1793153539107.jsonl",
+        "kind": "assistant",
+        "mcp_pid": 8042,
+        "tool_call_ts": "2026-10-28T02:12:19.601945+00:00"
+      }
+    },
+    {
+      "began_in_turn": null,
+      "exit": {
+        "reason": "finished: no open tasks",
+        "ts": "2026-10-28T02:20:57.017236+00:00"
+      },
+      "exit_to_next_turn_end": [
+        7,
+        51.834764
+      ],
+      "pid": 9662,
+      "running_at_turn_ends": [],
+      "runs": {
+        "run_end": 5,
+        "run_end_killed": 0,
+        "run_start": 5,
+        "start_without_end": []
+      },
+      "start_ts": "2026-10-28T02:17:34.688259+00:00",
+      "starter": {
+        "file": "mcp-9656-1793153854444.jsonl",
+        "kind": "script",
+        "mcp_pid": 9656,
+        "tool_call_ts": "2026-10-28T02:17:34.725476+00:00"
+      }
+    },
+    {
+      "began_in_turn": 9,
+      "exit": {
+        "reason": "finished: no open tasks",
+        "ts": "2026-10-28T02:27:40.579771+00:00"
+      },
+      "exit_to_next_turn_end": [
+        9,
+        6.018229
+      ],
+      "pid": 11760,
+      "running_at_turn_ends": [],
+      "runs": {
+        "run_end": 5,
+        "run_end_killed": 0,
+        "run_start": 5,
+        "start_without_end": []
+      },
+      "start_ts": "2026-10-28T02:24:54.693356+00:00",
+      "starter": {
+        "file": "mcp-11740-1793154287539.jsonl",
+        "kind": "assistant",
+        "mcp_pid": 11740,
+        "tool_call_ts": "2026-10-28T02:24:54.726280+00:00"
+      }
+    },
+    {
+      "began_in_turn": 10,
+      "exit": {
+        "reason": "finished: no open tasks",
+        "ts": "2026-10-28T02:31:51.253131+00:00"
+      },
+      "exit_to_next_turn_end": [
+        10,
+        7.290869
+      ],
+      "pid": 13166,
+      "running_at_turn_ends": [],
+      "runs": {
+        "run_end": 5,
+        "run_end_killed": 0,
+        "run_start": 5,
+        "start_without_end": []
+      },
+      "start_ts": "2026-10-28T02:29:13.097061+00:00",
+      "starter": {
+        "file": "mcp-13157-1793154550230.jsonl",
+        "kind": "assistant",
+        "mcp_pid": 13157,
+        "tool_call_ts": "2026-10-28T02:29:13.124159+00:00"
+      }
+    },
+    {
+      "began_in_turn": 11,
+      "exit": {
+        "reason": "finished: no open tasks",
+        "ts": "2026-10-28T02:36:01.364690+00:00"
+      },
+      "exit_to_next_turn_end": [
+        11,
+        9.20231
+      ],
+      "pid": 14524,
+      "running_at_turn_ends": [],
+      "runs": {
+        "run_end": 5,
+        "run_end_killed": 0,
+        "run_start": 5,
+        "start_without_end": []
+      },
+      "start_ts": "2026-10-28T02:33:27.379196+00:00",
+      "starter": {
+        "file": "mcp-14515-1793154802667.jsonl",
+        "kind": "assistant",
+        "mcp_pid": 14515,
+        "tool_call_ts": "2026-10-28T02:33:27.414969+00:00"
+      }
+    },
+    {
+      "began_in_turn": 12,
+      "exit": {
+        "reason": "finished: no open tasks",
+        "ts": "2026-10-28T02:40:20.838019+00:00"
+      },
+      "exit_to_next_turn_end": [
+        12,
+        14.163981
+      ],
+      "pid": 15868,
+      "running_at_turn_ends": [],
+      "runs": {
+        "run_end": 5,
+        "run_end_killed": 0,
+        "run_start": 5,
+        "start_without_end": []
+      },
+      "start_ts": "2026-10-28T02:37:26.640976+00:00",
+      "starter": {
+        "file": "mcp-15864-1793155040035.jsonl",
+        "kind": "assistant",
+        "mcp_pid": 15864,
+        "tool_call_ts": "2026-10-28T02:37:26.671940+00:00"
+      }
+    },
+    {
+      "began_in_turn": 13,
+      "exit": {
+        "reason": "finished: no open tasks",
+        "ts": "2026-10-28T02:44:38.095908+00:00"
+      },
+      "exit_to_next_turn_end": [
+        13,
+        5.622092
+      ],
+      "pid": 17252,
+      "running_at_turn_ends": [],
+      "runs": {
+        "run_end": 5,
+        "run_end_killed": 0,
+        "run_start": 5,
+        "start_without_end": []
+      },
+      "start_ts": "2026-10-28T02:42:00.036512+00:00",
+      "starter": {
+        "file": "mcp-17230-1793155319783.jsonl",
+        "kind": "assistant",
+        "mcp_pid": 17230,
+        "tool_call_ts": "2026-10-28T02:42:00.069654+00:00"
+      }
+    },
+    {
+      "began_in_turn": 14,
+      "exit": {
+        "reason": "finished: no open tasks",
+        "ts": "2026-10-28T02:48:15.818186+00:00"
+      },
+      "exit_to_next_turn_end": [
+        14,
+        4.942814
+      ],
+      "pid": 18599,
+      "running_at_turn_ends": [],
+      "runs": {
+        "run_end": 5,
+        "run_end_killed": 0,
+        "run_start": 5,
+        "start_without_end": []
+      },
+      "start_ts": "2026-10-28T02:45:51.828699+00:00",
+      "starter": {
+        "file": "mcp-18590-1793155549765.jsonl",
+        "kind": "assistant",
+        "mcp_pid": 18590,
+        "tool_call_ts": "2026-10-28T02:45:51.865305+00:00"
+      }
+    },
+    {
+      "began_in_turn": 17,
+      "exit": {
+        "reason": "finished: no open tasks",
+        "ts": "2026-10-28T02:55:15.554695+00:00"
+      },
+      "exit_to_next_turn_end": [
+        17,
+        7.753305
+      ],
+      "pid": 20864,
+      "running_at_turn_ends": [],
+      "runs": {
+        "run_end": 5,
+        "run_end_killed": 0,
+        "run_start": 5,
+        "start_without_end": []
+      },
+      "start_ts": "2026-10-28T02:52:37.446267+00:00",
+      "starter": {
+        "file": "mcp-20857-1793155953465.jsonl",
+        "kind": "assistant",
+        "mcp_pid": 20857,
+        "tool_call_ts": "2026-10-28T02:52:37.457337+00:00"
+      }
+    },
+    {
+      "began_in_turn": 18,
+      "exit": {
+        "reason": "finished: no open tasks",
+        "ts": "2026-10-28T02:59:39.507261+00:00"
+      },
+      "exit_to_next_turn_end": [
+        18,
+        2.687739
+      ],
+      "pid": 22306,
+      "running_at_turn_ends": [],
+      "runs": {
+        "run_end": 5,
+        "run_end_killed": 0,
+        "run_start": 5,
+        "start_without_end": []
+      },
+      "start_ts": "2026-10-28T02:57:09.200288+00:00",
+      "starter": {
+        "file": "mcp-22274-1793156215517.jsonl",
+        "kind": "assistant",
+        "mcp_pid": 22274,
+        "tool_call_ts": "2026-10-28T02:57:09.213124+00:00"
+      }
+    },
+    {
+      "began_in_turn": 21,
+      "exit": {
+        "reason": "finished: no open tasks",
+        "ts": "2026-10-28T03:05:44.344664+00:00"
+      },
+      "exit_to_next_turn_end": [
+        21,
+        6.350336
+      ],
+      "pid": 24479,
+      "running_at_turn_ends": [],
+      "runs": {
+        "run_end": 5,
+        "run_end_killed": 0,
+        "run_start": 5,
+        "start_without_end": []
+      },
+      "start_ts": "2026-10-28T03:03:01.949362+00:00",
+      "starter": {
+        "file": "mcp-24456-1793156577235.jsonl",
+        "kind": "assistant",
+        "mcp_pid": 24456,
+        "tool_call_ts": "2026-10-28T03:03:01.968309+00:00"
+      }
+    },
+    {
+      "began_in_turn": 22,
+      "exit": {
+        "reason": "finished: no open tasks",
+        "ts": "2026-10-28T03:09:13.724928+00:00"
+      },
+      "exit_to_next_turn_end": [
+        22,
+        6.434072
+      ],
+      "pid": 25827,
+      "running_at_turn_ends": [],
+      "runs": {
+        "run_end": 5,
+        "run_end_killed": 0,
+        "run_start": 5,
+        "start_without_end": []
+      },
+      "start_ts": "2026-10-28T03:06:49.427805+00:00",
+      "starter": {
+        "file": null,
+        "kind": "unknown",
+        "mcp_pid": null,
+        "tool_call_ts": null
+      }
+    }
+  ],
+  "script": {
+    "md5": "d25f514da4ebd6e361230df61037070c",
+    "name": "scheduler_survival.py"
+  },
+  "signals": [],
+  "sleep_entries": 24,
+  "source_files": [
+    "events/2026-10-28/cli-11060-1793154135347.jsonl",
+    "events/2026-10-28/cli-11095-1793154135579.jsonl",
+    "events/2026-10-28/cli-11482-1793154240690.jsonl",
+    "events/2026-10-28/cli-11517-1793154240918.jsonl",
+    "events/2026-10-28/cli-11760-1793154460580.jsonl",
+    "events/2026-10-28/cli-12843-1793154491964.jsonl",
+    "events/2026-10-28/cli-12878-1793154492196.jsonl",
+    "events/2026-10-28/cli-13166-1793154711253.jsonl",
+    "events/2026-10-28/cli-14235-1793154744110.jsonl",
+    "events/2026-10-28/cli-14273-1793154744344.jsonl",
+    "events/2026-10-28/cli-14524-1793154961365.jsonl",
+    "events/2026-10-28/cli-15586-1793154996086.jsonl",
+    "events/2026-10-28/cli-15627-1793154996321.jsonl",
+    "events/2026-10-28/cli-15868-1793155220838.jsonl",
+    "events/2026-10-28/cli-16954-1793155260642.jsonl",
+    "events/2026-10-28/cli-16992-1793155260881.jsonl",
+    "events/2026-10-28/cli-17252-1793155478096.jsonl",
+    "events/2026-10-28/cli-18335-1793155510924.jsonl",
+    "events/2026-10-28/cli-18379-1793155511163.jsonl",
+    "events/2026-10-28/cli-18599-1793155695818.jsonl",
+    "events/2026-10-28/cli-19659-1793155727087.jsonl",
+    "events/2026-10-28/cli-19700-1793155727329.jsonl",
+    "events/2026-10-28/cli-20186-1793155848935.jsonl",
+    "events/2026-10-28/cli-20231-1793155849195.jsonl",
+    "events/2026-10-28/cli-20586-1793155915693.jsonl",
+    "events/2026-10-28/cli-20630-1793155915945.jsonl",
+    "events/2026-10-28/cli-20864-1793156115555.jsonl",
+    "events/2026-10-28/cli-21980-1793156149656.jsonl",
+    "events/2026-10-28/cli-22025-1793156149904.jsonl",
+    "events/2026-10-28/cli-22306-1793156379507.jsonl",
+    "events/2026-10-28/cli-23371-1793156408769.jsonl",
+    "events/2026-10-28/cli-23414-1793156409017.jsonl",
+    "events/2026-10-28/cli-23784-1793156484724.jsonl",
+    "events/2026-10-28/cli-23831-1793156484969.jsonl",
+    "events/2026-10-28/cli-24196-1793156551597.jsonl",
+    "events/2026-10-28/cli-24243-1793156551880.jsonl",
+    "events/2026-10-28/cli-24479-1793156744345.jsonl",
+    "events/2026-10-28/cli-25550-1793156778629.jsonl",
+    "events/2026-10-28/cli-25600-1793156778879.jsonl",
+    "events/2026-10-28/cli-25827-1793156953725.jsonl",
+    "events/2026-10-28/cli-26928-1793156986991.jsonl",
+    "events/2026-10-28/cli-26975-1793156987247.jsonl",
+    "events/2026-10-28/cli-27356-1793157065426.jsonl",
+    "events/2026-10-28/cli-27406-1793157065715.jsonl",
+    "events/2026-10-28/cli-27760-1793157124779.jsonl",
+    "events/2026-10-28/cli-27811-1793157125044.jsonl",
+    "events/2026-10-28/cli-5310-1793153382421.jsonl",
+    "events/2026-10-28/cli-7297-1793153395701.jsonl",
+    "events/2026-10-28/cli-7336-1793153395997.jsonl",
+    "events/2026-10-28/cli-7366-1793153396228.jsonl",
+    "events/2026-10-28/cli-7789-1793153504866.jsonl",
+    "events/2026-10-28/cli-7815-1793153505090.jsonl",
+    "events/2026-10-28/cli-8050-1793153675228.jsonl",
+    "events/2026-10-28/cli-9105-1793153708005.jsonl",
+    "events/2026-10-28/cli-9131-1793153708231.jsonl",
+    "events/2026-10-28/cli-9497-1793153789843.jsonl",
+    "events/2026-10-28/cli-9527-1793153790081.jsonl",
+    "events/2026-10-28/cli-9662-1793154057017.jsonl",
+    "events/2026-10-28/mcp-10052-1793153934945.jsonl",
+    "events/2026-10-28/mcp-10281-1793153969073.jsonl",
+    "events/2026-10-28/mcp-10465-1793153995811.jsonl",
+    "events/2026-10-28/mcp-10664-1793154041803.jsonl",
+    "events/2026-10-28/mcp-10914-1793154098432.jsonl",
+    "events/2026-10-28/mcp-11324-1793154187966.jsonl",
+    "events/2026-10-28/mcp-11740-1793154287539.jsonl",
+    "events/2026-10-28/mcp-11942-1793154320103.jsonl",
+    "events/2026-10-28/mcp-12111-1793154341968.jsonl",
+    "events/2026-10-28/mcp-12306-1793154378573.jsonl",
+    "events/2026-10-28/mcp-12482-1793154405932.jsonl",
+    "events/2026-10-28/mcp-12687-1793154452910.jsonl",
+    "events/2026-10-28/mcp-13157-1793154550230.jsonl",
+    "events/2026-10-28/mcp-13341-1793154585482.jsonl",
+    "events/2026-10-28/mcp-13532-1793154602476.jsonl",
+    "events/2026-10-28/mcp-13707-1793154634637.jsonl",
+    "events/2026-10-28/mcp-13895-1793154665395.jsonl",
+    "events/2026-10-28/mcp-14071-1793154703736.jsonl",
+    "events/2026-10-28/mcp-14515-1793154802667.jsonl",
+    "events/2026-10-28/mcp-14703-1793154825287.jsonl",
+    "events/2026-10-28/mcp-14895-1793154859128.jsonl",
+    "events/2026-10-28/mcp-15064-1793154891942.jsonl",
+    "events/2026-10-28/mcp-15252-1793154909445.jsonl",
+    "events/2026-10-28/mcp-15422-1793154946686.jsonl",
+    "events/2026-10-28/mcp-15864-1793155040035.jsonl",
+    "events/2026-10-28/mcp-16046-1793155075251.jsonl",
+    "events/2026-10-28/mcp-16237-1793155102930.jsonl",
+    "events/2026-10-28/mcp-16409-1793155134393.jsonl",
+    "events/2026-10-28/mcp-16601-1793155162990.jsonl",
+    "events/2026-10-28/mcp-16794-1793155206937.jsonl",
+    "events/2026-10-28/mcp-17230-1793155319783.jsonl",
+    "events/2026-10-28/mcp-17433-1793155334625.jsonl",
+    "events/2026-10-28/mcp-17606-1793155369544.jsonl",
+    "events/2026-10-28/mcp-17809-1793155407163.jsonl",
+    "events/2026-10-28/mcp-17978-1793155430815.jsonl",
+    "events/2026-10-28/mcp-18170-1793155469443.jsonl",
+    "events/2026-10-28/mcp-18590-1793155549765.jsonl",
+    "events/2026-10-28/mcp-18795-1793155574706.jsonl",
+    "events/2026-10-28/mcp-18966-1793155595271.jsonl",
+    "events/2026-10-28/mcp-19155-1793155627361.jsonl",
+    "events/2026-10-28/mcp-19326-1793155651274.jsonl",
+    "events/2026-10-28/mcp-19514-1793155689274.jsonl",
+    "events/2026-10-28/mcp-20062-1793155817430.jsonl",
+    "events/2026-10-28/mcp-20461-1793155885932.jsonl",
+    "events/2026-10-28/mcp-20857-1793155953465.jsonl",
+    "events/2026-10-28/mcp-21040-1793155974524.jsonl",
+    "events/2026-10-28/mcp-21232-1793156011796.jsonl",
+    "events/2026-10-28/mcp-21415-1793156039236.jsonl",
+    "events/2026-10-28/mcp-21635-1793156068864.jsonl",
+    "events/2026-10-28/mcp-21815-1793156106399.jsonl",
+    "events/2026-10-28/mcp-22274-1793156215517.jsonl",
+    "events/2026-10-28/mcp-22482-1793156249486.jsonl",
+    "events/2026-10-28/mcp-22659-1793156271173.jsonl",
+    "events/2026-10-28/mcp-22847-1793156301420.jsonl",
+    "events/2026-10-28/mcp-23019-1793156320467.jsonl",
+    "events/2026-10-28/mcp-23210-1793156364030.jsonl",
+    "events/2026-10-28/mcp-24050-1793156520880.jsonl",
+    "events/2026-10-28/mcp-24456-1793156577235.jsonl",
+    "events/2026-10-28/mcp-24656-1793156598150.jsonl",
+    "events/2026-10-28/mcp-24825-1793156635205.jsonl",
+    "events/2026-10-28/mcp-25015-1793156662230.jsonl",
+    "events/2026-10-28/mcp-25184-1793156685738.jsonl",
+    "events/2026-10-28/mcp-25380-1793156735997.jsonl",
+    "events/2026-10-28/mcp-25822-1793156808898.jsonl",
+    "events/2026-10-28/mcp-26023-1793156833355.jsonl",
+    "events/2026-10-28/mcp-26209-1793156853536.jsonl",
+    "events/2026-10-28/mcp-26379-1793156882711.jsonl",
+    "events/2026-10-28/mcp-26568-1793156904710.jsonl",
+    "events/2026-10-28/mcp-26761-1793156944059.jsonl",
+    "events/2026-10-28/mcp-27615-1793157094636.jsonl",
+    "events/2026-10-28/mcp-5296-1793153077583.jsonl",
+    "events/2026-10-28/mcp-5511-1793153109860.jsonl",
+    "events/2026-10-28/mcp-5679-1793153133863.jsonl",
+    "events/2026-10-28/mcp-5870-1793153168899.jsonl",
+    "events/2026-10-28/mcp-6043-1793153188366.jsonl",
+    "events/2026-10-28/mcp-6242-1793153247611.jsonl",
+    "events/2026-10-28/mcp-6412-1793153266137.jsonl",
+    "events/2026-10-28/mcp-6601-1793153295149.jsonl",
+    "events/2026-10-28/mcp-6781-1793153309962.jsonl",
+    "events/2026-10-28/mcp-6978-1793153343590.jsonl",
+    "events/2026-10-28/mcp-7151-1793153377846.jsonl",
+    "events/2026-10-28/mcp-7662-1793153473556.jsonl",
+    "events/2026-10-28/mcp-8042-1793153539107.jsonl",
+    "events/2026-10-28/mcp-8233-1793153555202.jsonl",
+    "events/2026-10-28/mcp-8425-1793153586357.jsonl",
+    "events/2026-10-28/mcp-8596-1793153611428.jsonl",
+    "events/2026-10-28/mcp-8764-1793153627780.jsonl",
+    "events/2026-10-28/mcp-8956-1793153667257.jsonl",
+    "events/2026-10-28/mcp-9656-1793153854444.jsonl",
+    "events/2026-10-28/mcp-9851-1793153892105.jsonl",
+    "events/2026-10-28/scheduler-11760-1793154294693.jsonl",
+    "events/2026-10-28/scheduler-13166-1793154553096.jsonl",
+    "events/2026-10-28/scheduler-14524-1793154807379.jsonl",
+    "events/2026-10-28/scheduler-15868-1793155046640.jsonl",
+    "events/2026-10-28/scheduler-17252-1793155320036.jsonl",
+    "events/2026-10-28/scheduler-18599-1793155551828.jsonl",
+    "events/2026-10-28/scheduler-20864-1793155957446.jsonl",
+    "events/2026-10-28/scheduler-22306-1793156229200.jsonl",
+    "events/2026-10-28/scheduler-24479-1793156581949.jsonl",
+    "events/2026-10-28/scheduler-25827-1793156809427.jsonl",
+    "events/2026-10-28/scheduler-5310-1793153088789.jsonl",
+    "events/2026-10-28/scheduler-8050-1793153539575.jsonl",
+    "events/2026-10-28/scheduler-9662-1793153854688.jsonl",
+    "session-turn-times-utc.txt",
+    "injection/injection-log.txt",
+    "turn-times.txt"
+  ],
+  "stream": "F3"
+}

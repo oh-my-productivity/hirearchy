@@ -1,0 +1,7 @@
+I read your reply as: the memo should have a title, then the Summary line, then the decisions, then the action items, and nothing else. I've recorded your reply as a rejection of the 2026-10-12 memo. Nothing has changed yet.
+
+About C8: add "The memo contains only, in this order: a one-line title, a line beginning 'Summary:' that summarizes the meeting, the Decisions section, and the action items table, with no other lines (no 'Present' or 'Next meeting' lines)" as a lasting rule? Yes or no.
+
+If yes, this replaces the current C8 in the contract. I'll then have the team redo the 2026-10-12 memo to match it, and drop the "probably" from Sam's row. That takes about 5 runs, bringing this memo to about 10 of the 12 approved.
+
+The 2026-10-05 memo you accepted has no title and still has the "Present" and "Next meeting" lines. It wouldn't match this rule, and I'm leaving it alone unless you tell me otherwise.

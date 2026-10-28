@@ -1,0 +1,12 @@
+files in /Users/aminalizadeh/Library/Application Support/hirearchy/kiro-home/hirearchy-p1-f1-17931291-b710c83948597702 before delete:      171
+deleted 2026-10-28T04:42:24Z /Users/aminalizadeh/Library/Application Support/hirearchy/kiro-home/hirearchy-p1-f1-17931291-b710c83948597702 exists_after=no
+files in /Users/aminalizadeh/Library/Application Support/hirearchy/kiro-home/hirearchy-p1-f2-17931469-141f8d494151e346 before delete:      208
+deleted 2026-10-28T04:42:24Z /Users/aminalizadeh/Library/Application Support/hirearchy/kiro-home/hirearchy-p1-f2-17931469-141f8d494151e346 exists_after=no
+files in /Users/aminalizadeh/Library/Application Support/hirearchy/kiro-home/hirearchy-p1-f3-17931528-f4b0de7112f5ea07 before delete:      181
+deleted 2026-10-28T04:42:25Z /Users/aminalizadeh/Library/Application Support/hirearchy/kiro-home/hirearchy-p1-f3-17931528-f4b0de7112f5ea07 exists_after=no
+files in /Users/aminalizadeh/Library/Application Support/hirearchy/kiro-home/hirearchy-p1-i1-17931362-53c0ba0683b744d2 before delete:      182
+deleted 2026-10-28T04:42:25Z /Users/aminalizadeh/Library/Application Support/hirearchy/kiro-home/hirearchy-p1-i1-17931362-53c0ba0683b744d2 exists_after=no
+files in /Users/aminalizadeh/Library/Application Support/hirearchy/kiro-home/hirearchy-p1-i2-17931420-43a60f0d2f38c7be before delete:      174
+deleted 2026-10-28T04:42:25Z /Users/aminalizadeh/Library/Application Support/hirearchy/kiro-home/hirearchy-p1-i2-17931420-43a60f0d2f38c7be exists_after=no
+files in /Users/aminalizadeh/Library/Application Support/hirearchy/kiro-home/hirearchy-p1-i3-17931574-331ae4382b4fa231 before delete:      192
+deleted 2026-10-28T04:42:25Z /Users/aminalizadeh/Library/Application Support/hirearchy/kiro-home/hirearchy-p1-i3-17931574-331ae4382b4fa231 exists_after=no

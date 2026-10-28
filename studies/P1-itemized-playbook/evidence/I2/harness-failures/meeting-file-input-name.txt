@@ -1,0 +1,12 @@
+Harness blind spot found by the stream-i2 step after turn 3 (2026-10-27, not a facilitator slip, not an H rule; reported, nothing edited).
+
+Fact: in I2 the team's service has the input `meeting_file` (PLAN FOR YOU: "You provide: meeting_file (required)"; root's first request
+S/org/sent/20261027T230507597219-root-5204.md has "## Request / - meeting_file: 2026-10-05.md"). The frozen harness reads the input by the name
+`notes_file` only:
+  - harness/after_turn.sh:94      re.search(r'notes_file:\s*(\d{4}-\d{2}-\d{2})', body)  -> requests-by-turn.txt says "(none)" for turn 3 although
+                                  root's request exists (the M3-VERDICT trigger line "memo 4's request (2026-10-26.md) sent" will read "no" regardless);
+  - harness/guarantees.py:67      memo_of_task(): notes_file only -> memo_case stays empty in the scoring (G1/G2 memo->case mapping);
+  - harness/assistant_facts.py:238  "- notes_file: (\S+)".
+What the stream step does instead (protocol 4.2 itself defines the trigger on the files): M3-VERDICT's trigger and the spend-ledger cases are read
+from root's sent mail directly (S/org/sent/*.md, "- meeting_file: <date>.md"); each such reading is written in lena-lines.txt.
+Effect on the course: none (no Lena line depends on requests-by-turn.txt alone). Effect on the measures: for the scorer. F1 and I1 used `notes_file`.

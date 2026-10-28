@@ -1,0 +1,8 @@
+######## TURN 29  start 00:17:56  end 00:18:13  elapsed 17s  (local, 2026-10-28; UTC wall-clock start 2026-10-28T00:17:56Z end 2026-10-28T00:18:13Z; exit code 0)
+######## LENA (prompt sent verbatim):
+This version is right now, thanks - keep it.
+
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-29.stderr.txt):
+I've recorded your approval of the 9 Nov memo. All six memos, 5 Oct through 9 Nov, are in `/tmp/hirearchy-p1-I2-1793142034/deliverables/`.
+
+To get next week's memo, give me the notes file name. Nothing runs until you ask. Each memo is budgeted at 12 runs.

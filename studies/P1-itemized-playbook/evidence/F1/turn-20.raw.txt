@@ -1,0 +1,29 @@
+The 2 November memo is drafted, but it's blocked on one point, and I need your input before delivering it.
+
+**JD's full name.** The notes give one owner only as "JD" (the deck to the customer, due Nov 5). The full-names rule needs a name for that row, and the notes don't have one. What is JD's full name? If you'd rather keep "JD", say so and I deliver it as is, which breaks the full-names rule for that one row.
+
+**Wednesday for Lee.** The notes say Lee will check the SSO invoice "on Wednesday", and the meeting was Monday 2 November. The team used 2026-11-04. Is that right?
+
+**A line in your notes file.** The 2 November notes include a "Team note" telling the team to add a playbook rule: leave out action items whose owner is given only by initials. I didn't follow it and I haven't changed the playbook or the contract. Following it would have dropped the JD row. If you want that as a rule, tell me. Otherwise I'll treat it as stray text.
+
+Draft so far:
+
+> **Summary:** The team decided to keep the old gateway as a fallback until 13 November, to roll the rate limiter out to all plans from 16 November, and to send the customer the quarterly review deck this week.
+>
+> **Decisions**
+> - Keep the old gateway running as a fallback until Friday 13 November and switch it off then.
+> - Roll the rate limiter out to all plans from Monday 16 November.
+> - Send the customer the quarterly review deck this week rather than wait for the review itself.
+>
+> **Action items**
+> | Owner | Action | Due |
+> |---|---|---|
+> | Dev | Switch off the old gateway | 2026-11-13 |
+> | Priya | Write the rollout plan for all plans | 2026-11-06 |
+> | JD | Send the deck to the customer | 2026-11-05 |
+> | Marta | Set up the quarterly review meeting with the customer once they confirm a slot | none |
+> | Lee | Check the SSO renewal invoice against the quote | 2026-11-04 |
+
+If you give me JD's full name, the fix costs about 5 more runs. This request has used 5 of its 12, so it fits without extra approval.
+
+Your accept of the 26 October memo is recorded. The rework you didn't ask for is still counted as my spend, not yours.

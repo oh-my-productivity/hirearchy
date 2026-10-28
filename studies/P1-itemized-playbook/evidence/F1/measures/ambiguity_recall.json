@@ -1,0 +1,109 @@
+{
+  "could_not_derive": [],
+  "items": {
+    "AMB-1": {
+      "memo": "2026-10-19",
+      "owner": "Marta",
+      "recall": {
+        "k": 0,
+        "n": 0
+      },
+      "recall_literal_timing": {
+        "k": 0,
+        "n": 0
+      },
+      "versions": [],
+      "versions_containing": 0,
+      "versions_of_the_memo": 2
+    },
+    "AMB-2": {
+      "memo": "2026-10-12",
+      "owner": "Sam",
+      "recall": {
+        "k": 0,
+        "n": 0
+      },
+      "recall_literal_timing": {
+        "k": 0,
+        "n": 0
+      },
+      "versions": [],
+      "versions_containing": 0,
+      "versions_of_the_memo": 2
+    }
+  },
+  "label": "F1",
+  "recall": {
+    "k": 0,
+    "n": 0
+  },
+  "recall_literal_timing": {
+    "k": 0,
+    "n": 0
+  },
+  "roles": {
+    "children": [
+      "lead/reviewer",
+      "lead/writer"
+    ],
+    "detected_by": "charter",
+    "owner": "lead",
+    "reviewer": "lead/reviewer",
+    "reviewer_dir": "lead-reviewer",
+    "roles": {
+      "lead/reviewer": "Independent Reviewer",
+      "lead/writer": "Writer"
+    }
+  },
+  "script": {
+    "md5": "92b67f74a38c04895402803e9388e718",
+    "name": "ambiguity_recall.py"
+  },
+  "source_files": [
+    "assistant-tool-calls.txt",
+    "injection/injection-log.txt",
+    "memos/versions/INDEX.txt",
+    "memos/versions/memo-2026-10-05.v1.933ea70.md",
+    "memos/versions/memo-2026-10-05.v2.53bfe3b.md",
+    "memos/versions/memo-2026-10-05.v3.c87d805.md",
+    "memos/versions/memo-2026-10-05.v4.a2018a0.md",
+    "memos/versions/memo-2026-10-12.v1.5f81c2b.md",
+    "memos/versions/memo-2026-10-12.v2.d2fe5dd.md",
+    "memos/versions/memo-2026-10-19.v1.7353651.md",
+    "memos/versions/memo-2026-10-19.v2.0d36d17.md",
+    "memos/versions/memo-2026-10-26.v1.ca63075.md",
+    "memos/versions/memo-2026-10-26.v2.63d89e6.md",
+    "memos/versions/memo-2026-11-02.v1.d1e571b.md",
+    "memos/versions/memo-2026-11-02.v2.bbab459.md",
+    "memos/versions/memo-2026-11-09.v1.0e035cf.md",
+    "msgs/lead-read/20261027T193622007957-lead.reviewer-478e.md",
+    "msgs/lead-read/20261027T193953870051-lead.reviewer-4312.md",
+    "msgs/lead-read/20261027T194938681393-lead.reviewer-4b16.md",
+    "msgs/lead-read/20261027T195850314457-lead.reviewer-b521.md",
+    "msgs/lead-read/20261027T201112361150-lead.reviewer-4bac.md",
+    "msgs/lead-read/20261027T202145524599-lead.reviewer-6434.md",
+    "msgs/lead-read/20261027T202958043201-lead.reviewer-cf11.md",
+    "msgs/lead-read/20261027T203609402832-lead.reviewer-c766.md",
+    "msgs/lead-read/20261027T204216895111-lead.reviewer-1c54.md",
+    "msgs/lead-read/20261027T205416384794-lead.reviewer-8089.md",
+    "msgs/lead-read/20261027T210116568206-lead.reviewer-09af.md",
+    "msgs/lead-read/20261027T210945855343-lead.reviewer-0bc1.md",
+    "msgs/lead-read/20261027T211726545905-lead.reviewer-939f.md",
+    "msgs/lead-reviewer-read/20261027T193455897800-lead-f07d.md",
+    "msgs/lead-reviewer-read/20261027T193858032971-lead-6b8b.md",
+    "msgs/lead-reviewer-read/20261027T194835308946-lead-3563.md",
+    "msgs/lead-reviewer-read/20261027T195736213261-lead-0e6b.md",
+    "msgs/lead-reviewer-read/20261027T200955981281-lead-72f4.md",
+    "msgs/lead-reviewer-read/20261027T202021001710-lead-ef30.md",
+    "msgs/lead-reviewer-read/20261027T202838627641-lead-f516.md",
+    "msgs/lead-reviewer-read/20261027T203508594784-lead-c603.md",
+    "msgs/lead-reviewer-read/20261027T204109629292-lead-2149.md",
+    "msgs/lead-reviewer-read/20261027T205322743616-lead-2f9c.md",
+    "msgs/lead-reviewer-read/20261027T205948882742-lead-1bed.md",
+    "msgs/lead-reviewer-read/20261027T210907567737-lead-5a08.md",
+    "msgs/lead-reviewer-read/20261027T211643230414-lead-accc.md",
+    "org-files/lead-reviewer-AGENT.md",
+    "org-files/lead-writer-AGENT.md",
+    "org-git-log.txt"
+  ]
+}

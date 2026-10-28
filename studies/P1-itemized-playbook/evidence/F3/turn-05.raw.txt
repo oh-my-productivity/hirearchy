@@ -1,0 +1,6 @@
+The memo has your two dates, and the reviewer passed it 9 of 9. Two more points from the notes need your call before I copy it.
+
+1. **Lee, SSO renewal.** The notes say he'd ping the vendor "this week", with "no hard date attached". The memo shows Due `none`. Keep `none`, or use a date? "This week" would be 2026-10-09, the Friday of that week.
+2. **Lee's agreement.** The notes say "We agreed Lee would ping the vendor". The memo lists it only as an action item. Should it also be a line under Decisions? I'd say no, because it's a task assignment.
+
+My suggestion is to keep both as they are. If you do, I copy the memo to `deliverables/memo-2026-10-05.md` now at no further cost. If you want either changed, the case is already about 15 runs against the 12 approved. Another rework needs your OK for about 5 more runs.

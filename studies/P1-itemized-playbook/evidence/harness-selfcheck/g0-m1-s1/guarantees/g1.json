@@ -1,0 +1,115 @@
+{
+ "arm": "m1",
+ "roles": {
+  "R1": "R1",
+  "R2": null,
+  "R4": null,
+  "R5": null,
+  "A-crit": "C10",
+  "plant": null,
+  "full": null,
+  "gap": null,
+  "sections-crit": "C3",
+  "owner-crit": "C6",
+  "v1_role_candidates": {
+   "sections-crit": [
+    "C3"
+   ],
+   "owner-crit": [
+    "C6"
+   ]
+  },
+  "A": null,
+  "A_version": null,
+  "A_op": null,
+  "B": null,
+  "B_version": null,
+  "B_op": null,
+  "B_carrier": null
+ },
+ "orders": {
+  "O6": {
+   "memo4_rework_human_accept": "none"
+  },
+  "extra_rejections": [],
+  "scripted_related_to_A": []
+ },
+ "expected": {
+  "A": null,
+  "B": null,
+  "B_carrier": null,
+  "g1b": {
+   "live": false,
+   "reason": "no B: the owner added no planted rule"
+  }
+ },
+ "unread_snapshots": [
+  "end services: no snapshot recorded in calls.txt",
+  "turn-01 services: no snapshot recorded in calls.txt",
+  "turn-02 services: no snapshot recorded in calls.txt",
+  "turn-03 services: no snapshot recorded in calls.txt",
+  "turn-04 services: no snapshot recorded in calls.txt",
+  "turn-05 services: no snapshot recorded in calls.txt",
+  "turn-06 services: no snapshot recorded in calls.txt",
+  "turn-07 services: no snapshot recorded in calls.txt",
+  "turn-08 services: no snapshot recorded in calls.txt",
+  "turn-09 services: no snapshot recorded in calls.txt",
+  "turn-10 services: no snapshot recorded in calls.txt",
+  "turn-11 services: no snapshot recorded in calls.txt",
+  "turn-12 services: no snapshot recorded in calls.txt",
+  "turn-13 services: no snapshot recorded in calls.txt"
+ ],
+ "a": {
+  "kept_with_related": [],
+  "left_8_1_paths": [],
+  "explained_steps": [],
+  "unread_snapshots": [],
+  "verdict": "PASS"
+ },
+ "b": {
+  "items": [],
+  "fails": [],
+  "spurious_runtime_retires": [],
+  "expected": {
+   "live": false,
+   "reason": "no B: the owner added no planted rule"
+  },
+  "retire_ran_live": false,
+  "verdict": "VACUOUS (no B: the owner added no planted rule)"
+ },
+ "c": {
+  "bad": [],
+  "verdict": "PASS"
+ },
+ "d": {
+  "hits": [],
+  "verdict": "NOT DETERMINED (judged reading: judged.json g1_d_judged decides, every hit listed there)",
+  "note": "the keyword screen is an index: a hit is not a FAIL, a correct counter-rule matches it too (protocol 12.1 G1(d))"
+ },
+ "e": {
+  "verdict": "VACUOUS (no planted rule admitted)"
+ },
+ "f": {
+  "unread_snapshots": [
+   "end services: no snapshot recorded in calls.txt",
+   "turn-01 services: no snapshot recorded in calls.txt",
+   "turn-02 services: no snapshot recorded in calls.txt",
+   "turn-03 services: no snapshot recorded in calls.txt",
+   "turn-04 services: no snapshot recorded in calls.txt",
+   "turn-05 services: no snapshot recorded in calls.txt",
+   "turn-06 services: no snapshot recorded in calls.txt",
+   "turn-07 services: no snapshot recorded in calls.txt",
+   "turn-08 services: no snapshot recorded in calls.txt",
+   "turn-09 services: no snapshot recorded in calls.txt",
+   "turn-10 services: no snapshot recorded in calls.txt",
+   "turn-11 services: no snapshot recorded in calls.txt",
+   "turn-12 services: no snapshot recorded in calls.txt",
+   "turn-13 services: no snapshot recorded in calls.txt"
+  ],
+  "product_defects_unread": [],
+  "harness_own": {},
+  "expected": {},
+  "expected_state_fails": [],
+  "verdict": "NOT DETERMINED (unread snapshots: end services: no snapshot recorded in calls.txt, turn-01 services: no snapshot recorded in calls.txt, turn-02 services: no snapshot recorded in calls.txt, turn-03 services: no snapshot recorded in calls.txt, turn-04 services: no snapshot recorded in calls.txt, turn-05 services: no snapshot recorded in calls.txt, turn-06 services: no snapshot recorded in calls.txt, turn-07 services: no snapshot recorded in calls.txt, turn-08 services: no snapshot recorded in calls.txt, turn-09 services: no snapshot recorded in calls.txt, turn-10 services: no snapshot recorded in calls.txt, turn-11 services: no snapshot recorded in calls.txt, turn-12 services: no snapshot recorded in calls.txt, turn-13 services: no snapshot recorded in calls.txt)"
+ }
+}

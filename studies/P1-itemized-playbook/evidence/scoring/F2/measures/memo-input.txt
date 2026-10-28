@@ -1,0 +1,7 @@
+memo input of F2 (manager-decision-memo-input-name.md, item 2; addendum for a path value)
+root's first request: 20261028T002628583154-root-8cba
+name: notes_file
+value: /tmp/hirearchy-p1-F2-1793146944/notes/2026-10-05.md
+SERVICE.md v1 inputs: notes_file; the name is in v1: True
+frozen reader (notes_file: <date>) reads it: False
+reader used: substituted in memory: name 'notes_file', date from the value's base name (manager-decision-memo-input-name.md + addendum)

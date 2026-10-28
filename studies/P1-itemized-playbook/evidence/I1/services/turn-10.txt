@@ -1,0 +1,21 @@
+Services you can request (from your direct reports):
+- weekly-meeting-memo (offered by lead; contract v2, playbook v2): One memo (decisions and action table) from one weekly meeting's notes file.
+  inputs: notes_file* (File name of the meeting notes in the notes folder, for example 2026-11-16.md)   (* required)
+  each request: 12 runs; acceptance criteria (lead/services/weekly-meeting-memo/SERVICE.md):
+    C1: Covers only the meeting in the requested notes file.
+    C2: The memo is markdown and has at most 400 words as counted by read.
+    C3: Every decision stated in the notes is listed under a heading "Decisions".
+    C4: Every commitment in the notes, including informal ones stated in prose (for example "X said he would ..."), is one row of a table under a heading "Actions".
+    C5: The table columns are exactly Owner | Action | Due.
+    C6: Due is an ISO date (YYYY-MM-DD) or "none". A relative date such as "by Friday" is converted to an ISO date using the meeting date only when the notes make it clear; if there is no date or it is not clear, Due is "none".
+    C7: Decisions and actions use the words of the notes, and nothing appears that is not in the notes.
+    C8: Topics that were only discussed and not decided are not listed.
+    C9: The memo names the meeting date and the people present.
+    C10: The memo gives the next meeting date when the notes give one.
+    C11: The reviewer's report shows every criterion met (criteria met: n of m with n = m), and the writer applied every required change.
+    C12: The first line of the memo is one line starting "Summary:" that summarises the meeting, in the team's own words and using only facts from the notes (this is the one exception to "use the words of the notes"). After it come "Decisions", then "Actions". The meeting date, the people present and the next meeting date go after the Actions table.
+  record: 2 request(s): 2 done, 0 failed, 0 open; 2 reworked; avg 15 runs; feedback 1 accept (1 after a reject), 1 reject
+  regression list (the client's rejections):
+    R1 (case 20261027T213102025357-root-7ca1, about C12): "No, not right yet. Always start the memo with a one-line 'Summary:' of the meeting, then the decisions, then the action items." (items citing it: P11)
+    R2 (case 20261027T215102682492-root-e5c1, about C5 (not confirmed)): "No, not right yet. Owners as initials only, always."
+  playbook v2 (2026-10-27): "C12 is client-confirmed (R1): add its exact words as a step."; 11 items (0 rules); watched: P11 new (0 of 3 clean cases, k 3; waiting for the user's answer to R2)

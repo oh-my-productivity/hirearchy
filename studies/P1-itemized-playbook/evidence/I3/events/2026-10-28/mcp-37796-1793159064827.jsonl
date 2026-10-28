@@ -1,0 +1,1 @@
+{"v":1,"ts":"2026-10-28T03:44:24.827776+00:00","seq":1,"proc":"mcp","pid":37796,"kind":"tool.call","actor":"root","run":null,"trace":null,"tool":"stop","ok":true,"ms":0.39,"error":null,"error_type":null,"args":{}}

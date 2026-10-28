@@ -1,0 +1,51 @@
+{
+  "schemaVersion": "1.0.0",
+  "dataModelVersion": 1,
+  "id": "sess_45a7ac0b-017b-4c9d-b90c-8fc540ae7dcd",
+  "title": "First read the hirearchy skill with disclose_context. Then load the hirearchy...",
+  "agentMode": "hirearchy-study-p1-detach-1793122219",
+  "workspacePaths": [
+    "/private/tmp/hirearchy-p1-detach-1793122219"
+  ],
+  "rootPaths": [
+    "/private/tmp/hirearchy-p1-detach-1793122219"
+  ],
+  "createdAt": "2026-10-27T17:30:53.684Z",
+  "lastModifiedAt": "2026-10-27T17:31:24.936Z",
+  "modelId": "claude-sonnet-5.5",
+  "autopilot": true,
+  "effortLevel": "high",
+  "contextSnapshotModelDisplay": {
+    "modelId": "claude-sonnet-5.5",
+    "display": "Claude Sonnet 5.5"
+  },
+  "semanticReviewEnabled": true,
+  "disableAutoCompaction": false,
+  "ftaEnabled": false,
+  "workflowsEnabled": false,
+  "specPlanEnabled": false,
+  "specWorkflow": "quick",
+  "specSkipClarificationEnabled": true,
+  "memoryConfig": {
+    "mode": "read_write",
+    "reflection": true
+  },
+  "memoryConfigSource": "explicit",
+  "status": "failed",
+  "_meta": {
+    "kiro": {
+      "settings": {
+        "memory": {
+          "mode": "read_write",
+          "reflection": true
+        },
+        "workflows": {
+          "enabled": false
+        },
+        "goal": {
+          "enabled": false
+        }
+      }
+    }
+  }
+}

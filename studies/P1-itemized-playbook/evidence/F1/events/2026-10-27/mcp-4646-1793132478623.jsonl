@@ -1,0 +1,1 @@
+{"v":1,"ts":"2026-10-27T20:21:18.623542+00:00","seq":1,"proc":"mcp","pid":4646,"kind":"tool.call","actor":"lead","run":"lead@20261027T202039542942","trace":"20261027T200713080765-root-399b","tool":"write","ok":true,"ms":1.83,"error":null,"error_type":null,"args":{"path":"lead/MEMORY.md","content_chars":969,"append":false}}

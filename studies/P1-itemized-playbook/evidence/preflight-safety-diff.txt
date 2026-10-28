@@ -1,0 +1,28 @@
+1,3c1,3
+< label: preflight-before
+< date: Tue Oct 27 17:23:27 WET 2026
+< date_utc: 2026-10-27T17:23:27Z  epoch: 1793121807
+---
+> label: preflight-after
+> date: Tue Oct 27 19:21:40 WET 2026
+> date_utc: 2026-10-27T19:21:40Z  epoch: 1793128900
+20c20
+< drwx------@  3 aminalizadeh  staff      96 Oct 27 17:21 .
+---
+> drwx------@  3 aminalizadeh  staff      96 Oct 27 17:30 .
+25c25
+< drwx------@  9 aminalizadeh  staff   288 Oct 27 03:50 .
+---
+> drwx------@  9 aminalizadeh  staff   288 Oct 27 19:21 .
+101c101
+< drwxr-xr-x@ 23 aminalizadeh  staff   736 Oct 21 01:17 ..
+---
+> drwxr-xr-x@ 23 aminalizadeh  staff   736 Oct 27 19:03 ..
+106c106,110
+< (none)
+---
+> hirearchy-p1-ambient-1793121877
+> hirearchy-p1-probe-F1-1793128368
+> hirearchy-p1-probe-F2-1793128740
+> hirearchy-p1-probe-I1-1793128490
+> hirearchy-p1-probe-I2-1793128614

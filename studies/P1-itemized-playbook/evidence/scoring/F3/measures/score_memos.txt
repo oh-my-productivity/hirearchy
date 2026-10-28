@@ -1,0 +1,37 @@
+score_memos F3: 14 versions, 6 final memos; reviewer lead/reviewer (owner lead)
+
+memo       ver sha      D    A    wrong  extra  Summary order words copied  review
+2026-10-05 v1  f4c2999  2/2  5/5      1      0  no      yes     124 no      6 of 8 NOT PASS (blocked)
+    wrong date: Sam due 2026-10-08 (expected 2026-10-09)
+2026-10-05 v2  a7680d2  2/2  5/5      2      0  no      yes     135 no      8 of 8 (done)
+    wrong date: Sam due 2026-10-08 (expected 2026-10-09)
+    wrong date: Marta due none (expected 2026-10-14)
+2026-10-05 v3  13bb8c4  2/2  5/5      0      0  no      yes     135 yes     9 of 9 (done)
+2026-10-05 v4  d1b5dd2  2/2  5/5      2      0  no      yes     181 no      7 of 7 (done)
+    wrong date: Sam due 2026-10-08 (expected 2026-10-09)
+    wrong date: Marta due none (expected 2026-10-14)
+2026-10-12 v1  8d9d120  3/3  5/5      0      0  yes     yes     173 no      8 of 8 (done)
+2026-10-12 v2  78d73e8  3/3  5/5      0      0  yes     yes     166 yes     8 of 8 (done)
+2026-10-12 v3  169f2e4  3/3  5/5      0      0  yes     yes     166 yes     9 of 9 (done)
+2026-10-19 v1  f29411e  3/3  4/5      3      2  yes     yes     183 no      9 of 9 (done)
+    wrong date: Lee due none (expected 2026-10-30)
+    wrong date: Dev due none (expected 2026-10-24)
+    wrong date: Priya due none (expected 2026-10-26)
+    extra row: M | Keep the agenda as sent | none
+    extra row: S | Pair with the new hire on the CI pipeline during their first week | none
+2026-10-19 v2  c699b30  3/3  4/5      0      1  yes     yes     172 yes     11 of 11 PASS (done)
+    extra row: S | Pair with the new hire on the CI pipeline during their first week | none
+2026-10-26 v1  6dc27b0  3/3  0/5      0      0  yes     no      158 yes     9 of 9 (done)
+2026-10-26 v2  7cce52b  3/3  0/5      0      0  yes     no      158 yes     9 of 9 PASS (done)
+2026-11-02 v1  440277d  3/3  5/5      0      0  yes     yes     155 yes     9 of 9 (done)
+2026-11-02 v2  d4e2437  3/3  5/5      0      0  yes     yes     161 yes     10 of 10 (done)
+2026-11-09 v1  85b9b28  3/3  0/5      0      0  yes     no      142 yes     9 of 9 PASS (done)
+
+final memos: decisions 17 of 17, actions 19 of 30, wrong dates 0, extra rows 1, Summary 3 of 6
+  2026-10-05 md5 4d3c8bb1ef69eea430d0aade25192a44 = v3 13bb8c4
+  2026-10-12 md5 01548f8c7d3d70cfad3c48e5f8f52116 = v3 169f2e4
+  2026-10-19 md5 709efaf7f0507754d30af6ba4eef3469 = v2 c699b30
+  2026-10-26 md5 231181bfd928e84231ee8cb203a0247e = v2 7cce52b
+  2026-11-02 md5 614f9c3e64e3867539f5bb5a5deb4fe9 = v2 d4e2437
+  2026-11-09 md5 53abdef7fcda180c88d2e0d8ec944268 = v1 85b9b28
+delivered (copied) versions: 9 of 14

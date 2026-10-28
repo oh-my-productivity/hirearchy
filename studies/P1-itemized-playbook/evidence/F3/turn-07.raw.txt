@@ -1,0 +1,7 @@
+I've recorded your rejection of the 2026-10-05 memo with your words. The memo is already in `deliverables/`, and I haven't changed it or the contract yet.
+
+About C3: add "The memo starts with a one-line 'Summary:' of the meeting, followed by the Decisions section, then the action items table" as a lasting rule? Yes or no.
+
+On yes, the rule applies to every future memo.
+
+On this week's memo: fixing it means a rework of about 5 runs. You said no more spend, so I'll leave it as it is unless you tell me to rework it.

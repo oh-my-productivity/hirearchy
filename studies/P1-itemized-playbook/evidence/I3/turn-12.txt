@@ -1,0 +1,18 @@
+######## TURN 12  start 03:56:07  end 03:59:33  elapsed 206s  (local, 2026-10-28; UTC wall-clock start 2026-10-28T03:56:07Z end 2026-10-28T03:59:33Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Yes, add it. Yes, fund it - but please keep an eye on the cost.
+
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-12.stderr.txt):
+The updated memo is at `/private/tmp/hirearchy-p1-I3-1793157452/deliverables/memo-2026-10-12.md`. The Owner column now reads D, M, P, S and L.
+
+- **Initials (C11):** met.
+- **All other checks (C1 to C10):** met. The reviewer's final score was "criteria met: 11 of 11", and the memo is 177 words by `wc -w`.
+- **Nothing else changed:** the title, the Summary line, the decisions (Decision 1 with "per API key"), the Action text, and the Due dates are as before. The Action "swap shifts with Dev" still uses the notes' words.
+
+**Cost:** this memo used 15 runs against your 12. I told you "about 13" when you approved, but I underestimated: each earlier rework had cost 5 runs, and this one did too. So it went 2 runs past the figure you approved, and I should have flagged that before spending, not now.
+
+**What stays in place:** "owners as initials only" is now a lasting check (C11) for every future memo. The "Summary first" rule from earlier also still applies.
+
+**The 5 October memo:** it still shows full names in its Owner column, since you asked for this rule after it was delivered. I haven't touched it. If you want it updated, that would be another rework with a cost, and I'd ask for your OK first.
+
+Is this one right, or what should change?

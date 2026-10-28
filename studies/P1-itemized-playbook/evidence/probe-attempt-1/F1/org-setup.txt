@@ -1,0 +1,10 @@
+org: /private/tmp/hirearchy-p1-probe-F1-1793127427/org
+initialized organization at /private/tmp/hirearchy-p1-probe-F1-1793127427/org
+edit /private/tmp/hirearchy-p1-probe-F1-1793127427/org/ORG.md to set the mission and limits
+init exit 0
+org: /private/tmp/hirearchy-p1-probe-F1-1793127427/org
+hired lead
+hire exit 0
+org: /private/tmp/hirearchy-p1-probe-F1-1793127427/org
+error: a first definition of `probe-memo` needs deliverable (it does not exist yet, so there is nothing to keep)
+define-service exit 1

@@ -1,0 +1,13 @@
+The updated 2026-11-02 memo is at `/private/tmp/hirearchy-p1-I3-1793157452/deliverables/memo-2026-11-02.md` (196 words). The deck row's Owner now reads "JD (full name not in the notes)". I compared it with the previous version and nothing else changed.
+
+- **C13 (initials plus "(full name not in the notes)"):** met.
+- **C1 to C8, C10 and C12:** met and unchanged. The decisions, the Action text, the Due dates (2026-11-13, 2026-11-06, 2026-11-05, `none`, 2026-11-04), the full names for Dev, Priya, Marta and Lee, and the Summary-first layout are as before.
+- **C9:** met. The reviewer's score was "criteria met: 10 of 10", and the lead judged C9 as met.
+
+The team asked two things again, Lee's "on Wednesday" date and the "full names" reading. You already answered both, so I didn't reopen them.
+
+**Rule change:** "initials plus (full name not in the notes)" is now a lasting check (C13). It applies to every future memo.
+
+**Cost:** this memo used 15 runs against your 12. That is the 3 extra runs you approved, and the figure I gave you was 15.
+
+Is this one right, or what should change?

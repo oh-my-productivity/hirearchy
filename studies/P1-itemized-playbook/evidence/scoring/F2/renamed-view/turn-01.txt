@@ -1,0 +1,23 @@
+######## TURN 1  start 00:23:15  end 00:23:43  elapsed 28s  (local, 2026-10-28; UTC wall-clock start 2026-10-28T00:23:15Z end 2026-10-28T00:23:43Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Hi! After each of our weekly team meetings I want a short memo from my notes: what we decided and who does what. My notes are in /tmp/hirearchy-p1-F2-1793146944/notes (one file per meeting). Can you set up a team that does this for me every week?
+
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-01.stderr.txt):
+Yes. Because this repeats every week, I'll set it up as a standing service. After each meeting you tell me which notes file to use and the team writes the memo. I can't make it run on its own on a schedule. It starts when you ask.
+
+I read your latest notes (9 Nov) to see what the work involves. A few questions first. Reply "defaults" to accept everything marked as a default.
+
+1. **Input each week:** the notes file for that meeting, such as `/tmp/hirearchy-p1-F2-1793146944/notes/2026-11-16.md`. The team can read your notes folder but can't change it. It uses only your notes, with no web research. (Default)
+2. **Where the memo goes:** a new folder called `deliverables` here, one file per meeting, named after the notes file (for example `deliverables/2026-11-09-memo.md`). (Default)
+3. **Format and length:** markdown, at most 300 words, with two sections: "Decisions" and "Who does what" (owner, task, date). (Default)
+4. **What counts as a decision or task:**
+   - **Informal commitments:** in your 9 Nov notes, Sam "said he would" add Jo to the on-call rotation and Lee "said he'd" check the SSO log. Should these count as tasks, not only the ones marked ACTION? (Default: yes, include every commitment, including informal ones in prose.)
+   - **Vague dates:** Sam's task says "by Friday" and Lee's has no date. Should "by Friday" become a real date using the meeting date (here 13 Nov)? Should a missing date be shown as "no date given"? (Default: convert to a date, and write "no date given" when there is none. Nothing is invented.)
+5. **Checks:**
+   - Every decision and every commitment in the notes appears in the memo.
+   - Each task names one owner and a date, or "no date given".
+   - Nothing appears that isn't in the notes.
+   - The memo is at most 300 words.
+6. **Review:** a second agent checks the memo against your notes before I hand it over. (Default: yes)
+7. **Team and cost:** a lead, a writer and a reviewer, all on claude-sonnet-5.5 at high effort. Each weekly memo has a budget in runs (each agent wake-up is one run). I'll show the estimate plus 25% in the plan. (Default)
+8. **Approval:** I show you the plan before anything is built. Each memo is delivered to you without extra approvals, unless it would go over budget. (Default)

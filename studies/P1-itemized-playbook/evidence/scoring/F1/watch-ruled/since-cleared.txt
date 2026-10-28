@@ -1,0 +1,3 @@
+# `since` mismatches cleared at whole-second precision in UTC (manager-decision-stage-1-gate.md item 1); each with both values
+
+# cleared: 0 (0 pinned, 0 unpinned); frozen file: /Volumes/workspace/hirearchy/studies/P1-itemized-playbook/evidence/scoring/F1/frozen/watch/watch-mismatches.txt md5 f722bc81ccc4fcf5b20386c9ced53d7a

@@ -1,0 +1,4 @@
+exit 1
+check 1 (reply): no
+check 2 (locked: true, version = before + 1 = 1): no
+check 3 (the owner's quiet note): no 

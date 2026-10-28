@@ -1,0 +1,4 @@
+F2 assistant session (assistant-session-messages.jsonl, the session_start record at 2026-10-28T00:23:42.901Z): the session start HOLDS a <memories>...</memories> block.
+length: 5714 characters (from "<memories>" to "</memories>", inclusive); md5 of that text 85a409422b7c9c93414401e123bdff78.
+Equal to I1's and I2's block (5714 characters, md5 85a409422b7c9c93414401e123bdff78: same text). F1's session start has no block (stage-1-gate.md 4.3).
+Presence per stream so far: F1 none, I1 present, I2 present, F2 present. memories.db md5 unchanged during F2 (f0aaf02a8a216c3a291a253d2c52d461 before and after). Facts only; the pairing rule is the manager's (manager-decision-stage-1-gate.md item 3).

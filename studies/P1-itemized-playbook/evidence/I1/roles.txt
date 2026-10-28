@@ -1,0 +1,6 @@
+[sections-crit] none service/ SERVICE.v1.md (read from lead/services/weekly-meeting-memo/SERVICE.md v1 before memo 1's first delivery; no v1 criterion says the memo has exactly/only some sections: C1 'Covers only the meeting', C5 'columns are exactly Owner | Action | Due' do not match the sections pattern)
+[owner-crit] none service/ SERVICE.v1.md (the only v1 criterion naming the Owner is C5, which holds the column list 'Owner | Action | Due', protocol 4.1)
+[A-crit] C12 services/turn-11.txt (memo 1's answering version, turn 6 'Yes, add it.': contract v2; the item named C7)
+[plant] C13 services/turn-11.txt (memo 2's answering version, turn 11 'Yes, add it.': contract v3; the item named C5)
+[full] C14 services/turn-17.txt (memo 4's answering version, turn 17 'Yes, add it.': contract v4; the item named C13 = [plant]; the change removed C13 and added a new text, so O10 does not apply: [owner-crit] is none in this stream)
+[gap] C15 services/turn-21.txt (memo 5's answering version, turn 21 'Yes, add it.': contract v5; the item named C14 = [full])

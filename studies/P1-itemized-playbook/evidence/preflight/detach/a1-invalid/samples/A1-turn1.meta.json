@@ -1,0 +1,66 @@
+{
+ "chat_first_seen": "2026-10-27T17:30:44.965+00:00",
+ "chat_gone": "2026-10-27T17:31:25.435+00:00",
+ "chat_gone_epoch": 1793122285.435859,
+ "chat_pid": 77358,
+ "profile_env_keys": [
+  "HIREARCHY_STATE_DIR",
+  "HOME",
+  "ORG_ROOT",
+  "UV_CACHE_DIR"
+ ],
+ "ps_sess_note": "SESS reads 0 on macOS; sessions are inferred from pgid/ppid only (DR-0a4-10)",
+ "sampler_env_kiro_names": [
+  "KIRO_AGENT_ENGINE",
+  "KIRO_API_KEY",
+  "KIRO_CHAT_CLI_BIN",
+  "KIRO_CHAT_CLI_BIN_IDENTITY",
+  "KIRO_CHAT_CLI_FALLBACK_BIN",
+  "KIRO_CONTENT_COLLECTION_ENABLED",
+  "KIRO_CUSTOM_USER_AGENT",
+  "KIRO_ENABLED_FEATURES",
+  "KIRO_FEED_FILE",
+  "KIRO_INFRA_SAFETY_ROLLOUT_ENABLED",
+  "KIRO_KAS_NODE_PATH",
+  "KIRO_KAS_SERVER_PATH",
+  "KIRO_LITE_ROLLOUT_ENABLED",
+  "KIRO_LOCAL_SANDBOX_ROLLOUT_ENABLED",
+  "KIRO_REMOTE_SESSIONS_ENDPOINT",
+  "KIRO_ROLLOUT_FEATURES",
+  "KIRO_SESSION_ID",
+  "KIRO_TELEMETRY_CLIENT_ID",
+  "KIRO_TELEMETRY_ENABLED",
+  "KIRO_TELEMETRY_IS_ENTERPRISE",
+  "KIRO_TRUST_CLASSIFIER_SHADOW",
+  "KIRO_TRUST_CLASSIFIER_SHADOW_LOG",
+  "KIRO_TUI_FORCE_COLOR",
+  "KIRO_TUI_READY_FILE",
+  "KIRO_TUI_READY_TOKEN",
+  "KIRO_TURN_MARKER_DIR",
+  "KIRO_VERSION",
+  "KIRO_VERSION_OVERRIDE",
+  "KIRO_VOICE_SUPPORTED"
+ ],
+ "sampler_started": "2026-10-27T17:30:39.758+00:00",
+ "sampler_stopped": "2026-10-27T17:31:50.475+00:00",
+ "server_changed_names": {
+  "d_env_names": [
+   "AWS_SDK_UA_APP_ID",
+   "KIRO_CUSTOM_USER_AGENT",
+   "KIRO_TELEMETRY_IS_INTERNAL_AMAZON",
+   "PWD",
+   "_"
+  ],
+  "dropped_invalid": [],
+  "kiro_chat_log_file": [
+   "KIRO_CHAT_LOG_FILE"
+  ],
+  "m2_refusal_list": [],
+  "profile_env_keys": [
+   "ORG_ROOT"
+  ],
+  "virtual_env_and_uv": []
+ },
+ "server_has_KIRO_API_KEY": "yes",
+ "server_pid": 77526
+}

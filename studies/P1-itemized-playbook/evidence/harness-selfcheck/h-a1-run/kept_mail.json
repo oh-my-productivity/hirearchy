@@ -1,0 +1,248 @@
+{
+ "G0 m1-s1 A": {
+  "live_from": "2026-10-26T05:52:58.368806+00:00",
+  "state": "new",
+  "k": 3,
+  "clean": 2,
+  "waiting": 0,
+  "related": [],
+  "pending": [],
+  "judged_tasks": [
+   "2165",
+   "51b6"
+  ],
+  "superseded_before": [
+   0,
+   1
+  ],
+  "E": null,
+  "D": null,
+  "K": null
+ },
+ "G0 m1-s1 A'": {
+  "live_from": "2026-10-26T05:52:58.368806+00:00",
+  "state": "kept",
+  "k": 3,
+  "clean": 3,
+  "waiting": 0,
+  "related": [],
+  "pending": [],
+  "judged_tasks": [
+   "36e8",
+   "2165",
+   "51b6"
+  ],
+  "superseded_before": [
+   0,
+   0,
+   1
+  ],
+  "E": "06:08:14",
+  "D": "06:09:23",
+  "K": "06:09:23"
+ },
+ "G0 m1-s2 A": {
+  "live_from": "2026-10-26T07:15:34.819685+00:00",
+  "state": "new",
+  "k": 3,
+  "clean": 2,
+  "waiting": 0,
+  "related": [],
+  "pending": [],
+  "judged_tasks": [
+   "6310",
+   "8c68"
+  ],
+  "superseded_before": [
+   1,
+   1
+  ],
+  "E": null,
+  "D": null,
+  "K": null
+ },
+ "G0 m1-s2 A'": {
+  "live_from": "2026-10-26T07:15:34.819685+00:00",
+  "state": "kept",
+  "k": 3,
+  "clean": 3,
+  "waiting": 0,
+  "related": [],
+  "pending": [],
+  "judged_tasks": [
+   "0114",
+   "6310",
+   "8c68"
+  ],
+  "superseded_before": [
+   0,
+   1,
+   1
+  ],
+  "E": "07:35:50",
+  "D": "07:37:05",
+  "K": "07:37:05"
+ },
+ "G0 m1-s3 A": {
+  "live_from": "2026-10-26T08:52:36.522128+00:00",
+  "state": "new",
+  "k": 3,
+  "clean": 2,
+  "waiting": 0,
+  "related": [],
+  "pending": [],
+  "judged_tasks": [
+   "1523",
+   "36a4"
+  ],
+  "superseded_before": [
+   1,
+   1
+  ],
+  "E": null,
+  "D": null,
+  "K": null
+ },
+ "G0 m1-s3 A'": {
+  "live_from": "2026-10-26T08:52:36.522128+00:00",
+  "state": "new",
+  "k": 3,
+  "clean": 2,
+  "waiting": 0,
+  "related": [],
+  "pending": [],
+  "judged_tasks": [
+   "1523",
+   "36a4"
+  ],
+  "superseded_before": [
+   1,
+   1
+  ],
+  "E": null,
+  "D": null,
+  "K": null
+ },
+ "E7 s1 A": {
+  "live_from": "2026-10-25T07:17:19.703786+00:00",
+  "state": "new",
+  "k": 3,
+  "clean": 2,
+  "waiting": 0,
+  "related": [],
+  "pending": [],
+  "judged_tasks": [
+   "faaa",
+   "deb0"
+  ],
+  "superseded_before": [
+   1,
+   1
+  ],
+  "E": null,
+  "D": null,
+  "K": null
+ },
+ "E7 s1 A'": {
+  "live_from": "2026-10-25T07:17:19.703786+00:00",
+  "state": "kept",
+  "k": 3,
+  "clean": 3,
+  "waiting": 0,
+  "related": [],
+  "pending": [],
+  "judged_tasks": [
+   "066f",
+   "faaa",
+   "deb0"
+  ],
+  "superseded_before": [
+   0,
+   1,
+   1
+  ],
+  "E": "07:34:25",
+  "D": "07:35:36",
+  "K": "07:35:36"
+ },
+ "E7 s2 A": {
+  "live_from": "2026-10-25T08:00:30.727776+00:00",
+  "state": "new",
+  "k": 3,
+  "clean": 2,
+  "waiting": 0,
+  "related": [],
+  "pending": [],
+  "judged_tasks": [
+   "ae3f",
+   "2272"
+  ],
+  "superseded_before": [
+   0,
+   1
+  ],
+  "E": null,
+  "D": null,
+  "K": null
+ },
+ "E7 s2 A'": {
+  "live_from": "2026-10-25T08:00:30.727776+00:00",
+  "state": "new",
+  "k": 3,
+  "clean": 2,
+  "waiting": 0,
+  "related": [],
+  "pending": [],
+  "judged_tasks": [
+   "ae3f",
+   "2272"
+  ],
+  "superseded_before": [
+   0,
+   1
+  ],
+  "E": null,
+  "D": null,
+  "K": null
+ },
+ "E7 s3 A": {
+  "live_from": "2026-10-25T08:38:09.500876+00:00",
+  "state": "new",
+  "k": 3,
+  "clean": 2,
+  "waiting": 0,
+  "related": [],
+  "pending": [],
+  "judged_tasks": [
+   "b576",
+   "f83d"
+  ],
+  "superseded_before": [
+   1,
+   1
+  ],
+  "E": null,
+  "D": null,
+  "K": null
+ },
+ "E7 s3 A'": {
+  "live_from": "2026-10-25T08:38:09.500876+00:00",
+  "state": "new",
+  "k": 3,
+  "clean": 2,
+  "waiting": 0,
+  "related": [],
+  "pending": [],
+  "judged_tasks": [
+   "b576",
+   "f83d"
+  ],
+  "superseded_before": [
+   1,
+   1
+  ],
+  "E": null,
+  "D": null,
+  "K": null
+ }
+}

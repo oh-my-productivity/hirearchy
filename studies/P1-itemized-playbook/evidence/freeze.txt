@@ -1,0 +1,148 @@
+P1 protocol and harness freeze (step 2 of workflow wf_9e81d83f470f71a8)
+freeze_utc: 2026-10-27T17:20:48Z
+== git -C /Volumes/workspace/hirearchy rev-parse HEAD; branch
+8bf7c69bb933bf2e1ecda5dc4ddbefde41eba565
+main
+== git -C /Volumes/workspace/hirearchy diff --stat 8bf7c69b HEAD -- src skills pyproject.toml uv.lock (empty below means no product change)
+== (end of diff output)
+protocol.md md5 (md5 -q): 70237b0f3a829795a89d81c8eba7a7d6
+protocol.md5 file holds: 70237b0f3a829795a89d81c8eba7a7d6
+protocol.md bytes: 127752  lines: 952
+harness/MD5SUMS md5 (md5 -q): 524b857e9b75f6f104f22d11860145e2  lines: 64
+== harness/MD5SUMS check (MISMATCH lines only):
+(done)
+== harness/MD5SUMS (md5  name):
+9c7c7cbff8ea428de76c0696bf72b9b4  CHANGES.md
+1321c43b45b5dda3f83c9a08e1578f63  after_turn.sh
+11bd236ce61ea4779c6087c5cc004c69  aggregate.py
+a97fa0bcf096ae8d41959658e34e8306  aggregate_check.py
+c40d05929771b0fcbc7f0491df79d195  ambient_context.py
+54c9e87b891fb5f378db19acaecced2c  ambient_snapshot.sh
+92b67f74a38c04895402803e9388e718  ambiguity_recall.py
+61f51c012dfff9305836990bef47cf4d  assistant_facts.py
+2987750f60593c3f4bfd5bc9f85d6ccf  copy_org_evidence.sh
+be93561e8bb48cc801459d51e3ecbb1b  cost_total.py
+060ae5b72630d7e040df142a731c73bc  empty_calls.py
+73b27e25bd18ea9ec17ad5e64c7f6d1c  extract_mechanical.py
+41f317d85f10cd0da284dc10398dd138  extract_proposals.py
+da57d91e9beea0f1947ffb126ea92c88  extract_tool_calls.py
+8219541c07df88ad81de0b22ca67045d  finish_stream.sh
+5edf59ede17f6b594fd1e289215135c2  g0_replay.py
+81469e30cbe39c65fc67176fa6b0d331  g1_cases.py
+ef33d33be717f58022c0562b1837fd60  guarantees.py
+1c4e7824e448a3a34e24a7b759a59fcd  inject_root_rework.py
+d0726c316b3325a9d79549fdcc42d175  injection_files.py
+e2b6ec1122b9a708d3c1ac81a41bb4d3  judged-template.json
+fba09b37b0af553c2d86eb26146b64ea  kept_mail.py
+7adc6fd57cb5fd82463850c915438c40  memories_gate.py
+a575566f47d5f934d2b1560664ad4411  model_check.sh
+8975461c17ce47eeebd68efbb487dc4d  next_stream.sh
+37b3b056ae8d45152161737c7e67bd86  next_stream_check.py
+b045f0fcad4cb15032c84a61b92d2d4c  org_state.py
+2313139d76dda765f3c3ef8e50e2a60e  p1-judged-template.json
+7f617bafdccc3df92187736dbd597b69  p1_scoring_check.py
+6aa21eb5c9ffb11bb0aed9cd420fcd26  playbook_attempts.py
+6d33606b1972fb55e8c02343624abe52  probe.sh
+0ec6eb79d636e9e5c461a73382a49009  probe_check.py
+5edfa5889a9499596f7f8fae4152c774  probe_compare.py
+5f78c42cb92a4b17a46c6e8ece3abcba  profile-template.json
+1faad9255523d37a86795838a006e6dc  prompt_sizes.py
+4f3e7a973eb5da99b3c2c819bb8ca35d  quality_snapshot.sh
+567d9ce98f538d81d76d94343e778f23  rederive_quality.py
+894f0085eaebecdd0549b1a6be23c2a3  rederive_watch.py
+5ddf4b86b561beedd12ec8d4c0a0bf2d  run_turn.sh
+1aa8d7356eec8b0d70ad893d5a9eaaaf  safety-snapshot.sh
+d25f514da4ebd6e361230df61037070c  scheduler_survival.py
+4a63660bc6040f443b6fbf997e57b4e2  score_memos.py
+3712ce20c13cffd2b0c1298474088163  selfcheck.sh
+db902b8101bb6206c5d5399e6db8c9d6  selfcheck/e7-expected-assistant.json
+68a709f8278d819974850291731d36be  selfcheck/e7-expected-drivers.json
+5c12c96deaaa53768b928b8800a26457  selfcheck/e7-expected-rederive.json
+61db24c3858073ba31e44543086e7826  selfcheck/e7-expected-team.json
+4f95716fcea862c836318dbfd1b97760  selfcheck/p1-kept-mail-expected.json
+2c02c1a29d2001834a8c31932721723f  services_snapshot.sh
+dfbadb6ad2efc287e9e2efce120ca8d8  setup_stream.sh
+df7bd77dd2b7fc9eb6681e677b6c7e7c  skill_check.py
+b2142afade6e526672511a03ac40225d  skill_check.sh
+af909d830bb04b05b8cdf34412940536  spend-ledger-template.json
+0b269d00bcd8ce4e7c4498e270960c30  test_poll_loop.py
+a9c5d458ac1c32f9421fa070a8814469  tests/test_ambiguity_recall.py
+b253e1e15538ac2b13fda763bdba2e12  tests/test_assistant_facts.py
+9a8320cf1b4f61a2768fde3d32f6c087  tests/test_extract_mechanical.py
+5c370a1fca07198d8fe04b1ff3116ddc  tests/test_playbook_attempts.py
+9b651f32a58729748b0d4893aebec483  tests/test_prompt_sizes.py
+470af29ff57c534f2d9b00244ae3e86d  tests/test_rederive_quality.py
+33d0d9cdc2042077e770ecb74d4815f5  tests/test_scheduler_survival.py
+c20c9f37487c77640d496bf7b6bf837b  tests/test_score_memos.py
+e5a549f17e2666c8d4e22f3083de6ca3  watch_cases.py
+05d30ccbfd35530747c8a542eb67985c  workspace-cli.json
+== the pins of protocol section 2 re-checked (found / required):
+OK script/e7-protocol.md 0acc2b4191b8cbfa5f4bb6197b877de1
+OK script/g0-protocol.md 08cccd6458f5f418b4d388cb93d633b5
+OK script/g0-harness-MD5SUMS be21347995b821185a2adaba36d8390c
+OK harness/inject_root_rework.py 1c4e7824e448a3a34e24a7b759a59fcd
+OK script/injection/20261018T035429740646-root-d90e.md daf2085495c213ee9b1c3c6bff1bbd55
+OK answer-key.md 2fb69bbef857c2bd4862cd5dd8be9da8
+OK notes/2026-10-05.md 903e3bbf5f35df2c17444f3313c12395
+OK notes/2026-10-12.md 3893bd637c87760b43be4894b47fdb53
+OK notes/2026-10-19.md 9976a7653a6346b0976c3c38b1c697dd
+OK notes/2026-10-26.md 78cd76ede0804ffdc126f9fb1a8c1bc6
+OK notes/2026-11-02.md 93240174a95598e6b848b0bc6e9dd780
+OK notes/2026-11-09.md f9f8b4249f461bf14fa2bb4b9b1545b0
+OK answer-key-p1.md d340ff638fa7efe1a7ece8808d9a6168
+OK harness/workspace-cli.json 05d30ccbfd35530747c8a542eb67985c
+E7 protocol.md at source: 0acc2b4191b8cbfa5f4bb6197b877de1; G0 protocol.md at source: 08cccd6458f5f418b4d388cb93d633b5
+== E7 turn files (md5 -r, script/e7-turn-files):
+f98d774dd0086430370b75a9d85ac900
+(md5 of that sorted listing above; per-file md5s are in protocol section 2.2; diff -rq against E7's prompts:)
+s1 identical to E7's prompts
+s2 identical to E7's prompts
+s3 identical to E7's prompts
+== skill: repo b10238639f48ab351fa44a06aed03ffb, lines 125; global (read-only, md5 only) b10238639f48ab351fa44a06aed03ffb, lines 125; required b10238639f48ab351fa44a06aed03ffb
+== KIRO_HOME in the freezing shell: 'unset'
+== kiro-cli --version: kiro-cli 2.33.0
+== the harness self-check on the frozen files (harness/selfcheck.sh harness-selfcheck/frozen-run; earlier results in harness-selfcheck/ kept):
+watch_cases: exit 0: watch_cases: 83 of 83 checks OK
+g1_cases: exit 0: g1_cases: 342 of 342 checks OK
+kept_mail: exit 0: kept_mail: 135 of 135 checks OK
+p1_scoring: exit 0: p1_scoring_check: 22 of 22 OK
+aggregate_check: exit 0: aggregate_check: 236 of 236 checks OK
+cost_total: exit 0: cost_total: 13 of 13 checks OK
+next_stream: exit 0: next_stream_check: 23 of 23 checks OK
+empty_calls: exit 0: empty_calls: 6 of 6 checks OK
+probe_check: exit 0: probe_check: 6 of 6 checks OK
+g0_e7_rederive: exit 0: selfcheck rederive: 372 of 372 OK
+g0_e7_score_memos: exit 0: selfcheck score_memos: 334 of 334 OK
+g0_e7_ambiguity_recall: exit 0: selfcheck ambiguity_recall: 59 of 59 OK
+g0_e7_prompt_sizes: exit 0: selfcheck prompt_sizes: 15 of 15 OK
+g0_e7_playbook_attempts: exit 0: selfcheck playbook_attempts: 34 of 34 OK
+g0_e7_assistant_facts: exit 0: selfcheck assistant: 281 of 281 OK
+g0_e7_skill_check: exit 0: selfcheck skill_check: 21 of 21 OK
+g0_replay: exit 0: g0_replay: 24 of 24 OK
+tests: exit 0: 206 passed in 9.56s
+selfcheck: 17 of 17 parts OK; tests exit 0
+rc=0
+outcome: PASSED: 17 of 17 parts OK, 206 tests passed (same counts as SELFCHECK.md iteration 3b)
+== state at freeze: no P1 sandbox, profile or stream
+zsh:48: no matches found: /tmp/hirearchy-p1-*
+(no /tmp/hirearchy-p1-* dir)
+(no hirearchy-study-p1-* profile in ~/.kiro/agents)
+(no stream, probe or preflight folder under evidence/)
+== ~/.kiro/agents (names only):
+agent_config.json.example
+claude-opus-5.5.json
+claude-sonnet-5.5.json
+evolve.json
+explainer.json
+hirearchy-organization-9d66c1-web-fetch-web-search.json
+telegram_bot.json
+
+== AMENDMENT 1 (H-A1) re-freeze, 2026-10-27T19:12:39Z (by the preflight step, workflow wf_9e81d83f470f71a8; ruling: manager-decision-probe-define.md; amendment: protocol-amendment-1.md, md5 8a203c5efd7445c55096858320ef46e5)
+protocol.md md5: 70237b0f3a829795a89d81c8eba7a7d6 (unchanged); protocol.md5 holds: 70237b0f3a829795a89d81c8eba7a7d6 (unchanged)
+harness/probe.sh md5: 6d33606b1972fb55e8c02343624abe52 -> 6e18b2826cb9bb942c63c5cce36c3f58
+harness/CHANGES.md md5: 9c7c7cbff8ea428de76c0696bf72b9b4 -> 88a4a0f5f25bf56196f1700b7c38f96a
+harness/MD5SUMS md5: 524b857e9b75f6f104f22d11860145e2 -> d21508978d71e6d805f1760b25acb1b6 (lines: 64)
+harness/MD5SUMS check on the re-frozen files (MISMATCH lines only): (none)
+git HEAD: 8bf7c69bb933bf2e1ecda5dc4ddbefde41eba565; product freeze diff lines: 0
+self-check on the re-frozen files (harness-selfcheck/h-a1-run, console harness-selfcheck/h-a1-run-console.txt): selfcheck: 17 of 17 parts OK; tests exit 0; tests: 206 passed in 9.76s
+(the freeze block above this line is the original freeze of 2026-10-27T17:20:48Z; the harness md5s above are superseded by this block for probe.sh, CHANGES.md and MD5SUMS only)

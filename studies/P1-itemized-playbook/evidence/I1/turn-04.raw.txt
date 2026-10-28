@@ -1,0 +1,16 @@
+The memo for the 5 October meeting is at `/tmp/hirearchy-p1-I1-1793136275/deliverables/memo-2026-10-05.md`. I checked the delivered file against every criterion myself.
+
+- **Covers only that meeting, with date and attendees:** met.
+- **At most 400 words:** met, 139 words by `wc`.
+- **Decisions listed:** met, 2 decisions under "Decisions".
+- **Commitments listed:** met, 5 rows under "Actions", including Sam's and Lee's, which come from prose.
+- **Columns Owner | Action | Due:** met.
+- **Due dates:** met, using your three answers (Marta 2026-10-14, Sam 2026-10-09, Lee none).
+- **Wording and invented items:** met, the wording follows the notes and nothing is added.
+- **Discussed-only topics left out:** met.
+- **Next meeting date:** met, Monday 12 October.
+- **Reviewer's report:** met, 10 of 10 on the first ten checks, plus the 11th check that no required changes remain.
+
+The memo took 10 runs. The 12 approved only covered the first pass and one internal rework, so the rework you answered had to be a separate request. That request ran 1 run past your approval, which the system flagged and did not ask you to cover.
+
+Do you want to keep this memo, or change anything? Your answers on Marta, Sam and Lee could also become standing rules, so the team stops asking. Say if you want that.

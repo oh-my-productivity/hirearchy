@@ -1,0 +1,1 @@
+env -u KIRO_HOME kiro-cli chat --v3 --no-interactive --trust-all-tools --resume --effort high --agent hirearchy-study-p1-I3-assistant Sam\''s 2026-10-09 is right. Marta'\''s should be 2026-10-14. Lee'\''s none is right. No, that'\''s not an action item - leave it out.'

@@ -1,0 +1,9 @@
+I2 started: set up at 2026-10-27T23:00:51Z (setup_stream.sh I2; protocol/MD5SUMS/freeze/memories gates OK)
+SPEND LEDGER: I2/measures/spend-ledger.json created 2026-10-27T23:23:31Z-ish, before turn 4's line was sent (root's first request 23:05:07Z read from sent mail; harness-failures/meeting-file-input-name.txt; manager-decision-memo-input-name.md)
+injection ran at the end of turn 4: 23:13:50Z-23:17:07Z (exit 0); injected task 20261027T231350170182-root-0fec ended 'blocked: Questions for the client' (5 of 6 runs); window.txt and memo1-identification.txt in S/injection (copied by finish)
+STOP (turn 6 ended 23:22:35Z, sleep end 23:22:55Z; after_turn 6 done 23:23:22Z): the turn-6 reply asks a question the L-KEEP table does not clearly hold ('Should I count C7 as met? I recommend yes. If you agree, I'll copy the memo to deliverables/ and replace the old version.'); warning sent to the manager; no Lena line sent for turn 7 yet
+turn 7 line sent after the manager ruling 2026-10-27T23:25:11Z (gap since turn 6 end logged for the scorer, not a validity issue)
+STOP (turn 11 ended 23:33:48Z; after_turn 11 done 23:34:20Z): the turn-11 reply asks 'one bullet or two' for the rate-limiter decision; no row holds it; warning sent; no Lena line for turn 12 yet. SPEND LEDGER: memo 2 case entry created before the turn-12 line
+turn 12 line sent after manager-decision-row-I2-t12.md 2026-10-27T23:35:53Z
+turn 14: prompt file and lena-lines entry written in one block with run_turn.sh (same second); line exact; harness-failures/turn-14-prompt-file-timing.txt
+STREAM END after turn 29 at 2026-10-28T00:18:50Z

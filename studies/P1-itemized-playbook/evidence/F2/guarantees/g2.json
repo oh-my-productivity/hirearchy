@@ -1,0 +1,26 @@
+{
+ "a": {
+  "rejections": [],
+  "missing": [
+   "turn 5: H6 on 2026-10-05 (no case of that memo): no reject note of its own on that case in the turn's window",
+   "turn 12: L-PLANT on 2026-10-12 (no case of that memo): no reject note of its own on that case in the turn's window",
+   "turn 18: L-MIND on 2026-10-26 (no case of that memo): no reject note of its own on that case in the turn's window",
+   "turn 22: L-GAP on 2026-11-02 (no case of that memo): no reject note of its own on that case in the turn's window"
+  ],
+  "unmapped": [],
+  "verdict": "FAIL"
+ },
+ "b": {
+  "late_or_missing": [],
+  "late_detail": [],
+  "verdict": "PASS"
+ },
+ "c": {
+  "REQUEST-UNANSWERED": 0,
+  "FEEDBACK-UNANSWERED": 0,
+  "exception_uses": 0,
+  "relayed_accepts_while_unanswered": 0,
+  "one_off_delegates_while_unanswered": 0,
+  "verdict": "PASS (by construction; the counts are reported)"
+ }
+}

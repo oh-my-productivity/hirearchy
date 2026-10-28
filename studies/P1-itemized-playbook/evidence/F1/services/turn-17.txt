@@ -1,0 +1,19 @@
+Services you can request (from your direct reports):
+- weekly-memo (offered by lead; contract v5, playbook v1): One memo of decisions and action items from one weekly meeting notes file
+  inputs: notes_file* (File name of the meeting notes inside the notes folder, e.g. 2026-10-05.md)   (* required)
+  each request: 12 runs; acceptance criteria (lead/services/weekly-memo/SERVICE.md):
+    C2: At most 400 words as counted by read, table included.
+    C3: Every decision in the notes file appears under 'Decisions', including decisions stated informally in prose, and no decision that is not in the notes appears.
+    C4: Every commitment in the notes file appears as one row of the action items table, including commitments made informally in prose (for example 'X said he would ...'), and no row is invented.
+    C6: Due is an ISO date (YYYY-MM-DD) when the notes give a date or make it clear from the meeting date (for example 'by Friday' becomes the date of that Friday); otherwise Due is 'none', and 'none' is also used when the notes say no date was set.
+    C7: Every statement in the memo is traceable to the named notes file and to no other file.
+    C8: The reviewer's report shows every criterion met (criteria met: n of m with n = m), and the writer applied every required change.
+    C9: When an action is for a dated event, Due is the date of that event (for example, a room booked for the training on the 14th has Due 2026-10-14).
+    C10: The memo is markdown with a one-line title containing the meeting date, then one line starting with 'Summary:' that summarises the meeting in one line, then a section titled 'Decisions', then a section titled 'Action items', in that order, and nothing else. (amendment, user-initiated: never admits a playbook revision)
+    C11: The action items are a markdown table with exactly the columns Owner | Action | Due, and each row has exactly one owner.
+    C12: Owners are shown as initials only, always (for example P for Priya), never as full names.
+  record: 4 request(s): 4 done, 0 failed, 0 open; 3 reworked; avg 11.2 runs; feedback 2 accept (2 after a reject), 0 reject
+  regression list (the client's rejections):
+    R1 (case 20261027T193221247283-root-ebf5, about C9): "No, not right yet. And Marta's room is for the training on the 14th, so I want 2026-10-14 there."
+    R2 (case 20261027T200713080765-root-399b, about C11, C12): "No, not right yet. Owners as initials only, always."
+  playbook v1 (2026-10-27): "initial playbook"; 10 items (0 rules), none watched

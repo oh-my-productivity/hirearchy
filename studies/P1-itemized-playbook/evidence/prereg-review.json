@@ -1,0 +1,33 @@
+{
+ "verdict": "CHANGES_REQUESTED",
+ "iteration": 3,
+ "counts": {"HIGH": 0, "MEDIUM": 3, "LOW": 5},
+ "previous_findings_resolved": "every manager directive of manager-decision-prereg-loop.md implemented; all 7 MEDIUM and 9 LOW of iteration 2 resolved (tables in prereg-review.md)",
+ "findings": [
+  {"id": "P3-M1", "severity": "MEDIUM", "check": 1,
+   "summary": "A stream ended by ruling (b) (a question the L-KEEP table did not hold, a protocol-side gap) is scored as product FAILs of exit lines: section 5 routes undelivered memos to 12.3's 'memo never delivered fails' (no regression (arm I)), and G2(b)'s end-of-stream part fails the rejection whose answer was Lena's withheld line (G2 in both arms); no reason is written. Score the parts the ruling's end cut as NOT DETERMINED (validity.json ended_by_ruling, read by aggregate.py), keeping 'valid as at a cap'",
+   "files": ["studies/P1-itemized-playbook/evidence/protocol.md", "studies/P1-itemized-playbook/evidence/harness/score_memos.py", "studies/P1-itemized-playbook/evidence/harness/guarantees.py", "studies/P1-itemized-playbook/evidence/harness/aggregate.py", "studies/P1-itemized-playbook/evidence/harness/aggregate_check.py"]},
+  {"id": "P3-M2", "severity": "MEDIUM", "check": 2,
+   "summary": "Memo 3's late verdict leaves a choice: M3-VERDICT lists three outcomes (M3-ACCEPT, M3-MARTA, VR-REJECT) while L-ASIS 'stays with the same conditions' and can hold at that turn after a declined memo-3 spend (an accept against a human rejection); and 'memo 3's version' is undefined when another version was delivered after L-LATER. State one rule in 4.2 (e.g. the latest delivered version; L-ASIS when its trigger holds, recorded M3-VERDICT + L-ASIS)",
+   "files": ["studies/P1-itemized-playbook/evidence/protocol.md"]},
+  {"id": "P3-M3", "severity": "MEDIUM", "check": 1,
+   "summary": "G2(a) requires one human reject note per Lena rejection turn and does not check its case (rules parsed as a set), so a second rejection in the same line (M3-VERDICT reject + L-MIND; memo 4 rework VR-REJECT + L-GAP) can go unrecorded while G2(a) passes: a fail-open in a pass rule of both arms. Require one distinct note per (rule, memo) on that memo's case, with VR-REJECT@<memo> in lena-lines.txt, and two constructed cases",
+   "files": ["studies/P1-itemized-playbook/evidence/protocol.md", "studies/P1-itemized-playbook/evidence/harness/guarantees.py", "studies/P1-itemized-playbook/evidence/harness/g1_cases.py"]},
+  {"id": "P3-L1", "severity": "LOW", "check": 3,
+   "summary": "No row for a foreseeable arm-I question, whether the team should retire the warned initials rule (B has no coverage, so K31 does not apply; a ruling could only map it to 'Keep it as it is.', which steers O9); add K37 -> \"That's up to the team.\"",
+   "files": ["studies/P1-itemized-playbook/evidence/protocol.md"]},
+  {"id": "P3-L2", "severity": "LOW", "check": 2,
+   "summary": "The sentence forms inside 'Also:' are undefined (with or without E7's 'Not right yet'); state that they are L-ASIS's forms, in table order",
+   "files": ["studies/P1-itemized-playbook/evidence/protocol.md"]},
+  {"id": "P3-L3", "severity": "LOW", "check": 1,
+   "summary": "12.3 restates E7's rule as 'a memo not delivered and judged fails' while its procedure and score_memos fail only a memo never delivered; state the narrowing with design 18.4.1's reason (a cap's cut of memo 6's accept costs only its descriptive accept count)",
+   "files": ["studies/P1-itemized-playbook/evidence/protocol.md"]},
+  {"id": "P3-L4", "severity": "LOW", "check": 1,
+   "summary": "validity.json's before_failure keys are not named; aggregate.py reads only G1, G2 and no_regression and silently ignores others; name them in protocol 8 and reject other keys",
+   "files": ["studies/P1-itemized-playbook/evidence/protocol.md", "studies/P1-itemized-playbook/evidence/harness/aggregate.py"]},
+  {"id": "P3-L5", "severity": "LOW", "check": 3,
+   "summary": "Section 0 says a missing row is resolved 'never by a new line' while section 5 allows a line by amendment before F1's first turn; write 'after F1's first turn, never by a new line'",
+   "files": ["studies/P1-itemized-playbook/evidence/protocol.md"]}
+ ],
+ "reviewDoc": "/Volumes/workspace/hirearchy/studies/P1-itemized-playbook/evidence/prereg-review.md"
+}

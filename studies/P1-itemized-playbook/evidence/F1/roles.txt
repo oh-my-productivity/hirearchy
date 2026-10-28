@@ -1,0 +1,7 @@
+[sections-crit] C1 service/ SERVICE.v1.md (v1 criterion 'exactly two sections'); replaced at v4 by the Summary criterion (turn 7)
+[owner-crit] none service/ SERVICE.v1.md (C5 holds the column list 'Owner | Action | Due', protocol 4.1)
+[A-crit] C9 guarantees/roles.txt (the mechanical roles; agree with this record: the Summary/dated-event answers of memo 1; see the contract versions v2-v4)
+[plant] C11 guarantees/roles.txt (memo 2's answering version, turn 12 'Yes, add it.'; the item named C5)
+[full] C13 guarantees/roles.txt (memo 4's answer, turn 19; the item named C12)
+[gap] C14 guarantees/roles.txt (memo 5's answer, turn 23; the item named C13)
+(the step's record of the ids the items named is in lena-lines.txt facts; guarantees.py lists no disagreement: see guarantees/roles.txt)

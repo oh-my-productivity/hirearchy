@@ -1,0 +1,52 @@
+mission: >
+  After each weekly team meeting, write a short markdown memo from the user's notes file for that meeting: what was decided and who does what.
+needs:
+  kind: writing
+  scope: "One memo per request, from the one meeting notes file named in the request: the decisions made and the action items (who does what, by when). Nothing from other meetings' files, no commentary."
+  inputs:
+    - /tmp/hirearchy-p1-F3-1793152805/notes
+  quality_bar: Every decision and every commitment in the named notes file is in the memo, and nothing in the memo is missing from the notes.
+  sources: Only the files in needs.inputs; no web.
+  budget_runs: 12
+  models: {cheap: claude-sonnet-5.5, strong: claude-sonnet-5.5}
+  model_policy: one model for all
+  review: true
+  approval: Plan first; ask before any spend beyond the budget.
+  progress: One line when I ask.
+agents:
+  - name: lead
+    template: manager
+    model: strong
+    children:
+      - name: writer
+        template: writer
+        model: strong
+        tools: [read]
+      - name: reviewer
+        template: reviewer
+        model: strong
+        tools: [read]
+services:
+  - name: weekly-meeting-memo
+    owner: lead
+    description: One short markdown memo (decisions and action items table) from one weekly meeting notes file.
+    inputs:
+      - name: notes_file
+        description: File name of the meeting notes inside the notes folder, for example 2026-11-09.md
+        required: true
+    acceptance:
+      - The memo covers only the meeting in the named notes file.
+      - The memo is markdown and has at most 400 words as counted by read.
+      - The memo has a Decisions section listing every decision recorded in the notes file, one line each.
+      - "The memo has the action items as a markdown table with exactly the columns Owner | Action | Due."
+      - "The table contains every commitment in the notes file, including informal ones stated in prose (for example 'X said they would do Y'), whether or not it is labelled ACTION."
+      - "Every Due value is an ISO date (YYYY-MM-DD) or the word none. A vague deadline (for example 'by Friday') becomes a date, worked out from the meeting date, when the notes make it clear; if no date is given, Due is none."
+      - Every decision and action item is stated in the named notes file; nothing is invented.
+      - "The reviewer's report shows every criterion met (criteria met: n of m with n = m), and the writer applied every required change."
+    deliverable:
+      description: One memo per request, named memo-<notes file name>, for example memo-2026-11-09.md
+      format: markdown
+      max_words: 400
+      path: /tmp/hirearchy-p1-F3-1793152805/deliverables
+    budget: 12
+    locked: false

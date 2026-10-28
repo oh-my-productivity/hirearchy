@@ -1,0 +1,2 @@
+PLAYBOOK.md version 1 by 'root' op 'first'
+H-LOCK: ok (no version by the owner before the lock)

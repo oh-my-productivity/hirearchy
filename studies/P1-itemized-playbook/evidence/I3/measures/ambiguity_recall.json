@@ -1,0 +1,115 @@
+{
+  "could_not_derive": [],
+  "items": {
+    "AMB-1": {
+      "memo": "2026-10-19",
+      "owner": "Marta",
+      "recall": {
+        "k": 0,
+        "n": 0
+      },
+      "recall_literal_timing": {
+        "k": 0,
+        "n": 0
+      },
+      "versions": [],
+      "versions_containing": 0,
+      "versions_of_the_memo": 2
+    },
+    "AMB-2": {
+      "memo": "2026-10-12",
+      "owner": "Sam",
+      "recall": {
+        "k": 0,
+        "n": 0
+      },
+      "recall_literal_timing": {
+        "k": 0,
+        "n": 0
+      },
+      "versions": [],
+      "versions_containing": 0,
+      "versions_of_the_memo": 3
+    }
+  },
+  "label": "I3",
+  "recall": {
+    "k": 0,
+    "n": 0
+  },
+  "recall_literal_timing": {
+    "k": 0,
+    "n": 0
+  },
+  "roles": {
+    "children": [
+      "lead/reviewer",
+      "lead/writer"
+    ],
+    "detected_by": "charter",
+    "owner": "lead",
+    "reviewer": "lead/reviewer",
+    "reviewer_dir": "lead-reviewer",
+    "roles": {
+      "lead/reviewer": "Independent Reviewer",
+      "lead/writer": "Writer"
+    }
+  },
+  "script": {
+    "md5": "92b67f74a38c04895402803e9388e718",
+    "name": "ambiguity_recall.py"
+  },
+  "source_files": [
+    "assistant-tool-calls.txt",
+    "injection/injection-log.txt",
+    "memos/versions/INDEX.txt",
+    "memos/versions/memo-2026-10-05.v1.e80ce44.md",
+    "memos/versions/memo-2026-10-05.v2.00b6a86.md",
+    "memos/versions/memo-2026-10-05.v3.6f7c872.md",
+    "memos/versions/memo-2026-10-05.v4.05b6b11.md",
+    "memos/versions/memo-2026-10-12.v1.184e78a.md",
+    "memos/versions/memo-2026-10-12.v2.87e5990.md",
+    "memos/versions/memo-2026-10-12.v3.71c6cb8.md",
+    "memos/versions/memo-2026-10-19.v1.b8c45a2.md",
+    "memos/versions/memo-2026-10-19.v2.626a7fb.md",
+    "memos/versions/memo-2026-10-26.v1.1380316.md",
+    "memos/versions/memo-2026-10-26.v2.e82d45c.md",
+    "memos/versions/memo-2026-11-02.v1.0d2bfa3.md",
+    "memos/versions/memo-2026-11-02.v2.c236ec3.md",
+    "memos/versions/memo-2026-11-02.v3.0d0ecad.md",
+    "memos/versions/memo-2026-11-09.v1.7a9bd87.md",
+    "msgs/lead-read/20261028T032648394081-lead.reviewer-daac.md",
+    "msgs/lead-read/20261028T033110265704-lead.reviewer-7c54.md",
+    "msgs/lead-read/20261028T033505038473-lead.reviewer-68b0.md",
+    "msgs/lead-read/20261028T034213993272-lead.reviewer-8e3c.md",
+    "msgs/lead-read/20261028T034910864014-lead.reviewer-d0c2.md",
+    "msgs/lead-read/20261028T035338132559-lead.reviewer-9a0d.md",
+    "msgs/lead-read/20261028T035856497795-lead.reviewer-a80f.md",
+    "msgs/lead-read/20261028T040329519412-lead.reviewer-6de4.md",
+    "msgs/lead-read/20261028T040726663835-lead.reviewer-4cab.md",
+    "msgs/lead-read/20261028T041111884573-lead.reviewer-5754.md",
+    "msgs/lead-read/20261028T041726209845-lead.reviewer-2f79.md",
+    "msgs/lead-read/20261028T042153742939-lead.reviewer-57c4.md",
+    "msgs/lead-read/20261028T042602564673-lead.reviewer-7b3a.md",
+    "msgs/lead-read/20261028T043054193163-lead.reviewer-c993.md",
+    "msgs/lead-read/20261028T043515405402-lead.reviewer-ad4a.md",
+    "msgs/lead-reviewer-read/20261028T032549858918-lead-d919.md",
+    "msgs/lead-reviewer-read/20261028T033034928941-lead-20f2.md",
+    "msgs/lead-reviewer-read/20261028T033418667052-lead-74cd.md",
+    "msgs/lead-reviewer-read/20261028T034111856669-lead-a88b.md",
+    "msgs/lead-reviewer-read/20261028T034812580230-lead-1070.md",
+    "msgs/lead-reviewer-read/20261028T035253959951-lead-50cd.md",
+    "msgs/lead-reviewer-read/20261028T035824400032-lead-d5b1.md",
+    "msgs/lead-reviewer-read/20261028T040233232945-lead-97e8.md",
+    "msgs/lead-reviewer-read/20261028T040652087899-lead-7360.md",
+    "msgs/lead-reviewer-read/20261028T041029607909-lead-4b6e.md",
+    "msgs/lead-reviewer-read/20261028T041655679995-lead-ee5d.md",
+    "msgs/lead-reviewer-read/20261028T042104021431-lead-e409.md",
+    "msgs/lead-reviewer-read/20261028T042525805959-lead-0abf.md",
+    "msgs/lead-reviewer-read/20261028T043015713959-lead-d586.md",
+    "msgs/lead-reviewer-read/20261028T043427795660-lead-4107.md",
+    "org-files/lead-reviewer-AGENT.md",
+    "org-files/lead-writer-AGENT.md",
+    "org-git-log.txt"
+  ]
+}

@@ -1,0 +1,17 @@
+The rework is done and the Owner column now shows initials. I haven't delivered it yet because of one open question.
+
+This is the Actions table now:
+
+| Owner | Action | Due |
+|---|---|---|
+| D | Write the postmortem for the 8 October outage | 2026-10-14 |
+| M | Send the demo agenda to the customer | 2026-10-16 |
+| P | Start implementing the rate limiter behind a feature flag | 2026-10-20 |
+| S | Update the out-of-date staging test data | 2026-10-21 |
+| L | Swap pager shifts with Dev for the demo week | none |
+
+Only the Owner column changed. The reviewer passed 8 of 8 criteria, including the new initials rule. It also reported 13 of 13 facts verified.
+
+**Question:** you said "always," but the new rule covers only the Owner column. Lee's row still says "with Dev" in the Action text. Should names inside the Action text also become initials, so that row reads "Swap pager shifts with D for the demo week"? If so, I'll make it a lasting rule for every memo.
+
+The case has used 11 of the 12 runs you approved. A one-line fix would cost about 3 runs, which is about 2 more than that. I'd need your OK to go over. I'd ask the lead for the cheapest possible pass: one writer edit and one reviewer check.

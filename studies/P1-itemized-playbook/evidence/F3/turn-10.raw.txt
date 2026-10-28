@@ -1,0 +1,17 @@
+The memo is at `/tmp/hirearchy-p1-F3-1793152805/deliverables/memo-2026-10-12.md`. The copy matches the team's file.
+
+- Covers only the 2026-10-12 meeting: met
+- Markdown, at most 400 words: met (136 by the team's count)
+- Starts with a one-line `Summary:`, then Decisions, then the action table: met
+- Decisions, one line each (3): met
+- Table columns Owner | Action | Due: met
+- All commitments included, informal ones too: met (Dev, Marta, Priya, Sam, Lee)
+- Due values are ISO dates or `none`: met (Sam 2026-10-21, Lee `none`)
+- Nothing invented: met
+- Reviewer passed 8 of 8, with no required changes: met
+
+I made one change after your answers: Sam's row no longer says "probably". I left everything else as you confirmed.
+
+I read your answer on the RFC and feature-flag line as keeping it as one decision line. If you meant to split it into two decisions, say so, and I'll send it back for a rework of about 5 runs. You'd need to approve that spend.
+
+This memo used 10 runs, and the budget is 12 per request. The new rule is in the contract, so every memo from now on starts with the Summary line. Do you want to keep this memo, or change something?

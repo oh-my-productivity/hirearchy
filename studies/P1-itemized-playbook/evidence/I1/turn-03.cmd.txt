@@ -1,0 +1,1 @@
+env -u KIRO_HOME kiro-cli chat --v3 --no-interactive --trust-all-tools --resume --effort high --agent hirearchy-study-p1-I1-assistant 'Keep it as it is. Great, approve. Please do this week'\''s: 2026-10-05.md. I'\''ll wait.'

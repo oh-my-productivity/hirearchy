@@ -1,0 +1,13 @@
+######## TURN 7  start 20:02:32  end 20:04:15  elapsed 103s  (local, 2026-10-27; UTC wall-clock start 2026-10-27T20:02:32Z end 2026-10-27T20:04:15Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Yes, add it. No more spend, please deliver as is.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-07.stderr.txt):
+Malformed call; retrying with the arguments nested properly.I've updated the weekly memo rules, but I did not rework the 5 October memo, because you asked for no more spend.
+
+The file in `/tmp/hirearchy-p1-F1-1793129193/deliverables/memo-2026-10-05.md` is still the version I delivered before. It has no "Summary:" line, and Marta's Due is `none`, not `2026-10-14`. It doesn't meet the new rules. I haven't recorded it as accepted, because you said "deliver as is" and didn't say you accept it.
+
+From the next memo on, these rules apply:
+- **Marta-type rule:** if an action is for a dated event, Due is that event's date. A room booked for the training on the 14th gets `2026-10-14`.
+- **Summary line:** the memo starts with the title, then one line starting with `Summary:`, then "Decisions", then "Action items". This replaces the old "two sections and nothing else" rule.
+
+If you want 5 October redone under the new rules, it would take about 5 runs. Tell me and I'll ask the team. Otherwise, to run next week, give me the notes file name, for example `2026-10-12.md`.

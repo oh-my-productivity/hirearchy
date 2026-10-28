@@ -1,0 +1,2619 @@
+[
+ {
+  "expected": "lead",
+  "key": "services.0.owner",
+  "source": "design 19.3 E7 intro (offered by lead)",
+  "stream": "s1"
+ },
+ {
+  "expected": "weekly-meeting-memo",
+  "key": "services.0.service",
+  "source": "design 19.3 E7 intro",
+  "stream": "s1"
+ },
+ {
+  "expected": "root",
+  "key": "services.0.client",
+  "source": "design 19.3 E7 intro (client root, human)",
+  "stream": "s1"
+ },
+ {
+  "expected": "human",
+  "key": "services.0.client_kind",
+  "source": "design 19.3 E7 intro (client root, human)",
+  "stream": "s1"
+ },
+ {
+  "expected": 2,
+  "key": "services.0.contract",
+  "source": "design 19.3 E7S1-1 (contract v2)",
+  "stream": "s1"
+ },
+ {
+  "expected": 2,
+  "key": "services.0.playbook",
+  "source": "design 19.3 E7S1-1 (playbook v2)",
+  "stream": "s1"
+ },
+ {
+  "expected": 12,
+  "key": "services.0.budget",
+  "source": "design 19.3 E7S1-1 (budget 12)",
+  "stream": "s1"
+ },
+ {
+  "expected": 1,
+  "key": "services.#",
+  "source": "design 19.3 E7 intro (every stream is one service)",
+  "stream": "s1"
+ },
+ {
+  "expected": null,
+  "key": "one_off",
+  "source": "design 19.3 E7S1-1 / E7-all (no one-off record)",
+  "stream": "s1"
+ },
+ {
+  "expected": [],
+  "key": "nested",
+  "source": "design 19.3 E7S1-1 / E7-all (no nested service)",
+  "stream": "s1"
+ },
+ {
+  "expected": {
+   "known": true,
+   "skipped": 0,
+   "truncated": false
+  },
+  "key": "services.0.history",
+  "published": {
+   "known": false,
+   "skipped": 0,
+   "truncated": false
+  },
+  "source": "amended by manager-decision-selfcheck.md (2026-10-25) item 1: the history path reads org-git-log.txt (s1 43, s2 36, s3 42 commits; AGENT.md and ORG.md only in their creation commits, so no charter or model mark); design 19.3 E7-all's known false is the replay kit's (no org git), kept by the replays under their kit-limit label",
+  "stream": "s1"
+ },
+ {
+  "expected": 3,
+  "key": "services.0.cases.#",
+  "source": "design 19.3 E7S1-1 (3 cases)",
+  "stream": "s1"
+ },
+ {
+  "expected": "20261025T070423629042-root-5efc",
+  "key": "services.0.cases.0.id",
+  "source": "design 19.3 E7S1 heading (cases ...-root-5efc), oldest first",
+  "stream": "s1"
+ },
+ {
+  "expected": "Memo for the 5 October 2026 meeting",
+  "key": "services.0.cases.0.title",
+  "source": "design 19.3 E7S1-4 (case title)",
+  "stream": "s1"
+ },
+ {
+  "expected": "done",
+  "key": "services.0.cases.0.state",
+  "source": "design 19.3 E7S1-1 / E7-all (states)",
+  "stream": "s1"
+ },
+ {
+  "expected": 4,
+  "key": "services.0.cases.0.tasks",
+  "source": "design 19.3 E7S1-1 (tasks per case)",
+  "stream": "s1"
+ },
+ {
+  "expected": false,
+  "key": "services.0.cases.0.cut",
+  "source": "design 19.3 E7S1-1 / E7S1-4 (cut)",
+  "stream": "s1"
+ },
+ {
+  "expected": 0,
+  "key": "services.0.cases.0.credited",
+  "source": "design 19.3 E7-all (credited 0 in all nine cases)",
+  "stream": "s1"
+ },
+ {
+  "expected": 15,
+  "key": "services.0.cases.0.user_cost",
+  "source": "design 19.3 E7S1-4 (the user's runs 15 of 19)",
+  "stream": "s1"
+ },
+ {
+  "expected": 19,
+  "key": "services.0.cases.0.user_approved",
+  "source": "design 19.3 E7S1-4 (... of 19 approved) / E7 approvals paragraph",
+  "stream": "s1"
+ },
+ {
+  "expected": "0.79",
+  "key": "services.0.cases.0.ratio",
+  "source": "design 19.3 E7S1-4 (0.79x)",
+  "stream": "s1"
+ },
+ {
+  "expected": [
+   {
+    "amount": 7,
+    "id": "20261025T070822368798-root-5e3e",
+    "source": "human"
+   },
+   {
+    "amount": 6,
+    "id": "20261025T071152630842-root-6920",
+    "source": "relayed"
+   },
+   {
+    "amount": 5,
+    "id": "20261025T071718703786-root-066f",
+    "source": "human"
+   }
+  ],
+  "key": "services.0.cases.0.top_ups",
+  "source": "design 19.3 E7S1-4 top-ups and E7S1-3 top-up marks (amounts)",
+  "stream": "s1"
+ },
+ {
+  "expected": 5,
+  "key": "services.0.cases.0.relayed_runs",
+  "source": "design 19.3 E7S1-4 (relayed runs 5)",
+  "stream": "s1"
+ },
+ {
+  "expected": 20,
+  "key": "services.0.cases.0.spend",
+  "source": "design 19.3 E7S1-4 (total 20)",
+  "stream": "s1"
+ },
+ {
+  "expected": 20,
+  "key": "services.0.cases.0.runs",
+  "source": "design 19.3 E7S1-4 (20 charged runs)",
+  "stream": "s1"
+ },
+ {
+  "expected": {
+   "outcome": "none",
+   "superseded_by": "20261025T071152630842-root-6920",
+   "superseded_source": "relayed",
+   "task": "20261025T070423629042-root-5efc"
+  },
+  "key": "services.0.cases.0.first",
+  "source": "design 19.3 E7S1-1 (first deliveries: the head 5efc is superseded by the injected relayed rework 6920)",
+  "stream": "s1"
+ },
+ {
+  "expected": "20261025T072107521830-root-fb17",
+  "key": "services.0.cases.1.id",
+  "source": "design 19.3 E7S1 heading (cases ...-root-fb17), oldest first",
+  "stream": "s1"
+ },
+ {
+  "expected": "Memo for the 12 October 2026 meeting",
+  "key": "services.0.cases.1.title",
+  "source": "design 19.3 E7S1-4 (case title)",
+  "stream": "s1"
+ },
+ {
+  "expected": "done",
+  "key": "services.0.cases.1.state",
+  "source": "design 19.3 E7S1-1 / E7-all (states)",
+  "stream": "s1"
+ },
+ {
+  "expected": 2,
+  "key": "services.0.cases.1.tasks",
+  "source": "design 19.3 E7S1-1 (tasks per case)",
+  "stream": "s1"
+ },
+ {
+  "expected": false,
+  "key": "services.0.cases.1.cut",
+  "source": "design 19.3 E7S1-1 / E7S1-4 (cut)",
+  "stream": "s1"
+ },
+ {
+  "expected": 0,
+  "key": "services.0.cases.1.credited",
+  "source": "design 19.3 E7-all (credited 0 in all nine cases)",
+  "stream": "s1"
+ },
+ {
+  "expected": 11,
+  "key": "services.0.cases.1.user_cost",
+  "source": "design 19.3 E7S1-4 (the user's runs 11 of 12)",
+  "stream": "s1"
+ },
+ {
+  "expected": 12,
+  "key": "services.0.cases.1.user_approved",
+  "source": "design 19.3 E7S1-4 (... of 12 approved) / E7 approvals paragraph",
+  "stream": "s1"
+ },
+ {
+  "expected": "0.92",
+  "key": "services.0.cases.1.ratio",
+  "source": "design 19.3 E7S1-4 (0.92x)",
+  "stream": "s1"
+ },
+ {
+  "expected": [
+   {
+    "amount": 3,
+    "id": "20261025T072433451255-root-faaa",
+    "source": "human"
+   },
+   {
+    "amount": 3,
+    "id": "20261025T072621895274-root-0036",
+    "source": "granted"
+   }
+  ],
+  "key": "services.0.cases.1.top_ups",
+  "source": "design 19.3 E7S1-4 top-ups and E7S1-3 top-up marks (amounts)",
+  "stream": "s1"
+ },
+ {
+  "expected": 0,
+  "key": "services.0.cases.1.relayed_runs",
+  "source": "implied by design 19.3 E7S1-4 (11 of 12) and design 4.2: the case holds no relayed task (relayed_runs 0) and is done (spend = runs = user_cost)",
+  "stream": "s1"
+ },
+ {
+  "expected": 11,
+  "key": "services.0.cases.1.spend",
+  "source": "implied by design 19.3 E7S1-4 (11 of 12) and design 4.2: the case holds no relayed task (relayed_runs 0) and is done (spend = runs = user_cost)",
+  "stream": "s1"
+ },
+ {
+  "expected": 11,
+  "key": "services.0.cases.1.runs",
+  "source": "implied by design 19.3 E7S1-4 (11 of 12) and design 4.2: the case holds no relayed task (relayed_runs 0) and is done (spend = runs = user_cost)",
+  "stream": "s1"
+ },
+ {
+  "expected": {
+   "outcome": "none",
+   "superseded_by": "20261025T072433451255-root-faaa",
+   "superseded_source": "human",
+   "task": "20261025T072107521830-root-fb17"
+  },
+  "key": "services.0.cases.1.first",
+  "source": "design 19.3 E7S1-1 (first deliveries: fb17 superseded by the human rework faaa)",
+  "stream": "s1"
+ },
+ {
+  "expected": "20261025T072840565469-root-eb65",
+  "key": "services.0.cases.2.id",
+  "source": "design 19.3 E7S1 heading (cases ...-root-eb65), oldest first",
+  "stream": "s1"
+ },
+ {
+  "expected": "Memo for the 19 October 2026 meeting",
+  "key": "services.0.cases.2.title",
+  "source": "design 19.3 E7S1-4 (case title)",
+  "stream": "s1"
+ },
+ {
+  "expected": "done",
+  "key": "services.0.cases.2.state",
+  "source": "design 19.3 E7S1-1 / E7-all (states)",
+  "stream": "s1"
+ },
+ {
+  "expected": 2,
+  "key": "services.0.cases.2.tasks",
+  "source": "design 19.3 E7S1-1 (tasks per case)",
+  "stream": "s1"
+ },
+ {
+  "expected": false,
+  "key": "services.0.cases.2.cut",
+  "source": "design 19.3 E7S1-1 / E7S1-4 (cut)",
+  "stream": "s1"
+ },
+ {
+  "expected": 0,
+  "key": "services.0.cases.2.credited",
+  "source": "design 19.3 E7-all (credited 0 in all nine cases)",
+  "stream": "s1"
+ },
+ {
+  "expected": 10,
+  "key": "services.0.cases.2.user_cost",
+  "source": "design 19.3 E7S1-4 (the user's runs 10 of 12)",
+  "stream": "s1"
+ },
+ {
+  "expected": 12,
+  "key": "services.0.cases.2.user_approved",
+  "source": "design 19.3 E7S1-4 (... of 12 approved) / E7 approvals paragraph",
+  "stream": "s1"
+ },
+ {
+  "expected": "0.83",
+  "key": "services.0.cases.2.ratio",
+  "source": "design 19.3 E7S1-4 (0.83x)",
+  "stream": "s1"
+ },
+ {
+  "expected": [
+   {
+    "amount": 5,
+    "id": "20261025T073214471497-root-deb0",
+    "source": "human"
+   }
+  ],
+  "key": "services.0.cases.2.top_ups",
+  "source": "design 19.3 E7S1-4 top-ups and E7S1-3 top-up marks (amounts)",
+  "stream": "s1"
+ },
+ {
+  "expected": 0,
+  "key": "services.0.cases.2.relayed_runs",
+  "source": "implied by design 19.3 E7S1-4 (10 of 12) and design 4.2: the case holds no relayed task (relayed_runs 0) and is done (spend = runs = user_cost)",
+  "stream": "s1"
+ },
+ {
+  "expected": 10,
+  "key": "services.0.cases.2.spend",
+  "source": "implied by design 19.3 E7S1-4 (10 of 12) and design 4.2: the case holds no relayed task (relayed_runs 0) and is done (spend = runs = user_cost)",
+  "stream": "s1"
+ },
+ {
+  "expected": 10,
+  "key": "services.0.cases.2.runs",
+  "source": "implied by design 19.3 E7S1-4 (10 of 12) and design 4.2: the case holds no relayed task (relayed_runs 0) and is done (spend = runs = user_cost)",
+  "stream": "s1"
+ },
+ {
+  "expected": {
+   "outcome": "none",
+   "superseded_by": "20261025T073214471497-root-deb0",
+   "superseded_source": "human",
+   "task": "20261025T072840565469-root-eb65"
+  },
+  "key": "services.0.cases.2.first",
+  "source": "design 19.3 E7S1-1 (first deliveries: eb65 superseded by the human rework deb0)",
+  "stream": "s1"
+ },
+ {
+  "expected": {
+   "accepted": 0,
+   "neither": 0,
+   "never_delivered": 0,
+   "no_verdict": 3,
+   "rejected": 0,
+   "superseded": 3
+  },
+  "key": "services.0.first_deliveries",
+  "source": "design 19.3 E7S1-1 (first deliveries line)",
+  "stream": "s1"
+ },
+ {
+  "expected": 8,
+  "key": "services.0.deliveries.total",
+  "source": "design 19.3 E7S1-1 (8 deliveries)",
+  "stream": "s1"
+ },
+ {
+  "expected": 4,
+  "key": "services.0.deliveries.judged",
+  "source": "design 19.3 E7S1-1 (judged 4 of 8)",
+  "stream": "s1"
+ },
+ {
+  "expected": [],
+  "key": "services.0.deliveries.unjudged_cases",
+  "source": "design 19.3 E7S1-1 (0 cases without a verdict)",
+  "stream": "s1"
+ },
+ {
+  "expected": [],
+  "key": "services.0.deliveries.relayed_only",
+  "source": "design 19.3 E7S1-1 (relayed only 0)",
+  "stream": "s1"
+ },
+ {
+  "expected": [],
+  "key": "services.0.deliveries.unseen_relayed",
+  "source": "design 19.3 E7S1-1 (unseen relayed none)",
+  "stream": "s1"
+ },
+ {
+  "expected": [],
+  "key": "services.0.deliveries.not_as_delivered",
+  "source": "design 19.3 E7S1-6 (not_as_delivered [])",
+  "stream": "s1"
+ },
+ {
+  "expected": [],
+  "key": "services.0.deliveries.neither",
+  "source": "design 19.3 E7S1-6 (neither [])",
+  "stream": "s1"
+ },
+ {
+  "expected": 0,
+  "key": "services.0.deliveries.legacy_verdicts",
+  "source": "design 19.3 E7S1-1 (0 legacy verdicts)",
+  "stream": "s1"
+ },
+ {
+  "expected": [],
+  "key": "services.0.deliveries.not_on_a_delivery",
+  "source": "design 19.3 E7S1-1 (0 verdicts not on a delivery)",
+  "stream": "s1"
+ },
+ {
+  "expected": 1,
+  "key": "services.0.escapes.#",
+  "source": "design 19.3 E7S1-2 (one escape)",
+  "stream": "s1"
+ },
+ {
+  "expected": "R1",
+  "key": "services.0.escapes.0.assertion",
+  "source": "design 19.3 E7S1-2 (escape assertion)",
+  "stream": "s1"
+ },
+ {
+  "expected": "20261025T070423629042-root-5efc",
+  "key": "services.0.escapes.0.case",
+  "source": "design 19.3 E7S1-2 (escape case)",
+  "stream": "s1"
+ },
+ {
+  "expected": "20261025T070822368798-root-5e3e",
+  "key": "services.0.escapes.0.task",
+  "source": "design 19.3 E7S1-2 (escape task)",
+  "stream": "s1"
+ },
+ {
+  "expected": "20261025T071537817238-root-905b",
+  "key": "services.0.escapes.0.verdict",
+  "source": "design 19.3 E7S1-2 (escape verdict)",
+  "stream": "s1"
+ },
+ {
+  "expected": "lead/reviewer",
+  "key": "services.0.escapes.0.signer",
+  "source": "design 19.3 E7S1-2 (escape signer)",
+  "stream": "s1"
+ },
+ {
+  "expected": "contract-gap",
+  "key": "services.0.escapes.0.cause",
+  "source": "design 19.3 E7S1-2 (escape cause)",
+  "stream": "s1"
+ },
+ {
+  "expected": "answer",
+  "key": "services.0.escapes.0.rule",
+  "source": "design 19.3 E7S1-2 (escape rule)",
+  "stream": "s1"
+ },
+ {
+  "expected": [
+   "answer",
+   "words"
+  ],
+  "key": "services.0.escapes.0.rules",
+  "source": "design 19.3 E7S1-2 (escape rules)",
+  "stream": "s1"
+ },
+ {
+  "expected": [
+   "20261025T071714388062-root-6096",
+   "C9"
+  ],
+  "key": "services.0.escapes.0.detail",
+  "source": "design 19.3 E7S1-2 (escape detail)",
+  "stream": "s1"
+ },
+ {
+  "expected": [],
+  "key": "services.0.escapes.0.also",
+  "source": "design 19.3 E7S1-2 (escape also)",
+  "stream": "s1"
+ },
+ {
+  "expected": "20261025T071152630842-root-6920",
+  "key": "services.0.escapes.0.before_verdict",
+  "source": "design 19.3 E7S1-2 (escape before_verdict)",
+  "stream": "s1"
+ },
+ {
+  "expected": "not its",
+  "key": "services.0.escapes.0.attribution",
+  "source": "design 19.3 E7S1-2 (escape attribution)",
+  "stream": "s1"
+ },
+ {
+  "expected": 1,
+  "key": "services.0.verifiers.#",
+  "source": "design 19.3 E7S1-2 (one verifier line: lead/reviewer)",
+  "stream": "s1"
+ },
+ {
+  "expected": "lead/reviewer",
+  "key": "services.0.verifiers.0.addr",
+  "source": "design 19.3 E7S1-2 (verifier line: escapes 0 of 4 judged; not its: 1 contract-gap; PASS precision 4 of 4; 0 re-check(s), 0 author rework run(s))",
+  "stream": "s1"
+ },
+ {
+  "expected": 4,
+  "key": "services.0.verifiers.0.judged",
+  "source": "design 19.3 E7S1-2 (verifier line: escapes 0 of 4 judged; not its: 1 contract-gap; PASS precision 4 of 4; 0 re-check(s), 0 author rework run(s))",
+  "stream": "s1"
+ },
+ {
+  "expected": {
+   "counted": {},
+   "not_its": {
+    "contract-gap": 1
+   }
+  },
+  "key": "services.0.verifiers.0.escapes",
+  "source": "design 19.3 E7S1-2 (verifier line: escapes 0 of 4 judged; not its: 1 contract-gap; PASS precision 4 of 4; 0 re-check(s), 0 author rework run(s))",
+  "stream": "s1"
+ },
+ {
+  "expected": [
+   4,
+   4
+  ],
+  "key": "services.0.verifiers.0.pass_precision",
+  "source": "design 19.3 E7S1-2 (verifier line: escapes 0 of 4 judged; not its: 1 contract-gap; PASS precision 4 of 4; 0 re-check(s), 0 author rework run(s))",
+  "stream": "s1"
+ },
+ {
+  "expected": 0,
+  "key": "services.0.verifiers.0.rechecks",
+  "source": "design 19.3 E7S1-2 (verifier line: escapes 0 of 4 judged; not its: 1 contract-gap; PASS precision 4 of 4; 0 re-check(s), 0 author rework run(s))",
+  "stream": "s1"
+ },
+ {
+  "expected": 0,
+  "key": "services.0.verifiers.0.rework_runs",
+  "source": "design 19.3 E7S1-2 (verifier line: escapes 0 of 4 judged; not its: 1 contract-gap; PASS precision 4 of 4; 0 re-check(s), 0 author rework run(s))",
+  "stream": "s1"
+ },
+ {
+  "expected": {
+   "fired": [],
+   "judged": 3,
+   "not_counted": {
+    "R1": [
+     "C2"
+    ]
+   },
+   "state": "no",
+   "subjects": {
+    "C9": 1,
+    "R1": 1
+   },
+   "window": [
+    "20261025T070423629042-root-5efc",
+    "20261025T072107521830-root-fb17",
+    "20261025T072840565469-root-eb65"
+   ]
+  },
+  "key": "services.0.alarms.repeat",
+  "source": "design 19.3 E7S1-5 (repeat no; window, subjects, fired, not_counted)",
+  "stream": "s1"
+ },
+ {
+  "expected": {
+   "cases": [],
+   "compared": 3,
+   "judged": 3,
+   "skipped": [],
+   "state": "no"
+  },
+  "key": "services.0.alarms.cost",
+  "source": "design 19.3 E7S1-5 (cost no (0 of 3 cases above 1.25x); judged 3, compared 3)",
+  "stream": "s1"
+ },
+ {
+  "expected": 10,
+  "key": "services.0.timeline.#",
+  "source": "design 19.3 E7S1-3 (2 contract marks, 2 playbook marks and the listed top-up marks; no charter or model mark)",
+  "stream": "s1"
+ },
+ {
+  "expected": [
+   "C1",
+   "C2",
+   "C3",
+   "C4",
+   "C5",
+   "C6",
+   "C7",
+   "C8"
+  ],
+  "key": "services.0.timeline.[kind=contract&version=1].adds",
+  "source": "design 19.3 E7S1-3 (contract v1 (C1, C2, C3, C4, C5, C6, C7, C8))",
+  "stream": "s1"
+ },
+ {
+  "expected": [],
+  "key": "services.0.timeline.[kind=contract&version=1].removes",
+  "source": "design 19.3 E7S1-3 / 9.4 (v1: every id in adds)",
+  "stream": "s1"
+ },
+ {
+  "expected": "first",
+  "key": "services.0.timeline.[kind=contract&version=1].basis",
+  "source": "design 19.3 E7S1-3 / 9.4 (v1)",
+  "stream": "s1"
+ },
+ {
+  "expected": "root",
+  "key": "services.0.timeline.[kind=contract&version=2].by",
+  "source": "design 19.3 E7S1-3 (contract v2 mark: contract v2 (root): adds C9; removes C2: the user's answer to R1: C9 confirmed (link ...-root-6096))",
+  "stream": "s1"
+ },
+ {
+  "expected": [
+   "C9"
+  ],
+  "key": "services.0.timeline.[kind=contract&version=2].adds",
+  "source": "design 19.3 E7S1-3 (contract v2 mark: contract v2 (root): adds C9; removes C2: the user's answer to R1: C9 confirmed (link ...-root-6096))",
+  "stream": "s1"
+ },
+ {
+  "expected": [
+   "C2"
+  ],
+  "key": "services.0.timeline.[kind=contract&version=2].removes",
+  "source": "design 19.3 E7S1-3 (contract v2 mark: contract v2 (root): adds C9; removes C2: the user's answer to R1: C9 confirmed (link ...-root-6096))",
+  "stream": "s1"
+ },
+ {
+  "expected": "answers",
+  "key": "services.0.timeline.[kind=contract&version=2].basis",
+  "source": "design 19.3 E7S1-3 (contract v2 mark: contract v2 (root): adds C9; removes C2: the user's answer to R1: C9 confirmed (link ...-root-6096))",
+  "stream": "s1"
+ },
+ {
+  "expected": "R1",
+  "key": "services.0.timeline.[kind=contract&version=2].answers",
+  "source": "design 19.3 E7S1-3 (contract v2 mark: contract v2 (root): adds C9; removes C2: the user's answer to R1: C9 confirmed (link ...-root-6096))",
+  "stream": "s1"
+ },
+ {
+  "expected": [
+   {
+    "id": "C9",
+    "link": "20261025T071714388062-root-6096"
+   }
+  ],
+  "key": "services.0.timeline.[kind=contract&version=2].confirmed",
+  "source": "design 19.3 E7S1-3 (contract v2 mark: contract v2 (root): adds C9; removes C2: the user's answer to R1: C9 confirmed (link ...-root-6096))",
+  "stream": "s1"
+ },
+ {
+  "expected": [],
+  "key": "services.0.timeline.[kind=contract&version=2].not_confirmed",
+  "source": "design 19.3 E7S1-3 (contract v2 mark: contract v2 (root): adds C9; removes C2: the user's answer to R1: C9 confirmed (link ...-root-6096))",
+  "stream": "s1"
+ },
+ {
+  "expected": "root",
+  "key": "services.0.timeline.[kind=playbook&version=1].by",
+  "source": "design 19.3 E7S1-3 (playbook v1 (root): written by the client)",
+  "stream": "s1"
+ },
+ {
+  "expected": "client",
+  "key": "services.0.timeline.[kind=playbook&version=1].basis",
+  "source": "design 19.3 E7S1-3 (written by the client (no admission needed))",
+  "stream": "s1"
+ },
+ {
+  "expected": "lead",
+  "key": "services.0.timeline.[kind=playbook&version=2].by",
+  "source": "design 19.3 E7S1-3 (playbook v2 (lead): admitted (c) on C9, R1, root-6096: 1 changed line(s): 1 the cited criteria's own words, 0 beyond them; no 'line(s) removed' part)",
+  "stream": "s1"
+ },
+ {
+  "expected": "c",
+  "key": "services.0.timeline.[kind=playbook&version=2].basis",
+  "source": "design 19.3 E7S1-3 (playbook v2 (lead): admitted (c) on C9, R1, root-6096: 1 changed line(s): 1 the cited criteria's own words, 0 beyond them; no 'line(s) removed' part)",
+  "stream": "s1"
+ },
+ {
+  "expected": [
+   "C9",
+   "R1",
+   "20261025T071714388062-root-6096"
+  ],
+  "key": "services.0.timeline.[kind=playbook&version=2].evidence",
+  "source": "design 19.3 E7S1-3 (playbook v2 (lead): admitted (c) on C9, R1, root-6096: 1 changed line(s): 1 the cited criteria's own words, 0 beyond them; no 'line(s) removed' part)",
+  "stream": "s1"
+ },
+ {
+  "expected": 1,
+  "key": "services.0.timeline.[kind=playbook&version=2].changed",
+  "source": "design 19.3 E7S1-3 (playbook v2 (lead): admitted (c) on C9, R1, root-6096: 1 changed line(s): 1 the cited criteria's own words, 0 beyond them; no 'line(s) removed' part)",
+  "stream": "s1"
+ },
+ {
+  "expected": 1,
+  "key": "services.0.timeline.[kind=playbook&version=2].own_words",
+  "source": "design 19.3 E7S1-3 (playbook v2 (lead): admitted (c) on C9, R1, root-6096: 1 changed line(s): 1 the cited criteria's own words, 0 beyond them; no 'line(s) removed' part)",
+  "stream": "s1"
+ },
+ {
+  "expected": 0,
+  "key": "services.0.timeline.[kind=playbook&version=2].beyond",
+  "source": "design 19.3 E7S1-3 (playbook v2 (lead): admitted (c) on C9, R1, root-6096: 1 changed line(s): 1 the cited criteria's own words, 0 beyond them; no 'line(s) removed' part)",
+  "stream": "s1"
+ },
+ {
+  "expected": 0,
+  "key": "services.0.timeline.[kind=playbook&version=2].removed",
+  "source": "design 19.3 E7S1-3 (playbook v2 (lead): admitted (c) on C9, R1, root-6096: 1 changed line(s): 1 the cited criteria's own words, 0 beyond them; no 'line(s) removed' part)",
+  "stream": "s1"
+ },
+ {
+  "expected": "20261025T070423629042-root-5efc",
+  "key": "services.0.timeline.[kind=top-up&id=20261025T070822368798-root-5e3e].case",
+  "source": "design 19.3 E7S1-3 (top-up mark at 07:08, case of the rework)",
+  "stream": "s1"
+ },
+ {
+  "expected": "human",
+  "key": "services.0.timeline.[kind=top-up&id=20261025T070822368798-root-5e3e].source",
+  "source": "design 19.3 E7S1-3 (top-up mark at 07:08)",
+  "stream": "s1"
+ },
+ {
+  "expected": 7,
+  "key": "services.0.timeline.[kind=top-up&id=20261025T070822368798-root-5e3e].amount",
+  "source": "design 19.3 E7S1-3 (top-up mark at 07:08: +7)",
+  "stream": "s1"
+ },
+ {
+  "expected": "20261025T070423629042-root-5efc",
+  "key": "services.0.timeline.[kind=top-up&id=20261025T071152630842-root-6920].case",
+  "source": "design 19.3 E7S1-3 (top-up mark at 07:11, case of the rework)",
+  "stream": "s1"
+ },
+ {
+  "expected": "relayed",
+  "key": "services.0.timeline.[kind=top-up&id=20261025T071152630842-root-6920].source",
+  "source": "design 19.3 E7S1-3 (top-up mark at 07:11)",
+  "stream": "s1"
+ },
+ {
+  "expected": 6,
+  "key": "services.0.timeline.[kind=top-up&id=20261025T071152630842-root-6920].amount",
+  "source": "design 19.3 E7S1-3 (top-up mark at 07:11: +6)",
+  "stream": "s1"
+ },
+ {
+  "expected": "20261025T070423629042-root-5efc",
+  "key": "services.0.timeline.[kind=top-up&id=20261025T071718703786-root-066f].case",
+  "source": "design 19.3 E7S1-3 (top-up mark at 07:17, case of the rework)",
+  "stream": "s1"
+ },
+ {
+  "expected": "human",
+  "key": "services.0.timeline.[kind=top-up&id=20261025T071718703786-root-066f].source",
+  "source": "design 19.3 E7S1-3 (top-up mark at 07:17)",
+  "stream": "s1"
+ },
+ {
+  "expected": 5,
+  "key": "services.0.timeline.[kind=top-up&id=20261025T071718703786-root-066f].amount",
+  "source": "design 19.3 E7S1-3 (top-up mark at 07:17: +5)",
+  "stream": "s1"
+ },
+ {
+  "expected": "20261025T072107521830-root-fb17",
+  "key": "services.0.timeline.[kind=top-up&id=20261025T072433451255-root-faaa].case",
+  "source": "design 19.3 E7S1-3 (top-up mark at 07:24, case of the rework)",
+  "stream": "s1"
+ },
+ {
+  "expected": "human",
+  "key": "services.0.timeline.[kind=top-up&id=20261025T072433451255-root-faaa].source",
+  "source": "design 19.3 E7S1-3 (top-up mark at 07:24)",
+  "stream": "s1"
+ },
+ {
+  "expected": 3,
+  "key": "services.0.timeline.[kind=top-up&id=20261025T072433451255-root-faaa].amount",
+  "source": "design 19.3 E7S1-3 (top-up mark at 07:24: +3)",
+  "stream": "s1"
+ },
+ {
+  "expected": "20261025T072107521830-root-fb17",
+  "key": "services.0.timeline.[kind=top-up&id=20261025T072621895274-root-0036].case",
+  "source": "design 19.3 E7S1-3 (top-up mark at 07:26, case of the rework)",
+  "stream": "s1"
+ },
+ {
+  "expected": "granted",
+  "key": "services.0.timeline.[kind=top-up&id=20261025T072621895274-root-0036].source",
+  "source": "design 19.3 E7S1-3 (top-up mark at 07:26)",
+  "stream": "s1"
+ },
+ {
+  "expected": 3,
+  "key": "services.0.timeline.[kind=top-up&id=20261025T072621895274-root-0036].amount",
+  "source": "design 19.3 E7S1-3 (top-up mark at 07:26: +3)",
+  "stream": "s1"
+ },
+ {
+  "expected": "20261025T072840565469-root-eb65",
+  "key": "services.0.timeline.[kind=top-up&id=20261025T073214471497-root-deb0].case",
+  "source": "design 19.3 E7S1-3 (top-up mark at 07:32, case of the rework)",
+  "stream": "s1"
+ },
+ {
+  "expected": "human",
+  "key": "services.0.timeline.[kind=top-up&id=20261025T073214471497-root-deb0].source",
+  "source": "design 19.3 E7S1-3 (top-up mark at 07:32)",
+  "stream": "s1"
+ },
+ {
+  "expected": 5,
+  "key": "services.0.timeline.[kind=top-up&id=20261025T073214471497-root-deb0].amount",
+  "source": "design 19.3 E7S1-3 (top-up mark at 07:32: +5)",
+  "stream": "s1"
+ },
+ {
+  "expected": [],
+  "key": "moved_past",
+  "source": "design 19.3 E7S1-7 (moved past: none)",
+  "stream": "s1"
+ },
+ {
+  "expected": "lead",
+  "key": "services.0.owner",
+  "source": "design 19.3 E7 intro (offered by lead)",
+  "stream": "s2"
+ },
+ {
+  "expected": "weekly-meeting-memo",
+  "key": "services.0.service",
+  "source": "design 19.3 E7 intro",
+  "stream": "s2"
+ },
+ {
+  "expected": "root",
+  "key": "services.0.client",
+  "source": "design 19.3 E7 intro (client root, human)",
+  "stream": "s2"
+ },
+ {
+  "expected": "human",
+  "key": "services.0.client_kind",
+  "source": "design 19.3 E7 intro (client root, human)",
+  "stream": "s2"
+ },
+ {
+  "expected": 2,
+  "key": "services.0.contract",
+  "source": "design 19.3 E7S2-1 (contract v2)",
+  "stream": "s2"
+ },
+ {
+  "expected": 2,
+  "key": "services.0.playbook",
+  "source": "design 19.3 E7S2-1 (playbook v2)",
+  "stream": "s2"
+ },
+ {
+  "expected": 12,
+  "key": "services.0.budget",
+  "source": "design 19.3 E7S2-1 (budget 12)",
+  "stream": "s2"
+ },
+ {
+  "expected": 1,
+  "key": "services.#",
+  "source": "design 19.3 E7 intro (every stream is one service)",
+  "stream": "s2"
+ },
+ {
+  "expected": null,
+  "key": "one_off",
+  "source": "design 19.3 E7S1-1 / E7-all (no one-off record)",
+  "stream": "s2"
+ },
+ {
+  "expected": [],
+  "key": "nested",
+  "source": "design 19.3 E7S1-1 / E7-all (no nested service)",
+  "stream": "s2"
+ },
+ {
+  "expected": {
+   "known": true,
+   "skipped": 0,
+   "truncated": false
+  },
+  "key": "services.0.history",
+  "published": {
+   "known": false,
+   "skipped": 0,
+   "truncated": false
+  },
+  "source": "amended by manager-decision-selfcheck.md (2026-10-25) item 1: the history path reads org-git-log.txt (s1 43, s2 36, s3 42 commits; AGENT.md and ORG.md only in their creation commits, so no charter or model mark); design 19.3 E7-all's known false is the replay kit's (no org git), kept by the replays under their kit-limit label",
+  "stream": "s2"
+ },
+ {
+  "expected": 3,
+  "key": "services.0.cases.#",
+  "source": "design 19.3 E7S2-1 (3 cases)",
+  "stream": "s2"
+ },
+ {
+  "expected": "20261025T074451197103-root-3ca4",
+  "key": "services.0.cases.0.id",
+  "source": "design 19.3 E7S2 heading (cases ...-root-3ca4), oldest first",
+  "stream": "s2"
+ },
+ {
+  "expected": "Memo for 2026-10-05 meeting",
+  "key": "services.0.cases.0.title",
+  "source": "design 19.3 E7S2-4 (case title)",
+  "stream": "s2"
+ },
+ {
+  "expected": "done",
+  "key": "services.0.cases.0.state",
+  "source": "design 19.3 E7S2-1 / E7-all (states)",
+  "stream": "s2"
+ },
+ {
+  "expected": 3,
+  "key": "services.0.cases.0.tasks",
+  "source": "design 19.3 E7S2-1 (tasks per case)",
+  "stream": "s2"
+ },
+ {
+  "expected": false,
+  "key": "services.0.cases.0.cut",
+  "source": "design 19.3 E7S2-1 / E7S2-4 (cut)",
+  "stream": "s2"
+ },
+ {
+  "expected": 0,
+  "key": "services.0.cases.0.credited",
+  "source": "design 19.3 E7-all (credited 0 in all nine cases)",
+  "stream": "s2"
+ },
+ {
+  "expected": 14,
+  "key": "services.0.cases.0.user_cost",
+  "source": "design 19.3 E7S2-4 (the user's runs 14 of 13)",
+  "stream": "s2"
+ },
+ {
+  "expected": 13,
+  "key": "services.0.cases.0.user_approved",
+  "source": "design 19.3 E7S2-4 (... of 13 approved) / E7 approvals paragraph",
+  "stream": "s2"
+ },
+ {
+  "expected": "1.08",
+  "key": "services.0.cases.0.ratio",
+  "source": "design 19.3 E7S2-4 (1.08x)",
+  "stream": "s2"
+ },
+ {
+  "expected": [
+   {
+    "amount": 1,
+    "id": "20261025T075038845671-root-c671",
+    "source": "human"
+   },
+   {
+    "amount": 1,
+    "id": "20261025T075138446837-root-68df",
+    "source": "granted"
+   },
+   {
+    "amount": 6,
+    "id": "20261025T075456327958-root-37b7",
+    "source": "relayed"
+   }
+  ],
+  "key": "services.0.cases.0.top_ups",
+  "source": "design 19.3 E7S2-4 top-ups and E7S2-3 top-up marks (amounts)",
+  "stream": "s2"
+ },
+ {
+  "expected": 5,
+  "key": "services.0.cases.0.relayed_runs",
+  "source": "design 19.3 E7S2-4 (relayed runs 5)",
+  "stream": "s2"
+ },
+ {
+  "expected": 19,
+  "key": "services.0.cases.0.spend",
+  "source": "design 19.3 E7S2-4 (total 19)",
+  "stream": "s2"
+ },
+ {
+  "expected": 19,
+  "key": "services.0.cases.0.runs",
+  "source": "design 19.3 E7S2-4 (19 charged runs)",
+  "stream": "s2"
+ },
+ {
+  "expected": {
+   "outcome": "none",
+   "superseded_by": "20261025T075456327958-root-37b7",
+   "superseded_source": "relayed",
+   "task": "20261025T074451197103-root-3ca4"
+  },
+  "key": "services.0.cases.0.first",
+  "source": "design 19.3 E7S2-1 (first deliveries: the head 3ca4 is superseded by the injected relayed rework 37b7)",
+  "stream": "s2"
+ },
+ {
+  "expected": "20261025T080139460250-root-ae3f",
+  "key": "services.0.cases.1.id",
+  "source": "design 19.3 E7S2 heading (cases ...-root-ae3f), oldest first",
+  "stream": "s2"
+ },
+ {
+  "expected": "Memo for 2026-10-12 meeting",
+  "key": "services.0.cases.1.title",
+  "source": "design 19.3 E7S2-4 (case title)",
+  "stream": "s2"
+ },
+ {
+  "expected": "done",
+  "key": "services.0.cases.1.state",
+  "source": "design 19.3 E7S2-1 / E7-all (states)",
+  "stream": "s2"
+ },
+ {
+  "expected": 1,
+  "key": "services.0.cases.1.tasks",
+  "source": "design 19.3 E7S2-1 (tasks per case)",
+  "stream": "s2"
+ },
+ {
+  "expected": false,
+  "key": "services.0.cases.1.cut",
+  "source": "design 19.3 E7S2-1 / E7S2-4 (cut)",
+  "stream": "s2"
+ },
+ {
+  "expected": 0,
+  "key": "services.0.cases.1.credited",
+  "source": "design 19.3 E7-all (credited 0 in all nine cases)",
+  "stream": "s2"
+ },
+ {
+  "expected": 5,
+  "key": "services.0.cases.1.user_cost",
+  "source": "design 19.3 E7S2-4 (the user's runs 5 of 12)",
+  "stream": "s2"
+ },
+ {
+  "expected": 12,
+  "key": "services.0.cases.1.user_approved",
+  "source": "design 19.3 E7S2-4 (... of 12 approved) / E7 approvals paragraph",
+  "stream": "s2"
+ },
+ {
+  "expected": "0.42",
+  "key": "services.0.cases.1.ratio",
+  "source": "design 19.3 E7S2-4 (0.42x)",
+  "stream": "s2"
+ },
+ {
+  "expected": [],
+  "key": "services.0.cases.1.top_ups",
+  "source": "design 19.3 E7S2-4 top-ups and E7S2-3 top-up marks (amounts)",
+  "stream": "s2"
+ },
+ {
+  "expected": 0,
+  "key": "services.0.cases.1.relayed_runs",
+  "source": "implied by design 19.3 E7S2-4 (5 of 12) and design 4.2: the case holds no relayed task (relayed_runs 0) and is done (spend = runs = user_cost)",
+  "stream": "s2"
+ },
+ {
+  "expected": 5,
+  "key": "services.0.cases.1.spend",
+  "source": "implied by design 19.3 E7S2-4 (5 of 12) and design 4.2: the case holds no relayed task (relayed_runs 0) and is done (spend = runs = user_cost)",
+  "stream": "s2"
+ },
+ {
+  "expected": 5,
+  "key": "services.0.cases.1.runs",
+  "source": "implied by design 19.3 E7S2-4 (5 of 12) and design 4.2: the case holds no relayed task (relayed_runs 0) and is done (spend = runs = user_cost)",
+  "stream": "s2"
+ },
+ {
+  "expected": {
+   "outcome": "accepted",
+   "superseded_by": null,
+   "superseded_source": null,
+   "task": "20261025T080139460250-root-ae3f"
+  },
+  "key": "services.0.cases.1.first",
+  "source": "design 19.3 E7S2-1 (first deliveries: 1 accepted (ae3f))",
+  "stream": "s2"
+ },
+ {
+  "expected": "20261025T080619539939-root-96a5",
+  "key": "services.0.cases.2.id",
+  "source": "design 19.3 E7S2 heading (cases ...-root-96a5), oldest first",
+  "stream": "s2"
+ },
+ {
+  "expected": "Memo for 2026-10-19 meeting",
+  "key": "services.0.cases.2.title",
+  "source": "design 19.3 E7S2-4 (case title)",
+  "stream": "s2"
+ },
+ {
+  "expected": "done",
+  "key": "services.0.cases.2.state",
+  "source": "design 19.3 E7S2-1 / E7-all (states)",
+  "stream": "s2"
+ },
+ {
+  "expected": 2,
+  "key": "services.0.cases.2.tasks",
+  "source": "design 19.3 E7S2-1 (tasks per case)",
+  "stream": "s2"
+ },
+ {
+  "expected": false,
+  "key": "services.0.cases.2.cut",
+  "source": "design 19.3 E7S2-1 / E7S2-4 (cut)",
+  "stream": "s2"
+ },
+ {
+  "expected": 0,
+  "key": "services.0.cases.2.credited",
+  "source": "design 19.3 E7-all (credited 0 in all nine cases)",
+  "stream": "s2"
+ },
+ {
+  "expected": 10,
+  "key": "services.0.cases.2.user_cost",
+  "source": "design 19.3 E7S2-4 (the user's runs 10 of 12)",
+  "stream": "s2"
+ },
+ {
+  "expected": 12,
+  "key": "services.0.cases.2.user_approved",
+  "source": "design 19.3 E7S2-4 (... of 12 approved) / E7 approvals paragraph",
+  "stream": "s2"
+ },
+ {
+  "expected": "0.83",
+  "key": "services.0.cases.2.ratio",
+  "source": "design 19.3 E7S2-4 (0.83x)",
+  "stream": "s2"
+ },
+ {
+  "expected": [
+   {
+    "amount": 5,
+    "id": "20261025T081146777819-root-2272",
+    "source": "human"
+   }
+  ],
+  "key": "services.0.cases.2.top_ups",
+  "source": "design 19.3 E7S2-4 top-ups and E7S2-3 top-up marks (amounts)",
+  "stream": "s2"
+ },
+ {
+  "expected": 0,
+  "key": "services.0.cases.2.relayed_runs",
+  "source": "implied by design 19.3 E7S2-4 (10 of 12) and design 4.2: the case holds no relayed task (relayed_runs 0) and is done (spend = runs = user_cost)",
+  "stream": "s2"
+ },
+ {
+  "expected": 10,
+  "key": "services.0.cases.2.spend",
+  "source": "implied by design 19.3 E7S2-4 (10 of 12) and design 4.2: the case holds no relayed task (relayed_runs 0) and is done (spend = runs = user_cost)",
+  "stream": "s2"
+ },
+ {
+  "expected": 10,
+  "key": "services.0.cases.2.runs",
+  "source": "implied by design 19.3 E7S2-4 (10 of 12) and design 4.2: the case holds no relayed task (relayed_runs 0) and is done (spend = runs = user_cost)",
+  "stream": "s2"
+ },
+ {
+  "expected": {
+   "outcome": "none",
+   "superseded_by": "20261025T081146777819-root-2272",
+   "superseded_source": "human",
+   "task": "20261025T080619539939-root-96a5"
+  },
+  "key": "services.0.cases.2.first",
+  "source": "design 19.3 E7S2-1 (first deliveries: 96a5 by the human rework 2272)",
+  "stream": "s2"
+ },
+ {
+  "expected": {
+   "accepted": 1,
+   "neither": 0,
+   "never_delivered": 0,
+   "no_verdict": 2,
+   "rejected": 0,
+   "superseded": 2
+  },
+  "key": "services.0.first_deliveries",
+  "source": "design 19.3 E7S2-1 (first deliveries line)",
+  "stream": "s2"
+ },
+ {
+  "expected": 6,
+  "key": "services.0.deliveries.total",
+  "source": "design 19.3 E7S2-1 (6 deliveries)",
+  "stream": "s2"
+ },
+ {
+  "expected": 3,
+  "key": "services.0.deliveries.judged",
+  "source": "design 19.3 E7S2-1 (judged 3 of 6)",
+  "stream": "s2"
+ },
+ {
+  "declared_product_deviation": {
+   "finding": "F-G0-1",
+   "product": [
+    "20261025T074451197103-root-3ca4"
+   ]
+  },
+  "expected": [],
+  "key": "services.0.deliveries.unjudged_cases",
+  "source": "manager-decision-selfcheck.md (2026-10-25) item 2: OQ-2's given delivery is the delivery whose checked artifact equals the file; of several, the one with a human-tier verdict (c671: reject ...-root-ce17, accept ...-root-4a88); design 19.3's kit-limit paragraph and E7S2-6 name c671. The product's P3 newest-first pair names the head 3ca4 (late result ...-lead-a112, two seconds after c671's ...-lead-64cb, same v3) and so reads [3ca4]: declared product deviation F-G0-1",
+  "stream": "s2"
+ },
+ {
+  "expected": [],
+  "key": "services.0.deliveries.relayed_only",
+  "source": "derived by hand from design 4.3 'relayed only' and the same files: the given delivery c671 carries human verdicts; design 19.3 kit-limit paragraph and E7S2-6 (history path: a `relayed` finding names c671 as the delivery Lena was given; OQ-2 reads her reject ...-root-ce17 and accept ...-root-4a88 on c671)",
+  "stream": "s2"
+ },
+ {
+  "expected": [
+   "20261025T074451197103-root-3ca4"
+  ],
+  "key": "services.0.deliveries.unseen_relayed",
+  "source": "derived by hand from design 4.3 'unseen relayed' (a later delivery than the given one, a relayed rework's: 37b7 after c671) and msgs/read (d91e done on 37b7), INDEX.txt; design 19.3 kit-limit paragraph and E7S2-6 (history path: a `relayed` finding names c671 as the delivery Lena was given; OQ-2 reads her reject ...-root-ce17 and accept ...-root-4a88 on c671)",
+  "stream": "s2"
+ },
+ {
+  "expected": [],
+  "key": "services.0.deliveries.not_as_delivered",
+  "source": "derived by hand from design 4.3 (a `relayed` finding is not a delivery that is not as delivered) and INDEX.txt + memos/memo-2026-10-05.md; design 19.3 kit-limit paragraph and E7S2-6 (history path: a `relayed` finding names c671 as the delivery Lena was given; OQ-2 reads her reject ...-root-ce17 and accept ...-root-4a88 on c671)",
+  "stream": "s2"
+ },
+ {
+  "expected": [],
+  "key": "services.0.deliveries.neither",
+  "source": "design 19.3 E7S2-6 (neither [])",
+  "stream": "s2"
+ },
+ {
+  "expected": 0,
+  "key": "services.0.deliveries.legacy_verdicts",
+  "source": "design 19.3 E7S2-1 (0 legacy verdicts)",
+  "stream": "s2"
+ },
+ {
+  "expected": [],
+  "key": "services.0.deliveries.not_on_a_delivery",
+  "source": "design 19.3 E7S2-1 (0 verdicts not on a delivery)",
+  "stream": "s2"
+ },
+ {
+  "expected": 1,
+  "key": "services.0.escapes.#",
+  "source": "design 19.3 E7S2-2 (one escape)",
+  "stream": "s2"
+ },
+ {
+  "expected": "R1",
+  "key": "services.0.escapes.0.assertion",
+  "source": "design 19.3 E7S2-2 (escape assertion)",
+  "stream": "s2"
+ },
+ {
+  "expected": "20261025T074451197103-root-3ca4",
+  "key": "services.0.escapes.0.case",
+  "source": "design 19.3 E7S2-2 (escape case)",
+  "stream": "s2"
+ },
+ {
+  "expected": "20261025T075038845671-root-c671",
+  "key": "services.0.escapes.0.task",
+  "source": "design 19.3 E7S2-2 (escape task)",
+  "stream": "s2"
+ },
+ {
+  "expected": "20261025T075910994217-root-ce17",
+  "key": "services.0.escapes.0.verdict",
+  "source": "design 19.3 E7S2-2 (escape verdict)",
+  "stream": "s2"
+ },
+ {
+  "expected": "lead/reviewer",
+  "key": "services.0.escapes.0.signer",
+  "source": "design 19.3 E7S2-2 (escape signer)",
+  "stream": "s2"
+ },
+ {
+  "expected": "contract-gap",
+  "key": "services.0.escapes.0.cause",
+  "source": "design 19.3 E7S2-2 (escape cause)",
+  "stream": "s2"
+ },
+ {
+  "expected": "answer",
+  "key": "services.0.escapes.0.rule",
+  "source": "design 19.3 E7S2-2 (escape rule)",
+  "stream": "s2"
+ },
+ {
+  "expected": [
+   "answer",
+   "words"
+  ],
+  "key": "services.0.escapes.0.rules",
+  "source": "design 19.3 E7S2-2 (escape rules)",
+  "stream": "s2"
+ },
+ {
+  "expected": [
+   "20261025T080029734610-root-356e",
+   "C8"
+  ],
+  "key": "services.0.escapes.0.detail",
+  "source": "design 19.3 E7S2-2 (escape detail)",
+  "stream": "s2"
+ },
+ {
+  "expected": [],
+  "key": "services.0.escapes.0.also",
+  "source": "design 19.3 E7S2-2 (escape also)",
+  "stream": "s2"
+ },
+ {
+  "expected": "20261025T075456327958-root-37b7",
+  "key": "services.0.escapes.0.before_verdict",
+  "source": "design 19.3 E7S2-2 (escape before_verdict)",
+  "stream": "s2"
+ },
+ {
+  "expected": "not its",
+  "key": "services.0.escapes.0.attribution",
+  "source": "design 19.3 E7S2-2 (escape attribution)",
+  "stream": "s2"
+ },
+ {
+  "expected": 1,
+  "key": "services.0.verifiers.#",
+  "source": "design 19.3 E7S2-2 (one verifier line: lead/reviewer)",
+  "stream": "s2"
+ },
+ {
+  "expected": "lead/reviewer",
+  "key": "services.0.verifiers.0.addr",
+  "source": "design 19.3 E7S2-2 (verifier line: escapes 0 of 3 judged; not its: 1 contract-gap; PASS precision 3 of 3; 1 re-check(s), 1 author rework run(s))",
+  "stream": "s2"
+ },
+ {
+  "expected": 3,
+  "key": "services.0.verifiers.0.judged",
+  "source": "design 19.3 E7S2-2 (verifier line: escapes 0 of 3 judged; not its: 1 contract-gap; PASS precision 3 of 3; 1 re-check(s), 1 author rework run(s))",
+  "stream": "s2"
+ },
+ {
+  "expected": {
+   "counted": {},
+   "not_its": {
+    "contract-gap": 1
+   }
+  },
+  "key": "services.0.verifiers.0.escapes",
+  "source": "design 19.3 E7S2-2 (verifier line: escapes 0 of 3 judged; not its: 1 contract-gap; PASS precision 3 of 3; 1 re-check(s), 1 author rework run(s))",
+  "stream": "s2"
+ },
+ {
+  "expected": [
+   3,
+   3
+  ],
+  "key": "services.0.verifiers.0.pass_precision",
+  "source": "design 19.3 E7S2-2 (verifier line: escapes 0 of 3 judged; not its: 1 contract-gap; PASS precision 3 of 3; 1 re-check(s), 1 author rework run(s))",
+  "stream": "s2"
+ },
+ {
+  "expected": 1,
+  "key": "services.0.verifiers.0.rechecks",
+  "source": "design 19.3 E7S2-2 (verifier line: escapes 0 of 3 judged; not its: 1 contract-gap; PASS precision 3 of 3; 1 re-check(s), 1 author rework run(s))",
+  "stream": "s2"
+ },
+ {
+  "expected": 1,
+  "key": "services.0.verifiers.0.rework_runs",
+  "source": "design 19.3 E7S2-2 (verifier line: escapes 0 of 3 judged; not its: 1 contract-gap; PASS precision 3 of 3; 1 re-check(s), 1 author rework run(s))",
+  "stream": "s2"
+ },
+ {
+  "expected": {
+   "fired": [],
+   "judged": 3,
+   "not_counted": {
+    "R1": [
+     "C4"
+    ]
+   },
+   "state": "no",
+   "subjects": {
+    "C8": 1,
+    "R1": 1
+   },
+   "window": [
+    "20261025T074451197103-root-3ca4",
+    "20261025T080139460250-root-ae3f",
+    "20261025T080619539939-root-96a5"
+   ]
+  },
+  "key": "services.0.alarms.repeat",
+  "source": "design 19.3 E7S2-5 (repeat no; window, subjects, fired, not_counted)",
+  "stream": "s2"
+ },
+ {
+  "expected": {
+   "cases": [],
+   "compared": 3,
+   "judged": 3,
+   "skipped": [],
+   "state": "no"
+  },
+  "key": "services.0.alarms.cost",
+  "source": "design 19.3 E7S2-5 (cost no (0 of 3 cases above 1.25x); judged 3, compared 3)",
+  "stream": "s2"
+ },
+ {
+  "expected": 8,
+  "key": "services.0.timeline.#",
+  "source": "design 19.3 E7S2-3 (2 contract marks, 2 playbook marks and the listed top-up marks; no charter or model mark)",
+  "stream": "s2"
+ },
+ {
+  "expected": [
+   "C1",
+   "C2",
+   "C3",
+   "C4",
+   "C5",
+   "C6",
+   "C7"
+  ],
+  "key": "services.0.timeline.[kind=contract&version=1].adds",
+  "source": "design 19.3 E7S2-3 (contract v1 (C1, C2, C3, C4, C5, C6, C7))",
+  "stream": "s2"
+ },
+ {
+  "expected": [],
+  "key": "services.0.timeline.[kind=contract&version=1].removes",
+  "source": "design 19.3 E7S2-3 / 9.4 (v1: every id in adds)",
+  "stream": "s2"
+ },
+ {
+  "expected": "first",
+  "key": "services.0.timeline.[kind=contract&version=1].basis",
+  "source": "design 19.3 E7S2-3 / 9.4 (v1)",
+  "stream": "s2"
+ },
+ {
+  "expected": "root",
+  "key": "services.0.timeline.[kind=contract&version=2].by",
+  "source": "design 19.3 E7S2-3 (contract v2 mark: contract v2 (root): adds C8: the user's answer to R1: C8 confirmed (link ...-root-356e))",
+  "stream": "s2"
+ },
+ {
+  "expected": [
+   "C8"
+  ],
+  "key": "services.0.timeline.[kind=contract&version=2].adds",
+  "source": "design 19.3 E7S2-3 (contract v2 mark: contract v2 (root): adds C8: the user's answer to R1: C8 confirmed (link ...-root-356e))",
+  "stream": "s2"
+ },
+ {
+  "expected": [],
+  "key": "services.0.timeline.[kind=contract&version=2].removes",
+  "source": "design 19.3 E7S2-3 (contract v2 mark: contract v2 (root): adds C8: the user's answer to R1: C8 confirmed (link ...-root-356e))",
+  "stream": "s2"
+ },
+ {
+  "expected": "answers",
+  "key": "services.0.timeline.[kind=contract&version=2].basis",
+  "source": "design 19.3 E7S2-3 (contract v2 mark: contract v2 (root): adds C8: the user's answer to R1: C8 confirmed (link ...-root-356e))",
+  "stream": "s2"
+ },
+ {
+  "expected": "R1",
+  "key": "services.0.timeline.[kind=contract&version=2].answers",
+  "source": "design 19.3 E7S2-3 (contract v2 mark: contract v2 (root): adds C8: the user's answer to R1: C8 confirmed (link ...-root-356e))",
+  "stream": "s2"
+ },
+ {
+  "expected": [
+   {
+    "id": "C8",
+    "link": "20261025T080029734610-root-356e"
+   }
+  ],
+  "key": "services.0.timeline.[kind=contract&version=2].confirmed",
+  "source": "design 19.3 E7S2-3 (contract v2 mark: contract v2 (root): adds C8: the user's answer to R1: C8 confirmed (link ...-root-356e))",
+  "stream": "s2"
+ },
+ {
+  "expected": [],
+  "key": "services.0.timeline.[kind=contract&version=2].not_confirmed",
+  "source": "design 19.3 E7S2-3 (contract v2 mark: contract v2 (root): adds C8: the user's answer to R1: C8 confirmed (link ...-root-356e))",
+  "stream": "s2"
+ },
+ {
+  "expected": "root",
+  "key": "services.0.timeline.[kind=playbook&version=1].by",
+  "source": "design 19.3 E7S2-3 (playbook v1 (root): written by the client)",
+  "stream": "s2"
+ },
+ {
+  "expected": "client",
+  "key": "services.0.timeline.[kind=playbook&version=1].basis",
+  "source": "design 19.3 E7S2-3 (written by the client (no admission needed))",
+  "stream": "s2"
+ },
+ {
+  "expected": "lead",
+  "key": "services.0.timeline.[kind=playbook&version=2].by",
+  "source": "design 19.3 E7S2-3 (playbook v2 (lead): admitted (c) on C8, R1, root-356e: 1 changed line(s): 1 the cited criteria's own words, 0 beyond them; no 'line(s) removed' part)",
+  "stream": "s2"
+ },
+ {
+  "expected": "c",
+  "key": "services.0.timeline.[kind=playbook&version=2].basis",
+  "source": "design 19.3 E7S2-3 (playbook v2 (lead): admitted (c) on C8, R1, root-356e: 1 changed line(s): 1 the cited criteria's own words, 0 beyond them; no 'line(s) removed' part)",
+  "stream": "s2"
+ },
+ {
+  "expected": [
+   "C8",
+   "R1",
+   "20261025T080029734610-root-356e"
+  ],
+  "key": "services.0.timeline.[kind=playbook&version=2].evidence",
+  "source": "design 19.3 E7S2-3 (playbook v2 (lead): admitted (c) on C8, R1, root-356e: 1 changed line(s): 1 the cited criteria's own words, 0 beyond them; no 'line(s) removed' part)",
+  "stream": "s2"
+ },
+ {
+  "expected": 1,
+  "key": "services.0.timeline.[kind=playbook&version=2].changed",
+  "source": "design 19.3 E7S2-3 (playbook v2 (lead): admitted (c) on C8, R1, root-356e: 1 changed line(s): 1 the cited criteria's own words, 0 beyond them; no 'line(s) removed' part)",
+  "stream": "s2"
+ },
+ {
+  "expected": 1,
+  "key": "services.0.timeline.[kind=playbook&version=2].own_words",
+  "source": "design 19.3 E7S2-3 (playbook v2 (lead): admitted (c) on C8, R1, root-356e: 1 changed line(s): 1 the cited criteria's own words, 0 beyond them; no 'line(s) removed' part)",
+  "stream": "s2"
+ },
+ {
+  "expected": 0,
+  "key": "services.0.timeline.[kind=playbook&version=2].beyond",
+  "source": "design 19.3 E7S2-3 (playbook v2 (lead): admitted (c) on C8, R1, root-356e: 1 changed line(s): 1 the cited criteria's own words, 0 beyond them; no 'line(s) removed' part)",
+  "stream": "s2"
+ },
+ {
+  "expected": 0,
+  "key": "services.0.timeline.[kind=playbook&version=2].removed",
+  "source": "design 19.3 E7S2-3 (playbook v2 (lead): admitted (c) on C8, R1, root-356e: 1 changed line(s): 1 the cited criteria's own words, 0 beyond them; no 'line(s) removed' part)",
+  "stream": "s2"
+ },
+ {
+  "expected": "20261025T074451197103-root-3ca4",
+  "key": "services.0.timeline.[kind=top-up&id=20261025T075038845671-root-c671].case",
+  "source": "design 19.3 E7S2-3 (top-up mark at 07:50, case of the rework)",
+  "stream": "s2"
+ },
+ {
+  "expected": "human",
+  "key": "services.0.timeline.[kind=top-up&id=20261025T075038845671-root-c671].source",
+  "source": "design 19.3 E7S2-3 (top-up mark at 07:50)",
+  "stream": "s2"
+ },
+ {
+  "expected": 1,
+  "key": "services.0.timeline.[kind=top-up&id=20261025T075038845671-root-c671].amount",
+  "source": "design 19.3 E7S2-3 (top-up mark at 07:50: +1)",
+  "stream": "s2"
+ },
+ {
+  "expected": "20261025T074451197103-root-3ca4",
+  "key": "services.0.timeline.[kind=top-up&id=20261025T075138446837-root-68df].case",
+  "source": "design 19.3 E7S2-3 (top-up mark at 07:51, case of the rework)",
+  "stream": "s2"
+ },
+ {
+  "expected": "granted",
+  "key": "services.0.timeline.[kind=top-up&id=20261025T075138446837-root-68df].source",
+  "source": "design 19.3 E7S2-3 (top-up mark at 07:51)",
+  "stream": "s2"
+ },
+ {
+  "expected": 1,
+  "key": "services.0.timeline.[kind=top-up&id=20261025T075138446837-root-68df].amount",
+  "source": "design 19.3 E7S2-3 (top-up mark at 07:51: +1)",
+  "stream": "s2"
+ },
+ {
+  "expected": "20261025T074451197103-root-3ca4",
+  "key": "services.0.timeline.[kind=top-up&id=20261025T075456327958-root-37b7].case",
+  "source": "design 19.3 E7S2-3 (top-up mark at 07:54, case of the rework)",
+  "stream": "s2"
+ },
+ {
+  "expected": "relayed",
+  "key": "services.0.timeline.[kind=top-up&id=20261025T075456327958-root-37b7].source",
+  "source": "design 19.3 E7S2-3 (top-up mark at 07:54)",
+  "stream": "s2"
+ },
+ {
+  "expected": 6,
+  "key": "services.0.timeline.[kind=top-up&id=20261025T075456327958-root-37b7].amount",
+  "source": "design 19.3 E7S2-3 (top-up mark at 07:54: +6)",
+  "stream": "s2"
+ },
+ {
+  "expected": "20261025T080619539939-root-96a5",
+  "key": "services.0.timeline.[kind=top-up&id=20261025T081146777819-root-2272].case",
+  "source": "design 19.3 E7S2-3 (top-up mark at 08:11, case of the rework)",
+  "stream": "s2"
+ },
+ {
+  "expected": "human",
+  "key": "services.0.timeline.[kind=top-up&id=20261025T081146777819-root-2272].source",
+  "source": "design 19.3 E7S2-3 (top-up mark at 08:11)",
+  "stream": "s2"
+ },
+ {
+  "expected": 5,
+  "key": "services.0.timeline.[kind=top-up&id=20261025T081146777819-root-2272].amount",
+  "source": "design 19.3 E7S2-3 (top-up mark at 08:11: +5)",
+  "stream": "s2"
+ },
+ {
+  "expected": [
+   {
+    "addr": "lead/writer",
+    "error": "",
+    "held": 4,
+    "held_error": "",
+    "tasks": [
+     {
+      "blocked": "2026-10-25T08:02:43Z",
+      "id": "20261025T080214459188-lead-1add",
+      "left_blocked": true,
+      "sender": "lead",
+      "sent_since": 2,
+      "title": null
+     }
+    ]
+   }
+  ],
+  "key": "moved_past",
+  "source": "design 19.3 E7S2-7 (one agent lead/writer, budget=4; task ...-lead-1add from lead, blocked result ...-lead.writer-cee2 08:02:43, left blocked, 2 task(s) since; 17a9 not listed; title null: 9.4, the sender is not root)",
+  "stream": "s2"
+ },
+ {
+  "expected": "lead",
+  "key": "services.0.owner",
+  "source": "design 19.3 E7 intro (offered by lead)",
+  "stream": "s3"
+ },
+ {
+  "expected": "weekly-meeting-memo",
+  "key": "services.0.service",
+  "source": "design 19.3 E7 intro",
+  "stream": "s3"
+ },
+ {
+  "expected": "root",
+  "key": "services.0.client",
+  "source": "design 19.3 E7 intro (client root, human)",
+  "stream": "s3"
+ },
+ {
+  "expected": "human",
+  "key": "services.0.client_kind",
+  "source": "design 19.3 E7 intro (client root, human)",
+  "stream": "s3"
+ },
+ {
+  "expected": 2,
+  "key": "services.0.contract",
+  "source": "design 19.3 E7S3-1 (contract v2)",
+  "stream": "s3"
+ },
+ {
+  "expected": 2,
+  "key": "services.0.playbook",
+  "source": "design 19.3 E7S3-1 (playbook v2)",
+  "stream": "s3"
+ },
+ {
+  "expected": 12,
+  "key": "services.0.budget",
+  "source": "design 19.3 E7S3-1 (budget 12)",
+  "stream": "s3"
+ },
+ {
+  "expected": 1,
+  "key": "services.#",
+  "source": "design 19.3 E7 intro (every stream is one service)",
+  "stream": "s3"
+ },
+ {
+  "expected": null,
+  "key": "one_off",
+  "source": "design 19.3 E7S1-1 / E7-all (no one-off record)",
+  "stream": "s3"
+ },
+ {
+  "expected": [],
+  "key": "nested",
+  "source": "design 19.3 E7S1-1 / E7-all (no nested service)",
+  "stream": "s3"
+ },
+ {
+  "expected": {
+   "known": true,
+   "skipped": 0,
+   "truncated": false
+  },
+  "key": "services.0.history",
+  "published": {
+   "known": false,
+   "skipped": 0,
+   "truncated": false
+  },
+  "source": "amended by manager-decision-selfcheck.md (2026-10-25) item 1: the history path reads org-git-log.txt (s1 43, s2 36, s3 42 commits; AGENT.md and ORG.md only in their creation commits, so no charter or model mark); design 19.3 E7-all's known false is the replay kit's (no org git), kept by the replays under their kit-limit label",
+  "stream": "s3"
+ },
+ {
+  "expected": 3,
+  "key": "services.0.cases.#",
+  "source": "design 19.3 E7S3-1 (3 cases)",
+  "stream": "s3"
+ },
+ {
+  "expected": "20261025T082434523661-root-09df",
+  "key": "services.0.cases.0.id",
+  "source": "design 19.3 E7S3 heading (cases ...-root-09df), oldest first",
+  "stream": "s3"
+ },
+ {
+  "expected": "Memo for 2026-10-05 meeting",
+  "key": "services.0.cases.0.title",
+  "source": "design 19.3 E7S3-4 (case title)",
+  "stream": "s3"
+ },
+ {
+  "expected": "blocked",
+  "key": "services.0.cases.0.state",
+  "source": "design 19.3 E7S3-1 / E7-all (states)",
+  "stream": "s3"
+ },
+ {
+  "expected": 4,
+  "key": "services.0.cases.0.tasks",
+  "source": "design 19.3 E7S3-1 (tasks per case)",
+  "stream": "s3"
+ },
+ {
+  "expected": true,
+  "key": "services.0.cases.0.cut",
+  "source": "design 19.3 E7S3-1 / E7S3-4 (cut)",
+  "stream": "s3"
+ },
+ {
+  "expected": 0,
+  "key": "services.0.cases.0.credited",
+  "source": "design 19.3 E7-all (credited 0 in all nine cases)",
+  "stream": "s3"
+ },
+ {
+  "expected": 15,
+  "key": "services.0.cases.0.user_cost",
+  "source": "design 19.3 E7S3-4 (the user's runs 15 of 15)",
+  "stream": "s3"
+ },
+ {
+  "expected": 15,
+  "key": "services.0.cases.0.user_approved",
+  "source": "design 19.3 E7S3-4 (... of 15 approved) / E7 approvals paragraph",
+  "stream": "s3"
+ },
+ {
+  "expected": "1.00",
+  "key": "services.0.cases.0.ratio",
+  "source": "design 19.3 E7S3-4 (1.00x)",
+  "stream": "s3"
+ },
+ {
+  "expected": [
+   {
+    "amount": 7,
+    "id": "20261025T082820566824-root-62a5",
+    "source": "human"
+   },
+   {
+    "amount": 6,
+    "id": "20261025T083249523405-root-5834",
+    "source": "relayed"
+   },
+   {
+    "amount": 5,
+    "id": "20261025T083808500876-root-d9bc",
+    "source": "human"
+   }
+  ],
+  "key": "services.0.cases.0.top_ups",
+  "source": "design 19.3 E7S3-4 top-ups and E7S3-3 top-up marks (amounts)",
+  "stream": "s3"
+ },
+ {
+  "expected": 5,
+  "key": "services.0.cases.0.relayed_runs",
+  "source": "design 19.3 E7S3-4 (relayed runs 5)",
+  "stream": "s3"
+ },
+ {
+  "expected": 20,
+  "key": "services.0.cases.0.spend",
+  "source": "design 19.3 E7S3-4 (total 20)",
+  "stream": "s3"
+ },
+ {
+  "expected": 20,
+  "key": "services.0.cases.0.runs",
+  "source": "design 19.3 E7S3-4 (20 charged runs)",
+  "stream": "s3"
+ },
+ {
+  "expected": {
+   "outcome": "none",
+   "superseded_by": "20261025T082820566824-root-62a5",
+   "superseded_source": "human",
+   "task": "20261025T082434523661-root-09df"
+  },
+  "key": "services.0.cases.0.first",
+  "source": "design 19.3 E7S3-1 (first deliveries: 09df by the human rework 62a5)",
+  "stream": "s3"
+ },
+ {
+  "expected": "20261025T084326297193-root-a443",
+  "key": "services.0.cases.1.id",
+  "source": "design 19.3 E7S3 heading (cases ...-root-a443), oldest first",
+  "stream": "s3"
+ },
+ {
+  "expected": "Memo for 2026-10-12 meeting",
+  "key": "services.0.cases.1.title",
+  "source": "design 19.3 E7S3-4 (case title)",
+  "stream": "s3"
+ },
+ {
+  "expected": "done",
+  "key": "services.0.cases.1.state",
+  "source": "design 19.3 E7S3-1 / E7-all (states)",
+  "stream": "s3"
+ },
+ {
+  "expected": 2,
+  "key": "services.0.cases.1.tasks",
+  "source": "design 19.3 E7S3-1 (tasks per case)",
+  "stream": "s3"
+ },
+ {
+  "expected": false,
+  "key": "services.0.cases.1.cut",
+  "source": "design 19.3 E7S3-1 / E7S3-4 (cut)",
+  "stream": "s3"
+ },
+ {
+  "expected": 0,
+  "key": "services.0.cases.1.credited",
+  "source": "design 19.3 E7-all (credited 0 in all nine cases)",
+  "stream": "s3"
+ },
+ {
+  "expected": 10,
+  "key": "services.0.cases.1.user_cost",
+  "source": "design 19.3 E7S3-4 (the user's runs 10 of 12)",
+  "stream": "s3"
+ },
+ {
+  "expected": 12,
+  "key": "services.0.cases.1.user_approved",
+  "source": "design 19.3 E7S3-4 (... of 12 approved) / E7 approvals paragraph",
+  "stream": "s3"
+ },
+ {
+  "expected": "0.83",
+  "key": "services.0.cases.1.ratio",
+  "source": "design 19.3 E7S3-4 (0.83x)",
+  "stream": "s3"
+ },
+ {
+  "expected": [
+   {
+    "amount": 5,
+    "id": "20261025T084737901775-root-b576",
+    "source": "human"
+   }
+  ],
+  "key": "services.0.cases.1.top_ups",
+  "source": "design 19.3 E7S3-4 top-ups and E7S3-3 top-up marks (amounts)",
+  "stream": "s3"
+ },
+ {
+  "expected": 0,
+  "key": "services.0.cases.1.relayed_runs",
+  "source": "implied by design 19.3 E7S3-4 (10 of 12) and design 4.2: the case holds no relayed task (relayed_runs 0) and is done (spend = runs = user_cost)",
+  "stream": "s3"
+ },
+ {
+  "expected": 10,
+  "key": "services.0.cases.1.spend",
+  "source": "implied by design 19.3 E7S3-4 (10 of 12) and design 4.2: the case holds no relayed task (relayed_runs 0) and is done (spend = runs = user_cost)",
+  "stream": "s3"
+ },
+ {
+  "expected": 10,
+  "key": "services.0.cases.1.runs",
+  "source": "implied by design 19.3 E7S3-4 (10 of 12) and design 4.2: the case holds no relayed task (relayed_runs 0) and is done (spend = runs = user_cost)",
+  "stream": "s3"
+ },
+ {
+  "expected": {
+   "outcome": "none",
+   "superseded_by": "20261025T084737901775-root-b576",
+   "superseded_source": "human",
+   "task": "20261025T084326297193-root-a443"
+  },
+  "key": "services.0.cases.1.first",
+  "source": "design 19.3 E7S3-1 (first deliveries: a443 by b576)",
+  "stream": "s3"
+ },
+ {
+  "expected": "20261025T085101224283-root-a74a",
+  "key": "services.0.cases.2.id",
+  "source": "design 19.3 E7S3 heading (cases ...-root-a74a), oldest first",
+  "stream": "s3"
+ },
+ {
+  "expected": "Memo for 2026-10-19 meeting",
+  "key": "services.0.cases.2.title",
+  "source": "design 19.3 E7S3-4 (case title)",
+  "stream": "s3"
+ },
+ {
+  "expected": "done",
+  "key": "services.0.cases.2.state",
+  "source": "design 19.3 E7S3-1 / E7-all (states)",
+  "stream": "s3"
+ },
+ {
+  "expected": 2,
+  "key": "services.0.cases.2.tasks",
+  "source": "design 19.3 E7S3-1 (tasks per case)",
+  "stream": "s3"
+ },
+ {
+  "expected": false,
+  "key": "services.0.cases.2.cut",
+  "source": "design 19.3 E7S3-1 / E7S3-4 (cut)",
+  "stream": "s3"
+ },
+ {
+  "expected": 0,
+  "key": "services.0.cases.2.credited",
+  "source": "design 19.3 E7-all (credited 0 in all nine cases)",
+  "stream": "s3"
+ },
+ {
+  "expected": 10,
+  "key": "services.0.cases.2.user_cost",
+  "source": "design 19.3 E7S3-4 (the user's runs 10 of 12)",
+  "stream": "s3"
+ },
+ {
+  "expected": 12,
+  "key": "services.0.cases.2.user_approved",
+  "source": "design 19.3 E7S3-4 (... of 12 approved) / E7 approvals paragraph",
+  "stream": "s3"
+ },
+ {
+  "expected": "0.83",
+  "key": "services.0.cases.2.ratio",
+  "source": "design 19.3 E7S3-4 (0.83x)",
+  "stream": "s3"
+ },
+ {
+  "expected": [
+   {
+    "amount": 5,
+    "id": "20261025T085455547239-root-f83d",
+    "source": "human"
+   }
+  ],
+  "key": "services.0.cases.2.top_ups",
+  "source": "design 19.3 E7S3-4 top-ups and E7S3-3 top-up marks (amounts)",
+  "stream": "s3"
+ },
+ {
+  "expected": 0,
+  "key": "services.0.cases.2.relayed_runs",
+  "source": "implied by design 19.3 E7S3-4 (10 of 12) and design 4.2: the case holds no relayed task (relayed_runs 0) and is done (spend = runs = user_cost)",
+  "stream": "s3"
+ },
+ {
+  "expected": 10,
+  "key": "services.0.cases.2.spend",
+  "source": "implied by design 19.3 E7S3-4 (10 of 12) and design 4.2: the case holds no relayed task (relayed_runs 0) and is done (spend = runs = user_cost)",
+  "stream": "s3"
+ },
+ {
+  "expected": 10,
+  "key": "services.0.cases.2.runs",
+  "source": "implied by design 19.3 E7S3-4 (10 of 12) and design 4.2: the case holds no relayed task (relayed_runs 0) and is done (spend = runs = user_cost)",
+  "stream": "s3"
+ },
+ {
+  "expected": {
+   "outcome": "none",
+   "superseded_by": "20261025T085455547239-root-f83d",
+   "superseded_source": "human",
+   "task": "20261025T085101224283-root-a74a"
+  },
+  "key": "services.0.cases.2.first",
+  "source": "design 19.3 E7S3-1 (first deliveries: a74a by f83d)",
+  "stream": "s3"
+ },
+ {
+  "expected": {
+   "accepted": 0,
+   "neither": 0,
+   "never_delivered": 0,
+   "no_verdict": 3,
+   "rejected": 0,
+   "superseded": 3
+  },
+  "key": "services.0.first_deliveries",
+  "source": "design 19.3 E7S3-1 (first deliveries line)",
+  "stream": "s3"
+ },
+ {
+  "expected": 7,
+  "key": "services.0.deliveries.total",
+  "source": "design 19.3 E7S3-1 (7 deliveries)",
+  "stream": "s3"
+ },
+ {
+  "expected": 3,
+  "key": "services.0.deliveries.judged",
+  "source": "design 19.3 E7S3-1 (judged 3 of 7)",
+  "stream": "s3"
+ },
+ {
+  "expected": [],
+  "key": "services.0.deliveries.unjudged_cases",
+  "source": "design 19.3 E7S3-1 (0 cases without a verdict)",
+  "stream": "s3"
+ },
+ {
+  "expected": [],
+  "key": "services.0.deliveries.relayed_only",
+  "source": "design 19.3 E7S3-1 (relayed only 0)",
+  "stream": "s3"
+ },
+ {
+  "expected": [],
+  "key": "services.0.deliveries.unseen_relayed",
+  "source": "design 19.3 E7S3-1 (unseen relayed none)",
+  "stream": "s3"
+ },
+ {
+  "expected": [
+   {
+    "case": "20261025T082434523661-root-09df",
+    "task": "20261025T083249523405-root-5834"
+   }
+  ],
+  "key": "services.0.deliveries.not_as_delivered",
+  "published": [],
+  "source": "amended by manager-decision-selfcheck.md (2026-10-25) item 3 (correct by definition): memos/memo-2026-10-05.md is v4 b5f1411 (d9bc's work; its result ...-lead-da3c is blocked, no delivery: D4); the newest delivery is the relayed 5834 (result ...-lead-f639, first committed in 0c86c20 with v3 1c5b8a5); P3 walks past it to 62a5 (v2): `differs`, naming 5834 (OQ-3's neutral label). Design 19.3 E7S3-6's 'the replay and the history agree' (not_as_delivered []) is a design correction; finding: a file copied from a blocked result reads not as delivered",
+  "stream": "s3"
+ },
+ {
+  "expected": [],
+  "key": "services.0.deliveries.neither",
+  "source": "design 19.3 E7S3-6 (neither [])",
+  "stream": "s3"
+ },
+ {
+  "expected": 0,
+  "key": "services.0.deliveries.legacy_verdicts",
+  "source": "design 19.3 E7S3-1 (0 legacy verdicts)",
+  "stream": "s3"
+ },
+ {
+  "expected": [
+   "20261025T084326230467-root-dd46"
+  ],
+  "key": "services.0.deliveries.not_on_a_delivery",
+  "source": "design 19.3 E7S3-1 (1 verdict not on a delivery: ...-root-dd46)",
+  "stream": "s3"
+ },
+ {
+  "expected": 1,
+  "key": "services.0.escapes.#",
+  "source": "design 19.3 E7S3-2 (one escape)",
+  "stream": "s3"
+ },
+ {
+  "expected": "R1",
+  "key": "services.0.escapes.0.assertion",
+  "source": "design 19.3 E7S3-2 (escape assertion)",
+  "stream": "s3"
+ },
+ {
+  "expected": "20261025T082434523661-root-09df",
+  "key": "services.0.escapes.0.case",
+  "source": "design 19.3 E7S3-2 (escape case)",
+  "stream": "s3"
+ },
+ {
+  "expected": "20261025T082820566824-root-62a5",
+  "key": "services.0.escapes.0.task",
+  "source": "design 19.3 E7S3-2 (escape task)",
+  "stream": "s3"
+ },
+ {
+  "expected": "20261025T083630462812-root-c370",
+  "key": "services.0.escapes.0.verdict",
+  "source": "design 19.3 E7S3-2 (escape verdict)",
+  "stream": "s3"
+ },
+ {
+  "expected": "lead/reviewer",
+  "key": "services.0.escapes.0.signer",
+  "source": "design 19.3 E7S3-2 (escape signer)",
+  "stream": "s3"
+ },
+ {
+  "expected": "contract-gap",
+  "key": "services.0.escapes.0.cause",
+  "source": "design 19.3 E7S3-2 (escape cause)",
+  "stream": "s3"
+ },
+ {
+  "expected": "answer",
+  "key": "services.0.escapes.0.rule",
+  "source": "design 19.3 E7S3-2 (escape rule)",
+  "stream": "s3"
+ },
+ {
+  "expected": [
+   "answer",
+   "words"
+  ],
+  "key": "services.0.escapes.0.rules",
+  "source": "design 19.3 E7S3-2 (escape rules)",
+  "stream": "s3"
+ },
+ {
+  "expected": [
+   "20261025T083800404013-root-43ce",
+   "C9"
+  ],
+  "key": "services.0.escapes.0.detail",
+  "source": "design 19.3 E7S3-2 (escape detail)",
+  "stream": "s3"
+ },
+ {
+  "expected": [],
+  "key": "services.0.escapes.0.also",
+  "source": "design 19.3 E7S3-2 (escape also)",
+  "stream": "s3"
+ },
+ {
+  "expected": "20261025T083249523405-root-5834",
+  "key": "services.0.escapes.0.before_verdict",
+  "source": "design 19.3 E7S3-2 (escape before_verdict)",
+  "stream": "s3"
+ },
+ {
+  "expected": "not its",
+  "key": "services.0.escapes.0.attribution",
+  "source": "design 19.3 E7S3-2 (escape attribution)",
+  "stream": "s3"
+ },
+ {
+  "expected": 1,
+  "key": "services.0.verifiers.#",
+  "source": "design 19.3 E7S3-2 (one verifier line: lead/reviewer)",
+  "stream": "s3"
+ },
+ {
+  "expected": "lead/reviewer",
+  "key": "services.0.verifiers.0.addr",
+  "source": "design 19.3 E7S3-2 (verifier line: escapes 0 of 3 judged; not its: 1 contract-gap; PASS precision 3 of 3; 0 re-check(s), 0 author rework run(s))",
+  "stream": "s3"
+ },
+ {
+  "expected": 3,
+  "key": "services.0.verifiers.0.judged",
+  "source": "design 19.3 E7S3-2 (verifier line: escapes 0 of 3 judged; not its: 1 contract-gap; PASS precision 3 of 3; 0 re-check(s), 0 author rework run(s))",
+  "stream": "s3"
+ },
+ {
+  "expected": {
+   "counted": {},
+   "not_its": {
+    "contract-gap": 1
+   }
+  },
+  "key": "services.0.verifiers.0.escapes",
+  "source": "design 19.3 E7S3-2 (verifier line: escapes 0 of 3 judged; not its: 1 contract-gap; PASS precision 3 of 3; 0 re-check(s), 0 author rework run(s))",
+  "stream": "s3"
+ },
+ {
+  "expected": [
+   3,
+   3
+  ],
+  "key": "services.0.verifiers.0.pass_precision",
+  "source": "design 19.3 E7S3-2 (verifier line: escapes 0 of 3 judged; not its: 1 contract-gap; PASS precision 3 of 3; 0 re-check(s), 0 author rework run(s))",
+  "stream": "s3"
+ },
+ {
+  "expected": 0,
+  "key": "services.0.verifiers.0.rechecks",
+  "source": "design 19.3 E7S3-2 (verifier line: escapes 0 of 3 judged; not its: 1 contract-gap; PASS precision 3 of 3; 0 re-check(s), 0 author rework run(s))",
+  "stream": "s3"
+ },
+ {
+  "expected": 0,
+  "key": "services.0.verifiers.0.rework_runs",
+  "source": "design 19.3 E7S3-2 (verifier line: escapes 0 of 3 judged; not its: 1 contract-gap; PASS precision 3 of 3; 0 re-check(s), 0 author rework run(s))",
+  "stream": "s3"
+ },
+ {
+  "expected": {
+   "fired": [],
+   "judged": 3,
+   "not_counted": {
+    "R1": [
+     "C3"
+    ]
+   },
+   "state": "no",
+   "subjects": {
+    "C9": 1,
+    "R1": 1
+   },
+   "window": [
+    "20261025T082434523661-root-09df",
+    "20261025T084326297193-root-a443",
+    "20261025T085101224283-root-a74a"
+   ]
+  },
+  "key": "services.0.alarms.repeat",
+  "source": "design 19.3 E7S3-5 (repeat no; window, subjects, fired, not_counted)",
+  "stream": "s3"
+ },
+ {
+  "expected": {
+   "cases": [],
+   "compared": 3,
+   "judged": 3,
+   "skipped": [],
+   "state": "no"
+  },
+  "key": "services.0.alarms.cost",
+  "source": "design 19.3 E7S3-5 (cost no (0 of 3 cases above 1.25x); judged 3, compared 3)",
+  "stream": "s3"
+ },
+ {
+  "expected": 9,
+  "key": "services.0.timeline.#",
+  "source": "design 19.3 E7S3-3 (2 contract marks, 2 playbook marks and the listed top-up marks; no charter or model mark)",
+  "stream": "s3"
+ },
+ {
+  "expected": [
+   "C1",
+   "C2",
+   "C3",
+   "C4",
+   "C5",
+   "C6",
+   "C7",
+   "C8"
+  ],
+  "key": "services.0.timeline.[kind=contract&version=1].adds",
+  "source": "design 19.3 E7S3-3 (contract v1 (C1, C2, C3, C4, C5, C6, C7, C8))",
+  "stream": "s3"
+ },
+ {
+  "expected": [],
+  "key": "services.0.timeline.[kind=contract&version=1].removes",
+  "source": "design 19.3 E7S3-3 / 9.4 (v1: every id in adds)",
+  "stream": "s3"
+ },
+ {
+  "expected": "first",
+  "key": "services.0.timeline.[kind=contract&version=1].basis",
+  "source": "design 19.3 E7S3-3 / 9.4 (v1)",
+  "stream": "s3"
+ },
+ {
+  "expected": "root",
+  "key": "services.0.timeline.[kind=contract&version=2].by",
+  "source": "design 19.3 E7S3-3 (contract v2 mark: contract v2 (root): adds C9: the user's answer to R1: C9 confirmed (link ...-root-43ce))",
+  "stream": "s3"
+ },
+ {
+  "expected": [
+   "C9"
+  ],
+  "key": "services.0.timeline.[kind=contract&version=2].adds",
+  "source": "design 19.3 E7S3-3 (contract v2 mark: contract v2 (root): adds C9: the user's answer to R1: C9 confirmed (link ...-root-43ce))",
+  "stream": "s3"
+ },
+ {
+  "expected": [],
+  "key": "services.0.timeline.[kind=contract&version=2].removes",
+  "source": "design 19.3 E7S3-3 (contract v2 mark: contract v2 (root): adds C9: the user's answer to R1: C9 confirmed (link ...-root-43ce))",
+  "stream": "s3"
+ },
+ {
+  "expected": "answers",
+  "key": "services.0.timeline.[kind=contract&version=2].basis",
+  "source": "design 19.3 E7S3-3 (contract v2 mark: contract v2 (root): adds C9: the user's answer to R1: C9 confirmed (link ...-root-43ce))",
+  "stream": "s3"
+ },
+ {
+  "expected": "R1",
+  "key": "services.0.timeline.[kind=contract&version=2].answers",
+  "source": "design 19.3 E7S3-3 (contract v2 mark: contract v2 (root): adds C9: the user's answer to R1: C9 confirmed (link ...-root-43ce))",
+  "stream": "s3"
+ },
+ {
+  "expected": [
+   {
+    "id": "C9",
+    "link": "20261025T083800404013-root-43ce"
+   }
+  ],
+  "key": "services.0.timeline.[kind=contract&version=2].confirmed",
+  "source": "design 19.3 E7S3-3 (contract v2 mark: contract v2 (root): adds C9: the user's answer to R1: C9 confirmed (link ...-root-43ce))",
+  "stream": "s3"
+ },
+ {
+  "expected": [],
+  "key": "services.0.timeline.[kind=contract&version=2].not_confirmed",
+  "source": "design 19.3 E7S3-3 (contract v2 mark: contract v2 (root): adds C9: the user's answer to R1: C9 confirmed (link ...-root-43ce))",
+  "stream": "s3"
+ },
+ {
+  "expected": "root",
+  "key": "services.0.timeline.[kind=playbook&version=1].by",
+  "source": "design 19.3 E7S3-3 (playbook v1 (root): written by the client)",
+  "stream": "s3"
+ },
+ {
+  "expected": "client",
+  "key": "services.0.timeline.[kind=playbook&version=1].basis",
+  "source": "design 19.3 E7S3-3 (written by the client (no admission needed))",
+  "stream": "s3"
+ },
+ {
+  "expected": "lead",
+  "key": "services.0.timeline.[kind=playbook&version=2].by",
+  "source": "design 19.3 E7S3-3 (playbook v2 (lead): admitted (c) on C9, R1, root-c370, root-43ce: 1 changed line(s): 1 the cited criteria's own words, 0 beyond them; no 'line(s) removed' part)",
+  "stream": "s3"
+ },
+ {
+  "expected": "c",
+  "key": "services.0.timeline.[kind=playbook&version=2].basis",
+  "source": "design 19.3 E7S3-3 (playbook v2 (lead): admitted (c) on C9, R1, root-c370, root-43ce: 1 changed line(s): 1 the cited criteria's own words, 0 beyond them; no 'line(s) removed' part)",
+  "stream": "s3"
+ },
+ {
+  "expected": [
+   "C9",
+   "R1",
+   "20261025T083630462812-root-c370",
+   "20261025T083800404013-root-43ce"
+  ],
+  "key": "services.0.timeline.[kind=playbook&version=2].evidence",
+  "source": "design 19.3 E7S3-3 (playbook v2 (lead): admitted (c) on C9, R1, root-c370, root-43ce: 1 changed line(s): 1 the cited criteria's own words, 0 beyond them; no 'line(s) removed' part)",
+  "stream": "s3"
+ },
+ {
+  "expected": 1,
+  "key": "services.0.timeline.[kind=playbook&version=2].changed",
+  "source": "design 19.3 E7S3-3 (playbook v2 (lead): admitted (c) on C9, R1, root-c370, root-43ce: 1 changed line(s): 1 the cited criteria's own words, 0 beyond them; no 'line(s) removed' part)",
+  "stream": "s3"
+ },
+ {
+  "expected": 1,
+  "key": "services.0.timeline.[kind=playbook&version=2].own_words",
+  "source": "design 19.3 E7S3-3 (playbook v2 (lead): admitted (c) on C9, R1, root-c370, root-43ce: 1 changed line(s): 1 the cited criteria's own words, 0 beyond them; no 'line(s) removed' part)",
+  "stream": "s3"
+ },
+ {
+  "expected": 0,
+  "key": "services.0.timeline.[kind=playbook&version=2].beyond",
+  "source": "design 19.3 E7S3-3 (playbook v2 (lead): admitted (c) on C9, R1, root-c370, root-43ce: 1 changed line(s): 1 the cited criteria's own words, 0 beyond them; no 'line(s) removed' part)",
+  "stream": "s3"
+ },
+ {
+  "expected": 0,
+  "key": "services.0.timeline.[kind=playbook&version=2].removed",
+  "source": "design 19.3 E7S3-3 (playbook v2 (lead): admitted (c) on C9, R1, root-c370, root-43ce: 1 changed line(s): 1 the cited criteria's own words, 0 beyond them; no 'line(s) removed' part)",
+  "stream": "s3"
+ },
+ {
+  "expected": "20261025T082434523661-root-09df",
+  "key": "services.0.timeline.[kind=top-up&id=20261025T082820566824-root-62a5].case",
+  "source": "design 19.3 E7S3-3 (top-up mark at 08:28, case of the rework)",
+  "stream": "s3"
+ },
+ {
+  "expected": "human",
+  "key": "services.0.timeline.[kind=top-up&id=20261025T082820566824-root-62a5].source",
+  "source": "design 19.3 E7S3-3 (top-up mark at 08:28)",
+  "stream": "s3"
+ },
+ {
+  "expected": 7,
+  "key": "services.0.timeline.[kind=top-up&id=20261025T082820566824-root-62a5].amount",
+  "source": "design 19.3 E7S3-3 (top-up mark at 08:28: +7)",
+  "stream": "s3"
+ },
+ {
+  "expected": "20261025T082434523661-root-09df",
+  "key": "services.0.timeline.[kind=top-up&id=20261025T083249523405-root-5834].case",
+  "source": "design 19.3 E7S3-3 (top-up mark at 08:32, case of the rework)",
+  "stream": "s3"
+ },
+ {
+  "expected": "relayed",
+  "key": "services.0.timeline.[kind=top-up&id=20261025T083249523405-root-5834].source",
+  "source": "design 19.3 E7S3-3 (top-up mark at 08:32)",
+  "stream": "s3"
+ },
+ {
+  "expected": 6,
+  "key": "services.0.timeline.[kind=top-up&id=20261025T083249523405-root-5834].amount",
+  "source": "design 19.3 E7S3-3 (top-up mark at 08:32: +6)",
+  "stream": "s3"
+ },
+ {
+  "expected": "20261025T082434523661-root-09df",
+  "key": "services.0.timeline.[kind=top-up&id=20261025T083808500876-root-d9bc].case",
+  "source": "design 19.3 E7S3-3 (top-up mark at 08:38, case of the rework)",
+  "stream": "s3"
+ },
+ {
+  "expected": "human",
+  "key": "services.0.timeline.[kind=top-up&id=20261025T083808500876-root-d9bc].source",
+  "source": "design 19.3 E7S3-3 (top-up mark at 08:38)",
+  "stream": "s3"
+ },
+ {
+  "expected": 5,
+  "key": "services.0.timeline.[kind=top-up&id=20261025T083808500876-root-d9bc].amount",
+  "source": "design 19.3 E7S3-3 (top-up mark at 08:38: +5)",
+  "stream": "s3"
+ },
+ {
+  "expected": "20261025T084326297193-root-a443",
+  "key": "services.0.timeline.[kind=top-up&id=20261025T084737901775-root-b576].case",
+  "source": "design 19.3 E7S3-3 (top-up mark at 08:47, case of the rework)",
+  "stream": "s3"
+ },
+ {
+  "expected": "human",
+  "key": "services.0.timeline.[kind=top-up&id=20261025T084737901775-root-b576].source",
+  "source": "design 19.3 E7S3-3 (top-up mark at 08:47)",
+  "stream": "s3"
+ },
+ {
+  "expected": 5,
+  "key": "services.0.timeline.[kind=top-up&id=20261025T084737901775-root-b576].amount",
+  "source": "design 19.3 E7S3-3 (top-up mark at 08:47: +5)",
+  "stream": "s3"
+ },
+ {
+  "expected": "20261025T085101224283-root-a74a",
+  "key": "services.0.timeline.[kind=top-up&id=20261025T085455547239-root-f83d].case",
+  "source": "design 19.3 E7S3-3 (top-up mark at 08:54, case of the rework)",
+  "stream": "s3"
+ },
+ {
+  "expected": "human",
+  "key": "services.0.timeline.[kind=top-up&id=20261025T085455547239-root-f83d].source",
+  "source": "design 19.3 E7S3-3 (top-up mark at 08:54)",
+  "stream": "s3"
+ },
+ {
+  "expected": 5,
+  "key": "services.0.timeline.[kind=top-up&id=20261025T085455547239-root-f83d].amount",
+  "source": "design 19.3 E7S3-3 (top-up mark at 08:54: +5)",
+  "stream": "s3"
+ },
+ {
+  "expected": [],
+  "key": "moved_past",
+  "source": "design 19.3 E7S3-7 (moved past: none)",
+  "stream": "s3"
+ },
+ {
+  "expected": "20261025T075038845671-root-c671",
+  "key": "given_deliveries.[case=20261025T074451197103-root-3ca4].given",
+  "source": "manager-decision-selfcheck.md (2026-10-25) item 2 (the given delivery of OQ-2 is c671, the design's history-path delivery: design 19.3 kit-limit paragraph and E7S2-6); P3's newest-first pair (the product's choice) is the head 3ca4: F-G0-1",
+  "stream": "s2"
+ },
+ {
+  "expected": "human verdict",
+  "key": "given_deliveries.[case=20261025T074451197103-root-3ca4].by",
+  "source": "manager-decision-selfcheck.md (2026-10-25) item 2 (the given delivery of OQ-2 is c671, the design's history-path delivery: design 19.3 kit-limit paragraph and E7S2-6); P3's newest-first pair (the product's choice) is the head 3ca4: F-G0-1",
+  "stream": "s2"
+ },
+ {
+  "expected": "20261025T074451197103-root-3ca4",
+  "key": "given_deliveries.[case=20261025T074451197103-root-3ca4].p3_names",
+  "source": "manager-decision-selfcheck.md (2026-10-25) item 2 (the given delivery of OQ-2 is c671, the design's history-path delivery: design 19.3 kit-limit paragraph and E7S2-6); P3's newest-first pair (the product's choice) is the head 3ca4: F-G0-1",
+  "stream": "s2"
+ },
+ {
+  "expected": true,
+  "key": "given_deliveries.[case=20261025T074451197103-root-3ca4].differs",
+  "source": "manager-decision-selfcheck.md (2026-10-25) item 2 (the given delivery of OQ-2 is c671, the design's history-path delivery: design 19.3 kit-limit paragraph and E7S2-6); P3's newest-first pair (the product's choice) is the head 3ca4: F-G0-1",
+  "stream": "s2"
+ },
+ {
+  "expected": "<absent>",
+  "key": "given_deliveries.[differs=True].#",
+  "source": "manager-decision-selfcheck.md (2026-10-25) item 2: F-G0-1's pattern decides no given delivery in s1 (s1's memo-1 file is the latest delivery 066f's v4; s3's is no delivery's checked artifact)",
+  "stream": "s1"
+ },
+ {
+  "expected": "<absent>",
+  "key": "given_deliveries.[differs=True].#",
+  "source": "manager-decision-selfcheck.md (2026-10-25) item 2: F-G0-1's pattern decides no given delivery in s3 (s1's memo-1 file is the latest delivery 066f's v4; s3's is no delivery's checked artifact)",
+  "stream": "s3"
+ }
+]

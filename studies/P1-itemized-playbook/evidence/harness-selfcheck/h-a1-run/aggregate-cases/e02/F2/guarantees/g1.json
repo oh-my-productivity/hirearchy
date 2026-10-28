@@ -1,0 +1,1 @@
+{"a": {"verdict": "PASS"}, "c": {"verdict": "PASS"}, "f": {"verdict": "PASS"}, "b": {"verdict": "VACUOUS (no B: the owner added no planted rule)", "retire_ran_live": false}, "e": {"verdict": "VACUOUS (no planted rule admitted)"}, "d": {"verdict": "NOT DETERMINED (judged reading)", "hits": []}}

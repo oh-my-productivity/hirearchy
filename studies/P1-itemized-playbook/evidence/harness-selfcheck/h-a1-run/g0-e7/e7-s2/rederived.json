@@ -1,0 +1,582 @@
+{
+  "given_deliveries": [
+    {
+      "by": "human verdict",
+      "candidates": [
+        "20261025T074451197103-root-3ca4",
+        "20261025T075038845671-root-c671"
+      ],
+      "case": "20261025T074451197103-root-3ca4",
+      "differs": true,
+      "file": "memo-2026-10-05.md",
+      "given": "20261025T075038845671-root-c671",
+      "kind": "relayed",
+      "p3_names": "20261025T074451197103-root-3ca4",
+      "results": [
+        "20261025T075348334986-lead-a112",
+        "20261025T075346466192-lead-64cb"
+      ]
+    },
+    {
+      "by": "human verdict",
+      "candidates": [
+        "20261025T080139460250-root-ae3f"
+      ],
+      "case": "20261025T080139460250-root-ae3f",
+      "differs": false,
+      "file": "memo-2026-10-12.md",
+      "given": "20261025T080139460250-root-ae3f",
+      "kind": "same",
+      "p3_names": "20261025T080139460250-root-ae3f",
+      "results": [
+        "20261025T080407667524-lead-433a"
+      ]
+    },
+    {
+      "by": "human verdict",
+      "candidates": [
+        "20261025T081146777819-root-2272"
+      ],
+      "case": "20261025T080619539939-root-96a5",
+      "differs": false,
+      "file": "memo-2026-10-19.md",
+      "given": "20261025T081146777819-root-2272",
+      "kind": "same",
+      "p3_names": "20261025T081146777819-root-2272",
+      "results": [
+        "20261025T081400609911-lead-02da"
+      ]
+    }
+  ],
+  "moved_past": [
+    {
+      "addr": "lead/writer",
+      "error": "",
+      "held": 4,
+      "held_error": "",
+      "tasks": [
+        {
+          "blocked": "2026-10-25T08:02:43Z",
+          "id": "20261025T080214459188-lead-1add",
+          "left_blocked": true,
+          "sender": "lead",
+          "sent_since": 2,
+          "title": null
+        }
+      ]
+    }
+  ],
+  "nested": [],
+  "not_derived": [],
+  "notes": [],
+  "one_off": null,
+  "schema": 1,
+  "script": {
+    "md5": "567d9ce98f538d81d76d94343e778f23",
+    "name": "rederive_quality.py"
+  },
+  "services": [
+    {
+      "alarms": {
+        "cost": {
+          "cases": [],
+          "compared": 3,
+          "judged": 3,
+          "skipped": [],
+          "state": "no"
+        },
+        "repeat": {
+          "fired": [],
+          "judged": 3,
+          "not_counted": {
+            "R1": [
+              "C4"
+            ]
+          },
+          "state": "no",
+          "subjects": {
+            "C8": 1,
+            "R1": 1
+          },
+          "window": [
+            "20261025T074451197103-root-3ca4",
+            "20261025T080139460250-root-ae3f",
+            "20261025T080619539939-root-96a5"
+          ]
+        }
+      },
+      "budget": 12,
+      "cases": [
+        {
+          "assignee": "lead",
+          "budget": 12,
+          "credited": 0,
+          "cut": false,
+          "first": {
+            "outcome": "none",
+            "superseded_by": "20261025T075456327958-root-37b7",
+            "superseded_source": "relayed",
+            "task": "20261025T074451197103-root-3ca4"
+          },
+          "id": "20261025T074451197103-root-3ca4",
+          "ratio": "1.08",
+          "relayed_runs": 5,
+          "runs": 19,
+          "runs_unknown": "",
+          "spend": 19,
+          "stalled": false,
+          "state": "done",
+          "tasks": 3,
+          "title": "Memo for 2026-10-05 meeting",
+          "top_ups": [
+            {
+              "amount": 1,
+              "id": "20261025T075038845671-root-c671",
+              "source": "human"
+            },
+            {
+              "amount": 1,
+              "id": "20261025T075138446837-root-68df",
+              "source": "granted"
+            },
+            {
+              "amount": 6,
+              "id": "20261025T075456327958-root-37b7",
+              "source": "relayed"
+            }
+          ],
+          "user_approved": 13,
+          "user_cost": 14
+        },
+        {
+          "assignee": "lead",
+          "budget": 12,
+          "credited": 0,
+          "cut": false,
+          "first": {
+            "outcome": "accepted",
+            "superseded_by": null,
+            "superseded_source": null,
+            "task": "20261025T080139460250-root-ae3f"
+          },
+          "id": "20261025T080139460250-root-ae3f",
+          "ratio": "0.42",
+          "relayed_runs": 0,
+          "runs": 5,
+          "runs_unknown": "",
+          "spend": 5,
+          "stalled": false,
+          "state": "done",
+          "tasks": 1,
+          "title": "Memo for 2026-10-12 meeting",
+          "top_ups": [],
+          "user_approved": 12,
+          "user_cost": 5
+        },
+        {
+          "assignee": "lead",
+          "budget": 12,
+          "credited": 0,
+          "cut": false,
+          "first": {
+            "outcome": "none",
+            "superseded_by": "20261025T081146777819-root-2272",
+            "superseded_source": "human",
+            "task": "20261025T080619539939-root-96a5"
+          },
+          "id": "20261025T080619539939-root-96a5",
+          "ratio": "0.83",
+          "relayed_runs": 0,
+          "runs": 10,
+          "runs_unknown": "",
+          "spend": 10,
+          "stalled": false,
+          "state": "done",
+          "tasks": 2,
+          "title": "Memo for 2026-10-19 meeting",
+          "top_ups": [
+            {
+              "amount": 5,
+              "id": "20261025T081146777819-root-2272",
+              "source": "human"
+            }
+          ],
+          "user_approved": 12,
+          "user_cost": 10
+        }
+      ],
+      "client": "root",
+      "client_kind": "human",
+      "contract": 2,
+      "deliveries": {
+        "judged": 3,
+        "legacy_verdicts": 0,
+        "neither": [],
+        "not_as_delivered": [],
+        "not_on_a_delivery": [],
+        "relayed_only": [],
+        "total": 6,
+        "unjudged_cases": [],
+        "unseen_relayed": [
+          "20261025T074451197103-root-3ca4"
+        ]
+      },
+      "error": "",
+      "escapes": [
+        {
+          "also": [],
+          "assertion": "R1",
+          "attribution": "not its",
+          "before_verdict": "20261025T075456327958-root-37b7",
+          "case": "20261025T074451197103-root-3ca4",
+          "cause": "contract-gap",
+          "class": null,
+          "detail": [
+            "20261025T080029734610-root-356e",
+            "C8"
+          ],
+          "rule": "answer",
+          "rules": [
+            "answer",
+            "words"
+          ],
+          "signer": "lead/reviewer",
+          "task": "20261025T075038845671-root-c671",
+          "verdict": "20261025T075910994217-root-ce17"
+        }
+      ],
+      "files_error": "",
+      "first_deliveries": {
+        "accepted": 1,
+        "neither": 0,
+        "never_delivered": 0,
+        "no_verdict": 2,
+        "rejected": 0,
+        "superseded": 2
+      },
+      "history": {
+        "known": true,
+        "skipped": 0,
+        "truncated": false
+      },
+      "owner": "lead",
+      "playbook": 2,
+      "service": "weekly-meeting-memo",
+      "stalled_error": "",
+      "timeline": [
+        {
+          "adds": [
+            "C1",
+            "C2",
+            "C3",
+            "C4",
+            "C5",
+            "C6",
+            "C7"
+          ],
+          "answers": null,
+          "basis": "first",
+          "by": "root",
+          "confirmed": [],
+          "kind": "contract",
+          "not_confirmed": [],
+          "removes": [],
+          "version": 1,
+          "when": "2026-10-25T07:44:49Z"
+        },
+        {
+          "agent_written": true,
+          "basis": "client",
+          "beyond": null,
+          "by": "root",
+          "changed": 15,
+          "cited": [],
+          "evidence": [],
+          "evidence_other": 0,
+          "kind": "playbook",
+          "lines": [
+            {
+              "own_words": false,
+              "text": "## Steps"
+            },
+            {
+              "own_words": false,
+              "text": "1. Read the request in your prompt: its inputs, every acceptance criterion and the deliverable. The criteria come from the contract and can only be met, never changed; copy the relevant ones verbatim into every task you delegate."
+            },
+            {
+              "own_words": false,
+              "text": "2. Delegate to `writer` (Writer) with `budget=3`: its part of the request, with the criteria it must meet."
+            },
+            {
+              "own_words": false,
+              "text": "3. When the work exists, delegate to `reviewer` (Independent Reviewer) with `budget=2` to check the final file independently against every criterion. It reports findings and required changes to you and never edits the author's file."
+            },
+            {
+              "own_words": false,
+              "text": "4. If a check fails: send the required changes, quoted verbatim, to the AUTHOR of the failing file (`delegate(to=<author>, revises=<that author's task id>, budget=1)`; for the deliverable usually `writer`), then have the checker re-check that same file (`delegate(to=<checker>, revises=<the checker's task id>)`). One rework and one re-check; if it still fails, report `blocked` with options and the checker's final line instead of starting another cycle."
+            },
+            {
+              "own_words": false,
+              "text": "5. Read the final artifact yourself and check it against EVERY criterion of the request, quoting counts from your own `read` output, and paste the checker's final coverage line verbatim."
+            },
+            {
+              "own_words": false,
+              "text": "6. Report: `done` only if every criterion is met (else `blocked` with the deviation and a recommended decision). Name the deliverable's path (the assistant copies it to /tmp/hirearchy-e7-s2-1792914064/deliverables) and pass `lessons`: 1-3 lines for the next request - what worked, what to change in this playbook, and the evidence (runs used, rework, review findings)."
+            },
+            {
+              "own_words": false,
+              "text": "## Budget plan"
+            },
+            {
+              "own_words": false,
+              "text": "Request budget: 12 runs (the contract's). Hand down no more than this up front, each with `budget=` set explicitly:"
+            },
+            {
+              "own_words": false,
+              "text": "- writer: 3 runs (2 work + 1 rework or re-check)"
+            }
+          ],
+          "lines_more": 5,
+          "own_words": null,
+          "removed": 0,
+          "restores": null,
+          "tagged": null,
+          "untagged": null,
+          "version": 1,
+          "when": "2026-10-25T07:44:49Z"
+        },
+        {
+          "amount": 1,
+          "case": "20261025T074451197103-root-3ca4",
+          "id": "20261025T075038845671-root-c671",
+          "kind": "top-up",
+          "source": "human",
+          "when": "2026-10-25T07:50:38Z"
+        },
+        {
+          "amount": 1,
+          "case": "20261025T074451197103-root-3ca4",
+          "id": "20261025T075138446837-root-68df",
+          "kind": "top-up",
+          "source": "granted",
+          "when": "2026-10-25T07:51:38Z"
+        },
+        {
+          "amount": 6,
+          "case": "20261025T074451197103-root-3ca4",
+          "id": "20261025T075456327958-root-37b7",
+          "kind": "top-up",
+          "source": "relayed",
+          "when": "2026-10-25T07:54:56Z"
+        },
+        {
+          "adds": [
+            "C8"
+          ],
+          "answers": "R1",
+          "basis": "answers",
+          "by": "root",
+          "confirmed": [
+            {
+              "id": "C8",
+              "link": "20261025T080029734610-root-356e"
+            }
+          ],
+          "kind": "contract",
+          "not_confirmed": [],
+          "removes": [],
+          "version": 2,
+          "when": "2026-10-25T08:00:29Z"
+        },
+        {
+          "agent_written": true,
+          "basis": "c",
+          "beyond": 0,
+          "by": "lead",
+          "changed": 1,
+          "cited": [
+            {
+              "id": "C8",
+              "text": "The memo starts with a one-line 'Summary:' of the meeting, followed by the Decisions section, then the Actions (action items) table, in that order."
+            }
+          ],
+          "evidence": [
+            "C8",
+            "R1",
+            "20261025T080029734610-root-356e"
+          ],
+          "evidence_other": 0,
+          "kind": "playbook",
+          "lines": [
+            {
+              "own_words": true,
+              "text": "- C8: The memo starts with a one-line 'Summary:' of the meeting, followed by the Decisions section, then the Actions (action items) table, in that order."
+            }
+          ],
+          "lines_more": 0,
+          "own_words": 1,
+          "removed": 0,
+          "restores": null,
+          "tagged": null,
+          "untagged": null,
+          "version": 2,
+          "when": "2026-10-25T08:02:07Z"
+        },
+        {
+          "amount": 5,
+          "case": "20261025T080619539939-root-96a5",
+          "id": "20261025T081146777819-root-2272",
+          "kind": "top-up",
+          "source": "human",
+          "when": "2026-10-25T08:11:46Z"
+        }
+      ],
+      "unit": "case",
+      "verifiers": [
+        {
+          "addr": "lead/reviewer",
+          "escapes": {
+            "counted": {},
+            "not_its": {
+              "contract-gap": 1
+            }
+          },
+          "fails_error": "",
+          "judged": 3,
+          "pass_precision": [
+            3,
+            3
+          ],
+          "rechecks": 1,
+          "rework_runs": 1
+        }
+      ]
+    }
+  ],
+  "source_files": [
+    "memos/memo-2026-10-05.md",
+    "memos/memo-2026-10-12.md",
+    "memos/memo-2026-10-19.md",
+    "memos/versions/INDEX.txt",
+    "msgs/lead-inbox/20261025T081500331415-root-32af.md",
+    "msgs/lead-read/20261025T074451197103-root-3ca4.md",
+    "msgs/lead-read/20261025T074543978837-lead.writer-5951.md",
+    "msgs/lead-read/20261025T074658153187-lead.reviewer-36f0.md",
+    "msgs/lead-read/20261025T074747369574-lead.writer-3d3e.md",
+    "msgs/lead-read/20261025T074853861120-lead.reviewer-d779.md",
+    "msgs/lead-read/20261025T075038845671-root-c671.md",
+    "msgs/lead-read/20261025T075138446837-root-68df.md",
+    "msgs/lead-read/20261025T075224799445-lead.writer-5b30.md",
+    "msgs/lead-read/20261025T075321776206-lead.reviewer-e61e.md",
+    "msgs/lead-read/20261025T075322851493-lead.reviewer-5a3e.md",
+    "msgs/lead-read/20261025T075456327958-root-37b7.md",
+    "msgs/lead-read/20261025T075559910596-lead.writer-cc0f.md",
+    "msgs/lead-read/20261025T075700175452-lead.reviewer-5fde.md",
+    "msgs/lead-read/20261025T075910994217-root-ce17.md",
+    "msgs/lead-read/20261025T080027642979-root-644d.md",
+    "msgs/lead-read/20261025T080029734610-root-356e.md",
+    "msgs/lead-read/20261025T080029735298-runtime-a8c4.md",
+    "msgs/lead-read/20261025T080139369073-root-4a88.md",
+    "msgs/lead-read/20261025T080139460250-root-ae3f.md",
+    "msgs/lead-read/20261025T080243264934-lead.writer-cee2.md",
+    "msgs/lead-read/20261025T080348088047-lead.reviewer-5768.md",
+    "msgs/lead-read/20261025T080618045147-root-1906.md",
+    "msgs/lead-read/20261025T080619539939-root-96a5.md",
+    "msgs/lead-read/20261025T080909467526-lead.writer-7a34.md",
+    "msgs/lead-read/20261025T081015980889-lead.reviewer-e257.md",
+    "msgs/lead-read/20261025T081146777819-root-2272.md",
+    "msgs/lead-read/20261025T081246199243-lead.writer-537a.md",
+    "msgs/lead-read/20261025T081339775494-lead.reviewer-71f3.md",
+    "msgs/lead-reviewer-read/20261025T074606589355-lead-12e5.md",
+    "msgs/lead-reviewer-read/20261025T074809756939-lead-d5ce.md",
+    "msgs/lead-reviewer-read/20261025T075249462824-lead-3ee6.md",
+    "msgs/lead-reviewer-read/20261025T075621375893-lead-e69f.md",
+    "msgs/lead-reviewer-read/20261025T080305561652-lead-93e2.md",
+    "msgs/lead-reviewer-read/20261025T080931167519-lead-1414.md",
+    "msgs/lead-reviewer-read/20261025T081309995888-lead-199f.md",
+    "msgs/lead-reviewer-sent/20261025T074658153187-lead.reviewer-36f0.md",
+    "msgs/lead-reviewer-sent/20261025T074853861120-lead.reviewer-d779.md",
+    "msgs/lead-reviewer-sent/20261025T075321776206-lead.reviewer-e61e.md",
+    "msgs/lead-reviewer-sent/20261025T075322851493-lead.reviewer-5a3e.md",
+    "msgs/lead-reviewer-sent/20261025T075700175452-lead.reviewer-5fde.md",
+    "msgs/lead-reviewer-sent/20261025T080348088047-lead.reviewer-5768.md",
+    "msgs/lead-reviewer-sent/20261025T081015980889-lead.reviewer-e257.md",
+    "msgs/lead-reviewer-sent/20261025T081339775494-lead.reviewer-71f3.md",
+    "msgs/lead-sent/20261025T074513126729-lead-596b.md",
+    "msgs/lead-sent/20261025T074606589355-lead-12e5.md",
+    "msgs/lead-sent/20261025T074724017019-lead-f9f3.md",
+    "msgs/lead-sent/20261025T074809756939-lead-d5ce.md",
+    "msgs/lead-sent/20261025T074917047599-lead-d5c7.md",
+    "msgs/lead-sent/20261025T075200497409-lead-5809.md",
+    "msgs/lead-sent/20261025T075249462824-lead-3ee6.md",
+    "msgs/lead-sent/20261025T075346466192-lead-64cb.md",
+    "msgs/lead-sent/20261025T075348334986-lead-a112.md",
+    "msgs/lead-sent/20261025T075532837013-lead-870e.md",
+    "msgs/lead-sent/20261025T075621375893-lead-e69f.md",
+    "msgs/lead-sent/20261025T075723074733-lead-d91e.md",
+    "msgs/lead-sent/20261025T080214459188-lead-1add.md",
+    "msgs/lead-sent/20261025T080305561652-lead-93e2.md",
+    "msgs/lead-sent/20261025T080407667524-lead-433a.md",
+    "msgs/lead-sent/20261025T080640855539-lead-17a9.md",
+    "msgs/lead-sent/20261025T080931167519-lead-1414.md",
+    "msgs/lead-sent/20261025T081037538558-lead-f890.md",
+    "msgs/lead-sent/20261025T081219637973-lead-d7a8.md",
+    "msgs/lead-sent/20261025T081309995888-lead-199f.md",
+    "msgs/lead-sent/20261025T081400609911-lead-02da.md",
+    "msgs/lead-writer-read/20261025T074513126729-lead-596b.md",
+    "msgs/lead-writer-read/20261025T074724017019-lead-f9f3.md",
+    "msgs/lead-writer-read/20261025T075200497409-lead-5809.md",
+    "msgs/lead-writer-read/20261025T075532837013-lead-870e.md",
+    "msgs/lead-writer-read/20261025T080214459188-lead-1add.md",
+    "msgs/lead-writer-read/20261025T080640855539-lead-17a9.md",
+    "msgs/lead-writer-read/20261025T081219637973-lead-d7a8.md",
+    "msgs/lead-writer-sent/20261025T074543978837-lead.writer-5951.md",
+    "msgs/lead-writer-sent/20261025T074747369574-lead.writer-3d3e.md",
+    "msgs/lead-writer-sent/20261025T075224799445-lead.writer-5b30.md",
+    "msgs/lead-writer-sent/20261025T075559910596-lead.writer-cc0f.md",
+    "msgs/lead-writer-sent/20261025T080243264934-lead.writer-cee2.md",
+    "msgs/lead-writer-sent/20261025T080909467526-lead.writer-7a34.md",
+    "msgs/lead-writer-sent/20261025T081246199243-lead.writer-537a.md",
+    "msgs/read/20261025T074917047599-lead-d5c7.md",
+    "msgs/read/20261025T075346466192-lead-64cb.md",
+    "msgs/read/20261025T075348334986-lead-a112.md",
+    "msgs/read/20261025T075355025199-runtime-d13a.md",
+    "msgs/read/20261025T075723074733-lead-d91e.md",
+    "msgs/read/20261025T080207849591-runtime-07a5.md",
+    "msgs/read/20261025T080407667524-lead-433a.md",
+    "msgs/read/20261025T081037538558-lead-f890.md",
+    "msgs/read/20261025T081400609911-lead-02da.md",
+    "msgs/sent/20261025T074451197103-root-3ca4.md",
+    "msgs/sent/20261025T075038845671-root-c671.md",
+    "msgs/sent/20261025T075138446837-root-68df.md",
+    "msgs/sent/20261025T075456327958-root-37b7.md",
+    "msgs/sent/20261025T075910994217-root-ce17.md",
+    "msgs/sent/20261025T080027642979-root-644d.md",
+    "msgs/sent/20261025T080029734610-root-356e.md",
+    "msgs/sent/20261025T080139369073-root-4a88.md",
+    "msgs/sent/20261025T080139460250-root-ae3f.md",
+    "msgs/sent/20261025T080618045147-root-1906.md",
+    "msgs/sent/20261025T080619539939-root-96a5.md",
+    "msgs/sent/20261025T081146777819-root-2272.md",
+    "msgs/sent/20261025T081500331415-root-32af.md",
+    "org-files/ORG.md",
+    "org-files/lead-AGENT.md",
+    "org-files/lead-reviewer-AGENT.md",
+    "org-files/lead-writer-AGENT.md",
+    "org-git-log.txt",
+    "playbook/current-PLAYBOOK.md",
+    "playbook/history--PLAYBOOK.v1.md",
+    "run-logs/lead-reviewer/*.log (names)",
+    "run-logs/lead-writer/*.log (names)",
+    "run-logs/lead/*.log (names)",
+    "service/current-SERVICE.md",
+    "service/history--SERVICE.v1.md"
+  ],
+  "thresholds": {
+    "cost_ratio": "1.25",
+    "min_judged": 3,
+    "repeat_failures": 2,
+    "repeat_window": 3,
+    "source": "defaults"
+  }
+}

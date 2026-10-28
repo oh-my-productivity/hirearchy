@@ -1,0 +1,58 @@
+{
+ "label": "I2",
+ "memo_input": {
+  "first_request": "20261027T230507597219-root-5204",
+  "name": "meeting_file",
+  "value": "2026-10-05.md",
+  "service_v1_inputs": [
+   "meeting_file"
+  ],
+  "name_in_v1": true,
+  "frozen_reader_reads_it": false,
+  "reader": "substituted in memory: name 'meeting_file', date from the value's base name (manager-decision-memo-input-name.md + addendum)"
+ },
+ "lena_lines": "I2/lena-lines.txt (frozen form)",
+ "since": {
+  "frozen_total": "63 mismatches (37 on pinned keys, 26 on unpinned keys); 0 services mismatches; 0 services lines unread; 0 lower-margin race matches (reported); 0 snapshots unread",
+  "ruled_total": "6 mismatches (0 on pinned keys, 6 on unpinned keys); 0 services mismatches; 0 services lines unread; 0 lower-margin race matches (reported); 0 snapshots unread",
+  "cleared": 57,
+  "cleared_pinned": 37
+ },
+ "lena_parse": {
+  "turn_lines": 29,
+  "parsed": 29
+ },
+ "memo_map": {
+  "requested": [
+   "2026-10-05",
+   "2026-10-12",
+   "2026-10-19",
+   "2026-10-26",
+   "2026-11-02",
+   "2026-11-09"
+  ],
+  "mapped": {
+   "2026-10-05": "20261027T230507597219-root-5204",
+   "2026-10-12": "20261027T233043473862-root-7f7a",
+   "2026-10-19": "20261027T234421361111-root-a19d",
+   "2026-10-26": "20261027T235208782012-root-c7bd",
+   "2026-11-02": "20261028T000316137116-root-2afa",
+   "2026-11-09": "20261028T001324513271-root-47f6"
+  },
+  "missing": []
+ },
+ "g1": {
+  "a": "PASS",
+  "b": "VACUOUS (B retired by its owner before memo 5's answer (O9))",
+  "c": "PASS",
+  "d": "NOT DETERMINED (judged reading: judged.json g1_d_judged decides, every hit listed there)",
+  "e": "PASS",
+  "f": "PASS"
+ },
+ "g2": {
+  "a": "PASS",
+  "b": "PASS",
+  "c": "PASS (by construction; the counts are reported)"
+ },
+ "assistant_facts": "re-run with 'meeting_file' substituted -> scoring/I2/measures/assistant_facts-substituted (exit 0)"
+}

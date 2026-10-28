@@ -1,0 +1,70 @@
+{
+ "O1": {
+  "sequence": [
+   "accept3",
+   "R4",
+   "R4-answer"
+  ],
+  "relayed_verdict_on_memo3": false
+ },
+ "O2": {
+  "form": "define_service(answers=)",
+  "subjects": [
+   "R3",
+   "C9",
+   "C10"
+  ],
+  "related_to_B": true
+ },
+ "O10": {
+  "added": [
+   "C10"
+  ],
+  "removed": [
+   "C9"
+  ],
+  "readded": [],
+  "readds_owner_crit": "n/a ([owner-crit] is none)"
+ },
+ "O3": {
+  "relayed_before_R5": false
+ },
+ "O4": {
+  "first_delivery_superseded": true
+ },
+ "O5": {
+  "memo3_human_accept_after_R5": false,
+  "R5_related_to_A": false
+ },
+ "R5": {
+  "subjects": [
+   "R4",
+   "C9",
+   "C10",
+   "C11"
+  ],
+  "answered": true,
+  "related_to_B": false,
+  "related_to_carrier": false
+ },
+ "O6": {
+  "memo4_rework_human_accept": "before memo 5's request"
+ },
+ "O7": {
+  "B_added": "base: before memo 3's first delivery",
+  "version": 3,
+  "op": "add"
+ },
+ "O8": {
+  "gated_edit_after_R4": false
+ },
+ "O9": {
+  "owner_retired_before_R5_answer": true,
+  "at": "2026-10-27T23:58:37.935810+00:00",
+  "before_R4": false,
+  "warned_at_retire": true,
+  "then": []
+ },
+ "extra_rejections": [],
+ "scripted_related_to_A": []
+}

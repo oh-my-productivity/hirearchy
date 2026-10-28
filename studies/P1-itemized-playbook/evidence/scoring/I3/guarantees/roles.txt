@@ -1,0 +1,14 @@
+[A-crit] C10
+[plant] C11
+[full] C12
+[gap] C13
+[sections-crit] none
+[owner-crit] C5
+R1 R1
+R2 R2
+R4 R3
+R5 R4
+A P11 (playbook v2, op add)
+B P12 (playbook v3, op add)
+B_carrier None
+disagreements with the stream step's roles.txt: none

@@ -1,0 +1,1 @@
+env -u KIRO_HOME kiro-cli chat --v3 --no-interactive --trust-all-tools --resume --effort high --agent hirearchy-study-p1-I3-assistant Sam\''s 2026-10-09 is right. Marta'\''s 2026-10-14 is right. No, just the title, the Summary line, the decisions and the action items. No more spend, please deliver as is.'

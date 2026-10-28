@@ -1,0 +1,1 @@
+F2 renamed view: 23 file names and 191 text files rewritten (<date>-memo -> memo-<date>); source /Volumes/workspace/hirearchy/studies/P1-itemized-playbook/evidence/F2; nothing else changed. Used only for the arm-F reported no-regression reading (scoring/F2/measures-renamed/).

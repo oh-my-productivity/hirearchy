@@ -1,0 +1,5 @@
+lead (lock/hook.txt): lead
+lock version: ('2026-10-28T00:29:43.549315+00:00', '2')
+owner versions: none
+contract versions from the lock on: v2 locked: true, v3 locked: true, v4 locked: true, v5 locked: true, v6 locked: true, v7 locked: true
+H-LOCK: ok

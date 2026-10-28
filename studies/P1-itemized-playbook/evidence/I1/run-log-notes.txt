@@ -1,0 +1,8 @@
+I1 started: set up at 2026-10-27T21:25:07Z
+STOP (turn 1 ended 2026-10-27T21:25:55Z, sleep end 21:26:15Z; after_turn 1 done 21:26:20Z): the turn-1 reply ends with three questions not held by the L-KEEP table ('Is the team always the same people, or should the memo be free to name anyone in the notes (including someone like Jo who isn't present)?'; 'Should the memo be in English?'; 'Do you want a short "open items from earlier weeks" section? Default: no.'). Warning sent to the manager at 2026-10-27T21:27:03Z; no Lena line sent; waiting (protocol 5: a ruling to an existing row, or the stream ends at this turn).
+turn 2 line sent 2026-10-27T21:28:59Z after the manager ruling (manager-decision-row-I1-t1.md); gap since turn 1's end logged for the scorer, not a validity issue
+SPEND LEDGER: I1/measures/spend-ledger.json created 2026-10-27T21:38:57Z with memo 1's case (head 20261027T213102025357-root-7ca1), plan budget 12; created after turn 4's line was sent, root's first request existed since turn 3 (fact, not a deviation of a measure)
+injection start 2026-10-27T21:39:48Z
+injection ran at the end of turn 4: 21:39:48Z-21:42:43Z (exit 0); window.txt and memo1-identification.txt written; text-identity.txt and window-runs.txt are produced by injection_files.py at finish
+turn 15: the prompt file t15.txt was written by a tool call issued in the same block as run_turn.sh (started a moment before it); turn-15.prompt.txt and turn-15.cmd.txt show the exact fixed line; no effect on the course
+STREAM END after turn 24 at 2026-10-27T22:38:18Z

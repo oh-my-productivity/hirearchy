@@ -1,0 +1,4 @@
+/Volumes/workspace/hirearchy/studies/P1-itemized-playbook/evidence/harness/copy_org_evidence.sh:12: no matches found: /tmp/hirearchy-p1-F2-1793146944/org/inbox/*
+/Volumes/workspace/hirearchy/studies/P1-itemized-playbook/evidence/harness/copy_org_evidence.sh:15: no matches found: /tmp/hirearchy-p1-F2-1793146944/org/lead/reviewer/inbox/*
+/Volumes/workspace/hirearchy/studies/P1-itemized-playbook/evidence/harness/copy_org_evidence.sh:15: no matches found: /tmp/hirearchy-p1-F2-1793146944/org/lead/writer/inbox/*
+copied; lead lead-reviewer lead-writer 

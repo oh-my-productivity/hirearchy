@@ -1,0 +1,50 @@
+prompt_sizes F3: owner lead (detected from root tasks), 42 runs
+
+prompt bytes: first 20662, max 29724, last 28818, last minus first 8156
+Reflect section words: min 333, max 558 (8 sections)
+reference E3: 20.2 KB -> 29.9 KB, 452-679 words
+
+  20261028T020448792600  bytes=20662  reflect=no  reflect_words=0
+  20261028T020545382732  bytes=24395  reflect=no  reflect_words=0
+  20261028T020704379724  bytes=25205  reflect=no  reflect_words=0
+  20261028T020755019177  bytes=24938  reflect=no  reflect_words=0
+  20261028T020843640050  bytes=24745  reflect=no  reflect_words=0
+  20261028T020918173491  bytes=20746  reflect=no  reflect_words=0
+  20261028T021219579576  bytes=23495  reflect=no  reflect_words=0
+  20261028T021312119699  bytes=24783  reflect=no  reflect_words=0
+  20261028T021404734531  bytes=24804  reflect=no  reflect_words=0
+  20261028T021734692289  bytes=21964  reflect=no  reflect_words=0
+  20261028T021907543333  bytes=26062  reflect=no  reflect_words=0
+  20261028T022024505749  bytes=25639  reflect=no  reflect_words=0
+  20261028T022454698900  bytes=27931  reflect=yes  reflect_words=333
+  20261028T022553398100  bytes=26440  reflect=no  reflect_words=0
+  20261028T022710186577  bytes=27698  reflect=no  reflect_words=0
+  20261028T022913102200  bytes=22509  reflect=no  reflect_words=0
+  20261028T023011831615  bytes=26172  reflect=no  reflect_words=0
+  20261028T023120765768  bytes=26613  reflect=no  reflect_words=0
+  20261028T023327385324  bytes=25611  reflect=yes  reflect_words=403
+  20261028T023430193801  bytes=25847  reflect=no  reflect_words=0
+  20261028T023530919729  bytes=26619  reflect=no  reflect_words=0
+  20261028T023726648074  bytes=27418  reflect=yes  reflect_words=399
+  20261028T023833344686  bytes=27127  reflect=no  reflect_words=0
+  20261028T023948342278  bytes=27480  reflect=no  reflect_words=0
+  20261028T024200043308  bytes=22972  reflect=no  reflect_words=0
+  20261028T024304707016  bytes=26768  reflect=no  reflect_words=0
+  20261028T024409655867  bytes=26980  reflect=no  reflect_words=0
+  20261028T024551836766  bytes=25626  reflect=yes  reflect_words=456
+  20261028T024646451608  bytes=28298  reflect=no  reflect_words=0
+  20261028T024747358930  bytes=27343  reflect=no  reflect_words=0
+  20261028T025237455533  bytes=29186  reflect=yes  reflect_words=534
+  20261028T025340212135  bytes=26789  reflect=no  reflect_words=0
+  20261028T025445043346  bytes=27654  reflect=no  reflect_words=0
+  20261028T025709209412  bytes=27306  reflect=yes  reflect_words=558
+  20261028T025757878484  bytes=28153  reflect=no  reflect_words=0
+  20261028T025900881964  bytes=28524  reflect=no  reflect_words=0
+  20261028T030301959393  bytes=29724  reflect=yes  reflect_words=510
+  20261028T030358676051  bytes=26389  reflect=no  reflect_words=0
+  20261028T030511722692  bytes=28193  reflect=no  reflect_words=0
+  20261028T030649438984  bytes=27467  reflect=yes  reflect_words=534
+  20261028T030740227215  bytes=28516  reflect=no  reflect_words=0
+  20261028T030843158196  bytes=28818  reflect=no  reflect_words=0
+
+lead-prompt-sizes.txt: compared 42 runs, 0 differences

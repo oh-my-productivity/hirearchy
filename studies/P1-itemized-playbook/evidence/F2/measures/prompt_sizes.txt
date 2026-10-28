@@ -1,0 +1,57 @@
+prompt_sizes F2: owner lead (detected from root tasks), 49 runs
+
+prompt bytes: first 20601, max 30274, last 27804, last minus first 7203
+Reflect section words: min 301, max 555 (10 sections)
+reference E3: 20.2 KB -> 29.9 KB, 452-679 words
+
+  20261028T002630447755  bytes=20601  reflect=no  reflect_words=0
+  20261028T002723133742  bytes=24426  reflect=no  reflect_words=0
+  20261028T002837970072  bytes=24529  reflect=no  reflect_words=0
+  20261028T003344706864  bytes=22831  reflect=no  reflect_words=0
+  20261028T003437225427  bytes=24301  reflect=no  reflect_words=0
+  20261028T003537871870  bytes=24720  reflect=no  reflect_words=0
+  20261028T003733698577  bytes=21900  reflect=no  reflect_words=0
+  20261028T003846380552  bytes=26542  reflect=no  reflect_words=0
+  20261028T003949063082  bytes=25434  reflect=no  reflect_words=0
+  20261028T004319629933  bytes=29373  reflect=yes  reflect_words=324
+  20261028T004418188822  bytes=29560  reflect=no  reflect_words=0
+  20261028T004521093655  bytes=28419  reflect=no  reflect_words=0
+  20261028T004915330310  bytes=24074  reflect=yes  reflect_words=301
+  20261028T005015965442  bytes=25461  reflect=no  reflect_words=0
+  20261028T005137015774  bytes=25960  reflect=no  reflect_words=0
+  20261028T005712942726  bytes=27932  reflect=yes  reflect_words=365
+  20261028T005817629754  bytes=26311  reflect=no  reflect_words=0
+  20261028T005938661415  bytes=26966  reflect=no  reflect_words=0
+  20261028T010248547831  bytes=28208  reflect=yes  reflect_words=411
+  20261028T010351392722  bytes=26278  reflect=no  reflect_words=0
+  20261028T010518452247  bytes=27454  reflect=no  reflect_words=0
+  20261028T010813624389  bytes=25527  reflect=yes  reflect_words=402
+  20261028T010910461888  bytes=26334  reflect=no  reflect_words=0
+  20261028T011017306567  bytes=26970  reflect=no  reflect_words=0
+  20261028T011110034054  bytes=26330  reflect=no  reflect_words=0
+  20261028T011213025922  bytes=27083  reflect=no  reflect_words=0
+  20261028T011419244674  bytes=23170  reflect=no  reflect_words=0
+  20261028T011521916301  bytes=26741  reflect=no  reflect_words=0
+  20261028T011632982062  bytes=27944  reflect=no  reflect_words=0
+  20261028T011834200150  bytes=25167  reflect=yes  reflect_words=458
+  20261028T011928986886  bytes=26537  reflect=no  reflect_words=0
+  20261028T012037943053  bytes=27131  reflect=no  reflect_words=0
+  20261028T012351673325  bytes=29722  reflect=yes  reflect_words=532
+  20261028T012502527732  bytes=26387  reflect=no  reflect_words=0
+  20261028T012611575329  bytes=27310  reflect=no  reflect_words=0
+  20261028T012748783779  bytes=27065  reflect=yes  reflect_words=555
+  20261028T012845605690  bytes=28129  reflect=no  reflect_words=0
+  20261028T012948547373  bytes=27554  reflect=no  reflect_words=0
+  20261028T013131400514  bytes=23345  reflect=no  reflect_words=0
+  20261028T013236225867  bytes=26711  reflect=no  reflect_words=0
+  20261028T013331064390  bytes=27142  reflect=no  reflect_words=0
+  20261028T013645868931  bytes=30274  reflect=yes  reflect_words=543
+  20261028T014028899885  bytes=27835  reflect=no  reflect_words=0
+  20261028T014601179855  bytes=28428  reflect=no  reflect_words=0
+  20261028T014937787701  bytes=27090  reflect=yes  reflect_words=547
+  20261028T015036876032  bytes=27281  reflect=no  reflect_words=0
+  20261028T015141827866  bytes=27732  reflect=no  reflect_words=0
+  20261028T015244969466  bytes=27111  reflect=no  reflect_words=0
+  20261028T015337767676  bytes=27804  reflect=no  reflect_words=0
+
+lead-prompt-sizes.txt: compared 49 runs, 0 differences
