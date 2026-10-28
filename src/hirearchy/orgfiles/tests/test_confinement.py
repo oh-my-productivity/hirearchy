@@ -29,7 +29,9 @@ def team(tmp_path, dirs):
 
 def test_a_manager_cannot_widen_a_charter_by_editing_it(team, dirs):
     ok = f"---\nrole: Writer\ntools: [read]\ninputs: ['{dirs['handbook/hr']}']\n---\nW.\n"
-    team.write("lead", "lead/writer/AGENT.md", ok)
+    with pytest.raises(OrgError, match="^refused: tools of lead/writer is the plan's"):  # (CHARTER-PLAN: a lead does not narrow the plan's tools either)
+        team.write("lead", "lead/writer/AGENT.md", ok)
+    atomic_write(team.dir("lead/writer") / "AGENT.md", ok)  # the user's own edit: the checks below are the confinement's, which run before the plan's
     wide = f"---\nrole: Writer\ntools: [read]\ninputs: ['{dirs['elsewhere']}']\n---\nW.\n"
     with pytest.raises(OrgError, match="inputs must be inside"):
         team.write("lead", "lead/writer/AGENT.md", wide)

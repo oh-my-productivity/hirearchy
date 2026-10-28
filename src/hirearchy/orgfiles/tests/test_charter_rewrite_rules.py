@@ -44,10 +44,12 @@ def test_a_rewrite_with_only_role_keeps_tools_inputs_model_and_the_rest(team, tm
 
 
 def test_a_key_set_explicitly_wins_even_when_empty(team):
-    team.write("lead", "lead/rev/AGENT.md", charter_text("Reviewer", tools=[], model="claude-sonnet-5.5"))
+    """Under CHARTER-PLAN (design 6.6) a lead's explicit value for a key of the plan is refused, even an empty one; nothing is written."""
+    with pytest.raises(OrgError, match="^refused: model of lead/rev is the plan's, which the user approved"):  # (the first differing key, sorted)
+        team.write("lead", "lead/rev/AGENT.md", charter_text("Reviewer", tools=[], model="claude-sonnet-5.5"))
     after, _ = team.charter("lead/rev")
-    assert after["tools"] == [] and after["model"] == "claude-sonnet-5.5"
-    assert after["inputs"]  # not set in the new text: kept
+    assert after["tools"] == ["read"] and after["model"] == "claude-opus-5.5"
+    assert after["inputs"]
 
 
 def test_authority_is_checked_on_the_merged_frontmatter(team, tmp_path):
@@ -70,15 +72,15 @@ def test_a_tool_the_manager_lacks_is_still_refused_when_set_explicitly(team):
 
 def test_the_write_reply_lists_kept_and_changed_keys(team):
     server = build_server(team, "lead")
-    out = call(server, "write", path="lead/rev/AGENT.md", content=charter_text("Sharper", tools=["read"], max_children=2))
+    out = call(server, "write", path="lead/rev/AGENT.md", content=charter_text("Sharper", tools=["read"]))
     assert "wrote lead/rev/AGENT.md" in out
     assert "kept from the old frontmatter (not in your text):" in out
-    for key in ("model", "inputs", "can_hire", "hired_by", "created"):
+    for key in ("model", "inputs", "can_hire", "max_children", "hired_by", "created"):
         assert key in out.split("kept from the old frontmatter")[1].split("changed")[0]
-    assert "role: Reviewer -> Sharper" in out and "max_children: 0 -> 2" in out
+    assert "role: Reviewer -> Sharper" in out
     assert "tools" not in out.split("kept from the old frontmatter")[1].split(".")[0]  # set explicitly, unchanged
-    out = call(server, "write", path="lead/rev/AGENT.md", content=charter_text("Sharper", tools=[]))
-    assert "tools: [read] -> []" in out
+    with pytest.raises(Exception, match="refused: tools of lead/rev is the plan's"):  # an emptied `tools` is the plan's key (CHARTER-PLAN)
+        call(server, "write", path="lead/rev/AGENT.md", content=charter_text("Sharper", tools=[]))
 
 
 def test_other_writes_have_no_note(team):

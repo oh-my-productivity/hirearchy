@@ -344,6 +344,10 @@ def test_root_status_and_whoami_name_an_existing_agent_below_the_floor(org):
         assert "Model floor" not in call(ceo, tool)  # the agents are not told
     # the agent keeps its model (nothing is substituted), and the line is gone once its model is allowed
     assert "--model claude-haiku-4.5" in " ".join(kiro_runner()(org, "ceo/eng", "P")[0])
-    call(ceo, "write", path="ceo/eng/AGENT.md", content="---\nrole: Engineer\nmodel: claude-sonnet-5.5\n---\nBuild things.\n")  # the manager's fix
+    # the manager's rewrite of the model is refused (CHARTER-PLAN, design 6.6: `model` is the plan's); the user's own edit of the file is the fix
+    assert "refused: model of ceo/eng is the plan's, which the user approved" in fails(
+        ceo, "write", path="ceo/eng/AGENT.md", content="---\nrole: Engineer\nmodel: claude-sonnet-5.5\n---\nBuild things.\n")
+    assert "--model claude-haiku-4.5" in " ".join(kiro_runner()(org, "ceo/eng", "P")[0])
+    pin_model(org, "ceo/eng", "claude-sonnet-5.5")
     for tool in ("status", "whoami"):
         assert "Model floor" not in call(root, tool)

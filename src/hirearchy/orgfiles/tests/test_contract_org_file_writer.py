@@ -186,7 +186,10 @@ def test_a_rewrite_that_grants_can_hire_is_refused(h: OrgFilesHarness) -> None:
 def test_a_rewrite_that_raises_max_children_above_the_writers_is_refused(h: OrgFilesHarness) -> None:
     assert refusal(lambda: h.writer.write("ceo", "ceo/eng/AGENT.md", charter_of("Engineer", max_children=3))) == a2(3, 2)
     assert refusal(lambda: h.writer.write("ceo", "ceo/eng/AGENT.md", charter_of("Engineer", max_children=99))) == a2(99, 2)
-    h.writer.write("ceo", "ceo/eng/AGENT.md", charter_of("Engineer", max_children=2))  # equal to its own is fine
+    # equal to its own limit passes the grant check; CHARTER-PLAN then refuses it as a raise, because the report's limit was never set (design 6.6)
+    assert refusal(lambda: h.writer.write("ceo", "ceo/eng/AGENT.md", charter_of("Engineer", max_children=2))).startswith(
+        "refused: max_children of ceo/eng is the plan's, which the user approved;"
+    )
 
 
 def test_an_odd_new_max_children_is_a3(h: OrgFilesHarness) -> None:
@@ -222,9 +225,12 @@ def test_lowering_max_children_is_allowed(h: OrgFilesHarness) -> None:
     h.writer.write("ceo", "ceo/legacy/AGENT.md", charter_of("Legacy", max_children=1))
     meta, _ = split_frontmatter(written(h, "ceo", "legacy", "AGENT.md") or "")
     assert meta["max_children"] == 1
-    h.writer.write("ceo", "ceo/legacy/AGENT.md", charter_of("Legacy", can_hire=False))  # taking the right away is no grant
+    # taking the right away is no grant (the grant check admits it), but `can_hire` is the plan's key: CHARTER-PLAN refuses the change
+    assert refusal(lambda: h.writer.write("ceo", "ceo/legacy/AGENT.md", charter_of("Legacy", can_hire=False))).startswith(
+        "refused: can_hire of ceo/legacy is the plan's, which the user approved;"
+    )
     meta, _ = split_frontmatter(written(h, "ceo", "legacy", "AGENT.md") or "")
-    assert meta["can_hire"] is False
+    assert meta["can_hire"] is True
 
 
 def test_the_charter_is_unchanged_after_a_refusal(h: OrgFilesHarness) -> None:

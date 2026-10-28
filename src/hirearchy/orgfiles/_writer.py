@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Container, Iterable
+from collections.abc import Container, Iterable, Mapping
 from pathlib import Path
 from typing import cast
 
@@ -13,6 +13,29 @@ from ..settings import OrgSettings, config_default_model, config_floor_problem, 
 from ._charter_merge import CharterMerge
 from ._guard import WriteGuard
 from .api import OrgFileStore, OrgFileWriter
+
+
+# CHARTER-PLAN (design 6.6, L20 of review 2): the frontmatter of a report's charter is the plan's, which the user approved.
+CHARTER_PLAN = (
+    'refused: {key} of {addr} is the plan\'s, which the user approved; a change goes through the user (propose_org(..., extend="current"), or the '
+    'terminal). A charter edit may change its body (outside "## Added by your changes"), its role, and lower max_children. Nothing was written.'
+)
+
+
+def _lowered(old: object, new: object) -> bool:
+    """``new`` is a ``max_children`` at or below ``old`` (both whole numbers; an absent limit is no value to stay under)."""
+    return all(isinstance(n, int) and not isinstance(n, bool) for n in (old, new)) and cast(int, new) <= cast(int, old)
+
+
+def _plan_key_changed(old: Mapping[str, object], new: Mapping[str, object]) -> str | None:
+    """The first key, in sorted order, in which ``new`` differs from ``old`` beyond what a parent may change (``role``, and a ``max_children`` at or below the
+    old one); an absent key equals ``None``. None when the frontmatter is the plan's."""
+    for key in sorted(set(old) | set(new)):
+        before, after = old.get(key), new.get(key)
+        if before == after or key == "role" or (key == "max_children" and _lowered(before, after)):
+            continue
+        return key
+    return None
 
 
 def _frontmatter_of(text: str) -> JsonObject:
@@ -71,6 +94,7 @@ class GuardedOrgFileWriter(OrgFileWriter):
         actor = self._agents.require(actor)
         p = self.resolve_write(actor, path)
         note = ""
+        planned: tuple[dict[str, object], dict[str, object]] | None = None  # (old, new) frontmatter of a report's charter, for CHARTER-PLAN
         if p.name == "AGENT.md" and actor != ROOT:  # a parent editing a report's charter
             meta, body = split_frontmatter(content)
             if not meta.get("role"):
@@ -105,6 +129,8 @@ class GuardedOrgFileWriter(OrgFileWriter):
             if wanted is not None and isinstance(before, int) and not isinstance(before, bool) and wanted <= before:
                 wanted = None  # lowering a report's limit is always allowed: only a raise is bounded by the writer's own
             self._authority.check_grant(actor, grants_hire=grants_hire, max_children=wanted)
+            if old is not None:
+                planned = (old, dict(new))
         if append and self._store.kind(p) != "missing":
             content = self._store.read_text(p) + content
         if p == self._layout.agent_dir(actor) / "MEMORY.md":
@@ -118,6 +144,8 @@ class GuardedOrgFileWriter(OrgFileWriter):
         if p.name == "AGENT.md":  # a report's charter: the registry of the agents writes it
             addr = p.parent.relative_to(self._layout.root).as_posix()
             self._check_charter_model(addr, p, content)
+            if planned is not None and (key := _plan_key_changed(*planned)) is not None:
+                raise OrgError(CHARTER_PLAN.format(key=key, addr=addr))
             self._registry.rewrite_charter(addr, content)
         else:
             self._check_org_md(p, content)

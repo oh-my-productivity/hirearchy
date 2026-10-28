@@ -20,6 +20,7 @@ from ._support import make, refusal, written
 
 
 REPORT = "lead/rev"
+PLAN = "refused: {key} of {addr} is the plan's, which the user approved; a change goes through the user"  # (CHARTER-PLAN, design 6.6: the start of its text)
 APPEND_NOTE = "A key you leave out is kept; to remove one, set it explicitly (e.g. `tools: []`)."
 
 
@@ -67,16 +68,29 @@ def test_the_merged_charter_is_the_new_keys_first_then_the_kept_ones_and_the_new
 
 
 def test_a_key_set_explicitly_wins_even_when_empty(h: OrgFilesHarness) -> None:
-    h.writer.write("lead", f"{REPORT}/AGENT.md", text("Reviewer", tools=[], model="claude-opus-5.5"))
+    """Under CHARTER-PLAN (design 6.6) a key a lead sets explicitly, even to an empty value, is still the plan's to change: the rewrite is refused. What
+    an explicit value wins over (the kept old one) is shown with the keys a lead may change: ``max_children`` lowered to ``0``."""
+    before = written(h, "lead", "rev", "AGENT.md")
+    assert refusal(lambda: h.writer.write("lead", f"{REPORT}/AGENT.md", text("Reviewer", tools=[], model="claude-opus-5.5"))).startswith(
+        PLAN.format(key="model", addr=REPORT)  # (the first differing key in sorted order)
+    )
+    assert written(h, "lead", "rev", "AGENT.md") == before
+    h.writer.write("lead", f"{REPORT}/AGENT.md", text("Reviewer", max_children=0))
     after = charter(h)
-    assert after["tools"] == [] and after["model"] == "claude-opus-5.5"
+    assert after["max_children"] == 0
     assert after["inputs"] == [str(h.outside / "notes")]  # not in the new text: kept
 
 
 def test_a_null_or_blank_value_wins_too(h: OrgFilesHarness) -> None:
-    h.writer.write("lead", f"{REPORT}/AGENT.md", "---\nrole: Reviewer\nmodel:\nhired_by: ''\n---\nbody\n")
-    after = charter(h)
-    assert after["model"] is None and after["hired_by"] == "" and after["tools"] == ["read"]
+    """A null or blank value is a change of the key like any other: refused by CHARTER-PLAN, and nothing is written."""
+    before = written(h, "lead", "rev", "AGENT.md")
+    assert refusal(lambda: h.writer.write("lead", f"{REPORT}/AGENT.md", "---\nrole: Reviewer\nmodel:\nhired_by: ''\n---\nbody\n")).startswith(
+        PLAN.format(key="hired_by", addr=REPORT)
+    )
+    assert refusal(lambda: h.writer.write("lead", f"{REPORT}/AGENT.md", "---\nrole: Reviewer\nmodel:\n---\nbody\n")).startswith(
+        PLAN.format(key="model", addr=REPORT)
+    )
+    assert written(h, "lead", "rev", "AGENT.md") == before
 
 
 def test_a_text_that_sets_every_key_is_written_as_it_is(h: OrgFilesHarness) -> None:
@@ -109,11 +123,13 @@ def test_an_append_to_a_charter_adds_text_and_is_not_merged(h: OrgFilesHarness) 
 
 
 def test_the_note_lists_what_was_kept_changed_and_added(h: OrgFilesHarness) -> None:
-    path, note = h.writer.write_noted("lead", f"{REPORT}/AGENT.md", text("Sharper", tools=["read"], max_children=2, extra="x"))
+    """(``added`` keys never reach the note of a lead's rewrite since CHARTER-PLAN: a key a lead adds is refused. The merger's own tests show the note
+    for any frontmatter.)"""
+    path, note = h.writer.write_noted("lead", f"{REPORT}/AGENT.md", text("Sharper", tools=["read"], max_children=2))
     assert path == h.root / "lead" / "rev" / "AGENT.md"
     assert note == (
         "charter frontmatter of `lead/rev`: kept from the old frontmatter (not in your text): model, inputs, can_hire, hired_by, created. "
-        "changed (old -> new): role: Reviewer -> Sharper; max_children: 5 -> 2. added: extra: x. " + APPEND_NOTE
+        "changed (old -> new): role: Reviewer -> Sharper; max_children: 5 -> 2. " + APPEND_NOTE
     )
 
 
@@ -124,10 +140,11 @@ def test_the_note_when_nothing_is_kept_and_nothing_changes(h: OrgFilesHarness) -
 
 
 def test_the_note_shows_an_emptied_key_and_clips_long_values(h: OrgFilesHarness) -> None:
-    h.put_org_md(join_frontmatter({"max_depth": 4, "extra_allowed_models": ["m" * 200]}, "# Organization"))  # the user allowed this odd id
-    _, note = h.writer.write_noted("lead", f"{REPORT}/AGENT.md", text("Reviewer", tools=[], model="m" * 200))
-    assert "tools: [read] -> []" in note
-    assert f"model: m-1 -> {'m' * 79}…" in note
+    """Under CHARTER-PLAN a lead may change ``role`` and lower ``max_children`` only, so the note shows those: a long role is clipped, a limit lowered to
+    zero is shown (an emptied ``tools`` or ``model`` is refused before there is a note)."""
+    _, note = h.writer.write_noted("lead", f"{REPORT}/AGENT.md", text("R" * 200, max_children=0))
+    assert "max_children: 5 -> 0" in note
+    assert f"role: Reviewer -> {'R' * 79}…" in note
 
 
 def test_the_note_names_the_agent_by_its_path_in_the_organization(h: OrgFilesHarness) -> None:
@@ -172,8 +189,11 @@ def test_a_legacy_charter_cannot_be_rewritten_by_a_confined_manager(h: OrgFilesH
         "not confined to the workspace and inputs you have yourself"
     )
     assert "R2" not in (written(h, "lead", "rev", "AGENT.md") or "")
-    h.writer.write("lead", f"{REPORT}/AGENT.md", "---\nrole: R2\ninputs: []\n---\nnew\n")  # an explicit (even empty) list is confined
-    assert charter(h)["inputs"] == [] and charter(h)["role"] == "R2"
+    # an explicit (even empty) list is confined, but it is a change of the plan's `inputs`: CHARTER-PLAN refuses it, and the charter stays as it was
+    assert refusal(lambda: h.writer.write("lead", f"{REPORT}/AGENT.md", "---\nrole: R2\ninputs: []\n---\nnew\n")).startswith(
+        PLAN.format(key="inputs", addr=REPORT)
+    )
+    assert "R2" not in (written(h, "lead", "rev", "AGENT.md") or "")
 
 
 def test_a_manager_that_is_itself_unconfined_may_hand_down_an_unconfined_read(h: OrgFilesHarness) -> None:
@@ -186,7 +206,9 @@ def test_a_manager_that_is_itself_unconfined_may_hand_down_an_unconfined_read(h:
 def test_a_workspace_outside_the_managers_is_refused(h: OrgFilesHarness) -> None:
     h.add_agent("wm", {"role": "WM", "tools": ["read"], "workspace": str(h.outside / "ws-wm"), "inputs": []})
     h.add_agent("wm/kid", {"role": "Kid"})
-    h.writer.write("wm", "wm/kid/AGENT.md", text("Kid", workspace=str(h.outside / "ws-wm" / "kid")))
+    assert refusal(lambda: h.writer.write("wm", "wm/kid/AGENT.md", text("Kid", workspace=str(h.outside / "ws-wm" / "kid")))).startswith(
+        PLAN.format(key="workspace", addr="wm/kid")  # inside the manager's own: the authority check passes, and the plan's key is not the lead's
+    )
     assert refusal(lambda: h.writer.write("wm", "wm/kid/AGENT.md", text("Kid", workspace=str(h.outside / "ws-other")))) == (
         f"a report's workspace must be inside yours ({h.outside / 'ws-wm'})"
     )

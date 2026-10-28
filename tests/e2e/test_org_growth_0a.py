@@ -333,8 +333,12 @@ def test_10_a_charter_rewrite_cannot_grant_hiring_or_raise_a_limit(tmp_path):
     assert charter_of(w, "lead/writer")["can_hire"] is False
     raised = fails(w.lead, "write", path="lead/sub/AGENT.md", content="---\nrole: Sub-lead\nmax_children: 5\n---\nLead.")
     assert "you cannot give a report max_children 5: your own limit is 3" in raised
-    call(w.lead, "write", path="lead/sub/AGENT.md", content="---\nrole: Sub-lead\nmax_children: 3\n---\nLead.")
-    assert charter_of(w, "lead/sub")["max_children"] == 3
+    # 3 is within the lead's own limit, but it raises the plan's limit of the report: CHARTER-PLAN (design 6.6) refuses a raise by rewrite; a lower one passes
+    plan = fails(w.lead, "write", path="lead/sub/AGENT.md", content="---\nrole: Sub-lead\nmax_children: 3\n---\nLead.")
+    assert "refused: max_children of lead/sub is the plan's, which the user approved" in plan
+    assert charter_of(w, "lead/sub")["max_children"] == 1
+    call(w.lead, "write", path="lead/sub/AGENT.md", content="---\nrole: Sub-lead\nmax_children: 0\n---\nLead.")
+    assert charter_of(w, "lead/sub")["max_children"] == 0
     call(w.lead, "write", path="lead/sub/AGENT.md", content="---\nrole: Sub-lead\n---\nLead the sub-team, and tell me what it does.")  # body only
     meta, body = w.org.charter("lead/sub")
-    assert meta["can_hire"] is True and meta["max_children"] == 3 and "tell me what it does" in body
+    assert meta["can_hire"] is True and meta["max_children"] == 0 and "tell me what it does" in body

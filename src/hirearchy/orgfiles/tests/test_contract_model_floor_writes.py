@@ -39,6 +39,11 @@ def charter(model: str | None, role: str = "Engineer") -> str:
     return join_frontmatter(meta, "# Role\n\nNew body.")
 
 
+def plan_refusal(addr: str) -> str:
+    """The start of CHARTER-PLAN's refusal of a manager's change of ``model`` (design 6.6): the model floor admitted it, the plan did not."""
+    return f"refused: model of {addr} is the plan's, which the user approved;"
+
+
 def pin(h: OrgFilesHarness, addr: str, model: str) -> None:
     """The agent's charter says ``model`` (written behind ``hire`` and ``write``: a charter from before the floor)."""
     old, _ = split_frontmatter(written(h, addr, "AGENT.md") or "")
@@ -59,6 +64,11 @@ def test_a_charter_rewrite_to_a_model_outside_the_set_is_refused(h: OrgFilesHarn
 @pytest.mark.parametrize("who, addr", WRITERS)
 @pytest.mark.parametrize("model", MODELS_IN)
 def test_a_charter_rewrite_to_a_floor_model_is_admitted(h: OrgFilesHarness, who: str, addr: str, model: str) -> None:
+    if who != "root":  # a manager passes the floor check, and CHARTER-PLAN then refuses the change of `model` (the plan's key)
+        before = written(h, addr, "AGENT.md")
+        assert refusal(lambda: h.writer.write(who, f"{addr}/AGENT.md", charter(model))).startswith(plan_refusal(addr))
+        assert written(h, addr, "AGENT.md") == before
+        return
     h.writer.write(who, f"{addr}/AGENT.md", charter(model))
     text = written(h, addr, "AGENT.md")
     assert text is not None and f"model: {model}" in text
@@ -100,9 +110,12 @@ def test_unsetting_the_model_is_refused_when_the_default_is_outside_the_set(h: O
 @pytest.mark.parametrize("who, addr", WRITERS)
 def test_a_widened_set_admits_its_extra_model_in_a_rewrite(h: OrgFilesHarness, who: str, addr: str) -> None:
     h.put_org_md(org_md({"max_depth": 4, "extra_allowed_models": ["claude-sonnet-4.6"]}))
-    h.writer.write(who, f"{addr}/AGENT.md", charter("claude-sonnet-4.6"))
-    text = written(h, addr, "AGENT.md")
-    assert text is not None and "model: claude-sonnet-4.6" in text
+    if who != "root":  # a manager passes the widened floor, and CHARTER-PLAN refuses the change of `model`
+        assert refusal(lambda: h.writer.write(who, f"{addr}/AGENT.md", charter("claude-sonnet-4.6"))).startswith(plan_refusal(addr))
+    else:
+        h.writer.write(who, f"{addr}/AGENT.md", charter("claude-sonnet-4.6"))
+        text = written(h, addr, "AGENT.md")
+        assert text is not None and "model: claude-sonnet-4.6" in text
     assert refusal(lambda: h.writer.write(who, f"{addr}/AGENT.md", charter("claude-haiku-4.5"))) == (
         f"charter of {addr}: {m1('claude-haiku-4.5', PAIR + ', claude-sonnet-4.6')}"
     )
@@ -208,6 +221,9 @@ def test_the_repair_of_an_unreadable_ORG_md_may_raise_the_effort_and_choose_a_fl
 @pytest.mark.parametrize("model", MODELS_IN)
 def test_a_charter_rewrite_works_while_ORG_md_cannot_be_parsed(h: OrgFilesHarness, who: str, addr: str, model: str) -> None:
     h.put_org_md(BROKEN)
+    if who != "root":  # a manager passes the floor (against the built-in set), and CHARTER-PLAN refuses the change of `model`
+        assert refusal(lambda: h.writer.write(who, f"{addr}/AGENT.md", charter(model))).startswith(plan_refusal(addr))
+        return
     h.writer.write(who, f"{addr}/AGENT.md", charter(model))
     text = written(h, addr, "AGENT.md")
     assert text is not None and f"model: {model}" in text
