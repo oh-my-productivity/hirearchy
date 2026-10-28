@@ -17,6 +17,7 @@ from datetime import datetime, timedelta, timezone
 from ..kernel import parent as parent_of
 from ..services import line_key
 from ._ports import CharterPair, CharterVersions, KeyChange
+from ._texts import day as _date
 from ._views import AgentFact, EventFacts, RetiredFact, ServiceFact, ServiceRetired
 from .api import BriefRecord
 
@@ -99,10 +100,6 @@ class Changes:
     def charter_line(self) -> str:
         """The line that stands for the charter and limit lines without a history; ``""`` with one."""
         return "" if self.known else NO_HISTORY
-
-
-def _date(when: datetime | None) -> str:
-    return "unknown date" if when is None else when.astimezone(timezone.utc).strftime("%Y-%m-%d")
 
 
 def _approval(text: str) -> tuple[str, str, bool]:

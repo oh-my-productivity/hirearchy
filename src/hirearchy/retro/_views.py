@@ -6,6 +6,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime
 
+from ..reflection import CostAlarm, RepeatAlarm
+
 
 @dataclass(frozen=True)
 class OneOffCase:
@@ -91,3 +93,69 @@ class EventFacts:
 
     writes: tuple[WriteFact, ...] = ()
     covers_from: datetime | None = None
+
+
+@dataclass(frozen=True)
+class Answering:
+    """The contract version that answers a rejection (design 4.3 D1): its number and the criteria it adds and removes."""
+
+    version: int
+    adds: tuple[str, ...] = ()
+    removes: tuple[str, ...] = ()
+
+
+@dataclass(frozen=True)
+class Said:
+    """One human rejection (D1, D3): ``service`` is ``""`` for one of root's one-off tasks, ``ref`` its ``R<k>``, ``words`` the user's own words. ``link`` is the
+    state of its human link (``confirmed``, ``none``, ``unconfirmed`` or ``""``), ``about`` the criteria it names, ``same_as`` the earlier rejection it repeats,
+    ``answering`` the contract version that answers it; ``current_about`` and ``removed_about`` split ``about`` into the criteria still in the contract and the ones removed."""
+
+    service: str
+    ref: str
+    case: str
+    when: datetime | None
+    words: str
+    link: str = ""
+    about: tuple[str, ...] = ()
+    same_as: str = ""
+    answering: Answering | None = None
+    current_about: tuple[str, ...] = ()
+    removed_about: tuple[str, ...] = ()
+
+
+@dataclass(frozen=True)
+class Passed:
+    """One escape (D2, D4): a delivery the team reported done and the user rejected. ``signer`` signed it off (``verifier``: ``blueprint.is_verifier`` holds
+    for it), ``refs`` and ``criteria`` are the ids of the user's rejection and of the criteria its human link names, ``cause`` the type the rules gave it and
+    ``also`` the other types a later rule matches (a disputed cause)."""
+
+    service: str
+    case: str
+    delivery: str
+    signer: str
+    verifier: bool
+    refs: tuple[str, ...]
+    criteria: tuple[str, ...]
+    cause: str
+    also: tuple[str, ...]
+    when: datetime | None
+    words: str
+
+
+@dataclass(frozen=True)
+class ServiceAlarms:
+    """The two alarms of a service's record (``reflection.RepeatAlarm`` and ``CostAlarm``, derived data: no team-written text)."""
+
+    service: str
+    repeat: RepeatAlarm
+    cost: CostAlarm
+
+
+@dataclass(frozen=True)
+class HealthFlag:
+    """An agent ``health`` flagged ``idle`` or ``stranded_budget`` with the analyzer's reason, and the unspent runs it holds (None when unknown)."""
+
+    addr: str
+    flag: str
+    reason: str
+    held: int | None = None
