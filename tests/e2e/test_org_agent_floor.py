@@ -119,10 +119,11 @@ def point_create_org(org, model: str) -> str | None:
 
 
 def point_charter_rewrite(org, model: str) -> str | None:
-    """Root rewrites the charter of ``ceo`` through its MCP ``write``, setting ``model``: the refusal, or None when the charter says so."""
+    """Root rewrites the charter of ``ceo`` through the facade's ``write`` (the writer of the files, whose floor check is the point; root's MCP ``write`` of a
+    charter is refused in favour of the plan, design 13), setting ``model``: the refusal, or None when the charter says so."""
     meta, body = split_frontmatter((org.dir("ceo") / "AGENT.md").read_text(encoding="utf-8"))
     try:
-        call(build_server(org, ROOT), "write", path="ceo/AGENT.md", content=join_frontmatter({**meta, "model": model}, body))
+        org.write(ROOT, "ceo/AGENT.md", join_frontmatter({**meta, "model": model}, body))
     except Exception as error:
         return str(error)
     assert split_frontmatter((org.dir("ceo") / "AGENT.md").read_text(encoding="utf-8"))[0]["model"] == model
@@ -218,7 +219,7 @@ def test_root_repairs_an_ORG_md_with_broken_yaml_and_still_rewrites_charters(org
     (org.root / "ORG.md").write_text("---\nmax_depth: 4\nextra_allowed_models: [claude-sonnet-4.6\n---\n# Organization\n", encoding="utf-8")
     server = build_server(org, ROOT)
     charter = join_frontmatter({"role": "CEO", "model": "claude-opus-5.5"}, "# Role\n\nNew body.")
-    call(server, "write", path="ceo/AGENT.md", content=charter)  # a charter rewrite does not need ORG.md to parse
+    org.write(ROOT, "ceo/AGENT.md", charter)  # a charter rewrite does not need ORG.md to parse (root's MCP write of a charter is refused: the facade's is the writer's)
     assert "model: claude-opus-5.5" in (org.dir("ceo") / "AGENT.md").read_text(encoding="utf-8")
     message = fails(server, "write", path="ORG.md", content=join_frontmatter({"max_depth": 4, "effort": "medium"}, "# Organization\n"))
     assert 'effort "medium" is not allowed for org agents' in message  # the repair is checked against the built-in floor
@@ -272,11 +273,12 @@ BROKEN_CALLS = {  # label: (tool, arguments of the call given the plan_id of the
     "hire with a model": (  # (root's MCP hire is refused before ORG.md is read, design 13)
         "hire", lambda pid: dict(name="ops", role="Ops", charter="c", model="claude-opus-5.5"), "refused: a new agent changes the organization"),
     "hire without a model": ("hire", lambda pid: dict(name="ops", role="Ops", charter="c"), "refused: a new agent changes the organization"),
-    "charter rewrite to a floor model": (
-        "write", lambda pid: dict(path="ceo/AGENT.md", content="---\nrole: CEO\nmodel: claude-opus-5.5\n---\nNew body.\n"), None),
+    "charter rewrite to a floor model": (  # (root's MCP write of a charter is refused before the floor, design 13)
+        "write", lambda pid: dict(path="ceo/AGENT.md", content="---\nrole: CEO\nmodel: claude-opus-5.5\n---\nNew body.\n"),
+        "refused: a charter changes through a plan the user approves"),
     "charter rewrite below the floor": (
         "write", lambda pid: dict(path="ceo/AGENT.md", content="---\nrole: CEO\nmodel: claude-haiku-4.5\n---\nNew body.\n"),
-        'model "claude-haiku-4.5" is not allowed'),
+        "refused: a charter changes through a plan the user approves"),
     "ORG.md repair": ("write", lambda pid: dict(path="ORG.md", content="---\nmax_depth: 4\n---\n# Organization\n"), None),
     "ORG.md repair that widens the set": (
         "write", lambda pid: dict(path="ORG.md", content="---\nmax_depth: 4\nextra_allowed_models: [claude-haiku-4.5]\n---\nx\n"),

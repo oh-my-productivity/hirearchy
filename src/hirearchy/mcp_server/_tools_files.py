@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 from ..access import ToolNaming
 from ..kernel import ROOT, OrgLayout, Provider
 from ..orgfiles import OrgFileReader, OrgFileWriter
-from ._ports import ToolGroup
+from ._ports import StructureGuard, ToolGroup
 
 if TYPE_CHECKING:
     from mcp.server.fastmcp import FastMCP
@@ -16,11 +16,13 @@ if TYPE_CHECKING:
 class FileTools(ToolGroup):
     def __init__(
         self, naming: Provider[ToolNaming], reader: Provider[OrgFileReader], writer: Provider[OrgFileWriter], layout: Provider[OrgLayout],
+        guard: StructureGuard,
     ) -> None:
         self._naming = naming
         self._reader = reader
         self._writer = writer
         self._layout = layout
+        self._guard = guard
 
     def register(self, mcp: FastMCP, me: str) -> None:
         # kiro exposes MCP tools by their plain names, so a built-in `read`/`write` in the agent's charter would shadow
@@ -31,6 +33,7 @@ class FileTools(ToolGroup):
             return self._reader().read(path, me)
 
         def write(path: str, content: str, append: bool = False) -> str:
+            self._guard.write(me, path, content, append)
             p, note = self._writer().write_noted(me, path, content, append=append)
             return f"wrote {self._layout().rel(p)} (organization file)" + (f". {note}" if note else "")
 

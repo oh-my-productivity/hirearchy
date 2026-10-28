@@ -169,6 +169,10 @@ class StructureGuard(Protocol):
         amendment of a service that exists is never refused here."""
         ...
 
+    def write(self, me: str, path: str, content: str, append: bool) -> None:
+        """The same for ``write`` of ``path``: a charter (``AGENT.md``), or ORG.md with another ``max_depth``. Any other write passes."""
+        ...
+
 
 @runtime_checkable
 class InstalledSkill(Protocol):

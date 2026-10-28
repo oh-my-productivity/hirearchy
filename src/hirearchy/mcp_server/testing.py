@@ -401,6 +401,9 @@ class AllowingStructureGuard(StructureGuard):
     def new_service(self, me: str, owner: str, name: str) -> None:
         pass
 
+    def write(self, me: str, path: str, content: str, append: bool) -> None:
+        pass
+
 
 class StaticNaming(ToolNaming):
     """The names of the tools: ``read`` / ``write``, except for the agents in ``shadowed``, whose built-ins hide them (``org_read`` / ``org_write``)."""

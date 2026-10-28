@@ -8,15 +8,24 @@ from __future__ import annotations
 
 import pytest
 
-from hirearchy.kernel import ROOT
+from pathlib import Path
+
+from hirearchy.kernel import ROOT, OrgPaths
 from hirearchy.mcp_server._root_structure import RootStructureGuard
+from hirearchy.mcp_server._tools_files import FileTools
 from hirearchy.mcp_server._tools_hiring import HiringTools
 from hirearchy.mcp_server._tools_services import ServiceTools
-from hirearchy.mcp_server.testing import HeldBudgets, ScriptedHiring, ScriptedReports, ScriptedRetirement, ScriptedSteps
+from hirearchy.mcp_server.testing import (
+    HeldBudgets, ScriptedFiles, ScriptedHiring, ScriptedReports, ScriptedRetirement, ScriptedSteps, StaticNaming,
+)
+from hirearchy.settings.testing import MemoryOrgSettings
 from hirearchy.services.testing import AdmittingServiceEvidence
 
 from ._support import call, described, fails, serve
 from .test_tools_services import Catalog, Commands
+
+HERE = Path("/memory/org")
+ORG_MD = "---\nmax_depth: 4\neffort: high\n---\nThe rules.\n"
 
 ROOT_HIRE = (
     'refused: a new agent changes the organization, so the user approves it in a plan: propose_org(blueprint=<an extension with add_agents>, '
@@ -33,7 +42,7 @@ def root_retire(addr: str) -> str:
 
 
 def group(hiring: ScriptedHiring, retirement: ScriptedRetirement) -> HiringTools:
-    return HiringTools(lambda: hiring, lambda: retirement, lambda: Catalog({}), lambda: AdmittingServiceEvidence(), RootStructureGuard(lambda: Catalog({})))
+    return HiringTools(lambda: hiring, lambda: retirement, lambda: Catalog({}), lambda: AdmittingServiceEvidence(), RootStructureGuard(lambda: Catalog({}), lambda: ScriptedFiles(HERE), lambda: MemoryOrgSettings(ORG_MD), lambda: OrgPaths(HERE)))
 
 
 def test_root_hire_is_root_hire_word_for_word_and_creates_nothing() -> None:
@@ -91,7 +100,7 @@ def services(offered: dict[str, list[str]]) -> tuple[ServiceTools, Commands]:
 
     agents, commands = agents_in("ceo", "ceo/eng", "ops"), Commands()
     roles = DirectoryServiceRoles(InstructionText(MemoryBinding(Path("/o"), exists=True)), lambda: agents, lambda: agents, lambda: Catalog(offered))
-    guard = RootStructureGuard(lambda: Catalog(offered))
+    guard = RootStructureGuard(lambda: Catalog(offered), lambda: ScriptedFiles(HERE), lambda: MemoryOrgSettings(ORG_MD), lambda: OrgPaths(HERE))
     return ServiceTools(
         roles, lambda: ScriptedReports("SERVICES"), lambda: commands, lambda: HeldBudgets({"ceo": 5}), lambda: ScriptedSteps(), guard,
     ), commands
@@ -133,3 +142,61 @@ def test_an_agents_define_service_of_a_new_name_is_unchanged() -> None:
     group, commands = services({})
     assert call(serve(group, "ceo"), "define_service", owner="ceo/eng", name="brief", description="d") == "defined brief"
     assert len(commands.calls) == 1
+
+
+# ------------------------------------------------------------------------------------------------------------ write (ROOT-CHARTER, ROOT-DEPTH)
+
+ROOT_CHARTER = (
+    "refused: a charter changes through a plan the user approves: one line with add_charter_lines, hiring limits with limits, in "
+    'propose_org(blueprint=<an extension>, extend="current"). Nothing was written.'
+)
+ROOT_DEPTH = (
+    "refused: max_depth bounds the organization's structure, so the user approves a change of it in a plan: limits: [{org: max_depth, value: N}] in "
+    'propose_org(blueprint=<an extension>, extend="current"). Nothing was written.'
+)
+
+
+def files(org_md: str = ORG_MD) -> tuple[FileTools, ScriptedFiles]:
+    """The file tools over scripted files, with ORG.md holding ``org_md``, behind the refusing guard."""
+    written = ScriptedFiles(HERE)
+    guard = RootStructureGuard(lambda: Catalog({}), lambda: written, lambda: MemoryOrgSettings(org_md), lambda: OrgPaths(HERE))
+    return FileTools(lambda: StaticNaming(), lambda: written, lambda: written, lambda: OrgPaths(HERE), guard), written
+
+
+def test_root_write_of_an_agent_md_is_root_charter() -> None:
+    group, written = files()
+    server = serve(group, ROOT)
+    for path in ("ceo/AGENT.md", str(HERE / "ceo" / "AGENT.md")):
+        assert ROOT_CHARTER in fails(server, "write", path=path, content="---\nrole: Chief\n---\nNew body.\n")
+    assert ROOT_CHARTER in fails(server, "write", path="ceo/AGENT.md", content="One more line.\n", append=True)
+    assert written.log.of("write_noted") == []
+
+
+def test_root_write_of_org_md_changing_max_depth_is_root_depth() -> None:
+    group, written = files()
+    server = serve(group, ROOT)
+    assert ROOT_DEPTH in fails(server, "write", path="ORG.md", content="---\nmax_depth: 6\neffort: high\n---\nThe rules.\n")
+    assert ROOT_DEPTH in fails(server, "write", path="ORG.md", content="---\nmax_depth: 3\n---\nThe rules.\n")
+    deeper, written_deeper = files("---\nmax_depth: 6\n---\nThe rules.\n")
+    assert ROOT_DEPTH in fails(serve(deeper, ROOT), "write", path="ORG.md", content="---\neffort: high\n---\nThe rules.\n")  # (a missing key is the default, 4)
+    assert written.log.of("write_noted") == [] == written_deeper.log.of("write_noted")
+
+
+def test_root_write_of_org_md_changing_nothing_structural_keeps_todays_floor_check() -> None:
+    """GREEN when written: ORG.md's other settings and its rules are root's to write (the writer's floor check stays the only one)."""
+    group, written = files()
+    server = serve(group, ROOT)
+    same = "---\nmax_depth: 4\neffort: xhigh\n---\nNew rules.\n"
+    assert call(server, "write", path="ORG.md", content=same) == "wrote ORG.md (organization file)"
+    assert call(server, "write", path="ORG.md", content="\nA line of rules.\n", append=True) == "wrote ORG.md (organization file)"
+    assert call(server, "write", path="notes/a.md", content="x") == "wrote notes/a.md (organization file)"
+    broken, written_broken = files("---\nmax_depth: [unclosed\n---\n")  # (ORG.md that cannot be parsed: root can still repair it)
+    assert call(serve(broken, ROOT), "write", path="ORG.md", content="---\nmax_depth: 9\n---\nRepaired.\n") == "wrote ORG.md (organization file)"
+    assert len(written.log.of("write_noted")) == 3 and len(written_broken.log.of("write_noted")) == 1
+
+
+def test_an_agents_write_of_a_charter_is_unchanged() -> None:
+    """GREEN when written: an agent's charter writes keep the writer's rules (design 6.6 adds CHARTER-PLAN and CHARTER-ADDED there)."""
+    group, written = files()
+    assert call(serve(group, "ceo"), "write", path="ceo/eng/AGENT.md", content="---\nrole: E\n---\nB.\n") == "wrote ceo/eng/AGENT.md (organization file)"
+    assert len(written.log.of("write_noted")) == 1

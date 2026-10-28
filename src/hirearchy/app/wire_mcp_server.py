@@ -159,6 +159,7 @@ def server_factory(binding: OrgBindingPort, scheduler_control: Callable[[Schedul
     from ..prompts import Whoami
     from ..reflection import DeliverableChecks, ServiceReports, ServiceSteps
     from ..services import ServiceCatalog, ServiceCommands, ServiceEvidence, ServiceHints
+    from ..settings import OrgSettings
     from ..telemetry._summarize import JsonArgumentSummarizer
     from ..traces import TraceLookup
 
@@ -166,7 +167,7 @@ def server_factory(binding: OrgBindingPort, scheduler_control: Callable[[Schedul
         return provide(binding, port)
 
     resources, environment = process_resources(), OsEnvironment()
-    structure = RootStructureGuard(of(ServiceCatalog))  # root's structural calls over MCP are refused in favour of the extension (design 13)
+    structure = RootStructureGuard(of(ServiceCatalog), of(OrgFileWriter), of(OrgSettings), of(OrgLayout))  # root's structural calls over MCP are refused in favour of the extension (design 13)
     plan_time = CachedPlanTime()
     text = InstructionText(binding)  # the instructions, and the setup state
     directory = of(AgentDirectory)
@@ -190,7 +191,7 @@ def server_factory(binding: OrgBindingPort, scheduler_control: Callable[[Schedul
         TaskTools(of(TaskAssigner), of(TaskReporter), of(BudgetQuery), of(MailboxReader), of(ServiceHints)),
         NoteTools(of(MessageSender), of(BudgetQuery), of(BudgetReclaimer)),
         HiringTools(of(Hiring), of(Retirement), of(ServiceCatalog), of(ServiceEvidence), structure),
-        FileTools(of(ToolNaming), of(OrgFileReader), of(OrgFileWriter), of(OrgLayout)),
+        FileTools(of(ToolNaming), of(OrgFileReader), of(OrgFileWriter), of(OrgLayout), structure),
         StatusTools(
             text, of(OrgTree), of(SchedulerStatus), directory, of(HealthAnalyzer), of(HealthRenderer), installed_skill, of(DeliverableChecks),
             of(ModelFloorAudit),

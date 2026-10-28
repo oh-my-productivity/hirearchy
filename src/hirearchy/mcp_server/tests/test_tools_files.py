@@ -6,7 +6,7 @@ from pathlib import Path
 
 from hirearchy.kernel import ROOT, OrgPaths
 from hirearchy.mcp_server._tools_files import FileTools
-from hirearchy.mcp_server.testing import ScriptedFiles, StaticNaming
+from hirearchy.mcp_server.testing import AllowingStructureGuard, ScriptedFiles, StaticNaming
 
 from ._support import call, described, names, serve
 
@@ -15,7 +15,7 @@ HERE = Path("/memory/org")
 
 def tools(files: ScriptedFiles | None = None, shadowed: dict[str, tuple[str, str]] | None = None) -> tuple[FileTools, ScriptedFiles]:
     files = files or ScriptedFiles(HERE, text="THE TEXT")
-    return FileTools(lambda: StaticNaming(shadowed), lambda: files, lambda: files, lambda: OrgPaths(HERE)), files
+    return FileTools(lambda: StaticNaming(shadowed), lambda: files, lambda: files, lambda: OrgPaths(HERE), AllowingStructureGuard()), files
 
 
 def test_the_plain_names_for_root_and_for_an_agent_without_the_built_ins() -> None:
