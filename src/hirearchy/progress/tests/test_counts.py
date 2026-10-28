@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from hirearchy.budget import run_credit
+from hirearchy.budget import effort_credit, run_credit
 from hirearchy.kernel import ROOT, Message
 from hirearchy.progress._ports import RunCounts
 from hirearchy.progress._counts import LogRunCounts
@@ -123,3 +123,12 @@ def test_a_credited_run_is_neither_used_nor_kept(w: ProgressWorld, task: Message
     assert text(w, task, done) == "runs 1 of 8" and kept(w, task, done) == 7  # 8 handed down, 1 charged
     w.post(run_credit("ceo/eng", "20260101T000000000000"))  # a credit for a stem that is no log of the team changes nothing
     assert text(w, task, done) == "runs 1 of 8"
+
+
+def test_an_effort_credited_run_is_neither_used_nor_kept(w: ProgressWorld, task: Message) -> None:
+    w.use_run("ceo")
+    w.use_run("ceo")
+    w.post(effort_credit("ceo", w.runs.files("ceo")[-1].stem))  # the second run was stopped because kiro-cli did not set its effort: returned
+    assert text(w, task) == "runs 1 of 8"
+    done = w.answer(task, "done", "ok", 0)
+    assert text(w, task, done) == "runs 1 of 8" and kept(w, task, done) == 7  # 8 handed down, 1 charged

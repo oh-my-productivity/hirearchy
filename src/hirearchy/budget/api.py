@@ -10,12 +10,13 @@ from __future__ import annotations
 from typing import Protocol, runtime_checkable
 
 from ..kernel import Message
-from ._credit import run_credit
+from ._credit import effort_credit, run_credit
 
 __all__ = [
     "AllocationPolicy",
     "BudgetQuery",
     "BudgetReclaimer",
+    "effort_credit",
     "run_credit",
 ]
 
