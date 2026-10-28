@@ -182,6 +182,12 @@ def lineage_as_of(contracts: Sequence[Contract], criterion: str, when: datetime)
     return tuple(sorted(found, key=number_of))
 
 
+def lineage_class(contracts: Sequence[Contract], criterion: str, when: datetime) -> frozenset[str]:
+    """The lineage class of ``criterion`` as of ``when`` (design 3, 10.5): the criterion and its lineage as of ``when``. Two rejections fail "the same
+    criterion" when the classes of their subjects meet."""
+    return frozenset({criterion, *lineage_as_of(contracts, criterion, when)})
+
+
 def subjects_of(records: Records, rejection: str) -> frozenset[str]:
     """What the rejection ``R<k>`` is about (section 3): itself; the ids its effective human link names (the criteria and the earlier rejections
     it resolves through); the question's id of its answering contract version, the ids that version adds (or, adding none, removes: what the link

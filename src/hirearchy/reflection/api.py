@@ -76,6 +76,7 @@ __all__ = [
     "items_listing",
     "judged_cases",
     "lessons_of",
+    "lineage_class",
     "not_on_a_delivery",
     "over_cost",
     "open_client_items",
@@ -1088,4 +1089,5 @@ from ._causes import attribution, cause_of, failure_class  # noqa: E402
 from ._quality_rules import (  # noqa: E402
     cost_alarm, deliveries_of, judged_cases, not_on_a_delivery, over_cost, quality_thresholds, repeat_alarm, signer_of, unjudged_cases,
 )
+from ._watch import lineage_class  # noqa: E402
 from ._watch_text import watch_entry  # noqa: E402
