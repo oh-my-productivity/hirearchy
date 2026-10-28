@@ -3,6 +3,7 @@ that hold human-tier verdicts, runtime facts (runs, times, the agents' tree) and
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass
 from datetime import datetime
 
@@ -282,3 +283,59 @@ class Tracked:
     exercised: tuple[Occasion, ...] = ()
     recurred: tuple[Occasion, ...] = ()
     watch: WatchState | None = None
+
+
+@dataclass(frozen=True)
+class FailedCase:
+    """A judged case of a service that the user rejected (7.2): ``classes`` has the lineage class of each criterion a human rejection of it names (a pending rejection and
+    a link to no criterion name none), ``signer`` signed its delivery off (``verifier``: it is a check), ``escape`` is true when that delivery was rejected, and
+    ``rework_runs`` the runs of the owner's subtree after its first rejection (None when they cannot be read)."""
+
+    case: str
+    when: datetime | None
+    classes: tuple[frozenset[str], ...]
+    signer: str
+    verifier: bool
+    escape: bool
+    rework_runs: int | None = None
+
+
+@dataclass(frozen=True)
+class TakenFix:
+    """A ``checker-fix`` item that was taken (4.4): the verifier it instructed, the criterion it named, the item's id and the case in which the class recurred since
+    (``""`` when it has not)."""
+
+    verifier: str
+    klass: str
+    ref: str
+    recurred_case: str = ""
+
+
+@dataclass(frozen=True)
+class OwnerFacts:
+    """What the call that adds a checker to a service reads of its owner's team (runtime facts only): its direct reports and limits, its tools, the estimate of the
+    team's runs now and the service's budget, the template of a check the team already has (``""`` for none) and the ``base_runs`` of the templates."""
+
+    owner: str
+    children: int
+    max_children: int
+    can_hire: bool
+    tools: tuple[str, ...]
+    team_estimate: int
+    old_budget: int
+    verifier_template: str = ""
+    template_runs: tuple[tuple[str, int], ...] = ()
+
+
+@dataclass(frozen=True)
+class ServiceFailures:
+    """A service as 7.2 reads it: ``window`` has its failing cases among the last judged ones, ``judged`` the number of judged cases in that window, ``criteria`` the text
+    of each current criterion, ``owner_facts`` the team and ``taken`` the instructions already taken."""
+
+    service: str
+    owner: str
+    window: tuple[FailedCase, ...]
+    judged: int
+    criteria: Mapping[str, str]
+    owner_facts: OwnerFacts
+    taken: tuple[TakenFix, ...] = ()

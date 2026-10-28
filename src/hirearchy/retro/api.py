@@ -75,7 +75,8 @@ class Item:
     distinct cases of the evidence that carry a human-tier verdict; ``rung`` its place on the change ladder (1 to 7, 0 for an item that is no
     structure); ``question`` is the one sentence put to the user; ``call`` the pre-filled call its yes makes, ``revert`` the call that takes it back;
     ``objection`` the result of the objection test; ``effect`` what the files show once it is taken; ``notes`` the lines of Details beyond the fixed ones;
-    ``state`` is ``""`` (new), ``taken``, ``open`` or ``no longer suggested``."""
+    ``blueprint`` and ``revert_blueprint`` the extension (JSON, which is YAML) the call and the revert carry, with ``B{n}.{k}`` where the brief writes the item's
+    id; ``state`` is ``""`` (new), ``taken``, ``open`` or ``no longer suggested``."""
 
     kind: str
     key: str
@@ -91,6 +92,8 @@ class Item:
     effect: Mapping[str, str] = field(default_factory=dict)
     notes: tuple[str, ...] = ()
     oldest: str = ""  # the lowest message id of the evidence: the third key of the order (4.5a item 5)
+    blueprint: str = ""
+    revert_blueprint: str = ""
     n: int = 0
     state: str = ""
 
