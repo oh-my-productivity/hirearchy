@@ -19,8 +19,23 @@ UNREADABLE = "- {service}: cannot be read ({error})"
 
 HEADINGS = {
     "d1": "What you said", "d2": "What got past a check", "d3": "Rejections with no criterion yet", "d4": "Alarms and causes to settle",
-    "d5": "Work you ask for again and again", "d6": "Idle or stranded agents",
+    "d5": "Work you ask for again and again", "d6": "Idle or stranded agents", "d9": "Criteria and your words", "d10": "Your team's own proposals",
+    "d11": "Playbooks", "d12": "Spend", "d13": "The last brief", "d14": "Held back",
 }
+
+FROM_LINE = 'from your words "{quote}"{asked}; words I added: {added}'  # the source lines of PLAN FOR YOU (blueprint), as D9 shows them
+ASKED_LINE = ' (my question: "{asked}")'
+AMENDED_LINE = " (your answer about {asked})"
+DEFAULT_LINE = "my default: you did not say this"
+TASKS_LINE = "my wording, from the one-off tasks I sent for you ({dates}); you accepted those deliveries"
+TASKS_LINE_NO_DATES = "my wording, from the one-off tasks I sent for you; you accepted those deliveries"
+NO_SOURCE = "- {k} criteria have no recorded source (from before Phase 2, or from a plan applied at the terminal without one)"
+EXPIRED = "- events before {date} have expired (events_keep_days)"
+APPROVED_BASIS = "- approved = root's hand-downs (the user's own approvals are not recorded; F-P1-10)"
+REFINED = (
+    "because a refinement of the criterion it carries was rejected ({refs}: the answers replaced {replaced}); its wording is now only in the contract."
+)
+DIRECT = "{refs} rejected deliveries on {criterion} it carries"
 
 CAUSE_UNTYPED = (
     '{ref} ({service}, {date}): "{words}". Was it a gap in the criteria (the team met them), a check that missed it, or a one-off?'

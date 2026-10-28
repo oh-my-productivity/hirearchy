@@ -8,13 +8,17 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 
+from datetime import datetime
+
 from ..reflection import CostAlarm, RepeatAlarm
+from ..services import listed_added_words
+from . import _texts as texts
 from ._shapes import RELATIONS, ShapeGroup
 from ._texts import (
     BLOCK_LINES, BLOCK_MORE, BLOCK_WORDS, DETAIL_LINES, DETAIL_MORE, HEADINGS, NONE, UNREADABLE, cause_question, day, quoted,
 )
-from ._views import HealthFlag, Passed, Said, ServiceAlarms
-from .api import RetroThresholds, Section
+from ._views import Fate, HealthFlag, Passed, PlaybookFacts, ProposalFacts, Said, ServiceAlarms, Sourced, SpendFacts, WatchRetire
+from .api import Item, RetroThresholds, Section
 
 Unreadable = Sequence[tuple[str, str]]  # (service, why) of the services whose record could not be read
 
@@ -28,11 +32,13 @@ def _capped(lines: Sequence[str], limit: int, more: str) -> tuple[str, ...]:
 
 def _section(
     key: str, block: Sequence[str], details: Sequence[str], unreadable: Unreadable, counts: tuple[tuple[str, int | str], ...], *, show: bool = True,
+    tail: Sequence[str] = (), block_lines: int = BLOCK_LINES,
 ) -> Section:
-    """The section ``key``: its block lines (``()`` when the block does not show it) and its details, capped, then the lines of the services that could not be read."""
-    broken = [UNREADABLE.format(service=service or ONE_OFF, error=error) for service, error in unreadable]
-    shown = (_capped(block, BLOCK_LINES, BLOCK_MORE) + tuple(broken) or (NONE,)) if show else ()
-    lines = _capped(details, DETAIL_LINES, DETAIL_MORE) + tuple(broken)
+    """The section ``key``: its block lines (``()`` when the block does not show it) and its details, capped, then the lines of the services that could not be
+    read (in both) and the ``tail`` (in Details only), which the cap never hides."""
+    broken = tuple(UNREADABLE.format(service=service or ONE_OFF, error=error) for service, error in unreadable)
+    shown = (_capped(block, block_lines, BLOCK_MORE) + broken or (NONE,)) if show else ()
+    lines = _capped(details, DETAIL_LINES, DETAIL_MORE) + tuple(tail) + broken
     return Section(key, HEADINGS[key], shown, lines or (NONE,), counts)
 
 
@@ -160,3 +166,92 @@ def d6_health(flags: Sequence[HealthFlag], notes: Sequence[str]) -> Section:
     """D6 Idle or stranded agents: each flagged agent with the analyzer's reason and the runs it holds, then the notes the signal adds (an agent that is kept, and why)."""
     lines = [f"- {f.addr} ({f.flag}): {f.reason}" + (f"; holds {f.held} unspent runs" if f.held is not None else "") for f in flags] + list(notes)
     return _section("d6", (), lines, (), (("flagged", len(flags)),), show=False)
+
+
+# ------------------------------------------------------------------------------------------------------------------------ D9 to D14
+
+
+def _source_line(c: Sourced) -> str:
+    if c.kind == "default":
+        return texts.DEFAULT_LINE
+    if c.kind == "tasks":
+        return texts.TASKS_LINE.format(dates=c.tasks_dates) if c.tasks_dates else texts.TASKS_LINE_NO_DATES
+    asked = texts.AMENDED_LINE.format(asked=c.asked) if c.kind == "amendment" else texts.ASKED_LINE.format(asked=c.asked) if c.asked else ""
+    return texts.FROM_LINE.format(quote=" ".join(c.quote.split()), asked=asked, added=listed_added_words(c.added))
+
+
+def d9_criteria(rows: Sequence[Sourced], unknown: int, unreadable: Unreadable) -> Section:
+    """D9 Criteria and your words: every current criterion with a recorded source, its source, the words root added and the judged cases it was exercised in;
+    the criteria with no recorded source are counted in one line."""
+    lines = [
+        f'- {c.service} {c.id} "{quoted(c.text)}": {_source_line(c)}; exercised in {c.exercised} judged cases, {c.accepted} accepted' for c in rows
+    ]
+    return _section("d9", (), lines, unreadable, (("sourced", len(rows)), ("unknown_source", unknown)), show=False, tail=[texts.NO_SOURCE.format(k=unknown)] if unknown else [])
+
+
+def d10_proposals(facts: ProposalFacts, since: datetime | None, oldest: datetime | None) -> Section:
+    """D10 Your team's own proposals: the refusals of the evidence gate to a ``revise_playbook`` call as ``{actor} on {service}: {kind} ({op})`` (no text of the
+    team), then the refusals of every tool since ``since`` counted as ``observe`` counts them, and a line when the event log does not reach back to ``since``."""
+    rows = [f"- {r.actor} on {r.service}: {r.kind} ({r.op})" for r in facts.rows]
+    by_tool = f" ({', '.join(f'{tool} {n}' for tool, n in facts.by_tool)})" if facts.by_tool else ""
+    tail = [f"- Refusals since {day(since) if since else 'the organization started'}: {facts.refused}{by_tool}"]
+    if oldest is not None and since is not None and since < oldest:
+        tail.append(texts.EXPIRED.format(date=day(oldest)))
+    return _section("d10", rows, rows, (), (("proposals_refused", len(rows)), ("refusals", facts.refused)), tail=tail, block_lines=3)
+
+
+def _retire_line(service: str, r: WatchRetire) -> str:
+    refined = texts.REFINED.format(refs=_ids(r.refined_refs), replaced=", ".join(f"{old} with {new}" for old, new in r.replaced))
+    direct = texts.DIRECT.format(refs=_ids(r.direct_refs), criterion=r.direct_criterion)
+    if r.direct_refs and r.refined_refs:
+        return f"- {service}: {r.item} retired by the watch in v{r.version}: {direct}; and {refined}"
+    if r.refined_refs:
+        return f"- {service}: {r.item} retired by the watch in v{r.version} {refined}"
+    return f"- {service}: {r.item} retired by the watch in v{r.version}: {direct}."
+
+
+def d11_playbooks(rows: Sequence[PlaybookFacts], unreadable: Unreadable) -> Section:
+    """D11 Playbooks: per service the words against the cap, the live items by state, the retire candidates and the mirror items (a rule the contract already
+    carries), then every item the watch retired with the reason in 10.4's words (a refinement was rejected, a direct rejection, or both)."""
+    lines: list[str] = []
+    for p in rows:
+        parts = [f"{p.words} of {p.cap} words", "items: " + ", ".join(f"{n} {state}" for state, n in p.states) if p.states else "no playbook items"]
+        if p.candidates:
+            parts.append(f"{len(p.candidates)} retire candidate{'s' if len(p.candidates) != 1 else ''} ({_ids(p.candidates)})")
+        if p.mirrors:
+            k = len(p.mirrors)
+            parts.append(f"{k} mirror item{'s' if k != 1 else ''} repeat{'s' if k == 1 else ''} {p.mirror_words} words of the contract ({_ids(p.mirrors)})")
+        lines.append(f"- {p.service}: " + "; ".join(parts))
+        lines += [_retire_line(p.service, r) for r in p.retires]
+    return _section("d11", (), lines, unreadable, (("playbooks", len(rows)), ("watch_retires", sum(len(p.retires) for p in rows))), show=False)
+
+
+def d12_spend(rows: Sequence[SpendFacts], unreadable: Unreadable) -> Section:
+    """D12 Spend: per service the cases since the window start, the runs they used against the runs approved per request, and the cases above that; the approved
+    runs are root's hand-downs in 2a (the user's own approvals are not recorded)."""
+    lines = [
+        f"- {s.service}: {s.cases} cases" + (f", {s.runs} runs used against {s.approved} approved per request; {s.above} cases above it" if s.cases else "") for s in rows
+    ]
+    return _section("d12", (), [texts.APPROVED_BASIS, *lines], unreadable, (("cases", sum(s.cases for s in rows)), ("cases_above_approval", sum(s.above for s in rows))), show=False)
+
+
+def _fate(f: Fate) -> str:
+    if f.state == "taken":
+        return "taken" + (f" ({f.seen})" if f.seen else "")
+    return "lapsed: no change" if f.state == "lapsed" else f.state
+
+
+def d13_last(fates: Sequence[Fate], last_id: str | None) -> Section:
+    """D13 The last brief: each item of the last brief as taken (with the effect seen), lapsed (no change) or still open."""
+    if last_id is None:
+        lines = ["- no earlier brief"]
+    elif not fates:
+        lines = [f"- {last_id} offered no item"]
+    else:
+        lines = [f"- {f.id} {f.kind}: {_fate(f)}" for f in fates]
+    return _section("d13", (), lines, (), (("items", len(fates)), ("taken", sum(f.state == "taken" for f in fates)), ("lapsed", sum(f.state == "lapsed" for f in fates))), show=False)
+
+
+def d14_held(held: Sequence[Item]) -> Section:
+    """D14 Held back: the candidates beyond the cap of 3 with their weight."""
+    return _section("d14", (), [f"- {i.kind} {i.key} (weight {i.weight})" for i in held], (), (("held_back", len(held)),), show=False)

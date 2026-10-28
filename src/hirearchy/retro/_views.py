@@ -159,3 +159,90 @@ class HealthFlag:
     flag: str
     reason: str
     held: int | None = None
+
+
+@dataclass(frozen=True)
+class Sourced:
+    """A current criterion with a recorded source (D9, 7.5): ``kind`` is ``user``, ``amendment``, ``default`` or ``tasks`` (never ``unknown``, which is only counted),
+    ``quote`` the user's words it rests on, ``asked`` the question those words answered (for an amendment the id its question named), ``tasks_dates`` the dates of
+    the one-off tasks it copies, ``added`` the words that are root's. ``exercised`` is the judged human cases it was exercised in, ``accepted`` how many were accepted."""
+
+    service: str
+    id: str
+    text: str
+    kind: str
+    quote: str = ""
+    asked: str = ""
+    tasks_dates: str = ""
+    added: tuple[str, ...] = ()
+    exercised: int = 0
+    accepted: int = 0
+
+
+@dataclass(frozen=True)
+class Refusal:
+    """A refused ``revise_playbook`` call whose refusal is the evidence gate's (D10): who, on which service, which gate refusal (``reflection.gate_refusal_kind``)
+    and the call's ``op``. No text of the team is kept."""
+
+    actor: str
+    service: str
+    kind: str
+    op: str
+
+
+@dataclass(frozen=True)
+class ProposalFacts:
+    """D10's inputs: the gate refusals, the count of every refused tool call (the rule ``observe`` uses) and the count per tool."""
+
+    rows: tuple[Refusal, ...] = ()
+    refused: int = 0
+    by_tool: tuple[tuple[str, int], ...] = ()
+
+
+@dataclass(frozen=True)
+class WatchRetire:
+    """A playbook item the watch retired (D11, 10.4): ``direct_refs`` are the rejections that named the criterion ``direct_criterion`` it carries,
+    ``refined_refs`` those that named a refinement, and ``replaced`` the (old, new) criteria the answers replaced."""
+
+    item: str
+    version: int
+    direct_refs: tuple[str, ...] = ()
+    direct_criterion: str = ""
+    refined_refs: tuple[str, ...] = ()
+    replaced: tuple[tuple[str, str], ...] = ()
+
+
+@dataclass(frozen=True)
+class PlaybookFacts:
+    """A service's playbook as D11 reads it: its words against the cap, its live items by watch state, the retire candidates, the mirror items (a live item whose
+    tokens equal a current criterion's) with the words they repeat, and every watch retire."""
+
+    service: str
+    words: int
+    cap: int
+    states: tuple[tuple[str, int], ...] = ()
+    candidates: tuple[str, ...] = ()
+    mirrors: tuple[str, ...] = ()
+    mirror_words: int = 0
+    retires: tuple[WatchRetire, ...] = ()
+
+
+@dataclass(frozen=True)
+class SpendFacts:
+    """D12: a service's cases since the window start, the runs they used, the runs approved per request and the cases above that."""
+
+    service: str
+    cases: int
+    runs: int
+    approved: int
+    above: int
+
+
+@dataclass(frozen=True)
+class Fate:
+    """What became of an item of the last brief (D13): ``state`` is ``taken`` (``seen`` is the effect found), ``lapsed`` or ``open``."""
+
+    id: str
+    kind: str
+    state: str
+    seen: str = ""

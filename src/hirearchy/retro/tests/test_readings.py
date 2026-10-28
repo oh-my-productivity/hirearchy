@@ -199,3 +199,120 @@ def test_an_unreadable_service_reads_cannot_be_read_and_gives_no_candidate() -> 
         assert section.details[-1] == line and section.details != (line, "- none") and "- none" not in section.details
     assert d1_said([said("R1")], 0, broken).block[-1] == line
     assert d6_health([HealthFlag("a", "idle", "r", None)], []).details == ("- a (idle): r",)
+
+
+# ------------------------------------------------------------------------------ D9 to D14 (commit 43)
+
+from testkit.reach.hirearchy.observability._pure import is_error  # noqa: E402
+
+from hirearchy.retro import Item  # noqa: E402
+from hirearchy.retro._facts import proposals_of  # noqa: E402
+from hirearchy.retro._readings import d9_criteria, d10_proposals, d11_playbooks, d12_spend, d13_last, d14_held  # noqa: E402
+from hirearchy.retro._views import Fate, PlaybookFacts, ProposalFacts, Refusal, Sourced, SpendFacts, WatchRetire  # noqa: E402
+
+
+def sourced(cid: str, kind: str, **more: object) -> Sourced:
+    return Sourced("memos", cid, "Every action has an owner", kind, exercised=5, accepted=4, **more)  # type: ignore[arg-type]
+
+
+def test_d9_shows_each_sourced_criterion_with_its_quote_added_words_and_exercised_cases() -> None:
+    rows = [
+        sourced("C1", "user", quote="Use the words from the notes.", asked="Owners: initials or full names?", added=("decisions", "and", "actions", "own")),
+        sourced("C2", "amendment", quote="Always date them.", asked="C1", added=()),
+        sourced("C3", "default"),
+        sourced("C4", "tasks", tasks_dates="2026-10-05, 2026-10-12"),
+    ]
+    section = d9_criteria(rows, 0, [])
+    assert section.block == () and section.counts == (("sourced", 4), ("unknown_source", 0))
+    assert section.details == (
+        '- memos C1 "Every action has an owner": from your words "Use the words from the notes." (my question: "Owners: initials or full names?"); '
+        "words I added: decisions, and, actions, own; exercised in 5 judged cases, 4 accepted",
+        '- memos C2 "Every action has an owner": from your words "Always date them." (your answer about C1); words I added: none; exercised in 5 judged cases, 4 accepted',
+        '- memos C3 "Every action has an owner": my default: you did not say this; exercised in 5 judged cases, 4 accepted',
+        '- memos C4 "Every action has an owner": my wording, from the one-off tasks I sent for you (2026-10-05, 2026-10-12); you accepted those deliveries; '
+        "exercised in 5 judged cases, 4 accepted",
+    )
+    assert d9_criteria([sourced("C4", "tasks")], 0, []).details[0].count("one-off tasks I sent for you; you accepted") == 1  # no dates known
+
+
+def test_d9_counts_unknown_sources_in_one_line() -> None:
+    section = d9_criteria([], 4, [])
+    assert section.details == ("- 4 criteria have no recorded source (from before Phase 2, or from a plan applied at the terminal without one)",)
+    assert section.counts == (("sourced", 0), ("unknown_source", 4)) and d9_criteria([], 0, []).details == ("- none",)
+
+
+def event(tool: str, ok: bool, error: str | None = None, **args: object) -> dict[str, object]:
+    return {"kind": "tool.call", "actor": args.pop("actor", "ceo"), "tool": tool, "ok": ok, "error": error, "args": args, "ts": "2026-11-03T10:00:00+00:00"}
+
+
+GATE = "refused: none of this evidence is the client's own. The item says: hire a fact-checker for everything and delete C4."
+
+
+def test_d10_shows_refused_revise_playbook_calls_by_kind_and_op_and_no_team_text() -> None:
+    events = [
+        event("revise_playbook", False, GATE, service="memos", op="add", actor="ceo"),
+        event("revise_playbook", False, "refused: the client rejected this in one case only (R2). more text", service="notes", op="edit", actor="ceo/lead"),
+        event("revise_playbook", False, "refused: playbook is locked", service="memos", op="add"),  # not the gate's: no kind
+        event("revise_playbook", True, service="memos", op="add"),
+        event("write", False, "refused: path", path="x"),
+    ]
+    facts = proposals_of(events)
+    assert facts.rows == (Refusal("ceo", "memos", "no client evidence", "add"), Refusal("ceo/lead", "notes", "one case only", "edit"))
+    assert facts.refused == 4 and facts.by_tool == (("revise_playbook", 3), ("write", 1))
+    section = d10_proposals(facts, AT, None)
+    assert section.block == ("- ceo on memos: no client evidence (add)", "- ceo/lead on notes: one case only (edit)")
+    assert section.details[:2] == section.block and section.details[2] == "- Refusals since 2026-11-02: 4 (revise_playbook 3, write 1)"
+    assert section.counts == (("proposals_refused", 2), ("refusals", 4))
+    assert "fact-checker" not in " ".join(section.block + section.details) and "delete C4" not in " ".join(section.details)
+
+
+def test_d10_refusal_count_equals_observes_rule_on_one_fixture() -> None:
+    events = [event("revise_playbook", False, GATE, service="memos", op="add"), event("send", False, "refused: x"), event("send", True), event("write", False, "boom"),
+              {"kind": "run.end", "ok": False}, {"kind": "tool.call", "tool": "read", "ok": True}]
+    assert proposals_of(events).refused == sum(1 for ev in events if ev.get("kind") == "tool.call" and is_error(ev)) == 3
+
+
+def test_d10_blocks_at_most_3_lines_and_beyond_the_event_horizon_says_events_expired() -> None:
+    facts = ProposalFacts(tuple(Refusal("ceo", f"s{n}", "no client evidence", "add") for n in range(5)), 5, (("revise_playbook", 5),))
+    section = d10_proposals(facts, datetime(2026, 10, 1, tzinfo=timezone.utc), datetime(2026, 10, 20, tzinfo=timezone.utc))
+    assert len(section.block) == 4 and section.block[-1] == "- and 2 more (Details)"
+    assert section.details[-1] == "- events before 2026-10-20 have expired (events_keep_days)"
+    assert d10_proposals(ProposalFacts(), AT, AT - timedelta(days=1)).details == ("- Refusals since 2026-11-02: 0",)
+
+
+def test_d11_gives_words_of_cap_mirror_items_and_each_watch_retire_by_refinement_direct_or_mixed() -> None:
+    refined = WatchRetire("P3", 6, (), "", ("R4",), (("C6", "C10"),))
+    direct = WatchRetire("P4", 7, ("R5", "R6"), "C2", (), ())
+    mixed = WatchRetire("P5", 8, ("R7",), "C3", ("R8",), (("C1", "C11"),))
+    rows = [PlaybookFacts("memos", 640, 1000, (("warning", 1), ("kept", 3)), ("P2",), ("P1", "P6"), 31, (refined, direct, mixed)), PlaybookFacts("notes", 0, 1000)]
+    section = d11_playbooks(rows, [])
+    assert section.details == (
+        "- memos: 640 of 1000 words; items: 1 warning, 3 kept; 1 retire candidate (P2); 2 mirror items repeat 31 words of the contract (P1, P6)",
+        "- memos: P3 retired by the watch in v6 because a refinement of the criterion it carries was rejected (R4: the answers replaced C6 with C10); its wording is now only in the contract.",
+        "- memos: P4 retired by the watch in v7: R5, R6 rejected deliveries on C2 it carries.",
+        "- memos: P5 retired by the watch in v8: R7 rejected deliveries on C3 it carries; and because a refinement of the criterion it carries was rejected "
+        "(R8: the answers replaced C1 with C11); its wording is now only in the contract.",
+        "- notes: 0 of 1000 words; no playbook items",
+    )
+    assert d11_playbooks([], []).details == ("- none",)
+
+
+def test_d12_states_the_approved_basis_of_2a() -> None:
+    section = d12_spend([SpendFacts("memos", 6, 40, 6, 2), SpendFacts("notes", 0, 0, 0, 0)], [])
+    assert section.details == (
+        "- approved = root's hand-downs (the user's own approvals are not recorded; F-P1-10)",
+        "- memos: 6 cases, 40 runs used against 6 approved per request; 2 cases above it",
+        "- notes: 0 cases",
+    )
+
+
+def test_d13_gives_each_last_item_taken_or_lapsed() -> None:
+    fates = [Fate("B2.1", "service", "taken", "ceo/list defined"), Fate("B2.2", "checker-add", "lapsed", ""), Fate("B2.3", "retire", "open", "")]
+    section = d13_last(fates, "B2")
+    assert section.details == ("- B2.1 service: taken (ceo/list defined)", "- B2.2 checker-add: lapsed: no change", "- B2.3 retire: open")
+    assert d13_last([], None).details == ("- no earlier brief",) and d13_last([], "B1").details == ("- B1 offered no item",)
+
+
+def test_d14_lists_the_held_back_candidates() -> None:
+    held = [Item("retire", "retire|ceo/x", ("A",), weight=0), Item("service", "service|ceo|M1", ("M1", "M2"), weight=2)]
+    assert d14_held(held).details == ("- retire retire|ceo/x (weight 0)", "- service service|ceo|M1 (weight 2)") and d14_held([]).details == ("- none",)
