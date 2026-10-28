@@ -336,9 +336,12 @@ def _timeline_lines(view: RecordView) -> list[str]:
     return lines
 
 
+_AT_RETIRE = " (counts as at its retire, v{n})"  # 10.6: the counts of a retired item stop at the version that retired it
+
+
 def _watch_lines(view: RecordView) -> list[str]:
     """One line, in 14.3's words, when the record's watch holds an item that is not ``kept`` (design 14.4): ids and counts, never an item's words."""
-    shown = [watch_entry(w) for w in view.record.watch if w.state != "kept"]
+    shown = [watch_entry(w) + (_AT_RETIRE.format(n=w.retired_in) if w.state == "retired" and w.k and w.retired_in else "") for w in view.record.watch if w.state != "kept"]
     return [f"  playbook watch: {', '.join(shown)}"] if shown else []
 
 

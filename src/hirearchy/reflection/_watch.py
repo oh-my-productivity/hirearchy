@@ -305,6 +305,7 @@ class _Track:
     watch: _Watch | None = None
     restored: int = 0
     ended: list[tuple[int, _Watch]] = field(default_factory=list)  # the retires 8.6 keeps out: (version, the watch it ended), whatever the item does next
+    retired_in: int = 0  # the version in which the item last left the body (0 while it is live)
 
 
 @dataclass(frozen=True)
@@ -614,6 +615,7 @@ def _due(tr: _Tracking, w: _Watch, at: datetime) -> bool:
 def _gone(tr: _Tracking, track: _Track, v: Playbook, at: datetime) -> None:
     """The item left the body: an owner's retire (a warned text is remembered: carried watch (i)), the runtime's retire, a repair or a hand edit."""
     track.live = False
+    track.retired_in = v.version
     track.segs[-1].end = at
     w = track.watch
     if w is not None and v.item == track.id and (v.op == "watch" or (v.op == "retire" and not w.ended and _due(tr, w, at))):
@@ -633,6 +635,7 @@ def _changed(tr: _Tracking, v: Playbook, at: datetime, item: PlaybookItem, previ
         track.segs[-1].end = at
     track.segs.append(seg)
     track.live = True
+    track.retired_in = 0
     track.kind = item.kind
     target = v.item == item.id
     gated = v.admitted in ("b", "c") and target
@@ -724,15 +727,20 @@ def watch_states(
         w = track.watch
         if w is None:
             state = "retired" if not track.live else "restored" if track.restored else "kept"
-            out.append(ItemWatch(track.id, track.kind, state, last.version, restores=track.restored, coverage=coverage, retires=_retires(rec, track)))
+            out.append(ItemWatch(
+                track.id, track.kind, state, last.version, restores=track.restored, coverage=coverage, retires=_retires(rec, track), retired_in=track.retired_in,
+            ))
             continue
         found = _derive_watch(rec, w)
+        if not track.live and last.end is not None:  # a retired item's counts stop at the version that retired it (10.6); its related rejections do not
+            frozen = _derive_watch(until(rec, (last.end, 2, "")), w)  # every record created at or before the retiring version's ``revised``
+            found = replace(found, clean=frozen.clean, waiting=frozen.waiting, pending=frozen.pending)
         state = (
             "retired" if not track.live else "restored" if track.restored else "kept" if w.ended
             else "warning" if found.related else "kept" if found.kept else "new"
         )
         out.append(ItemWatch(
             track.id, track.kind, state, w.changes[-1].version, w.start, w.k, w.r, found.clean, found.waiting, found.related, found.pending,
-            track.restored, coverage, len(found.related) >= 2 and track.live and not w.ended, w.carried, _retires(rec, track, (w, found)),
+            track.restored, coverage, len(found.related) >= 2 and track.live and not w.ended, w.carried, _retires(rec, track, (w, found)), track.retired_in,
         ))
     return tuple(out)

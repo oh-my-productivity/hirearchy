@@ -240,6 +240,48 @@ def test_every_item_retired_returns_the_retired_items_only() -> None:
     assert {i: (s.state, s.kind) for i, s in found.items()} == {"P1": ("retired", "step"), "P2": ("retired", "rule")}
 
 
+def retired_at_40(w: Watching) -> None:
+    """P2 is retired by its owner (v3, tick 40); the cases below are judged, left waiting and left pending before it."""
+    w.versions.append(playbook(3, 40, [w.items(1)[0]], op="retire", item="P2", admitted="exempt"))
+
+
+def test_a_retired_items_clean_waiting_and_pending_stop_at_the_retiring_version() -> None:
+    """F-P1-6 (design 10.6): after the retire, a verdict, a link or a delivery moves nothing in ``clean``, ``waiting`` and ``pending``."""
+    w = world()
+    w.case("c1", 20, 21, verdict=(30, "accept"))  # clean
+    w.case("c2", 22, 23)  # delivered, no verdict: waiting
+    w.case("c3", 24, 25, verdict=(26, "reject"))  # judged, not yet answered: pending, and not clean
+    retired_at_40(w)
+    at_retire = p2(w)
+    assert (at_retire.state, at_retire.clean, at_retire.waiting, at_retire.pending) == ("retired", 1, 1, ("R2",))
+    assert at_retire.retired_in == 3  # the version that retired it
+    w.bag.verdict(w.tasks["c2"], 50, "accept")  # the waiting case is judged after the retire ...
+    w.bag.link(w.notes["c3"], 51, "none")  # ... the pending rejection is answered ...
+    w.case("c4", 52, 53, verdict=(54, "accept"))  # ... and a later case is delivered and accepted
+    later = p2(w)
+    assert (later.state, later.clean, later.waiting, later.pending) == ("retired", 1, 1, ("R2",))
+
+
+def test_a_later_verdict_does_not_move_a_retired_items_counts() -> None:
+    w = world()
+    w.case("c1", 20, 21)  # delivered, no verdict
+    retired_at_40(w)
+    assert (p2(w).clean, p2(w).waiting) == (0, 1)
+    w.bag.verdict(w.tasks["c1"], 60, "accept")
+    assert (p2(w).state, p2(w).clean, p2(w).waiting) == ("retired", 0, 1)
+
+
+def test_related_of_a_retired_item_is_unchanged() -> None:
+    """The watch's ``related`` is still read over all the files, as in Phase 1: a rejection linked after the retire is related to the retired text."""
+    w = world()
+    w.case("c1", 20, 21, verdict=(30, "accept"))
+    w.case("c2", 22, 23, verdict=(31, "reject"))
+    retired_at_40(w)
+    assert p2(w).related == ()
+    w.bag.link(w.notes["c2"], 50, "C5")
+    assert (p2(w).state, p2(w).related) == ("retired", ("R2",))
+
+
 def test_a_candidate_with_no_counted_verdict_holds_the_item_new() -> None:
     w = world()
     w.case("c1", 20, 21, verdict=(30, "accept"))

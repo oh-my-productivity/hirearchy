@@ -749,6 +749,15 @@ def test_a_record_that_cannot_be_read_is_one_line() -> None:
     assert "other (offered by ops; client: you, human;" in text  # the other blocks render
 
 
+def test_a_retired_item_reads_counts_as_at_its_retire_vn() -> None:
+    """F-P1-6 (design 10.6): a watched item that was retired reads `(counts as at its retire, v{n})` in the watch line; one never watched has no counts to freeze."""
+    watch = (
+        ItemWatch("P7", "rule", "retired", 2, related=("R4", "R6")),
+        ItemWatch("P8", "rule", "retired", 2, k=3, clean=1, waiting=1, pending=("R7",), related=("R4",), retired_in=5),
+    )
+    assert line(block(record(watch=watch)), "  playbook watch:") == "  playbook watch: P7 retired (R4, R6), P8 retired (R4) (counts as at its retire, v5)"
+
+
 def test_the_playbook_watch_line_only_when_an_item_is_not_kept() -> None:
     """Design 14.4: one line `playbook watch: ...` in 14.3's words, ids and counts only, and only when the list holds an item that is not `kept`; a
     corpus with no item-format playbook (or with every item kept) prints as it always did."""

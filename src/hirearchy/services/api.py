@@ -372,6 +372,7 @@ class ItemWatch:
     retire_due: bool = False  # two or more related rejections and the runtime's retire not written yet
     carried: str = ""  # the id whose watch the item continues ("" when none)
     retires: tuple[tuple[int, tuple[str, ...]], ...] = ()  # see the docstring
+    retired_in: int = 0  # the playbook version that retired the item (state "retired"; 0 otherwise): its clean, waiting and pending are counted as at that version
 
 @dataclass(frozen=True)
 class PlaybookSection:
