@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Protocol
 
 from ..attention import Waiting
+from ..kiro import EffortStop
 from ..processes import ProcessHandle
 from ._run import Exit, PreparedRun, RunRecord, RunTable, Standing, StopWhen
 
@@ -142,6 +143,18 @@ class ThrottleCredits(Protocol):
         ...
 
 
+class EffortStops(Protocol):
+    def stop_of(self, run: RunRecord) -> EffortStop | None:
+        """The launcher's stop of a run whose kiro-cli did not set its effort, as the end of its log records it; None when it records none
+        or cannot be read (never raises)."""
+        ...
+
+    def credit(self, run: RunRecord, stop: EffortStop) -> str:
+        """Give back a stopped run that had no tool effect: ``"free"`` (the relaunch is no failure), ``"counted"`` (the run before it was credited
+        too: not charged, but a failure) or ``""`` (no credit exists: charged as today; never raises)."""
+        ...
+
+
 class RunTerminating(Protocol):
     def terminate_all(self, runs: RunTable) -> None:
         """Interrupt every run in flight (SIGTERM, then SIGKILL of the group), give their batches back and empty the table."""
@@ -265,7 +278,7 @@ class SchedulerSession(Protocol):
 
 
 __all__ = [
-    "Claim", "Console", "ExitPolicy", "FailureEscalation", "InterruptedRuns", "Lifecycle", "OrphanSettler", "Pacing", "PhaseGuard", "RunAdmission", "RunEvents",
+    "Claim", "Console", "EffortStops", "ExitPolicy", "FailureEscalation", "InterruptedRuns", "Lifecycle", "OrphanSettler", "Pacing", "PhaseGuard", "RunAdmission", "RunEvents",
     "RunFailures", "RunInitiation", "RunNotes", "RunPreparation", "RunReaper", "RunRecords", "RunSettling", "RunSpawning", "RunStarter",
     "RunTerminating", "RunWatching", "SchedulerSession", "SessionEvents", "StartAnnouncing", "StartFailures", "StrayWatch", "ThrottleCredits", "TickPhase",
     "WaitGrace", "WorkLeft",
