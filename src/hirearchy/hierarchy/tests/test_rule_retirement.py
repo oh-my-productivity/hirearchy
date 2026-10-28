@@ -94,7 +94,7 @@ class Rig:
         self.events = ListEventSink()
         self.clock = FakeClock(datetime(2031, 1, 2, 3, 4, 5, tzinfo=timezone.utc))
         self.retirement: Retirement = RuleRetirement(
-            self.files, self.files, Tasks(open_by_agent or {}), self.budget, self.delivery, self.notices, self.clock, self.events,
+            self.files, self.files, self.files, Tasks(open_by_agent or {}), self.budget, self.delivery, self.notices, self.clock, self.events,
         )
 
 

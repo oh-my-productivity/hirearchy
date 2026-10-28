@@ -31,7 +31,7 @@ def register(b: Builder) -> None:
     b.provide(
         Retirement,
         lambda b: RuleRetirement(
-            b.get(AgentDirectory), b.get(AgentRegistry), b.get(TaskQuery), b.get(BudgetQuery), b.get(MessageDelivery), b.get(Notices),
-            b.get(Clock), b.get(EventSink),
+            b.get(AgentDirectory), b.get(AgentRegistry), b.get(CharterReader), b.get(TaskQuery), b.get(BudgetQuery), b.get(MessageDelivery),
+            b.get(Notices), b.get(Clock), b.get(EventSink),
         ),
     )

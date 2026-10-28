@@ -129,7 +129,7 @@ def _assemble(
         hiring=RuleHiring(
             agents, charters, registry, slots, settings, static_document_templates(), scopes, authority, models, clock, events,
         ),
-        retirement=RuleRetirement(agents, registry, mail.tasks, budget, delivery, static_notices(), clock, events),
+        retirement=RuleRetirement(agents, registry, charters, mail.tasks, budget, delivery, static_notices(), clock, events),
         agents=agents,
         charters=charters,
         tasks=mail.tasks,

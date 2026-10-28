@@ -2,13 +2,18 @@
 
 from __future__ import annotations
 
-from ..agents import AgentDirectory, AgentRegistry
+from ..agents import AgentDirectory, AgentRegistry, CharterReader
 from ..budget import BudgetQuery
 from ..delivery import MessageDelivery
 from ..kernel import ROOT, RUNTIME, Clock, EventSink, Message, OrgError, child_addr, clip, norm, parent
 from ..mail import TaskQuery
 from ..templates import Notices
 from .api import Retired, Retirement
+
+# VERIFIER-KEPT (design 6.6): an agent does not remove a check of its team; the user does, in a plan.
+VERIFIER_KEPT = (
+    "refused: {addr} checks your team's work ({role}); removing a check is the user's decision (the retro brief shows them the team). Nothing was retired."
+)
 
 ERROR_MAX = 500  # the longest reason that goes into an event (the longest error text of an event: telemetry.ERROR_MAX)
 
@@ -20,6 +25,7 @@ class RuleRetirement(Retirement):
         self,
         agents: AgentDirectory,
         registry: AgentRegistry,
+        charters: CharterReader,
         tasks: TaskQuery,
         budget: BudgetQuery,
         delivery: MessageDelivery,
@@ -29,6 +35,7 @@ class RuleRetirement(Retirement):
     ) -> None:
         self._agents = agents
         self._registry = registry
+        self._charters = charters
         self._tasks = tasks
         self._budget = budget
         self._delivery = delivery
@@ -55,6 +62,10 @@ class RuleRetirement(Retirement):
             raise OrgError("the root of the organization cannot be retired")
         if actor != ROOT and parent(addr) != actor:
             raise OrgError("you can only retire your direct reports")
+        if actor != ROOT:
+            meta, _ = self._charters.charter(addr)
+            if meta.get("kind") == "verifier":  # only the stored key: an agent from before Phase 2 has none and is not held to it
+                raise OrgError(VERIFIER_KEPT.format(addr=addr, role=meta.get("role") or "verifier"))
         team = set(self._agents.subtree(addr))
         for a in team:  # close every task the team owes to the outside world
             for task in self._tasks.open_tasks(a):
