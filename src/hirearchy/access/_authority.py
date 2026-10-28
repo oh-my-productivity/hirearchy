@@ -11,6 +11,19 @@ from ..kernel import ROOT, OrgError, OrgLayout, inside
 from .api import AccessScopes, AuthorityPolicy
 
 
+# A1 and A2 (design 6.6, G4): the refusals of a grant for every non-root actor. A change of a team's limits is the user's decision (the retro brief shows
+# them the evidence), so neither text invites a proposal to the parent: for a top-level lead the parent is root, and such a proposal would reach the user as
+# a waking item outside the brief.
+A1 = (
+    "refused: you cannot grant `can_hire: true`: only the user (root) or an approved plan gives an agent the right to hire. Hire it with can_hire "
+    "false. A change of your team's limits is the user's decision: the retro brief shows them the evidence, so do not ask for it."
+)
+A2 = (
+    "refused: you cannot give a report max_children {n}: your own limit is {mine}, and a report's may not be above yours. Use at most {mine}. "
+    "A change of the limits is the user's decision (the retro brief shows them the evidence)."
+)
+
+
 class CharterAuthorityPolicy(AuthorityPolicy):
     def __init__(self, paths: OrgLayout, charters: CharterReader, scopes: AccessScopes) -> None:
         self._paths = paths
@@ -43,19 +56,13 @@ class CharterAuthorityPolicy(AuthorityPolicy):
         if actor == ROOT:
             return
         if grants_hire:
-            raise OrgError(
-                "you cannot grant `can_hire: true`: only the user (root) or an approved plan gives an agent the right to hire. "
-                "Hire it with can_hire false, or ask your parent (`send`) with the reason."
-            )
+            raise OrgError(A1)
         if max_children is None:
             return
         meta, _ = self._charters.charter(actor)
         mine = int(cast("SupportsInt | str", meta.get("max_children", 5)))
         if max_children > mine:
-            raise OrgError(
-                f"you cannot give a report max_children {max_children}: your own limit is {mine}, and a report's may not be above "
-                f"yours. Use at most {mine}, or ask your parent (`send`)."
-            )
+            raise OrgError(A2.format(n=max_children, mine=mine))
 
     def check_inputs(self, inputs: object) -> list[str]:
         items = [inputs] if isinstance(inputs, str) else list(cast("Iterable[object]", inputs or []))

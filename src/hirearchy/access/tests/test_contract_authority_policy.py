@@ -207,15 +207,15 @@ def test_the_first_bad_input_decides(h: AccessHarness) -> None:
 # ------------------------------------------------------------------------------ check_grant (can_hire and max_children)
 
 A1 = (
-    "you cannot grant `can_hire: true`: only the user (root) or an approved plan gives an agent the right to hire. "
-    "Hire it with can_hire false, or ask your parent (`send`) with the reason."
+    "refused: you cannot grant `can_hire: true`: only the user (root) or an approved plan gives an agent the right to hire. "
+    "Hire it with can_hire false. A change of your team's limits is the user's decision: the retro brief shows them the evidence, so do not ask for it."
 )
 
 
 def a2(n: int, mine: int) -> str:
     return (
-        f"you cannot give a report max_children {n}: your own limit is {mine}, and a report's may not be above yours. "
-        f"Use at most {mine}, or ask your parent (`send`)."
+        f"refused: you cannot give a report max_children {n}: your own limit is {mine}, and a report's may not be above yours. "
+        f"Use at most {mine}. A change of the limits is the user's decision (the retro brief shows them the evidence)."
     )
 
 

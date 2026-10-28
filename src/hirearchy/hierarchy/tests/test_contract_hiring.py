@@ -387,8 +387,8 @@ def test_a_refused_hire_leaves_no_event_and_no_trace(w: HierarchyWorld) -> None:
 
 A3 = "max_children must be a whole number >= 0"
 A1 = (
-    "you cannot grant `can_hire: true`: only the user (root) or an approved plan gives an agent the right to hire. "
-    "Hire it with can_hire false, or ask your parent (`send`) with the reason."
+    "refused: you cannot grant `can_hire: true`: only the user (root) or an approved plan gives an agent the right to hire. "
+    "Hire it with can_hire false. A change of your team's limits is the user's decision: the retro brief shows them the evidence, so do not ask for it."
 )
 
 
