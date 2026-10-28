@@ -126,8 +126,10 @@ class ExampleText(Protocol):
 
 @runtime_checkable
 class PlanProposal(Protocol):
-    def propose(self, blueprint: str) -> str:
-        """``propose_org``: validate the blueprint text and return the plan the user must approve (works before the organization exists)."""
+    def propose(self, blueprint: str, extend: str | None = None) -> str:
+        """``propose_org``: validate the blueprint text and return the plan the user must approve (works before the organization exists). With
+        ``extend`` (``"current"`` or the path of the bound organization) the blueprint is an extension of that organization (design 5), and any other
+        use of an extension, or of ``extend``, is refused with the texts of 5.6."""
         ...
 
 
@@ -135,14 +137,19 @@ class PlanProposal(Protocol):
 class PlanApplication(Protocol):
     def apply(self, blueprint: str, approved: bool, plan_id: str | None) -> str:
         """``apply_org``: create what the approved blueprint describes. Refuses, with what to do, unless the user approved it, the ``plan_id`` is
-        the one of this blueprint, and the organization exists."""
+        the one of this blueprint, and the organization exists. An extension is applied by the extension applier, which makes the ``plan_id``
+        comparison itself against the organization as it is now (design 5.5 step 2)."""
         ...
 
 
 @runtime_checkable
 class PlanTarget(Protocol):
-    def line(self) -> str:
-        """The ``Target organization:`` line of a proposal: where it will be applied, and whether that exists."""
+    def line(self, extending: bool = False) -> str:
+        """The ``Target organization:`` line of a proposal: where it will be applied, and whether that exists (``extending``: the plan changes it)."""
+        ...
+
+    def bound(self) -> Path | None:
+        """The organization this server is bound to when it exists, else None."""
         ...
 
 

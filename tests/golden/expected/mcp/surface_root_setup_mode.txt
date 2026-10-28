@@ -1504,6 +1504,18 @@ input: {
     "blueprint": {
       "title": "Blueprint",
       "type": "string"
+    },
+    "extend": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Extend"
     }
   },
   "required": [
@@ -1542,6 +1554,9 @@ Validate a blueprint and return the plan the user must approve. Writes nothing; 
         locked}], in which case `task` may be omitted or be a first request {service, inputs: {name: value}, title}.
         Criteria (the acceptance items of `task` and of each service): acceptance items: {text, from: <the user's exact words in
         needs.elicitation>, asked} or {text, default: true}; needs.elicitation: the user's answers, verbatim (required with criteria).
+        extend: "current" to change the organization this server is bound to: blueprint is then an extension (extend: with add_agents,
+        add_services, add_charter_lines, remove_charter_lines, limits, budgets, schedules, retire_services, retire; see
+        blueprint_example("extension")). The plan shows what it adds, changes and removes; its plan_id holds only while nothing it touches changes.
         Works before the organization exists. Returns (1) a block headed "PLAN FOR YOU": show it to the user exactly
         as written and wait for their explicit approval; (2) Details, the full plan for you; (3) a plan_id that
         apply_org requires. If the plan has errors, fix the blueprint and propose again; never ask the user to approve
@@ -1600,6 +1615,7 @@ Create the agents of a blueprint and give its first task. Only after the user ap
         the user explicitly approved that plan in this conversation; otherwise nothing happens. plan_id: the id that
         propose_org returned for exactly this blueprint; a missing or different id is refused (propose again, show the
         PLAN FOR YOU block, get approval). Needs an existing organization (create_org first if there is none).
+        An extension (extend:) changes the existing organization: refused when anything it touches changed since propose_org.
         Refuses with the issues if the blueprint has errors or a name is taken, and undoes everything if it fails
         midway. Returns what was created (agents, services, the first task or request); then call start() (not when
         the blueprint gave no first task: the services wait for request(service, inputs)).

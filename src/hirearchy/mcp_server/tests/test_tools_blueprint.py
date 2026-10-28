@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import hashlib
+import json
 from collections.abc import Mapping, Sequence
 from pathlib import Path
 
@@ -10,7 +12,7 @@ import pytest
 import testkit
 import testkit.reach.yaml as yaml
 
-from hirearchy.blueprint import BlueprintApplier, BlueprintExamples, BlueprintLoader, PlanIdentity, PlanRenderer, Summary
+from hirearchy.blueprint import BlueprintApplier, BlueprintError, BlueprintExamples, BlueprintLoader, ExtensionApplying, PlanIdentity, PlanRenderer, Summary
 from hirearchy.blueprint.testing import applier_over_memory_directories, loader_over_memory, renderer_over_packaged_roles
 from hirearchy.daemon import SchedulerState
 from hirearchy.daemon.testing import FakeSchedulerStatus
@@ -278,3 +280,162 @@ def test_the_tools_ask_the_renderer_and_the_applier_for_sources() -> None:
     RenderedPlanProposal(lambda: TextLoader(), lambda: renderer, BindingPlanTarget(MemoryBinding(HERE, exists=True), lambda: agents_in())).propose("bp")
     application(applier=applier).apply("bp", True, "abc123")
     assert renderer.sources == [True] and applier.sources == [True]
+
+
+# ------------------------------------------------------------------------------------------------------------- propose_org(extend="current") and its apply (design 5, G1)
+
+EXTEND_STALE = (
+    "not applied: plan_id does not match this change against the organization as it is now (the blueprint, or something it names: an agent, a service, "
+    "a limit or a schedule, changed since propose_org), so this is not the plan the user approved. Call propose_org(blueprint, extend=\"current\") again, "
+    "show the new PLAN FOR YOU block, and apply only after their approval."
+)
+
+
+class HashPlanIdentity(PlanIdentity):
+    """The id of a blueprint as the real identity makes it, in the one property these tests need: any change of the text changes it."""
+
+    def plan_id(self, bp: Mapping[str, object]) -> str:
+        return hashlib.sha256(json.dumps(bp, sort_keys=True, default=str).encode()).hexdigest()[:12]
+
+
+EXTENSION = "reason: B1.1\nextend:\n  limits:\n    - {agent: lead, max_children: 3}\n"
+FULL = "mission: m\nagents: []\n"
+
+
+class ExtensionRenderer(Renderer):
+    def propose_text(
+        self, bp: Mapping[str, object], *, target: str = "", allowed_roots: Sequence[str | Path] | None = None, require_sources: bool = False,
+    ) -> str:
+        self.asked.append((bp, target))
+        self.sources.append(require_sources)
+        return f"EXTENSION PROPOSAL\n{target}\nplan_id: {HashPlanIdentity().plan_id(bp)}"
+
+
+class ExtensionApplier(ExtensionApplying):
+    """Applies an extension whose plan id is the hash of the blueprint, as the real applier does (it compares against the organization as it is now)."""
+
+    def __init__(self) -> None:
+        self.asked: list[tuple[Mapping[str, object], str | None, bool]] = []
+
+    def apply(
+        self, bp: Mapping[str, object], *, plan_id: str | None, require_sources: bool = False, allowed_roots: Sequence[str | Path] | None = None,
+    ) -> str:
+        self.asked.append((bp, plan_id, require_sources))
+        if plan_id is not None and plan_id != HashPlanIdentity().plan_id(bp):
+            raise BlueprintError(EXTEND_STALE)
+        return f"applied the change {plan_id} to /memory/org\nNothing runs because of it."
+
+
+def extension_proposal(exists: bool = True, renderer: Renderer | None = None) -> RenderedPlanProposal:
+    return RenderedPlanProposal(lambda: loader_over_memory(HERE).loader, lambda: renderer or ExtensionRenderer(),
+                                BindingPlanTarget(MemoryBinding(HERE, exists=exists), lambda: agents_in("lead", "lead/writer")))
+
+
+def extension_application(exists: bool = True, applier: ExtensionApplier | None = None) -> ApprovedPlanApplication:
+    applier = applier or ExtensionApplier()
+    return ApprovedPlanApplication(
+        InstructionText(MemoryBinding(HERE, exists=exists)), lambda: loader_over_memory(HERE).loader, lambda: HashPlanIdentity(), lambda: Applier(),
+        lambda: FakeSchedulerStatus(SchedulerState("stopped")), lambda: OrgPaths(HERE), lambda: applier,
+    )
+
+
+def test_extend_current_proposes_the_change_plan_with_its_plan_id() -> None:
+    renderer = ExtensionRenderer()
+    out = extension_proposal(renderer=renderer).propose(EXTENSION, "current")
+    assert out == f"EXTENSION PROPOSAL\nTarget organization: /memory/org (exists, 2 agent(s) besides root; this plan changes it)\nplan_id: {HashPlanIdentity().plan_id(renderer.asked[0][0])}"
+    assert renderer.sources == [True]  # over MCP the criteria must declare their sources
+    assert extension_proposal().propose(EXTENSION, str(HERE)).startswith("EXTENSION PROPOSAL")  # the bound path is the same as "current"
+
+
+def test_an_extension_without_extend_is_extend_mode() -> None:
+    with pytest.raises(OrgError) as info:
+        extension_proposal().propose(EXTENSION)
+    assert str(info.value) == 'refused: this blueprint changes an existing organization (it has extend:), so call propose_org(blueprint, extend="current").'
+
+
+def test_extend_with_a_full_blueprint_is_extend_full() -> None:
+    with pytest.raises(OrgError) as info:
+        extension_proposal().propose(FULL, "current")
+    assert str(info.value) == (
+        'refused: extend="current" takes an extension blueprint (a top-level extend: with add_agents, add_services, add_charter_lines, remove_charter_lines, '
+        "limits, budgets, schedules, retire_services or retire); a full blueprint builds a new team: call propose_org(blueprint) without extend."
+    )
+
+
+@pytest.mark.parametrize("target", ["somewhere", "/other/org", "", "Current"])
+def test_extend_naming_another_path_is_extend_target(target: str) -> None:
+    with pytest.raises(OrgError) as info:
+        extension_proposal().propose("not even read: [", target)  # (the target is judged before the text is read)
+    assert str(info.value) == 'refused: extend names the organization this server is bound to: "current" or /memory/org. Nothing was read.'
+
+
+def test_extend_without_an_organization_is_extend_none() -> None:
+    with pytest.raises(OrgError) as info:
+        extension_proposal(exists=False).propose(EXTENSION, "current")
+    assert str(info.value) == "refused: there is no organization yet, so there is nothing to extend: create_org(mission=...) and a full blueprint come first."
+
+
+def test_an_extension_applies_only_with_approved_and_a_fresh_plan_id() -> None:
+    applier = ExtensionApplier()
+    bp = loader_over_memory(HERE).loader.load_text(EXTENSION)
+    fresh = HashPlanIdentity().plan_id(bp)
+    with pytest.raises(OrgError, match="^not applied: the user must approve the plan first"):
+        extension_application(applier=applier).apply(EXTENSION, False, fresh)
+    for missing in (None, ""):
+        with pytest.raises(OrgError, match="^not applied: plan_id is missing, so this is not the plan the user approved"):
+            extension_application(applier=applier).apply(EXTENSION, True, missing)
+    with pytest.raises(OrgError, match="^not applied: there is no organization yet"):
+        extension_application(exists=False, applier=applier).apply(EXTENSION, True, fresh)
+    assert applier.asked == []  # none of the three got as far as the applier
+    assert extension_application(applier=applier).apply(EXTENSION, True, f" {fresh} ") == f"applied the change {fresh} to /memory/org\nNothing runs because of it."
+    assert [(plan_id, sources) for _, plan_id, sources in applier.asked] == [(fresh, True)]
+
+
+def test_a_stale_extension_is_refused_with_extend_stale_not_todays_text() -> None:
+    with pytest.raises(OrgError) as info:
+        extension_application().apply(EXTENSION, True, "000000000000")
+    assert str(info.value) == EXTEND_STALE and "plan_id does not match this blueprint" not in str(info.value)
+    assert "before/now" not in str(info.value) and "->" not in str(info.value)  # the id is a hash: it cannot say what changed
+
+
+def test_an_edited_extension_blueprint_is_extend_stale_too() -> None:
+    bp = loader_over_memory(HERE).loader.load_text(EXTENSION)
+    fresh = HashPlanIdentity().plan_id(bp)
+    with pytest.raises(OrgError) as info:
+        extension_application().apply(EXTENSION.replace("max_children: 3", "max_children: 4"), True, fresh)
+    assert str(info.value) == EXTEND_STALE
+
+
+def test_the_target_line_of_an_extension_says_this_plan_changes_it() -> None:
+    target = BindingPlanTarget(MemoryBinding(HERE, exists=True), lambda: agents_in("lead"))
+    assert target.line(extending=True) == "Target organization: /memory/org (exists, 1 agent(s) besides root; this plan changes it)"
+    assert target.line() == "Target organization: /memory/org (exists, 1 agent(s) besides root; apply_org adds to it)"
+    assert target.bound() == HERE and BindingPlanTarget(MemoryBinding(HERE), lambda: agents_in()).bound() is None
+
+
+def test_the_docstrings_name_extend_and_the_stale_rule() -> None:
+    group = BlueprintTools(TemplateExampleText(lambda: Examples(), EnvironmentExampleLocation(DictEnvironment(cwd=Path("/w")), MemoryBinding(HERE))),
+                           extension_proposal(), extension_application())
+    docs = described(serve(group, ROOT))
+    assert 'extend: "current" to change the organization this server is bound to: blueprint is then an extension' in docs["propose_org"]
+    assert "its plan_id holds only while nothing it touches changes" in " ".join(docs["propose_org"].split())
+    assert "An extension (extend:) changes the existing organization: refused when anything it touches changed since propose_org." in " ".join(docs["apply_org"].split())
+
+
+def test_the_tools_pass_extend_and_the_plan_id_through() -> None:
+    applier = ExtensionApplier()
+    group = BlueprintTools(TemplateExampleText(lambda: Examples(), EnvironmentExampleLocation(DictEnvironment(cwd=Path("/w")), MemoryBinding(HERE))),
+                           extension_proposal(), extension_application(applier=applier))
+    server = serve(group, ROOT)
+    assert call(server, "propose_org", blueprint=EXTENSION, extend="current").startswith("EXTENSION PROPOSAL")
+    assert "this blueprint changes an existing organization" in fails(server, "propose_org", blueprint=EXTENSION)
+    fresh = HashPlanIdentity().plan_id(loader_over_memory(HERE).loader.load_text(EXTENSION))
+    assert call(server, "apply_org", blueprint=EXTENSION, approved=True, plan_id=fresh).startswith(f"applied the change {fresh}")
+
+
+def test_a_full_blueprint_keeps_todays_plan_id_refusal() -> None:
+    with pytest.raises(OrgError) as info:
+        extension_application().apply(FULL, True, "zzz")
+    assert str(info.value) == ("not applied: plan_id does not match this blueprint, so this is not the plan the user approved. Call propose_org(blueprint), "
+                               "show the PLAN FOR YOU block to the user, get their explicit approval, then call apply_org(blueprint, approved=True, "
+                               "plan_id=<the plan_id from that propose_org>) with the same blueprint")

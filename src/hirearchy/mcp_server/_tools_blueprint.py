@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 from ..agents import AgentDirectory
-from ..blueprint import BlueprintApplier, BlueprintExamples, BlueprintLoader, PlanIdentity, PlanRenderer
+from ..blueprint import BlueprintApplier, BlueprintExamples, BlueprintLoader, ExtensionApplying, PlanIdentity, PlanRenderer, is_extension
 from ..daemon import SchedulerStatus
 from ..kernel import Environment, OrgError, OrgLayout, Provider
 from ._ports import ExampleLocation, ExampleText, PlanApplication, PlanProposal, PlanTarget, SetupMode, ToolGroup
@@ -16,6 +16,21 @@ from .api import OrgBindingPort
 
 if TYPE_CHECKING:
     from mcp.server.fastmcp import FastMCP
+
+
+EXTEND_CURRENT = "current"
+EXTEND_MODE = 'refused: this blueprint changes an existing organization (it has extend:), so call propose_org(blueprint, extend="current").'
+EXTEND_FULL = (
+    'refused: extend="current" takes an extension blueprint (a top-level extend: with add_agents, add_services, add_charter_lines, remove_charter_lines, '
+    "limits, budgets, schedules, retire_services or retire); a full blueprint builds a new team: call propose_org(blueprint) without extend."
+)
+EXTEND_TARGET = 'refused: extend names the organization this server is bound to: "current" or {path}. Nothing was read.'
+EXTEND_NONE = "refused: there is no organization yet, so there is nothing to extend: create_org(mission=...) and a full blueprint come first."
+MISSING_PLAN_ID = (
+    "not applied: plan_id is missing, so this is not the plan the user approved. Call propose_org(blueprint, extend=\"current\"), show the PLAN FOR YOU "
+    "block to the user, get their explicit approval, then call apply_org(blueprint, approved=True, plan_id=<the plan_id from that propose_org>) with the "
+    "same blueprint"
+)
 
 
 class EnvironmentExampleLocation(ExampleLocation):
@@ -45,11 +60,14 @@ class BindingPlanTarget(PlanTarget):
         self._binding = binding
         self._directory = directory
 
-    def line(self) -> str:
+    def bound(self) -> Path | None:
+        return self._binding.location()
+
+    def line(self, extending: bool = False) -> str:
         located = self._binding.location()
         if located is not None:
             agents = len(self._directory().agents())
-            return f"Target organization: {located} (exists, {agents} agent(s) besides root; apply_org adds to it)"
+            return f"Target organization: {located} (exists, {agents} agent(s) besides root; " + ("this plan changes it)" if extending else "apply_org adds to it)")
         root = self._binding.root
         where = root if root is not None else "(path given to create_org)"
         return f"Target organization: {where} (none yet: create_org(mission=...) comes first, then apply_org)"
@@ -61,15 +79,27 @@ class RenderedPlanProposal(PlanProposal):
         self._renderer = renderer
         self._target = target
 
-    def propose(self, blueprint: str) -> str:
+    def propose(self, blueprint: str, extend: str | None = None) -> str:
+        if extend is not None:
+            bound = self._target.bound()
+            if extend.strip() != EXTEND_CURRENT and (bound is None or extend.strip() != str(bound)):
+                raise OrgError(EXTEND_TARGET.format(path=bound if bound is not None else "(none yet)"))
         bp = self._loader().load_text(blueprint)
-        return self._renderer().propose_text(bp, target=self._target.line(), require_sources=True)
+        if extend is None:
+            if is_extension(bp):
+                raise OrgError(EXTEND_MODE)
+            return self._renderer().propose_text(bp, target=self._target.line(), require_sources=True)
+        if not is_extension(bp):
+            raise OrgError(EXTEND_FULL)
+        if self._target.bound() is None:
+            raise OrgError(EXTEND_NONE)
+        return self._renderer().propose_text(bp, target=self._target.line(extending=True), require_sources=True)
 
 
 class ApprovedPlanApplication(PlanApplication):
     def __init__(
         self, setup: SetupMode, loader: Provider[BlueprintLoader], identity: Provider[PlanIdentity], applier: Provider[BlueprintApplier],
-        scheduler: Provider[SchedulerStatus], layout: Provider[OrgLayout],
+        scheduler: Provider[SchedulerStatus], layout: Provider[OrgLayout], extensions: Provider[ExtensionApplying] | None = None,
     ) -> None:
         self._setup = setup
         self._loader = loader
@@ -77,6 +107,7 @@ class ApprovedPlanApplication(PlanApplication):
         self._applier = applier
         self._scheduler = scheduler
         self._layout = layout
+        self._extensions = extensions
 
     def apply(self, blueprint: str, approved: bool, plan_id: str | None) -> str:
         if not approved:
@@ -84,6 +115,13 @@ class ApprovedPlanApplication(PlanApplication):
                            "PLAN FOR YOU block to the user, and only after their explicit approval call "
                            "apply_org(blueprint, approved=True, plan_id=<the plan_id propose_org returned>)")
         bp = self._loader().load_text(blueprint)
+        if is_extension(bp) and self._extensions is not None:  # the extension applier makes the plan_id comparison against the organization as it is now
+            if not plan_id:
+                raise OrgError(MISSING_PLAN_ID)
+            if self._setup.active():
+                raise OrgError("not applied: there is no organization yet, so call create_org(mission=...) first, then "
+                               "apply_org again with the same blueprint and plan_id")
+            return self._extensions().apply(bp, plan_id=plan_id.strip(), require_sources=True)
         if not plan_id or plan_id.strip() != self._identity().plan_id(bp):
             raise OrgError(("not applied: plan_id is missing" if not plan_id else "not applied: plan_id does not match this blueprint")
                            + ", so this is not the plan the user approved. Call propose_org(blueprint), show the PLAN FOR YOU "
@@ -126,7 +164,7 @@ class BlueprintTools(ToolGroup):
             return self._examples.example(kind, service)
 
         @mcp.tool()
-        def propose_org(blueprint: str) -> str:
+        def propose_org(blueprint: str, extend: str | None = None) -> str:
             """Validate a blueprint and return the plan the user must approve. Writes nothing; safe to call repeatedly.
 
         blueprint: YAML or JSON text (never a file path). Start from blueprint_example(kind) for a template with every
@@ -142,12 +180,15 @@ class BlueprintTools(ToolGroup):
         locked}], in which case `task` may be omitted or be a first request {service, inputs: {name: value}, title}.
         Criteria (the acceptance items of `task` and of each service): acceptance items: {text, from: <the user's exact words in
         needs.elicitation>, asked} or {text, default: true}; needs.elicitation: the user's answers, verbatim (required with criteria).
+        extend: "current" to change the organization this server is bound to: blueprint is then an extension (extend: with add_agents,
+        add_services, add_charter_lines, remove_charter_lines, limits, budgets, schedules, retire_services, retire; see
+        blueprint_example("extension")). The plan shows what it adds, changes and removes; its plan_id holds only while nothing it touches changes.
         Works before the organization exists. Returns (1) a block headed "PLAN FOR YOU": show it to the user exactly
         as written and wait for their explicit approval; (2) Details, the full plan for you; (3) a plan_id that
         apply_org requires. If the plan has errors, fix the blueprint and propose again; never ask the user to approve
         a plan with errors.
         """
-            return self._proposal.propose(blueprint)
+            return self._proposal.propose(blueprint, extend)
 
         @mcp.tool()
         def apply_org(blueprint: str, approved: bool = False, plan_id: str | None = None) -> str:
@@ -157,6 +198,7 @@ class BlueprintTools(ToolGroup):
         the user explicitly approved that plan in this conversation; otherwise nothing happens. plan_id: the id that
         propose_org returned for exactly this blueprint; a missing or different id is refused (propose again, show the
         PLAN FOR YOU block, get approval). Needs an existing organization (create_org first if there is none).
+        An extension (extend:) changes the existing organization: refused when anything it touches changed since propose_org.
         Refuses with the issues if the blueprint has errors or a name is taken, and undoes everything if it fails
         midway. Returns what was created (agents, services, the first task or request); then call start() (not when
         the blueprint gave no first task: the services wait for request(service, inputs)).

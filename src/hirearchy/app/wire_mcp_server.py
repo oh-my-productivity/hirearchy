@@ -116,7 +116,7 @@ def server_factory(binding: OrgBindingPort, scheduler_control: Callable[[Schedul
     from ..access import ModelFloorAudit, ToolNaming
     from ..agents import AgentDirectory, CharterReader
     from ..attention import OpenWork, WaitingOnUser
-    from ..blueprint import BlueprintApplier, BlueprintExamples, BlueprintLoader, PlanIdentity, PlanRenderer
+    from ..blueprint import BlueprintApplier, BlueprintExamples, BlueprintLoader, ExtensionApplying, PlanIdentity, PlanRenderer
     from ..blueprint._examples import TemplateBlueprintExamples
     from ..blueprint._files import FsTextFiles
     from ..blueprint._identity import HashPlanIdentity
@@ -205,7 +205,7 @@ def server_factory(binding: OrgBindingPort, scheduler_control: Callable[[Schedul
         BlueprintTools(
             TemplateExampleText(examples, EnvironmentExampleLocation(environment, binding)),
             RenderedPlanProposal(loader, renderer, BindingPlanTarget(binding, directory)),
-            ApprovedPlanApplication(text, loader, identity, of(BlueprintApplier), of(SchedulerStatus), of(OrgLayout)),
+            ApprovedPlanApplication(text, loader, identity, of(BlueprintApplier), of(SchedulerStatus), of(OrgLayout), of(ExtensionApplying)),
         ),
         ProgressTools(text, of(ProgressReporter)),
         QualityTools(text, of(QualityReport)),
