@@ -116,7 +116,7 @@ class MemoryAgents(TreeDirectory, CharterReader, AgentRegistry, RetiredArchive):
     def rewrite_charter(self, addr: str, text: str) -> None:
         self.put(self._at(addr, "AGENT.md"), text)
 
-    def archive(self, addr: str, stamp: str) -> str:
+    def archive(self, addr: str, stamp: str, record: Mapping[str, str] | None = None) -> str:
         a = norm(addr)
         if a not in self.dirs:
             raise FileNotFoundError(2, "No such file or directory", a)
@@ -131,6 +131,8 @@ class MemoryAgents(TreeDirectory, CharterReader, AgentRegistry, RetiredArchive):
 
         self.files = {moved(p): text for p, text in self.files.items()}
         self.dirs = {moved(p) for p in self.dirs}
+        if record is not None:
+            self.put(f"{dest}/RETIRED.md", join_frontmatter(dict(record), ""))
         return name
 
     # ------------------------------------------------------------------ RetiredArchive

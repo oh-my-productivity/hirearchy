@@ -134,6 +134,19 @@ def test_archive_moves_the_whole_directory_below_retired(h: AgentsHarness) -> No
     assert h.read(".retired/ceo-20261018T101500/AGENT.md") == join_frontmatter(dict(META), "x")
 
 
+def test_archive_writes_the_record_as_retired_md(h: AgentsHarness) -> None:
+    h.registry.create("ceo", {"role": "Boss"}, "x")
+    h.registry.create("ceo/eng", {"role": "Eng"}, "y")
+    record: dict[str, str] = {"retired": "2026-10-18T10:15:00+00:00", "by": "root", "reason": "restructuring", "approved_in": "change 0123456789ab"}
+    assert h.registry.archive("ceo", "S1", record) == "ceo-S1"
+    assert h.read(".retired/ceo-S1/RETIRED.md") == join_frontmatter(dict[str, object](record), "")
+    assert h.listing(".retired/ceo-S1") == sorted([*SKELETON, "RETIRED.md", "eng"])
+    assert h.read(".retired/ceo-S1/eng/RETIRED.md") is None  # one record for the tree, at its top agent
+    h.registry.create("ceo", {"role": "Boss"}, "x")
+    h.registry.archive("ceo", "S2")  # without a record none is written
+    assert h.read(".retired/ceo-S2/RETIRED.md") is None
+
+
 def test_archive_takes_the_agents_below_along(h: AgentsHarness) -> None:
     h.registry.create("ceo", {"role": "Boss"}, "x")
     h.registry.create("ceo/eng", {"role": "Eng"}, "y")

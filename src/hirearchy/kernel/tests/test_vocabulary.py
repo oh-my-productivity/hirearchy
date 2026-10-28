@@ -29,8 +29,8 @@ def test_the_vocabulary() -> None:
     assert (ROOT, RUNTIME) == ("root", "runtime")
     assert BOXES == ("inbox", "inflight", "read", "sent")
     assert RUNTIME_NAMES == {
-        "inbox", "inflight", "read", "sent", "runs", "services", ".paused", ".kiro", ".runtime", ".retired", ".git", ".gitignore",
-    }
+        "inbox", "inflight", "read", "sent", "runs", "services", ".paused", ".kiro", ".runtime", ".retired", ".git", ".gitignore", "RETIRED.md",
+    }  # RETIRED.md: the record a retire writes into a retired tree (design 4.5); no agent may plant one
     assert RESERVED == RUNTIME_NAMES | {"work", "root", "runtime", "agent", "memory", "org"}
 
 

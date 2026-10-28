@@ -35,9 +35,9 @@ class SpyFiles(MemoryAgents):
         super().__init__()
         self.log = log
 
-    def archive(self, addr: str, stamp: str) -> str:
+    def archive(self, addr: str, stamp: str, record: Mapping[str, str] | None = None) -> str:
         self.log.entries.append(f"archive {addr} {stamp}")
-        return super().archive(addr, stamp)
+        return super().archive(addr, stamp, record)
 
 
 class SpyDelivery(MessageDelivery):

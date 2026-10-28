@@ -74,7 +74,7 @@ def test_a_retired_team_moves_to_a_stamped_name_below_retired(org: Org) -> None:
     org.runtime = wiring.open_runtime(org.root, {Clock: ClockReading(lambda: datetime(2026, 10, 18, 10, 15, 0, tzinfo=timezone.utc))})
     assert org.retire("ceo", "eng", "done") == "ceo/eng"
     retired = org.root / ".retired" / "ceo.eng-20261018T101500"
-    assert sorted(p.name for p in retired.iterdir()) == sorted([*SKELETON, "qa"])
+    assert sorted(p.name for p in retired.iterdir()) == sorted([*SKELETON, "RETIRED.md", "qa"])  # commit 14: a retire writes its record
     assert not org.dir("ceo/eng").exists() and org.agents() == ["ceo", "ceo/ops", "cto"]
     assert org.retire("root", "cto", "closed") == "cto"
     assert (org.root / ".retired" / "cto-20261018T101500" / "AGENT.md").is_file()

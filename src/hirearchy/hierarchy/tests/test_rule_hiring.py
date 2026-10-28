@@ -46,7 +46,7 @@ class SpyRegistry(AgentRegistry):
     def rewrite_charter(self, addr: str, text: str) -> None:
         raise AssertionError("hiring never rewrites a charter")
 
-    def archive(self, addr: str, stamp: str) -> str:
+    def archive(self, addr: str, stamp: str, record: Mapping[str, str] | None = None) -> str:
         raise AssertionError("hiring never archives")
 
 

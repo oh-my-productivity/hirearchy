@@ -69,8 +69,10 @@ class AgentRegistry(Protocol):
         """Replace ``AGENT.md`` by ``text`` as it is (the callers did all the authority checks)."""
         ...
 
-    def archive(self, addr: str, stamp: str) -> str:
-        """Move the agent's directory, with everything below it, to ``.retired/<addr with . for />-<stamp>``; returns that name."""
+    def archive(self, addr: str, stamp: str, record: Mapping[str, str] | None = None) -> str:
+        """Move the agent's directory, with everything below it, to ``.retired/<addr with . for />-<stamp>``; returns that name. With ``record``
+        (``retired``, ``by``, ``reason`` and, when the approval is known, ``approved_in``) the moved tree's top directory then gets a ``RETIRED.md``
+        with it as its frontmatter. The record is written after the move: an ``OSError`` from that write leaves the tree retired."""
         ...
 
 

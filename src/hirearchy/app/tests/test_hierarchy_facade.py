@@ -76,7 +76,7 @@ class Retirer(Retirement):
         self.calls.append(("retire", actor, name, reason))
         return "retire-from-the-port"
 
-    def retire_team(self, actor: str, name: str, reason: str) -> Retired:
+    def retire_team(self, actor: str, name: str, reason: str, approved_in: str = "") -> Retired:
         self.calls.append(("retire_team", actor, name, reason))
         return Retired("team-from-the-port", 1, None)
 

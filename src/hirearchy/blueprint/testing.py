@@ -217,7 +217,7 @@ class RecordingRetirement(Retirement):
     def retire(self, actor: str, name: str, reason: str) -> str:
         return self.retire_team(actor, name, reason).addr
 
-    def retire_team(self, actor: str, name: str, reason: str) -> Retired:
+    def retire_team(self, actor: str, name: str, reason: str, approved_in: str = "") -> Retired:
         self._log.add("retire", actor, name, reason)
         if not self._agents.exists(name):
             raise OrgError(f"no such agent: {name}")

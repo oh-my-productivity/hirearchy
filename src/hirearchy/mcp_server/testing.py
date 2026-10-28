@@ -359,7 +359,7 @@ class ScriptedRetirement(Retirement):
     def retire(self, actor: str, name: str, reason: str) -> str:
         return self.retire_team(actor, name, reason).addr
 
-    def retire_team(self, actor: str, name: str, reason: str) -> Retired:
+    def retire_team(self, actor: str, name: str, reason: str, approved_in: str = "") -> Retired:
         self.log.add("retire_team", actor, name, reason)
         return Retired(name if "/" in name else f"{actor}/{name}", self.refunded, self.to)
 

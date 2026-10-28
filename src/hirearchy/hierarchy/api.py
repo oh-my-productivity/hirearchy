@@ -63,11 +63,15 @@ class Retirement(Protocol):
         """``retire_team(actor, name, reason).addr``."""
         ...
 
-    def retire_team(self, actor: str, name: str, reason: str) -> Retired:
+    def retire_team(self, actor: str, name: str, reason: str, approved_in: str = "") -> Retired:
         """Retire the direct report ``name`` (short name or full address; root may retire any agent by full address) and its team.
 
         Every task the team owes to somebody outside it is answered with a ``failed`` result, the directory is archived, the team's unspent runs
         (``max(0, sum of the budgets of its agents)``; nothing when the parent is root, who has no limit) go to the parent as a runtime note that
         carries them and wakes nobody, and ``agent.retire`` is emitted. The archive comes before the refund: a crash in between loses the refund
-        rather than counting it twice. ``OrgError`` for root, an agent that does not exist and an agent that is not a direct report."""
+        rather than counting it twice. ``OrgError`` for root, an agent that does not exist and an agent that is not a direct report.
+
+        The retired tree gets a ``RETIRED.md`` (``retired``, ``by``, ``reason`` and, when given, ``approved_in``: ``change {plan_id}``, passed only
+        by the extension applier). A record that cannot be written after the move leaves the tree retired; ``agent.retire`` then carries
+        ``record="failed"``."""
         ...

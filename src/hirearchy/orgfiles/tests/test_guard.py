@@ -68,6 +68,12 @@ def test_runtime_names_and_dot_names_are_refused_in_any_case(h: OrgFilesHarness,
     assert refused(h, "ceo", f"ceo/{name}") == runtime(name)
 
 
+@pytest.mark.parametrize("name", ["RETIRED.md", "retired.md", "Retired.MD", "RETIRED.md.", "RETIRED.md "])
+def test_an_agent_cannot_write_retired_md_in_its_own_directory(h: OrgFilesHarness, name: str) -> None:
+    assert refused(h, "ceo", f"ceo/{name}") == runtime(name)
+    assert refused(h, "ceo", f"ceo/{name}/x.md") == runtime(name)
+
+
 @pytest.mark.parametrize("spelling", ["inbox.", "inbox ", "inbox. .", "INBOX..", ".paused.", "Runs ", "ｉｎｂｏｘ", "ＩＮＢＯＸ", "ｓｅｎｔ", "read."])
 def test_the_name_is_compared_the_way_windows_and_unicode_would(h: OrgFilesHarness, spelling: str) -> None:
     assert refused(h, "ceo", f"ceo/{spelling}/x.md") == runtime(spelling)

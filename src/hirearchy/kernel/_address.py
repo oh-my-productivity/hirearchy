@@ -7,7 +7,7 @@ import re
 ROOT = "root"
 RUNTIME = "runtime"
 BOXES = ("inbox", "inflight", "read", "sent")
-RUNTIME_NAMES = {*BOXES, "runs", "services", ".paused", ".kiro", ".runtime", ".retired", ".git", ".gitignore"}
+RUNTIME_NAMES = {*BOXES, "runs", "services", ".paused", ".kiro", ".runtime", ".retired", ".git", ".gitignore", "RETIRED.md"}
 RESERVED = RUNTIME_NAMES | {"work", "root", "runtime", "agent", "memory", "org"}
 # Always use NAME_RE.fullmatch: a "$" anchor would accept a trailing newline ("ops\n"), so \Z is used as well.
 NAME_RE = re.compile(r"[a-z][a-z0-9-]{0,31}\Z")

@@ -40,7 +40,7 @@ class RuleRetirement(Retirement):
         """Remove a direct report and its team; returns the retired address. See :meth:`retire_team`."""
         return self.retire_team(actor, name, reason).addr
 
-    def retire_team(self, actor: str, name: str, reason: str) -> Retired:
+    def retire_team(self, actor: str, name: str, reason: str, approved_in: str = "") -> Retired:
         """Retire a direct report (short name or full address; root: any agent by full address) and its team.
 
         Open tasks the team owes the outside are closed as failed, and the team's unspent budget is returned to the
@@ -66,7 +66,15 @@ class RuleRetirement(Retirement):
         owner = parent(addr)
         # Grants inside the team cancel out, so this is what the parent handed down minus what the team ran.
         refund = max(0, sum(self._budget.budget(a) or 0 for a in team)) if owner != ROOT else 0
-        self._registry.archive(addr, f"{self._clock.now():%Y%m%dT%H%M%S}")
+        now = self._clock.now()
+        record = {"retired": now.isoformat(timespec="seconds"), "by": actor, "reason": reason.strip(), **({"approved_in": approved_in} if approved_in else {})}
+        extra: dict[str, str] = {}
+        try:
+            self._registry.archive(addr, f"{now:%Y%m%dT%H%M%S}", record)
+        except OSError:
+            if self._agents.exists(addr):  # the move failed: nothing was retired
+                raise
+            extra["record"] = "failed"  # the tree is retired; only its RETIRED.md is missing
         if refund:  # after the move: a crash in between loses the refund rather than counting it twice
             assert owner is not None  # a refund is only due to a parent that is not root
             self._delivery.deliver(Message(
@@ -74,5 +82,5 @@ class RuleRetirement(Retirement):
                 body=self._notices.budget_returned(addr, refund, actor, reason),
             ))
         self._events.emit("agent.retire", actor=actor, agent=addr, by=actor, reason=clip(reason, ERROR_MAX),
-                          returned_budget=refund, team=sorted(team))
+                          returned_budget=refund, team=sorted(team), **extra)
         return Retired(addr, refund, owner if refund else None)

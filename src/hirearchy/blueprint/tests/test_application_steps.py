@@ -226,7 +226,7 @@ def test_a_refused_retirement_is_not_an_error_and_the_others_go_on(tmp_path: Pat
     agents.create("a", {"role": "r"}, "c")
 
     class Refusing(RecordingRetirement):
-        def retire_team(self, actor: str, name: str, reason: str):  # type: ignore[no-untyped-def]
+        def retire_team(self, actor: str, name: str, reason: str, approved_in: str = ""):  # type: ignore[no-untyped-def]
             if name == "a":
                 raise OrgError("no way")
             return super().retire_team(actor, name, reason)
