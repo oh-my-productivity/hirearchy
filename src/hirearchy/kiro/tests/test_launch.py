@@ -713,3 +713,93 @@ def test_the_kiro_api_exports_the_effort_names() -> None:
     assert kiro.EffortStop is _launch.EffortStop
     assert kiro.effort_stop is _launch.effort_stop
     assert kiro.effort_warning is _launch.effort_warning
+
+
+# --------------------------------------------- kiro's stderr reaches the run log in full and in order (batch 1.1, condition 2)
+
+
+def say(line: str) -> str:
+    """A line of the fake kiro that prints ``line`` (no single quote in it) to stdout, as ``hello`` does."""
+    return "printf '%s\\n' '" + line + "'\n"
+
+
+def to_stderr(text: str) -> str:
+    """A line of the fake kiro that writes ``text`` (no double quote, ``$`` or backquote) to its stderr."""
+    return 'printf \'%s\\n\' "' + text + '" >&2\n'
+
+
+def err_lines(first: int, count: int) -> tuple[str, list[str]]:
+    """A shell loop of the fake kiro that writes ``count`` numbered 80-byte lines to its stderr, and the lines it writes."""
+    script = f"i={first}\nwhile [ $i -lt {first + count} ]; do printf 'err-%05d-%069d\\n' $i 0 >&2; i=$((i+1)); done\n"
+    return script, [f"err-{i:05d}-{0:069d}" for i in range(first, first + count)]
+
+
+def launch_logged(tmp_path: Path, body: str, timeout: float = 30) -> tuple[int, list[str]]:
+    """(exit code, the run log's lines): the launcher as the scheduler starts it, leader of its group, with fd 1 and fd 2 on one log file."""
+    log = tmp_path / "run.log"
+    argv = [sys.executable, "-I", "-S", str(LAUNCHER), "--start-deadline", "30", "--", str(fake(tmp_path, body))]
+    with log.open("wb") as handle:
+        proc = subprocess.Popen(argv, stdin=subprocess.DEVNULL, stdout=handle, stderr=subprocess.STDOUT, start_new_session=True)
+        try:
+            code = proc.wait(timeout=timeout)
+        except subprocess.TimeoutExpired:
+            os.killpg(proc.pid, signal.SIGKILL)
+            proc.wait()
+            raise
+    return code, log.read_text(encoding="utf-8").splitlines()
+
+
+def only_err(lines: list[str]) -> list[str]:
+    return [line for line in lines if line.startswith("err-")]
+
+
+def test_more_than_a_pipe_buffer_of_stderr_is_drained_and_logged_in_order(tmp_path: Path) -> None:
+    first, written_first = err_lines(1, 2000)
+    second, written_second = err_lines(2001, 2000)
+    code, log = launch_logged(tmp_path, first + START + second + FINISHED)
+    assert code == 0
+    assert only_err(log) == written_first + written_second
+    assert "# kiro: run started (engine v3)" in log and "[run finished] success (end_turn)" in log
+
+
+def test_stderr_written_after_kiro_closed_its_stdout_is_logged_and_the_run_completes(tmp_path: Path) -> None:
+    first, written_first = err_lines(1, 2000)
+    second, written_second = err_lines(2001, 2000)
+    third, written_third = err_lines(4001, 2000)
+    code, log = launch_logged(tmp_path, first + START + second + FINISHED + "exec 1>&-\n" + third)
+    assert code == 0
+    assert only_err(log) == written_first + written_second + written_third
+    assert "[run finished] success (end_turn)" in log
+
+
+def test_kiros_stderr_reaches_the_launchers_stderr_byte_for_byte(tmp_path: Path) -> None:
+    first, written_first = err_lines(1, 2000)
+    second, written_second = err_lines(2001, 2000)
+    last = "printf '%s' 'the last line, without a newline' >&2\n"
+    code, out, err = launch(tmp_path, first + START + second + FINISHED + last)
+    assert code == 0
+    assert err == "".join(line + "\n" for line in written_first + written_second) + "the last line, without a newline"
+    assert out == ["# kiro: run started (engine v3)", "[run finished] success (end_turn)"]
+
+
+def test_stderr_before_an_early_end_is_logged_in_full(tmp_path: Path) -> None:
+    script, written = err_lines(1, 2000)
+    code, log = launch_logged(tmp_path, "exec 1>&-\n" + script + "exit 4\n")
+    assert code == 4
+    assert only_err(log) == written
+    assert log[-1] == "# kiro: kiro-cli exited with code 4 before the run started"
+
+
+def test_a_background_child_holding_stderr_does_not_hold_the_run(tmp_path: Path) -> None:
+    body = START + "sleep 30 >/dev/null &\necho $! > pid\nexit 0\n"
+    started = time.monotonic()
+    try:
+        code, log = launch_logged(tmp_path, body, timeout=20)
+        assert code == 0 and log[0] == "# kiro: run started (engine v3)"
+        assert time.monotonic() - started < 5
+    finally:
+        if (tmp_path / "pid").exists() and (tmp_path / "pid").read_text(encoding="utf-8").strip():
+            try:
+                os.kill(int((tmp_path / "pid").read_text(encoding="utf-8")), signal.SIGKILL)
+            except ProcessLookupError:
+                pass
