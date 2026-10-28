@@ -1,7 +1,7 @@
 """The public surface of ``settings``: ORG.md, its settings block and its rules text.
 
-``OrgSettings`` reads the settings and the rules, ``OrgDocumentStore`` is the raw file (the only way to write it), and
-``EventSwitch`` answers whether the event log is on. The pure functions read one value out of a settings mapping; the ``*_floor_problem``
+``OrgSettings`` reads the settings and the rules, ``OrgDocumentStore`` is the raw file (the only way to write it), ``OrgLimits`` changes the
+organization's ``max_depth`` (and nothing else of the file), and ``EventSwitch`` answers whether the event log is on. The pure functions read one value out of a settings mapping; the ``*_floor_problem``
 ones are the org-agent floor (the allowed models and the effort levels, docs/design/org-agent-model-floor.md); ``readable_config`` reads the
 settings of a caller that must refuse in plain words when ORG.md cannot be parsed.
 """
@@ -39,6 +39,7 @@ __all__ = [
     "EFFORT_LEVELS",
     "EventSwitch",
     "OrgDocumentStore",
+    "OrgLimits",
     "OrgSettings",
     "config_allowed_models",
     "config_default_model",
@@ -88,6 +89,15 @@ class OrgDocumentStore(Protocol):
 
     def write_raw(self, text: str) -> None:
         """Atomically replace the file."""
+        ...
+
+
+@runtime_checkable
+class OrgLimits(Protocol):
+    def set_max_depth(self, value: int) -> int:
+        """Rewrite ``max_depth`` in ORG.md's settings block, keeping every other key and the body byte for byte; returns the old value (the
+        default when the key was missing). ``OrgError`` when ORG.md cannot be read or parsed, or ``value`` is not a whole number >= 1: nothing is
+        written then. The one way an extension of the organization changes its depth, so ``settings`` stays ORG.md's only writer."""
         ...
 
 

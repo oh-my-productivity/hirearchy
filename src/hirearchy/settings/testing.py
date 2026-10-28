@@ -11,17 +11,18 @@ from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 
-from ..kernel import JsonObject, OrgPaths
+from ..kernel import JsonObject, OrgError, OrgPaths
 from ..kernel.testing import fs_atomic_writer
 from ._caching import CachingOrgSettings
 from ._config import config_default_model, config_message_cap, config_number, parse_config, parse_rules
 from ._fs import FsOrgSettings
+from ._limits import with_max_depth
 from ._stamp import FsOrgDocumentStamp, OrgDocumentStamp
 from ._switch import StampedEventSwitch
-from .api import EventSwitch, OrgDocumentStore, OrgSettings
+from .api import EventSwitch, OrgDocumentStore, OrgLimits, OrgSettings
 
 
-class MemoryOrgSettings(OrgSettings, OrgDocumentStore, OrgDocumentStamp):
+class MemoryOrgSettings(OrgSettings, OrgDocumentStore, OrgDocumentStamp, OrgLimits):
     """ORG.md kept as text in memory. ``text`` is None while the file does not exist; every write is a change of the stamp."""
 
     def __init__(self, text: str | None = None) -> None:
@@ -65,6 +66,13 @@ class MemoryOrgSettings(OrgSettings, OrgDocumentStore, OrgDocumentStamp):
     def message_cap(self) -> int:
         return config_message_cap(self.config())
 
+    def set_max_depth(self, value: int) -> int:
+        if self.text is None:
+            raise OrgError("ORG.md does not exist, so max_depth was not changed. Nothing was written.")
+        new, old = with_max_depth(self.text, value)
+        self.set_text(new)
+        return old
+
 
 # ------------------------------------------------------------------------------ harnesses and the registry
 
@@ -82,6 +90,14 @@ class DocumentHarness:
     store: OrgDocumentStore
     stored: Callable[[], str | None]  # the text that is stored, None when there is no document
     put: Callable[[str], None]  # put a document there, behind the store's back
+
+
+@dataclass(frozen=True)
+class LimitsHarness:
+    limits: OrgLimits
+    put: Callable[[str], None]  # ORG.md becomes this text
+    stored: Callable[[], str | None]  # the text that is stored, None when there is no document
+    config: Callable[[], JsonObject]  # the settings the document reads as
 
 
 @dataclass(frozen=True)
@@ -148,6 +164,17 @@ def memory_org_document_store(tmp_path: Path) -> DocumentHarness:
     return DocumentHarness(fake, lambda: fake.text, fake.set_text)
 
 
+def fs_org_limits(tmp_path: Path) -> LimitsHarness:
+    disk = _disk(tmp_path)
+    settings = FsOrgSettings(OrgPaths(tmp_path), fs_atomic_writer(tmp_path).writer)
+    return LimitsHarness(settings, disk.put, disk.text, settings.config)
+
+
+def memory_org_limits(tmp_path: Path) -> LimitsHarness:
+    fake = MemoryOrgSettings()
+    return LimitsHarness(fake, fake.write_raw, lambda: fake.text, fake.config)
+
+
 def fs_event_switch(tmp_path: Path) -> SwitchHarness:
     disk, paths = _disk(tmp_path), OrgPaths(tmp_path)
     documents = FsOrgSettings(paths, fs_atomic_writer(tmp_path).writer)
@@ -164,5 +191,6 @@ def memory_event_switch(tmp_path: Path) -> SwitchHarness:
 IMPLEMENTATIONS: Mapping[type, Sequence[Callable[[Path], object]]] = {
     OrgSettings: [fs_org_settings, memory_org_settings, caching_org_settings],
     OrgDocumentStore: [fs_org_document_store, memory_org_document_store],
+    OrgLimits: [fs_org_limits, memory_org_limits],
     EventSwitch: [fs_event_switch, memory_event_switch],
 }

@@ -4,12 +4,13 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from ..kernel import AtomicWriter, JsonObject, OrgLayout
+from ..kernel import AtomicWriter, JsonObject, OrgError, OrgLayout
 from ._config import config_default_model, config_message_cap, config_number, parse_config, parse_rules
-from .api import OrgDocumentStore, OrgSettings
+from ._limits import with_max_depth
+from .api import OrgDocumentStore, OrgLimits, OrgSettings
 
 
-class FsOrgSettings(OrgSettings, OrgDocumentStore):
+class FsOrgSettings(OrgSettings, OrgDocumentStore, OrgLimits):
     def __init__(self, paths: OrgLayout, writer: AtomicWriter) -> None:
         self._paths = paths
         self._writer = writer
@@ -40,3 +41,12 @@ class FsOrgSettings(OrgSettings, OrgDocumentStore):
 
     def message_cap(self) -> int:
         return config_message_cap(self.config())
+
+    def set_max_depth(self, value: int) -> int:
+        try:
+            text = self.read_raw()
+        except OSError as exc:
+            raise OrgError(f"ORG.md cannot be read ({exc}), so max_depth was not changed. Nothing was written.") from exc
+        new, old = with_max_depth(text, value)
+        self.write_raw(new)
+        return old
