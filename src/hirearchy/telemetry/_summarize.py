@@ -11,7 +11,7 @@ from .api import ArgumentSummarizer
 _KEEP_STR = {
     "to": 200, "task_id": 200, "status": 40, "name": 80, "owner": 200, "service": 80, "verdict": 20, "report": 200,
     "agent": 200, "path": 300, "reply_to": 200, "revises": 200, "view": 40, "target": 200, "since": 80, "until": 80,
-    "by": 40, "model": 80, "workspace": 300, "kind": 40, "plan_id": 80, "role": 80, "title": TITLE_MAX,
+    "by": 40, "model": 80, "workspace": 300, "kind": 40, "plan_id": 80, "role": 80, "title": TITLE_MAX, "op": 20,
 }
 # Lists of short strings that are kept (paths, tool names).
 _KEEP_LIST = {"inputs", "artifacts", "tools"}

@@ -42,6 +42,7 @@ __all__ = [
     "DeliverableFinding",
     "Delivery",
     "FAILURE_CLASSES",
+    "GATE_REFUSALS",
     "ITEMS_SHOWN",
     "ITEM_CHARS",
     "ItemWatch",
@@ -73,6 +74,7 @@ __all__ = [
     "delivered_unrated",
     "deliverables_note",
     "failure_class",
+    "gate_refusal_kind",
     "items_listing",
     "judged_cases",
     "lessons_of",
@@ -1093,5 +1095,6 @@ from ._causes import attribution, cause_of, failure_class  # noqa: E402
 from ._quality_rules import (  # noqa: E402
     cost_alarm, deliveries_of, judged_cases, not_on_a_delivery, over_cost, quality_thresholds, repeat_alarm, signer_of, unjudged_cases,
 )
+from ._evidence import GATE_REFUSALS, gate_refusal_kind  # noqa: E402
 from ._watch import lineage_class  # noqa: E402
 from ._watch_text import watch_entry  # noqa: E402

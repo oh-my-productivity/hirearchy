@@ -28,8 +28,13 @@ REASON_CLIP = 200  # characters of the reason in the question of a refusal
 WORDS_CLIP = 300  # characters of the client's words in the question of a refusal
 RULE_TEXT_CLIP = 300  # characters of a criterion's text in "Write it as ..."
 QUESTION_LINE_CLIP = 160  # characters of the item in the question
+NO_CLIENT_EVIDENCE = "refused: none of this evidence is the client's own"  # G1
+ONE_CASE_ONLY = "refused: the client rejected this in one case only"  # G2
+NOT_THE_CLIENTS_WORDS = " confirmed by the client, so an item citing "  # PB-C-WORDS: the fixed part, after the ids
+GATE_REFUSALS = (("no client evidence", NO_CLIENT_EVIDENCE), ("one case only", ONE_CASE_ONLY), ("not the client's words", NOT_THE_CLIENTS_WORDS))
+GATE_PHRASES_WITHIN = 200  # every phrase lies within the first characters of the gate's refusal, so the clip of a stored error (500) keeps it
 PB_C_WORDS = (
-    "refused: {ids} {be} confirmed by the client, so an item citing {them} may be only {their} own words: this item is not.{sentences} "
+    "refused: {ids} {be}" + NOT_THE_CLIENTS_WORDS + "{them} may be only {their} own words: this item is not.{sentences} "
     "A different way of doing it needs a second case the client rejected on the same criterion (rule (b)). Nothing was written: change it again "
     "with those words, or send {client} (`send`) this question once: "
     '"We would add to how we deliver {service}: {first}. Is that what you want from now on? If yes, please add it to the contract as a criterion."'
@@ -41,6 +46,13 @@ PB_C_WORDS_LONG = (
 RELAYED_LINK = (
     "{id} was confirmed only by a link on a relayed rejection (the assistant's own reading): rule (c) needs a rejection of the client's own"
 )
+
+
+def gate_refusal_kind(error: str) -> str | None:
+    """Which refusal of the evidence gate a stored tool error is (pure; design 4.3 D10): the kind of the first of ``GATE_REFUSALS`` whose fixed phrase is
+    in the first ``GATE_PHRASES_WITHIN`` characters of ``error``, else None. A relayed link is one of G1's notes, so it reads ``no client evidence``."""
+    head = error[:GATE_PHRASES_WITHIN]
+    return next((kind for kind, phrase in GATE_REFUSALS if phrase in head), None)
 
 
 class CaseServiceEvidence(ServiceEvidence):
@@ -286,7 +298,7 @@ def _verdict_note(v: Verdict) -> str:
 def _no_client_evidence(service: str, client: str, amended: str, notes: Sequence[str], reason: str) -> str:
     """G1: none of the evidence is the client's own."""
     return (
-        f"refused: none of this evidence is the client's own: {'; '.join(notes) or 'no evidence given'}. An item is admitted only when (b) the "
+        f"{NO_CLIENT_EVIDENCE}: {'; '.join(notes) or 'no evidence given'}. An item is admitted only when (b) the "
         f"same criterion or regression assertion failed in 2 different cases the client rejected, or (c) it is the own words of a criterion {client} added to "
         f"the contract by an amendment the client confirmed ({amended}). Your team's lessons, relayed verdicts (the assistant's own reading) and an agent client's "
         "verdicts weigh nothing. Nothing was written: follow the playbook and the contract.\n"
@@ -301,7 +313,7 @@ def _one_case(service: str, client: str, amended: str, crit: Mapping[str, Criter
     is never offered)."""
     current = [x for x in g.about if x in crit and crit[x].current]
     return (
-        f"refused: the client rejected this in one case only ({g.case}), and the evidence cites no criterion {client} added to the contract by an "
+        f"{ONE_CASE_ONLY} ({g.case}), and the evidence cites no criterion {client} added to the contract by an "
         f"amendment the client confirmed ({amended}). One case is a reason to ask, not to change how the team works: a lasting requirement goes into the contract "
         "first. Nothing was written: apply the client's words to the work at hand without changing the playbook.\n"
         f"Send {client} (`send`) this question once, and do not wait for an answer (it reaches you as a contract change or a criterion link): "

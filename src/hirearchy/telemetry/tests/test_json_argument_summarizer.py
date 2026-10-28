@@ -47,3 +47,9 @@ def test_it_summarizes_like_the_frozen_function(seed: int) -> None:
 
     arguments = {rng.choice(NAMES): value() for _ in range(rng.randrange(0, 12))}
     assert JsonArgumentSummarizer().summarize(arguments) == _oracle.summarize_args(arguments)
+
+
+def test_op_is_kept_up_to_20_characters() -> None:
+    """The gate's refusals are listed by the call's ``op`` (design 4.3 D10): ``add``, ``edit``, ``retire``, ``restore``, ``move``."""
+    assert JsonArgumentSummarizer().summarize({"op": "restore"}) == {"op": "restore"}
+    assert JsonArgumentSummarizer().summarize({"op": "x" * 40}) == {"op": "x" * 19 + "…"}
