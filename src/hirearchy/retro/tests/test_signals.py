@@ -271,3 +271,87 @@ def world(tmp_path: Path) -> Org:
 def validate(org: Org, bp: dict[str, object]) -> list[Issue]:
     found = org.runtime.blueprint_validator.validate(org.runtime.blueprint_loader.load_text(json.dumps(bp)), org_exists=True)
     return list(found)
+
+
+# ------------------------------------------------------------------------------ 7.4 to 7.6 (commit 46)
+
+from hirearchy.retro._signals import answer_items, cause_items, clarify_items, idle_items  # noqa: E402
+from hirearchy.retro._views import HealthFlag, Passed, Said, Sourced  # noqa: E402
+
+
+def test_an_idle_agent_is_a_retire_item_unless_it_is_the_last_check_or_an_owner() -> None:
+    flags = [HealthFlag("ceo/writer", "idle", "r", 4, "2d"), HealthFlag("ceo/checker", "idle", "r", 2, "3d"), HealthFlag("ceo/lead", "idle", "r", 1, "1d")]
+    items, notes = idle_items(flags, {"ceo/checker": "memos"}, {"ceo/lead": ("notes", "memos")})
+    (item,) = items
+    assert (item.kind, item.key, item.rung, item.evidence) == ("retire", "retire|ceo/writer", 7, ("ceo/writer",))
+    assert item.rung_why == "ceo/writer has no open task and no activity for 2d; nothing cheaper applies to an agent with no work"
+    assert item.question == "Retire ceo/writer (idle for 2d)? Its unspent runs come back." and item.cost == "returns its 4 unspent runs"
+    assert json.loads(item.blueprint) == {"reason": "B{n}.{k}: idle for 2d", "extend": {"retire": [{"agent": "ceo/writer", "reason": "idle for 2d (B{n}.{k})"}]}}
+    assert notes == ("- ceo/checker: idle, kept: last check of memos", "- ceo/lead: idle, owns notes, memos: kept")
+
+
+def test_a_stranded_direct_report_of_root_is_a_reclaim_item_and_a_deeper_one_a_d6_line() -> None:
+    items, notes = idle_items([HealthFlag("ceo", "stranded_budget", "r", 5), HealthFlag("ceo/writer", "stranded_budget", "r", 3)], {}, {})
+    (item,) = items
+    assert (item.kind, item.key, item.rung, item.weight) == ("reclaim", "reclaim|ceo", 0, 0)
+    assert (item.question, item.call, item.revert, item.cost) == ("Take back the 5 unspent runs ceo holds?", "reclaim(report=ceo)", "send(to=ceo, budget=5)", "returns 5 runs")
+    assert notes == ("- ceo/writer: stranded, holds 3 unspent runs: ask ceo",)
+
+
+def user(cid: str, added: tuple[str, ...], accepted: int = 3, **more: object) -> Sourced:
+    return Sourced("memos", cid, "Use the notes' own words for decisions", "user", "Use the words from the notes.", "Owners: initials or full names?", "", added, 5, accepted, **more)
+
+
+def test_clarify_fires_after_3_accepts_with_3_added_words() -> None:
+    (item,) = clarify_items([user("C1", ("decisions", "and", "actions"))], THRESHOLDS)
+    assert (item.kind, item.key.split("|")[:3], item.rung, item.weight) == ("clarify", ["clarify", "memos", "C1"], 1, 0)
+    assert item.question == (
+        'C1 of memos reads "Use the notes\' own words for decisions". It rests on your words "Use the words from the notes.", your answer to "Owners: initials or full names?"; '
+        "the words decisions, and, actions are mine. Does it say what you meant?"
+    )
+    assert item.call == "nothing to record: keep it" and item.rung_why == "no rejection names it, so nothing else will ever show it again"
+    assert item.notes == ('On no: ask what they meant, then define_service(owner, name, remove_acceptance=["C1"], add_acceptance=[<their wording>], words=<their answer, verbatim>)',)
+    assert clarify_items([user("C1", ("decisions", "and"))], THRESHOLDS) == () and clarify_items([user("C1", ("a", "b", "c"), accepted=2)], THRESHOLDS) == ()
+
+
+def test_clarify_fires_for_a_tasks_criterion_after_3_accepts_with_its_question() -> None:
+    tasks = Sourced("memos", "C4", "Every action has an owner", "tasks", "", "", "2026-10-05", (), 4, 3)
+    (item,) = clarify_items([tasks], THRESHOLDS)
+    assert item.question == 'C4 of memos reads "Every action has an owner": I wrote it for your one-off tasks. Does it say what you meant?'
+    assert clarify_items([Sourced("memos", "C4", "t", "tasks", exercised=4, accepted=2)], THRESHOLDS) == ()
+
+
+def test_default_and_unknown_sources_never_fire() -> None:
+    assert clarify_items([Sourced("memos", "C2", "t", "default", exercised=9, accepted=9), Sourced("memos", "C3", "t", "unknown", exercised=9, accepted=9)], THRESHOLDS) == ()
+
+
+def escape(ref: str, cause: str, also: tuple[str, ...] = ()) -> Passed:
+    return Passed("memos", "M1", "T-M1", "lead/checker", True, (ref,), ("C4",), cause, also, at(1), "Not what I meant.")
+
+
+def test_an_untyped_cause_asks_its_three_way_question() -> None:
+    (item,) = cause_items([escape("R3", "untyped")])
+    assert (item.kind, item.key, item.rung, item.weight) == ("cause", "cause|R3", 1, 1)
+    assert item.question == 'R3 (memos, 2026-11-03): "Not what I meant.". Was it a gap in the criteria (the team met them), a check that missed it, or a one-off?'
+    assert len(item.notes) == 3 and item.cost == "no run" and item.revert == "none needed (a later corrected link changes it again)"
+
+
+def test_a_disputed_cause_asks_was_it() -> None:
+    (item,) = cause_items([escape("R4", "reviewer-miss", ("contract-gap",))])
+    assert item.question == "R4 (memos): the rules read it as reviewer-miss and as contract-gap. Was it a check that missed it?"
+    assert cause_items([escape("R5", "contract-gap")]) == ()  # a typed cause with no dispute asks nothing
+
+
+def test_an_unanswered_rejection_is_an_answer_item_with_request_unanswereds_calls() -> None:
+    row = Said("memos", "R6", "M1", at(1), "Too long.", owner="ceo", rejection_id="20261103T090000-1-a", task="T-M1", question='About C3: add "<the rule, in their words>" as a lasting rule? Yes or no.')
+    (item,) = answer_items([row, Said("memos", "R7", "M2", at(2), "Fine.", link="none"), Said("", "R8", "M3", at(3), "one-off")])
+    assert (item.kind, item.key, item.rung, item.weight) == ("answer", "answer|R6", 1, 1) and item.question == row.question
+    assert item.call == (
+        'on yes: define_service(owner="ceo", name="memos", ..., answers="20261103T090000-1-a", about=<the id you asked about>, words=<their answer, verbatim>); '
+        'on no: feedback(task_id="T-M1", verdict="reject", confirms="20261103T090000-1-a", criterion=["none"], ["R<j>"] or ["C<k>"], source="human", note=<their answer, verbatim>)'
+    )
+
+
+def test_7_4_to_7_6_zero_and_empty() -> None:
+    assert idle_items([], {}, {}) == ((), ()) and clarify_items([], THRESHOLDS) == () and cause_items([]) == () and answer_items([]) == ()
+    assert idle_items([HealthFlag("a", "paused", "r")], {}, {}) == ((), ())  # only idle and stranded flags are read

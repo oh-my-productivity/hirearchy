@@ -122,6 +122,10 @@ class Said:
     answering: Answering | None = None
     current_about: tuple[str, ...] = ()
     removed_about: tuple[str, ...] = ()
+    owner: str = ""  # the service's owner, the rejection's message id, its task and the one question to ask the user about it: what the answer item's calls need
+    rejection_id: str = ""
+    task: str = ""
+    question: str = ""
 
 
 @dataclass(frozen=True)
@@ -160,6 +164,7 @@ class HealthFlag:
     flag: str
     reason: str
     held: int | None = None
+    idle_for: str = ""  # how long it has been idle, as ``fmt_duration`` words it (``2d``)
 
 
 @dataclass(frozen=True)

@@ -17,7 +17,7 @@ pytestmark = pytest.mark.architecture
 SIGNALS = SRC / "retro" / "_signals.py"
 ALLOWED = {
     "Sequence", "Mapping", "ShapeGroup", "RetroThresholds", "ServiceFailures", "FailedCase", "TakenFix", "OneOffCase", "Fraction", "frozenset", "tuple", "str", "int", "None", "bool",
-    "OwnerFacts", "HealthFlag", "Flag", "Item", "float", "object",
+    "OwnerFacts", "HealthFlag", "Passed", "Said", "Sourced", "Item", "float", "object",
 }
 FORBIDDEN_NAMES = {"lessons", "lesson", "memory", "notes", "note", "report", "reports", "body", "Message", "Case", "ServiceRecord", "Verdict", "Delivery", "Assertion", "Playbook"}
 

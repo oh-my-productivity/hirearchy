@@ -12,9 +12,11 @@ from collections.abc import Mapping, Sequence
 from fractions import Fraction
 
 from ..kernel import strip_markers
+from ..services import line_key, listed_added_words
+from ._readings import answer_of
 from ._shapes import ShapeGroup, criteria_key, title_skeleton
-from ._texts import day, quoted
-from ._views import FailedCase, ServiceFailures, TakenFix
+from ._texts import cause_question, day, quoted
+from ._views import FailedCase, HealthFlag, Passed, Said, ServiceFailures, Sourced, TakenFix
 from .api import Item, RetroThresholds
 
 REF = "B{n}.{k}"  # where the call and the revert carry the id of the item, which the brief writes
@@ -22,6 +24,7 @@ CALL = 'propose_org(blueprint=<the blueprint of this item>, extend="current")'
 SLACK = Fraction(5, 4)  # the largest case of a repeated task, plus 25%
 FIX_RUNS = 3  # the runs of an in-team fix when it finds the defect (the author's fix, the re-check, the owner's routing)
 LINE_MAX = 300
+ASK_NONE = 'About <its id>: add "<the rule, in their words>" as a lasting rule? Yes or no.'  # Phase 1's question when root has no reading yet
 
 
 def _json(value: Mapping[str, object]) -> str:
@@ -215,3 +218,106 @@ def _add(s: ServiceFailures, cls: frozenset[str], cases: tuple[FailedCase, ...],
         {"owner": o.owner}, tuple(extra), min(ids), _json({"reason": f"{REF}: {len(cases)} cases failed {cid}", "extend": extend}),
         _json({"reason": f"revert of {REF}", "extend": undo}),
     )
+
+
+# ----------------------------------------------------------------------------------------------------------------- 7.4 idle or stranded agents
+
+
+def idle_items(
+    flags: Sequence[HealthFlag], last_checks: Mapping[str, str], owners: Mapping[str, tuple[str, ...]],
+) -> tuple[tuple[Item, ...], tuple[str, ...]]:
+    """The ``retire`` and ``reclaim`` candidates of the agents ``health`` flagged ``idle`` or ``stranded_budget``, and the D6 lines for the ones it does not suggest: an
+    agent that is the last check of a service, or that owns one (its service waits for requests), is kept; a stranded agent below the top level is a line that names its parent."""
+    items: list[Item] = []
+    lines: list[str] = []
+    for f in flags:
+        held = f.held or 0
+        if f.flag == "idle":
+            if f.addr in last_checks:
+                lines.append(f"- {f.addr}: idle, kept: last check of {last_checks[f.addr]}")
+            elif owners.get(f.addr):
+                lines.append(f"- {f.addr}: idle, owns {', '.join(owners[f.addr])}: kept")
+            else:
+                items.append(Item(
+                    "retire", f"retire|{f.addr}", (f.addr,), 0, 7,
+                    f"{f.addr} has no open task and no activity for {f.idle_for}; nothing cheaper applies to an agent with no work",
+                    f"Retire {f.addr} (idle for {f.idle_for})? Its unspent runs come back.", CALL,
+                    "an extension that adds the agent again with the same role (its charter stays in the retired tree)", f"returns its {held} unspent runs",
+                    "spends nothing; lowers no criterion", {"agent": f.addr}, (), f.addr,
+                    _json({"reason": f"{REF}: idle for {f.idle_for}", "extend": {"retire": [{"agent": f.addr, "reason": f"idle for {f.idle_for} ({REF})"}]}}),
+                ))
+        elif f.flag == "stranded_budget":
+            if "/" in f.addr:
+                lines.append(f"- {f.addr}: stranded, holds {held} unspent runs: ask {f.addr.rsplit('/', 1)[0]}")
+            else:
+                items.append(Item(
+                    "reclaim", f"reclaim|{f.addr}", (f.addr,), 0, 0, "", f"Take back the {held} unspent runs {f.addr} holds?", f"reclaim(report={f.addr})",
+                    f"send(to={f.addr}, budget={held})", f"returns {held} runs", "spends nothing; lowers no criterion", {"agent": f.addr}, (), f.addr,
+                ))
+    return tuple(items), tuple(lines)
+
+
+# ----------------------------------------------------------------------------------------------------------------- 7.5 a criterion that rests on root's words
+
+
+def clarify_items(rows: Sequence[Sourced], thresholds: RetroThresholds) -> tuple[Item, ...]:
+    """The ``clarify`` candidates (F-P1-3): a criterion with source ``user`` or ``amendment`` and at least ``added_words`` words of root's own, and every one with source
+    ``tasks`` (root wrote those lines into its one-off tasks), once it was exercised in ``accepted_cases`` accepted cases. A ``default`` and an ``unknown`` source never fire."""
+    items: list[Item] = []
+    for c in rows:
+        words_of_root = c.kind in ("user", "amendment") and len(c.added) >= thresholds.added_words
+        if not (words_of_root or c.kind == "tasks") or c.accepted < thresholds.accepted_cases:
+            continue
+        text = quoted(c.text)
+        if c.kind == "tasks":
+            question = f'{c.id} of {c.service} reads "{text}": I wrote it for your one-off tasks. Does it say what you meant?'
+        else:
+            asked = f', your answer to "{quoted(c.asked)}"' if c.kind == "user" and c.asked else ""
+            question = f'{c.id} of {c.service} reads "{text}". It rests on your words "{quoted(c.quote)}"{asked}; the words {listed_added_words(c.added)} are mine. Does it say what you meant?'
+        items.append(Item(
+            "clarify", f"clarify|{c.service}|{c.id}|{line_key(c.text)[:40]}", (f"{c.service}/{c.id}",), 0, 1, "no rejection names it, so nothing else will ever show it again", question,
+            "nothing to record: keep it", "the same call back", "no run", "spends nothing; lowers no criterion (a no leads to your own wording, recorded with your words)",
+            {"service": c.service, "criterion": c.id},
+            (f'On no: ask what they meant, then define_service(owner, name, remove_acceptance=["{c.id}"], add_acceptance=[<their wording>], words=<their answer, verbatim>)',),
+            f"{c.service}/{c.id}",
+        ))
+    return tuple(items)
+
+
+# ----------------------------------------------------------------------------------------------------------------- 7.6 causes and unanswered rejections
+
+
+def cause_items(escapes: Sequence[Passed]) -> tuple[Item, ...]:
+    """The ``cause`` candidates: an escape whose cause is untyped, or disputed (its ``also`` types are not empty), with the one question that settles it."""
+    items: list[Item] = []
+    for e in escapes:
+        if e.cause != "untyped" and not e.also:
+            continue
+        ref = e.refs[0] if e.refs else e.delivery
+        steps = (
+            f'a gap in the criteria: define_service(..., answers=..., about=..., words=...) if the rejection is not yet answered, or feedback(task_id="{e.delivery}", "reject", confirms=<note>, criterion=[<C>], source="human", note=<their words>)',
+            f'a check that missed it: the same link naming the criterion the reviewer passed (the cause is then read as a missed check by rule)',
+            'a one-off: the same link with criterion=["none"]',
+        )
+        items.append(Item(
+            "cause", f"cause|{ref}", (ref,), 1, 1, "the cause decides which check to improve, and no one has typed it", cause_question(ref, e.service, e.when, e.words, e.cause, e.also),
+            "ask the user; then record their answer as a link (see Details)", "none needed (a later corrected link changes it again)", "no run", "spends nothing; lowers no criterion",
+            {"rejection": ref}, steps, e.delivery,
+        ))
+    return tuple(items)
+
+
+def answer_items(rows: Sequence[Said]) -> tuple[Item, ...]:
+    """The ``answer`` candidates: a human rejection still without an answer (Phase 1's ``unanswered``: no human link and no answering version)."""
+    items: list[Item] = []
+    for r in rows:
+        if not r.service or answer_of(r) != "no answer yet":
+            continue
+        question = r.question or ASK_NONE
+        yes = f'define_service(owner="{r.owner}", name="{r.service}", ..., answers="{r.rejection_id}", about=<the id you asked about>, words=<their answer, verbatim>)'
+        no = f'feedback(task_id="{r.task}", verdict="reject", confirms="{r.rejection_id}", criterion=["none"], ["R<j>"] or ["C<k>"], source="human", note=<their answer, verbatim>)'
+        items.append(Item(
+            "answer", f"answer|{r.ref}", (r.ref,), 1, 1, "the rejection has no answer yet, so its next request waits", question, f"on yes: {yes}; on no: {no}",
+            "none needed (a later corrected link changes it again)", "no run", "spends nothing; lowers no criterion", {"rejection": r.ref}, (), r.rejection_id or r.ref,
+        ))
+    return tuple(items)
