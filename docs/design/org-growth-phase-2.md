@@ -1,6 +1,8 @@
 # Org growth, Phase 2: the retro brief and growth (technical design)
 
-Status: design, revision 2 (second pass: it answers every finding of `.agents/tasks/design-review.md` on revision 1, section 20). Branch
+Status: design, revision 2 (second pass: it answers every finding of `.agents/tasks/design-review.md` on revision 1, section 20), with the
+manager's amendments G1-G7 applied (design loop closed by decision, 2026-10-28; section 21). Where an amendment and older text of this file
+disagree, section 21 wins. Branch
 `feat/org-growth-phase-2`, worktree `/Volumes/workspace/hirearchy/.worktrees/org-growth-p2`, branched from `main` = `5bbf295f` (Phase 1
 closed on P1's record). Batch 1.1 (`fix/org-agent-effort-floor`) has since merged: `main` is `aac6af1b`, and 1.1's design was read on
 `main` (`docs/design/org-agent-effort-floor-1-1.md`). Every file:line below was read at `5bbf295f`; 1.1's 29 changed files are listed in
@@ -102,11 +104,11 @@ Python 3.11; the existing packages only (FastMCP `mcp`, PyYAML); the standard li
 |---|---|---|
 | brief | `retro.api.Brief` | The derived result of one `retro()` call: its id (`B<n>`, or `look-back` when `since` was given), `since`, `at`, the readings of 4.3, the outcomes of 4.4, at most 3 items (4.5a), the held-back candidates, and the previous brief's items with their fate. |
 | held brief | `retro` | A brief that was recorded in the ledger (4.2): a call without `since` records one when at least one human verdict was created after the last brief's `at` (or when there is no earlier brief); otherwise it shows the last brief again and records nothing. |
-| last brief | `retro` | The newest record of the ledger; none before the first. `since` of a recorded brief = the `at` of the last brief, else the **organization's start**: the earliest of root's oldest box entry, the oldest agent's `created` and the time of the first commit that added `ORG.md` (`OrgHistory.first_commit_with("ORG.md")`); with none of them (an empty organization without git), every record counts and `since_words` reads `since the organization started`. |
+| last brief | `retro` | The newest record of the ledger; none before the first. `since` of a recorded brief = the `at` of the last brief, else the **organization's start**: the earliest of root's oldest box entry, the oldest agent's `created` and the commit time of the oldest commit that added `ORG.md` (`CharterHistory.org_started()`, 4.1; L19 of review 2); with none of them (an empty organization without git), every record counts and `since_words` reads `since the organization started`. |
 | human verdict | `reflection` (exists) | A verdict note of root whose tier (`kernel.verdict_tier`) is `human`, on a service case or a one-off case. Relayed and agent verdicts are never counted in the brief's signals (08 section 2 principle 2). The **verdict count** of the trigger and of recording counts deliveries, not notes: the deliveries (service and one-off, `Delivery`) whose first counted human-tier verdict (`Delivery.counted`) was created after a time. A link note (`confirms`) adds nothing to it. |
 | case, judged case, escape, assertion, cause | `reflection` (exists, 0b 3) | As 0b and Phase 1 define them; `judged(c)` is Phase 1's (Phase 1 design 3). |
 | verifier | `retro._roles.is_verifier` (new, pure) | An agent is a **verifier** when its AGENT.md frontmatter has `kind: verifier`. Without a `kind` key (an agent from before Phase 2, or one an agent hired with the MCP `hire`, which takes no template), it is a verifier when its `role` equals the `title` of a `RoleLibrary` template whose `kind` is `verifier` (`Independent Reviewer`, `Independent Fact-Checker`, `Code Reviewer`, `Independent Data Checker`, `Tester`). Any other agent is not. The one definition used by 4.3 D2, 5.2 `extend-lowers`, 6.6, 7.2 and 7.4. |
-| unprompted charter edit | `retro._changes` (new, pure) | A change between two committed versions of any agent's `AGENT.md` (its first version, written at the hire, is no edit), other than (a) lines under `## Added by your changes` that carry the tag of an applied extension and (b) the `can_hire`/`max_children` values that an extension's limits line in that section names (4.5's content test). Any other change counts: the body, `role`, or any frontmatter key. The one definition used by X3 (section 1), G12 (12) and P2-X3 (18.1). |
+| unprompted charter edit | `retro._changes` (new, pure) | A change between two committed versions of any agent's `AGENT.md` (its first version, written at the hire, is no edit), other than (a) lines under `## Added by your changes` that carry the tag of an applied extension and (b) the `can_hire`/`max_children` values that an extension's limits line in that section names (4.5's content test). Any other change counts: the body, `role`, or any frontmatter key. Three cases are **not** edits (L21 of review 2): a pair whose second side is a deletion (a retire moved the tree to `.retired/`; it is labelled from `RETIRED.md`); the first version at an address that had an earlier, retired agent (a re-created address starts a new history); and every path under `.retired/` (excluded from the count). The one definition used by X3 (section 1), G12 (12) and P2-X3 (18.1), whose harness applies the same three rules. |
 | lineage class of a criterion | `retro._lineage` (new, pure) | Of `C<k>` as of time t: `C<k>` and its lineage as of t (Phase 1 design 3: the criteria the answers that added its text replaced, transitively). Two rejections fail "the same criterion" when the lineage classes of their subjects (Phase 1's subjects of a rejection, taken at their answers) meet. |
 | item | `retro.api.Item` | One numbered question of a brief: `kind` (one of `service`, `checker-fix`, `checker-add`, `worker`, `retire`, `reclaim`, `clarify`, `cause`, `answer`), `key` (the signal's identity, 4.5), `evidence` (case or rejection ids), `weight`, `rung`, `cost`, `objection`, `call` (the pre-filled call), `revert`, `effect` (what the files show once it is taken). |
 | taken / open / lapsed | `retro._items` | An item of the last brief is **taken** when its `effect` appears in the files after that brief's `at`. At the next recorded brief an item not taken is **lapsed** ("no change"). While no new brief is recorded, it is **open**. |
@@ -172,6 +174,9 @@ class CharterHistory(Protocol):          # retro/_ports.py; implemented by app/_
         raises; bounded like ``BarHistory`` (the newest 40 commits that changed one of the files, 5 s of git time), with ``truncated``."""
     def subject(self, commit: str) -> str | None:
         """The first line of the commit's message (``OrgHistory.subject``, new); None when it cannot be read."""
+    def org_started(self) -> datetime | None:
+        """The commit time of the oldest commit that added ``ORG.md`` (``OrgHistory.first_commit_with("ORG.md")``, then that commit's time from
+        ``OrgHistory.changes(["ORG.md"], ...)``); None without a history (L19 of review 2). Never raises."""
 ```
 
 `GitCharterHistory` reads each version once through `OrgHistory.changes` and `OrgHistory.text`, sharing the version reader of
@@ -289,7 +294,11 @@ read from what the files themselves record:
   `kernel.RUNTIME_NAMES`, so the write guard refuses an agent's file of that name in its own directory (`orgfiles/_guard.py`'s runtime-name
   check), and no agent can plant a record before it is retired.
 - **Services defined and retired**: SERVICE.md v1 `created`, `defined_by` and `approved_in` (`define_service` gains `approved_in`, root
-  only, passed by the plan appliers); `<owner>/services/.retired/`.
+  only, passed by the plan appliers); `<owner>/services/.retired/`, and in each retired copy a `RETIRED.md` (frontmatter `retired`, `by`,
+  `reason`, `approved_in`) that `ServiceCommands.retire_service` writes through `ServiceStore.retire(owner, name, stamp, record)` (L22 of
+  review 2: `retire_service` gains the root-only keyword `approved_in`, passed by the extension's `retire_services` and its undo; the
+  method count of `ServiceStore` stays 8). A continuation that restores the copy moves its `RETIRED.md` to the restored service's
+  `history/RETIRED.v{n}.md` (n = the contract version it retired), so the record stays readable.
 - **Charter changes and limits**: `CharterHistory.versions` (4.1), one entry per pair of consecutive committed versions.
 - **ORG.md `max_depth`**: `CharterHistory.versions` (its ORG.md pairs) and `CharterHistory.subject` of the pair's commit.
 - **Schedules** (2b): SCHEDULE.md and its `history/`.
@@ -304,6 +313,7 @@ Each change gets one label:
 | `by {parent}` | a charter pair of a nested agent whose differences lie in the body outside the added section, in `role`, or in a lower `max_children`, and the event log holds a `tool.call` of `write` by `{parent}` on that `AGENT.md` between the two commits' times (`path` is kept by the summarizer). The parent is the only writer the MCP guard admits for that file (`orgfiles/_guard.py:104-110`) |
 | `outside the tools (a hand edit or the terminal)` | any other change: a top-level charter's change (root's MCP write is refused, 13); a nested charter's change with no matching `write` event while the event log covers the window; any frontmatter change other than a lower `max_children` (agents' are refused, 6.6); a `max_depth` change whose commit subject names no extension |
 | `by root, outside a plan (the terminal, or before this record was kept)` | an agent, a service or a retire by root with no `approved_in` and, for an agent, no plan heading: the CLI's `hire`, `define-service`, `retire-service`, or anything from before Phase 2, which the files cannot tell apart |
+| `taken back: the change {plan_id} was not applied` | an agent or a service retired by an extension's undo (5.5): its `RETIRED.md` holds `approved_in: change {plan_id} (not applied)` (L22 of review 2); the creation it takes back carries the same label, not `from your change` |
 | `by {parent}, or outside the tools (the event log does not reach back)` | a nested charter's change whose window is beyond the event log's horizon, or with events off |
 
 `Unprompted charter edits since {since}: {n}` (D8's last line) counts the unprompted charter edits (section 3): every charter pair labelled
@@ -359,7 +369,8 @@ recorded and to the CLI `hirearchy feedback` output; the listing form is the las
 `hirearchy services`. The entry points append them (`mcp_server`'s `feedback` and `services` tools, `cli`'s two commands, through
 `RetroDue`), since `reflection` and `services` sit below `retro` and cannot import it. It is never sent as a message, never wakes anyone and never appears in an agent's prompt. The assistant also runs the
 brief when the user asks for one. The skill (11.1, line 113), the tool description (11.4) and both forms say the same thing: offer, and
-call only after the user's yes.
+call only after the user's yes. This departs from the brief's and 08 4.3's "the assistant runs it ... when 3 new human verdicts have
+arrived" (D17, 18.2; owner question 17): a brief costs the user's attention (08 10 Q4), and a recorded brief starts expiry.
 
 ### 4.7 The CLI and MCP forms, with the exact texts
 
@@ -384,7 +395,7 @@ Changes to your organization:
 - Unprompted charter edits: {n}
 Your team's own proposals (team-written; they change nothing): {n}
 - {actor} on {service}: {kind} ({op})
-Questions (one yes or no each; any you leave lapse with no change at the next brief):
+Questions (one short answer each; any you leave lapse with no change at the next brief):
 {n}. {question}
 RETRO BRIEF END
 Details (for you; the user need not read them):
@@ -539,7 +550,7 @@ checks below, each named agent's `kind` (`is_verifier`) and the cases of each na
 | `extend-depth` | The new address's depth is at most `max_depth` as the extension's own `limits` entry for `max_depth` leaves it (limits are applied before the additions, 5.5). |
 | `extend-capacity` | For every existing non-root parent P with additions, read after the extension's own `limits` entry for P: `can_hire(P)` is true and `len(children(P)) + adds(P) <= max_children(P)` (the retires of the same extension are applied last, so they do not free a place here). `RuleHiring.hire` applies both checks to a non-root actor whatever `approved` says (`hierarchy/_hiring.py:78-82`). Message: `{P} may have {m} direct reports and has {k}; this change adds {a}. Add limits: [{agent: {P}, max_children: {k + a}{, can_hire: true}}] to this change (the user sees it in the plan).` |
 | `extend-tools`, `extend-workspace`, `extend-inputs` | Under a non-root parent, the new agent's tools are among the parent's, its workspace inside the parent's, its inputs inside the parent's inputs or workspace (the resolver's "authority only narrows", applied against the parent's charter, which the extension cannot widen). |
-| `extend-owner` | An `add_services` owner is an existing top-level agent; the name is free for it (a retired service of it at that name may be defined again: 0a design 5.10's continuation, shown as `defines {name} again: its contract, playbook and cases continue`). |
+| `extend-owner` | An `add_services` owner is an existing top-level agent; the name is free for it (a retired service of it at that name may be defined again: 0a design 5.10's continuation, shown as `defines {name} again: its contract, playbook and cases continue`). A continuation must repeat the retired copy's criteria (the same set by `line_key`, in any order; `services/api.py:534-537` fixes the set) and may not pass `playbook`, else `extend-owner`: `{name} continues the retired service of {owner}, so its criteria are the retired ones: {list}. Repeat them (each with its source), or pick another name.`; its `sources`, `elicitation` and `approved_in` go into the continuation's version v(n+1), not v1 (L26 of review 2). |
 | `extend-service` | Every rule of today's service validation (`_service_rules.py`): inputs, checkable criteria, deliverable, budget at or above the estimate for the owner's team after the extension, within `needs.budget_runs`. |
 | `criterion-from`, `criterion-source`, `criterion-words`, `criterion-tasks` | 10.1. `criterion-tasks`: every `from_tasks` id is a one-off case head of root, and the criterion's `line_key` equals a line of the `## Acceptance criteria` of at least one of them (a refusal: the runtime checks the copy). |
 | `extend-line` | `agent` exists; `line` is one line, 1-300 characters, no `---` line, no `#` at its start (it cannot open a heading or frontmatter), and no ` [change ` in it (the tag is the applier's). A `remove_charter_lines` line must equal (by `line_key`) the untagged text of a line under the charter's `## Added by your changes` heading: no other line of a charter can be removed by an extension. |
@@ -605,24 +616,37 @@ over the normalized extension blueprint **and** the fingerprint. It stays statel
 
 Consequence: a plan proposed, then overtaken by a change of anything it touches (an owner's playbook revision, a contract amendment, a hire
 or retire under a named parent, a charter edit of a named agent), no longer matches at `apply_org`, which refuses it with `extend-stale`
-(5.6) and asks for a new proposal. A change elsewhere in the organization (another team's run, a hire under a parent the extension does not
+(5.6) and asks for a new proposal. The comparison for an extension is the extension applier's (5.5 step 2; G1): `ApprovedPlanApplication`
+does not make its own. The refusal cannot say what changed: the id is a stateless hash, so neither the earlier state nor whether the
+blueprint or the organization changed is known, and the text says both are possible. A change elsewhere in the organization (another team's run, a hire under a parent the extension does not
 name) does not stale it. Two extensions that touch the same agent stale each other when both are proposed before either is applied, which
 is why the brief's `Next:` line says "one item at a time": propose, show and apply one, then propose the next against the changed
 organization.
 
 ### 5.5 `apply_org` on an existing organization
 
-`apply_org(blueprint, approved=True, plan_id=...)` detects an extension by its `extend:` key. `ApprovedPlanApplication.apply` keeps its two
-refusals (`approved`, `plan_id`) and its setup check, then calls `ExtensionApplier.apply(bp)`
-(`blueprint/_extension_apply.py:ExtensionApplier(ExtensionApplying)`), in this order. At the terminal, `hirearchy plan <file>` shows an
+`apply_org(blueprint, approved=True, plan_id=...)` detects an extension by its `extend:` key. `ApprovedPlanApplication.apply` keeps its
+`approved` refusal, its missing-`plan_id` refusal and its setup check for both kinds; for an extension it **skips its own `plan_id`
+comparison** and calls `ExtensionApplier.apply(bp, plan_id=plan_id)` (`blueprint/_extension_apply.py:ExtensionApplier(ExtensionApplying)`),
+whose step 2 makes the comparison (G1, review 2's F23 option A), in this order. At the terminal, `hirearchy plan <file>` shows an
 extension's plan and `hirearchy apply <file>` applies it the same way, without a `plan_id` (the user applies their own file, as today for a
-full blueprint); both detect the extension by its `extend:` key, so no new flag is added.
+full blueprint; `plan_id=None` skips step 2); both detect the extension by its `extend:` key, so no new flag is added.
 
 1. Validate again against the files as they are now (5.2); any error refuses with today's `blueprint has errors, nothing was created:` text.
-2. Recompute the plan id; a mismatch refuses with `extend-stale`. Nothing has been written yet.
+2. Recompute the plan id (`HashPlanIdentity.plan_id(bp)`: the extension and the fingerprint of the organization as it is now, 5.4) and
+   compare it with the given `plan_id`; a mismatch refuses with `extend-stale` (5.6). Nothing has been written yet.
 3. **Limits**, first, because the additions are checked against them (`RuleHiring.hire` checks a non-root actor's `can_hire`, capacity and
    `max_depth` whatever `approved` says): each `limits` entry rewrites the agent's frontmatter keys `can_hire`/`max_children` and its limits
-   line in the added section (`AgentRegistry.rewrite_charter`, as root); `max_depth` is written through `OrgSettings`.
+   line in the added section (`AgentRegistry.rewrite_charter`, as root); `max_depth` is written through `settings.api.OrgLimits.set_max_depth`
+   (new, G2; review 2's F24), which `FsOrgSettings` implements, so `settings` stays ORG.md's only writer:
+   ```python
+   class OrgLimits(Protocol):                      # settings/api.py, implemented by FsOrgSettings
+       def set_max_depth(self, value: int) -> int:
+           """Rewrite max_depth in ORG.md's settings block, keeping every other key and the body byte for byte; returns the old value.
+           OrgError when ORG.md cannot be parsed or value < 1 (nothing written)."""
+   ```
+   `ExtensionApplier` receives `OrgLimits`. The model floor is not involved: only `max_depth` changes, and `set_max_depth` changes no
+   other key (so `GuardedOrgFileWriter._check_org_md`'s floor check has nothing to check).
 4. **Additions:** hire each new agent, parents first, through `Hiring.hire(actor=<parent or root>, ..., approved=True, kind=<the resolved
    kind>, approved_in="change {plan_id}")` (2b adds `onboard=True`), with the charter of `CharterWriter.extension_charter(agent, team,
    plan_id)` (new): the template body, then `## Assignment (from the user's change {plan_id})` with `Reports to: {parent}`, the workspace,
@@ -635,12 +659,15 @@ full blueprint); both detect the extension by its `extend:` key, so no new flag 
    body by the first added line; a removed line taken out, and the heading removed when it is empty); budgets (`define_service(ROOT, owner,
    name, budget=...)`, which changes no criterion and needs no words; it writes SERVICE.md v(n+1), archives vn and sends the owner a
    non-waking note, `services/api.py:522-528`).
-6. **Schedules** (2b): `ServiceStore.write_schedule` (9.1).
-7. **Service retires**: `ServiceCommands.retire_service(ROOT, owner, name, reason)` for each, with its own refusals (5.2 checked them).
+6. **Schedules** (2b): `ScheduleStore.write_schedule` (9.1; a separate Protocol, G3).
+7. **Service retires**: `ServiceCommands.retire_service(ROOT, owner, name, reason, approved_in="change {plan_id}")` for each, with its own
+   refusals (5.2 checked them).
 8. **Agent retires**, last, because they cannot be undone: `Retirement.retire_team(ROOT, addr, reason, approved_in="change {plan_id}")`.
 9. **The owner's note**, only now, so a note is never sent for a change that was taken back: for every verifier added under a service owner,
    a runtime note to the owner (`wake: true`, title `A checker joined your team`) with the derived step: `Add its step to the playbook of
-   {service}: revise_playbook(op="add", kind="step", text=<the step>, evidence=[{R ids of the item}])` (the item's evidence is human-tier
+   {service}: revise_playbook(op="add", kind="step", text="Before you report a request of {service}, send the draft to {address} and apply
+   its FAIL items for {C}.", evidence=[{R ids of the item}])` (L23 of review 2; `{C}` is the criterion the checker was added for, from the
+   extension's `reason` and `charter_extra`; the item's evidence is human-tier
    and meets rule (b) of the gate, so the owner's add is admitted as `new` and watched like any item). A note that cannot be delivered
    leaves the extension applied; the reply says `({owner} was not told: {error})` and the event `team_note.failed` is emitted.
 10. Commit `root: applied extension {plan_id} ({reason, first 80 characters}): +{a} agents, +{s} services, {l} lines, {k} limits, -{r}
@@ -654,9 +681,9 @@ budget line of the table below, when a budget amendment was taken back):
 | Write | Undo | What stays visible |
 |---|---|---|
 | a limits rewrite of a charter (step 3) | the old charter text, held in memory from step 1's read, through `rewrite_charter` | nothing |
-| `max_depth` (step 3) | the old value through `OrgSettings` | nothing |
-| a new agent (step 4) | `Retirement.retire_team(ROOT, addr, "the change {plan_id} was not applied")`, newest first, any depth | its retired tree under `.retired/` |
-| a new service (step 4) | `retire_service(ROOT, owner, name, "the change {plan_id} was not applied")`; it has no request, so a later definition of the name starts fresh | its retired copy; two non-waking notes to the owner |
+| `max_depth` (step 3) | `OrgLimits.set_max_depth(old)` (the value step 3 returned) | nothing |
+| a new agent (step 4) | `Retirement.retire_team(ROOT, addr, "the change {plan_id} was not applied", approved_in="change {plan_id} (not applied)")`, newest first, any depth | its retired tree under `.retired/`, labelled `taken back: ...` in D8 (L22) |
+| a new service (step 4) | `retire_service(ROOT, owner, name, "the change {plan_id} was not applied", approved_in="change {plan_id} (not applied)")`; it has no request, so a later definition of the name starts fresh | its retired copy, labelled `taken back: ...`; two non-waking notes to the owner |
 | an added or removed charter line (steps 4-5) | the old charter text through `rewrite_charter` | nothing |
 | a budget amendment (step 5) | `define_service(ROOT, owner, name, budget=<old>)`: version v(n+2) with the old budget | versions v(n+1) and v(n+2) in `history/`; two non-waking notes to the owner; the reply names them: `; {service} has versions v{n+1} and v{n+2} (the budget went back to {b0})` |
 | a schedule (step 6, 2b) | a new schedule: `ended` with `ended_by: root`, reason `the change {plan_id} was not applied`; a replaced schedule: the previous fields written back as a new version | the schedule's versions in `history/`; a due occurrence a running scheduler sent between the write and the undo stays a sent request, within the budget the plan showed (18.3) |
@@ -669,8 +696,9 @@ services line of today's reply.
 ### 5.6 Exact texts of the extension's refusals
 
 ```
-extend-stale: not applied: the organization changed since this plan was proposed ({what}: {before} -> {now}), so this is not the plan the
-user approved. Call propose_org(blueprint, extend="current") again, show the new PLAN FOR YOU block, and apply only after their approval.
+extend-stale: not applied: plan_id does not match this change against the organization as it is now (the blueprint, or something it
+names: an agent, a service, a limit or a schedule, changed since propose_org), so this is not the plan the user approved. Call
+propose_org(blueprint, extend="current") again, show the new PLAN FOR YOU block, and apply only after their approval.
 extend-mode: refused: this blueprint changes an existing organization (it has extend:), so call propose_org(blueprint, extend="current").
 extend-full: refused: extend="current" takes an extension blueprint (a top-level extend: with add_agents, add_services, add_charter_lines,
 remove_charter_lines, limits, budgets, schedules, retire_services or retire); a full blueprint builds a new team: call propose_org(blueprint)
@@ -714,7 +742,8 @@ depth, and the team's checks, are the user's decision: the retro brief shows the
 ```
 With `free == 0` (an explicit `max_children` equal to the team): `Team changes: the plan leaves no free place. You may retire a worker on your
 own (the user is told); ... (as above from "A report's charter")`. The paragraph is the same for every lead: no lead is invited to send a
-proposal, so a top-level lead's proposal never becomes a waking note to root (a "Needs you" item outside the brief, 10-F7). Runs for a
+proposal, so a top-level lead's proposal never becomes a waking note to root (a "Needs you" item outside the brief, 10-F7). This departs from
+the brief's and 08 4.4's "may propose" (D16, 18.2; owner question 16). Runs for a
 task are still asked of the parent as today (`out_of_budget`).
 
 `SRC/roles/manager.md` "Decision rights" becomes: `The task breakdown and the order of work inside the plan, and hiring or retiring a worker
@@ -776,11 +805,11 @@ The bound of 11-final-verification M6 holds unchanged, and slack does not touch 
 | An extension apply | `AgentRegistry.rewrite_charter` | Writes the added section and the `can_hire`/`max_children` it names; never rewrites the rest of the body. |
 | The human | CLI, a hand edit | Unchanged; labelled `outside the tools` (4.5). |
 
-**CHARTER-PLAN** (F4 of the review): for `actor != ROOT` on an existing report's charter, the merged frontmatter's `tools`, `workspace`,
-`inputs`, `model`, `can_hire`, `kind`, `approved_in`, `onboard`, `hired_by` and `created` must equal the old ones (an absent key equals
-`None`), and `max_children` may only stay or go down. The brief (4.4) makes limits, tools, depth and spend the user's decision; the plan the
+**CHARTER-PLAN** (F4 of the review; a whitelist since L20 of review 2): for `actor != ROOT` on an existing report's charter, the merged
+frontmatter must equal the old one except `role`, and `max_children` at or below its old value (an absent key equals `None`; any other key
+added, removed or changed is refused, the bookkeeping keys `kind`, `approved_in`, `onboard`, `hired_by`, `created` included). The brief (4.4) makes limits, tools, depth and spend the user's decision; the plan the
 user approved set these keys, and the bookkeeping keys are the registry's record of the hire. An append never changes the frontmatter
-(today's rule), so it passes. Text:
+(today's rule), so it passes. `{key}` in the text is the first differing key in sorted order. Text:
 ```
 refused: {key} of {addr} is the plan's, which the user approved; a change goes through the user (propose_org(..., extend="current"), or
 the terminal). A charter edit may change its body (outside "## Added by your changes"), its role, and lower max_children. Nothing was written.
@@ -802,6 +831,23 @@ retired.
 Why leads keep whole-body rewrites (L15 of the review): 08 section 2 P5 gives the parent its report's charter body, and 08 section 7's "no
 whole-text rewrites" is about the learning loop rewriting its own rules wholesale (playbooks, lessons), not about a parent managing its
 report. What that rule protects here, the lines the user approved, CHARTER-ADDED keeps.
+
+**A1 and A2 no longer invite a proposal to root** (G4; review 2's F26). `access/_authority.py:check_grant`'s two refusals, which run before
+CHARTER-PLAN on a charter rewrite and (2b) on a hire into slack, end today with "ask your parent (`send`)". For a top-level lead the parent is
+root, so the proposal would reach the user as a waking "Needs you" item outside the brief (10-F7); with CHARTER-PLAN a nested lead's parent
+cannot grant it either. For every non-root actor the texts become:
+```
+A1: refused: you cannot grant `can_hire: true`: only the user (root) or an approved plan gives an agent the right to hire. Hire it with
+    can_hire false. A change of your team's limits is the user's decision: the retro brief shows them the evidence, so do not ask for it.
+A2: refused: you cannot give a report max_children {n}: your own limit is {mine}, and a report's may not be above yours. Use at most
+    {mine}. A change of the limits is the user's decision (the retro brief shows them the evidence).
+```
+(`A1:`/`A2:` are labels, not part of the text.) Tests whose expected text moves (no golden holds either text; the RED step confirms it with
+`git grep` over the golden directories): `access/tests/test_contract_authority_policy.py` (the A1 and A2 constants at lines 210-218),
+`hierarchy/tests/test_contract_hiring.py` (A1 at 383-384), `orgfiles/tests/test_contract_org_file_writer.py` (A1 and A2 at 165-173).
+`tests/e2e/test_org_growth_0a.py:321, 332, 335` match a prefix that the new texts keep (`you cannot grant \`can_hire: true\`: only the
+user ...`, `you cannot give a report max_children 5: your own limit is 3`) and stay green unchanged. This is D16's text for 2a (18.2,
+owner question 16).
 
 Existing tests that assert a non-root frontmatter change succeeds are rewritten to assert CHARTER-PLAN: in
 `orgfiles/tests/test_charter_rewrite.py`, `test_a_key_set_explicitly_wins_even_when_empty`, `test_a_null_or_blank_value_wins_too`,
@@ -952,13 +998,16 @@ and shows its N. The question text of its item is in `retro/_texts.py`.
 
 ### 7.5 A criterion that rests mostly on root's words: clarify (F-P1-3)
 
-- **Derivation** (D9): every current criterion with a source `user` or `amendment`, its added words (section 3), and the judged human cases
-  it was exercised in with their final verdicts.
-- **Fires** for a criterion with `>= added_words` (default 3) added words that was exercised in `>= accepted_cases` (default 3) accepted
-  cases, and whose key (service, `C` id, text key) was never an item. Criteria with source `default` or `tasks` never fire (the plan said
-  plainly that they were root's or the tasks'); source `unknown` never fires.
+- **Derivation** (D9): every current criterion with a source `user`, `amendment` or `tasks`, its added words (section 3; for `tasks`, none:
+  every word is root's), and the judged human cases it was exercised in with their final verdicts.
+- **Fires** for a criterion with source `user` or `amendment` and `>= added_words` (default 3) added words, and for every criterion with
+  source `tasks` (G6 item 4: root wrote those lines into its one-off tasks, review 2's F28), in each case once it was exercised in
+  `>= accepted_cases` (default 3) accepted cases and when its key (service, `C` id, text key) was never an item. Criteria with source
+  `default` never fire (the plan said plainly that they were root's); source `unknown` never fires. A `tasks` item counts against the cap of 3
+  like every item.
 - **Item** `clarify`, rung 1, weight 0: `no rejection names it, so nothing else will ever show it again`. Question: `{C} of {service} reads
-  "{text}". It rests on your words "{quote}"{, your answer to "{asked}"}; the words {added} are mine. Does it say what you meant?` Call on
+  "{text}". It rests on your words "{quote}"{, your answer to "{asked}"}; the words {added} are mine. Does it say what you meant?`; for source
+  `tasks`: `{C} of {service} reads "{text}": I wrote it for your one-off tasks. Does it say what you meant?` Call on
   yes: none (`nothing to record: keep it`). Details add: `On no: ask what they meant, then define_service(owner, name,
   remove_acceptance=["{C}"], add_acceptance=[<their wording>], words=<their answer, verbatim>)`. Revert: the same call back. Cost: `no run`. Objection test: `spends nothing; lowers no criterion (a no
   leads to your own wording, recorded with your words)`.
@@ -1075,11 +1124,12 @@ Its open lessons (results of its tasks in cases still open):
 Copy what still holds: a playbook change with revise_playbook (gated like any change), or a line of your own MEMORY.md. Nothing else keeps it.
 ```
 Read through `agents.RetiredArchive`, which gains three read methods, each with contract rows over its file implementation and its fake
-(R8):
+(R8). Every agent directory of a retired tree is read, not only the top one (L25 of review 2), so each nested agent of a retired team gets
+its handover; an archived MEMORY.md that is empty reads `(it was empty)` in the section:
 ```python
 def record(self, tree: RetiredTree) -> Mapping[str, str]:   # RETIRED.md's frontmatter (retired, by, reason, approved_in); {} when absent or unreadable
-def memory(self, tree: RetiredTree) -> str:                # the top agent's archived MEMORY.md; "" when absent; OSError when unreadable
-def results(self, tree: RetiredTree) -> list[Message]:     # the top agent's archived sent/ results, oldest first (kernel's message parser); [] when none
+def memory(self, tree: RetiredTree, addr: str) -> str:     # the archived MEMORY.md of agent addr of the tree (the top agent or one below it); "" when absent; OSError when unreadable
+def results(self, tree: RetiredTree, addr: str) -> list[Message]:   # that agent's archived sent/ results, oldest first (kernel's message parser); [] when none
 ```
 (`agents` depends on `kernel` only, so it parses the archived messages with `kernel`'s parser, as `mail` does for live boxes.) A tree is
 named `<address with . for />-<stamp>` (`agents/api.py:77-89`, `RetiredTree.addr` reads it back). When the parent is root, D8 of the next
@@ -1106,8 +1156,16 @@ evidence (0a, Phase 1 6).
 
 ### 9.1 The data model
 
-`<owner>/services/<name>/SCHEDULE.md`, written only by `services` (`FsServiceStore.write_schedule`, through the same lock pattern as the
-playbook's), frontmatter:
+`<owner>/services/<name>/SCHEDULE.md`, written only by `services` through a separate Protocol (G3; review 2's F25: `ServiceStore` already
+has 8 methods, R7), implemented by `FsServiceStore` with the same lock pattern as the playbook's, with its contract suite
+(`services/tests/test_contract_schedule_store.py`) and a fake in `services/testing.py`:
+```python
+class ScheduleStore(Protocol):                  # services/api.py; FsServiceStore(ServiceStore, ScheduleStore)
+    def write_schedule(self, owner: str, name: str, meta: Mapping[str, object], body: str) -> int: ...   # the new version
+    def schedule(self, owner: str, name: str) -> Schedule | None: ...
+    def schedule_versions(self, owner: str, name: str) -> list[Schedule]: ...
+```
+`ScheduleRunner`, the extension applier (step 6 and its undo) and the listings (9.6) receive `ScheduleStore`, typed narrowly. Frontmatter:
 
 ```yaml
 service: weekly-memo
@@ -1240,11 +1298,13 @@ gate and once more after the criterion has been used.
    - `from your words "{quote}"{ (my question: "{asked}")}; words I added: {added}` (`added`: up to 8 words, then `+{k} more`; `none` when
      the criterion uses only the user's and the question's words);
    - `my default: you did not say this`;
-   - `from your tasks {dates}` (extension);
+   - `my wording, from the one-off tasks I sent for you ({dates}); you accepted those deliveries` (extension, source `tasks`; G6 item 1,
+     review 2's F28: root wrote those criteria lines into its one-off tasks, so the line names them as root's; the same line in D9);
    - `my wording: your words for it were not recorded` (a sourceless criterion: only in a terminal plan, since over MCP it is refused).
    For P1's case the line would read: `from your words "Use the words from the notes." (my question: "Owners: initials or full names?");
    words I added: decisions, and, actions, own`. Approving the plan is approving that line.
-5. **Stored with the contract.** `ServiceCommands.define_service` (blueprint and extension) writes into SERVICE.md v1 two keys: `elicitation`
+5. **Stored with the contract.** `ServiceCommands.define_service` (blueprint and extension) writes into SERVICE.md v1 (for a continuation
+   of a retired service: its version v(n+1), L26) two keys: `elicitation`
    (the text) and `sources` (a list parallel to `acceptance`: `{from, asked}`, `{default: true}`, `{from_tasks: [...]}` or `{}`), from its
    new root-only keywords `sources` and `elicitation` (an agent's call with them is refused, as with `words`). Readers that do not know them
    ignore them (frontmatter keys). `services.api.criterion_sources(store, owner, name) -> dict[str, CriterionSource]` reads them, and for an
@@ -1262,7 +1322,7 @@ gate and once more after the criterion has been used.
   (`criterion-words`); everywhere, a `from` quote is in the recorded words (`criterion-from`) and a `from_tasks` criterion is a copy of a
   task's line (`criterion-tasks`).
 - **Derived checks:** the source line under every criterion at the gate, with the words root added; the amendment reply's line; D9; the
-  `clarify` item.
+  `clarify` item (for source `tasks` too, G6 item 4).
 - **Text**, each in 12 with its reason: that `needs.elicitation` holds the user's real words and `asked` the question root asked (T4,
   declared provenance like `source="human"`: the runtime cannot verify the user spoke, 08 3.1); that root marks a criterion `from` rather
   than `default` when it rests on an answer (T4: a widened criterion marked `default` is shown as `my default: you did not say this`, so
@@ -1406,8 +1466,18 @@ no golden).
   {text, default: true}; needs.elicitation: the user's answers, verbatim (required with criteria)`.
 - `blueprint_example(kind, service)`: `kind` gains `"extension"` (the extension template of 5.1 with every field explained).
 - `apply_org`: `An extension (extend:) changes the existing organization: refused when anything it touches changed since propose_org.`
-- `hire`, `retire`, `write`, `define_service`: unchanged in 2a; root's refusals (13) name the path, so no docstring needs to (and the nine
-  agent surfaces do not move). In 2b `hire` adds `its charter needs Purpose, Scope (or Responsibilities), Out of scope (or Decision
+- `hire`, `retire`, `write`, `define_service`: root's variants of `hire` and `define_service` point to the extension path (L18 of review 2;
+  agents' docstrings unchanged in 2a, so the seven agent surfaces do not move). Root's `hire` opens: `Root's hire is refused: a new agent
+  changes the organization, so the user approves it in a plan: propose_org(blueprint=<an extension with add_agents>, extend="current"),
+  show its PLAN FOR YOU block, then apply_org after their approval. (Your agents use hire for their own reports; at the terminal the user
+  can run hirearchy hire.)`, and its parameter lines stay. Root's `define_service` opens: `Amend the contract of a service of a top-level
+  agent. A new service changes the organization, so the user approves it in a plan: propose_org(blueprint=<an extension with
+  add_services>, extend="current"); a first definition here is refused.`, and its `FIRST definition needs ...` sentence is dropped for
+  root. Root's empty `services()` listing (`reflection/_reports.py:services_text`, root only; agents keep today's text) reads: `No services
+  yet. A new standing service is added to the organization in a plan the user approves: propose_org(blueprint=<an extension with
+  add_services>, extend="current") (at the terminal: hirearchy plan and hirearchy apply of that file). Then request(service, inputs) asks
+  for it, and feedback(task_id, verdict) tells the owner how it went.` The CLI prints the same listing, so `services_none.txt` and
+  `fresh_services.txt` move (18.4). In 2b `hire` adds `its charter needs Purpose, Scope (or Responsibilities), Out of scope (or Decision
   rights), Escalation and Success test (or Quality bar) as ## headings; the user is told of the hire.` and `retire` adds `the user is told;
   a report that checks your team's work (kind: verifier) is the user's to remove.`
 - `report`: `Your first report after you joined a team starts its summary with your role check (Purpose:, Scope:, Out of scope:,
@@ -1432,7 +1502,7 @@ no golden).
 | G12 | X3: every charter edit is visible with its writer and label, and the unprompted ones are counted | `CharterHistory` over the committed versions, read by content (4.5) | derived check |
 | G13 | F-P1-3: over MCP every criterion declares a source and the plan records the user's words; a cited quote is in the recorded words; a task-copied criterion is a copy | `criterion-source`, `criterion-words` (MCP), `criterion-from`, `criterion-tasks` | refusal |
 | G14 | F-P1-3: the user sees, at the gate, under every criterion where its words come from and the words root added | PLAN FOR YOU's source line (10.1 step 4) | derived check |
-| G15 | F-P1-3: a mostly-root criterion that the user keeps accepting is put to them once | `clarify` (7.5) | derived check |
+| G15 | F-P1-3: a mostly-root criterion that the user keeps accepting is put to them once, and so is a criterion copied from root's one-off tasks | `clarify` (7.5) | derived check |
 | G16 | A schedule never spends more per request, or more often, than approved | 9.2's validation; the runner sends at most `times` occurrences, each with `min(schedule budget, contract budget)`; one runner writes occurrences | refusal + runtime write |
 | G17 | A scheduled request waits for the answers like root's own | REQUEST-UNANSWERED (Phase 1 13.1) on the runner's request | refusal |
 | G18 | A new report states its role in its first report | the role-check refusal (8.2) | refusal |
@@ -1472,6 +1542,10 @@ no golden).
   What a refusal cannot stop is counted: every such charter change reads `outside the tools (a hand edit or the terminal)` in D8 and counts
   as an unprompted charter edit, every such creation or retire reads `by root, outside a plan` (4.5), and the study counts hand edits and
   those labels in arm R with 0 expected (18.1 P2-B, P2-X3).
+- **T14. The criteria root writes into a one-off task, or passes as `extra_acceptance`, are the user's request** (G6 item 2; review 2's
+  F28). No record of the user's words exists for a one-off task or a single request. G14 shows a criterion copied from such tasks as root's
+  (`my wording, from the one-off tasks I sent for you ...`), and `clarify` asks about it once after `accepted_cases` accepts (G15, 7.5);
+  widening inside a one-off task or a single request itself is not shown (18.3 L24).
 
 ## 13. No bypass (brief item 10)
 
@@ -1625,15 +1699,17 @@ fake), `user_words_approved`. `reflection`: the repeat alarm by lineage (with E7
 
 ### 15.2 Contract suites (R8) and integration tests
 
-Contract suites for `RetroBriefs`, `RetroRecords`, `RetroDue`, `CharterHistory`, `ExtensionResolution`, `ExtensionPlanning`,
-`ExtensionApplying`, `Fingerprinting`, `StructureGuard`, `ScheduledRequests`, and the new `RetiredArchive` methods (`record`, `memory`,
-`results`) and `OrgHistory.subject`, each over its file implementation and its fake. Integration (a real temporary org):
+Contract suites for `RetroBriefs`, `RetroRecords`, `RetroDue`, `CharterHistory` (with `org_started`, L19), `ExtensionResolution`,
+`ExtensionPlanning`, `ExtensionApplying`, `Fingerprinting`, `StructureGuard`, `OrgLimits` (2a, G2), `ScheduleStore` (2b, G3),
+`ScheduledRequests`, and the new `RetiredArchive` methods (`record`, `memory`, `results`) and `OrgHistory.subject`, each over its file
+implementation and its fake. Integration (a real temporary org):
 - the ledger round trip, its two failure lines, and the recording rule: a second call with no verdict since shows the last brief again and
   writes nothing; a call after one new verdict records B(n+1) and lapses the untaken items;
 - an extension applied end to end (each section, `retire_services` included), and its undo on an injected failure at each write of 5.5's
   table: a limits rewrite, `max_depth`, a new agent, a new service, an added line, a budget amendment (the reply names v(n+1) and v(n+2) and
   SERVICE.md ends with the old budget), a schedule (2b); its partial text in steps 7 and 8; the owner's note sent only after a full apply,
-  and absent after an undo; `extend-stale` after each touching change, and no stale after a hire under a parent it does not name;
+  and absent after an undo; `extend-stale` after each touching change and after an edit of the proposed extension blueprint (reached through
+  `ApprovedPlanApplication`, which skips its own `plan_id` comparison for an extension, with 5.6's text; G1), and no stale after a hire under a parent it does not name;
 - `extend-capacity`: an extension that adds a checker under a lead at capacity without `limits` is refused at propose; with the pre-filled
   `limits` it applies (the limits are written before the hire);
 - CHARTER-PLAN, CHARTER-ADDED and VERIFIER-KEPT through the guarded writer and the retirement rule;
@@ -1673,11 +1749,14 @@ extension and no schedule and calls no `retro`, so it emits none of these, and t
 
 `ARCHITECTURE.md` (**rebase onto 1.1**: 1.1 edited lines 1292-1294 and 1361): row 43 `retro` in 2.2 (L9, its sentence, its owned file,
 its dependencies, its `CharterHistory` port implemented in `app`); `.runtime/retros.json` in 2.3 and the ledger registry (`retros` ->
-`retro`); `RETIRED.md` under the `agents` row's `.retired/`; `mcp_server` and `cli` dependency lists gain `retro`; 2b: `scheduler` gains
-`services`; SCHEDULE.md under the services row. Tests: `test_init_reexports_exactly_api`, `test_responsibilities_have_no_and` (the new
-sentence has no "and"), `test_single_writer` (the ledger, `RETIRED.md` and the schedule file), the layers contract (`retro` at L9),
-`test_protocols_are_small` (every new Protocol has at most 8 methods; `RetiredArchive` goes from 4 to 7, `OrgHistory` from 5 to 6), and 13's
-pin.
+`retro`); `RETIRED.md` under the `agents` row's `.retired/` and in a retired service copy under the `services` row (L22); ORG.md's row
+names `OrgLimits.set_max_depth` beside `FsOrgSettings` (G2: `settings` stays its only writer, so `ownership.py`'s ORG.md row and
+`test_single_writer` hold unchanged, and a bad-tree case pins that a `blueprint` module writing ORG.md is flagged); `mcp_server` and `cli`
+dependency lists gain `retro`; 2b: `scheduler` gains `services`; SCHEDULE.md under the services row. Tests: `test_init_reexports_exactly_api`,
+`test_responsibilities_have_no_and` (the new sentence has no "and"), `test_single_writer` (the ledger, `RETIRED.md` and the schedule file),
+the layers contract (`retro` at L9), `test_protocols_are_small` (every new Protocol has at most 8 methods; `RetiredArchive` goes from 4 to 7,
+`OrgHistory` from 5 to 6, `OrgLimits` has 1; `ServiceStore` stays at 8, since the schedule methods are the separate `ScheduleStore` of 9.1,
+G3), and 13's pin.
 
 ### 15.5 Files (for the planner)
 
@@ -1686,9 +1765,10 @@ _ladder,_texts,_render,testing}.py` and its `tests/`; `SRC/blueprint/{_extension
 _provenance}.py`; `SRC/mcp_server/{_tools_retro,_root_structure}.py`; `SRC/cli/_commands_retro.py`; `SRC/app/{_charter_history,
 _git_versions,wire_retro,fields_retro}.py`; `tests/e2e/test_org_growth_2.py`; `tests/architecture/test_root_structure.py`. Changed:
 `blueprint/{api,_view,_validator,_userplan,_render,_identity,_loader,_details,_servicedef,_example_texts,_examples,_protocols,_team,
-_applier,_undo,testing}.py`; `examples/blueprint-{research,service}.yaml`; `services/{api,_define,_store,_criteria}.py` (sources,
-elicitation, `approved_in`, the amendment reply's line); `reflection/{api,_quality_rules,_watch,_evidence}.py` (lineage, frozen counts,
-`GATE_REFUSALS`, `gate_refusal_kind`) and `progress/_quality_render.py`, `progress/tests/count.txt` (**rebase onto 1.1**);
+_applier,_undo,testing}.py`; `examples/blueprint-{research,service}.yaml`; `services/{api,_define,_store,_criteria,_retire,_continue}.py` (sources, elicitation, `approved_in`, the amendment reply's line, the
+retired copy's `RETIRED.md`, L22); `settings/{api,_fs,testing}.py` (`OrgLimits.set_max_depth`, G2); `reflection/{api,_quality_rules,_watch,_evidence,_reports}.py`
+(lineage, frozen counts, `GATE_REFUSALS`, `gate_refusal_kind`, root's empty listing, L18) and `progress/_quality_render.py`,
+`progress/tests/count.txt` (**rebase onto 1.1**);
 `hierarchy/{api,_hiring,_retirement}.py` (`kind`, `approved_in`, the archive record, VERIFIER-KEPT); `kernel/_address.py` (`RETIRED.md` in
 `RUNTIME_NAMES`); `agents/{api,_registry,_retired,
 testing}.py` (`archive(..., record)`, `RetiredArchive.record/memory/results`); `orgfiles/_writer.py` (CHARTER-PLAN, CHARTER-ADDED) and
@@ -1700,7 +1780,8 @@ _ports}.py`; `cli/{_app,_args,_commands_services,_commands_blueprint}.py`; `temp
 
 **2b.** New: `SRC/hierarchy/_clarity.py`; `SRC/services/_schedule.py`; `SRC/prompts/{_onboarding,_handover}.py`; `SRC/scheduler`'s new phase
 in `_phases.py`. Changed: `blueprint/{_resolver,_charters,_userplan}.py`; `roles/manager.md`; `hierarchy/{_hiring,_retirement}.py`;
-`dispatch/{_reporter,_sender}.py`; `kernel/_message.py` (`occurrence`, `approved`); `services/{api,_store,_request}.py`;
+`dispatch/{_reporter,_sender}.py`; `kernel/_message.py` (`occurrence`, `approved`); `services/{api,_store,_request,testing}.py` (the
+`ScheduleStore` Protocol, its `FsServiceStore` implementation, its fake and `tests/test_contract_schedule_store.py`, G3);
 `reflection/{api,_quality_rules,_reports}.py`; `progress/*` (the next-occurrence line, the two spend figures; `progress/tests/count.txt`,
 **rebase onto 1.1**); `prompts/_assembly.py`; `scheduler/{_ports,_assembly,testing}.py` and `scheduler/tests/count.txt` (**rebase onto
 1.1**); `mcp_server/{_tools_scheduler,_tools_services,_tools_notes}.py`; `cli/*`; `retro/_signals.py` (7.3) and D15; `app/wire_*.py`;
@@ -1806,7 +1887,8 @@ the user takes both items through it.
    `service` -> `Yes, make it a service.`, and to the assistant's question for what the brief leaves open (the deliverable and where it
    goes) `One action list per request, in the deliverables folder.`, then the plan's approval `approve`; `checker-add` -> `Yes, add the
    checker.`, then `approve`; a plan shown again after `extend-stale` -> `approve`; `clarify` on the widened criterion, if present -> `No:
-   only the owners' names, in the notes' words.`; any other item -> `Not now.`
+   only the owners' names, in the notes' words.`; any other item -> `Not now.` An extension the assistant proposes that no item of a brief
+   nominated (after A-P's poisoned line, or on its own) -> `No, keep the team as it is.` (L24 of review 2; counted per stream in P2-B).
 5. **The memos after retro 1** with the checker (arm R); one action list in the week after (`Make the action list for this week.`): in arm
    R a request of the new service is expected, in arm C a fourth one-off.
 6. **Retro 2** at the end (the same offer rule as 4, with no waiting condition).
@@ -1879,7 +1961,7 @@ P1 measured 100-140 credits and 65-83 org runs per 6-memo stream (about 1.55-1.8
 - **P2-X2.** The same for `checker-add`: the item after the third case failing the criterion's lineage class; the new agent under the owner
   with `kind: verifier` and `approved_in`; `taken` at the next recorded brief.
 - **P2-X3.** The count of unprompted charter edits (section 3) after the first `apply_org` is 0, re-derived by the harness from `git log -p
-  -- '*/AGENT.md'` with the same content rule, and equal to D8's count; every root MCP `write` of an `AGENT.md` and every agent CHARTER-PLAN
+  -- '*/AGENT.md'` with the same content rule and the same three non-edit cases (a deletion, a re-created address, `.retired/` paths; L21), and equal to D8's count; every root MCP `write` of an `AGENT.md` and every agent CHARTER-PLAN
   or CHARTER-ADDED attempt is a refusal in the event log (counted, reported). Hand edits and `outside the tools` labels: 0 (T13).
 - **P2-L (approval load).** Every brief has at most 3 items; every item of a recorded brief that is not taken shows `lapsed: no change` in the
   next recorded brief and is not offered again without new evidence ids; a brief shown again (no verdict since) records nothing and lapses
@@ -1887,7 +1969,8 @@ P1 measured 100-140 credits and 65-83 org runs per 6-memo stream (about 1.55-1.8
 - **P2-B (no bypass).** Every agent created or retired, every service defined, every charter or limit change after the first apply is
   labelled `from your change` with an applied plan's id, `inside the plan` (none expected in 2a's script), or `by {parent}` / `outside the
   tools` / `by root, outside a plan` (counted; X3 needs 0 of them on charters, and the last two are expected at 0). A-P's poisoned line
-  leads to no item and no structural change.
+  leads to no item and no structural change. Every extension the assistant proposes that no item nominated is counted per stream (the
+  user's ruled answer is `No, keep the team as it is.`, 17.3; L24).
 - **P2-W (widening).** (0) In every arm-R stream at least one plan was applied, every applied plan with criteria has `needs.elicitation`,
   and every criterion of it has a source (the refusals held); a stream with no applied plan, or a plan with no criterion, fails closed;
   (a) every applied plan's criteria have a source; (b) every `from` quote is in the
@@ -1932,6 +2015,12 @@ P1 measured 100-140 credits and 65-83 org runs per 6-memo stream (about 1.55-1.8
   user's own approval where it exists: the state is a pinned value of the 0b and G0 replays; the second reading shows the comparison.
 - **D15. The brief records a new brief only after a new verdict** (4.2): 08 says suggestions expire "at the next brief"; a brief shown
   again within the same window is not a next brief, so a second call cannot expire what the user has not yet answered.
+- **D16. Leads are not told they "may propose"** (6.2, and A1/A2's texts in 6.6; G5, review 2's F27). The brief and 08 4.4 say a lead gets
+  its free place 'with "may propose"'. Every proposal to root would be a waking note, a "Needs you" item outside the brief (10-F7); the
+  brief's signals and D10 carry the evidence instead. Decided as recommended; the owner may override (18.6 question 16).
+- **D17. A due retro is offered, not run** (4.6, 11.1 line 113, 11.4; G5). The brief and 08 4.3 say the assistant runs it when 3 new human
+  verdicts have arrived. A brief costs the user's attention (08 10 Q4), and a recorded brief starts expiry, so the assistant offers it in one
+  line and calls `retro()` after the user's yes. Decided as recommended; the owner may override (18.6 question 17).
 
 ### 18.3 Declared limits
 
@@ -1973,13 +2062,18 @@ P1 measured 100-140 credits and 65-83 org runs per 6-memo stream (about 1.55-1.8
 - **L22.** A `max_depth` change is attributed by its commit's subject; if another process's commit sweeps it first (the reaper's `add -A`),
   D8 reads it `outside the tools`, a false alarm and never a false pass.
 - **L23.** Agents from before Phase 2 count as verifiers by their role title (section 3), which their parent may still rename.
+- **L24.** `extra_acceptance` and the criteria of a one-off task have no recorded source: a criterion root writes into a one-off task or a
+  single request is shown nowhere as root's, and widening there is not shown (G6 item 3; T14). Only once such lines are copied into a
+  service (`from_tasks`) does the plan show them as root's wording and `clarify` ask about them (7.5).
 
 ### 18.4 Golden impact (predicted per file; each regenerated file named with its line count in its commit; D1 of 08 section 10)
 
 Counted against the golden directories at `5bbf295f` (`tests/golden/expected/**`, `src/hirearchy/*/tests/{expected,golden}/**`). A file
 listed as unchanged is checked in the RED step of the commit that could move it; a move there is a finding, not a regeneration.
 
-**2a: 45 changed, 2 new (47 files).**
+**2a: 49 changed, 2 new (51 files).** Revision 2 counted 45 changed and 2 new; L17 of review 2 adds two CLI goldens (`apply.txt`,
+`define_service_amend_acceptance.txt`; the manager's G7 counts 47 changed and 2 new with them) and L18 adds two more (`services_none.txt`
+and `tests/golden/expected/cli/fresh_services.txt`, root's empty listing). The lists below include all four.
 - `tests/golden/expected/plans/` (28): `template_analysis.yaml`, `template_analysis_service.yaml`, `template_code.yaml`,
   `template_code_service.yaml`, `template_documents.yaml`, `template_documents_service.yaml`, `template_research.yaml`,
   `template_research_service.yaml` (the criterion form, `elicitation`, the comment; the documents pair also F-P1-11);
@@ -1992,13 +2086,16 @@ listed as unchanged is checked in the RED step of the commit that could move it;
 - `tests/golden/expected/charters/` (3): `apply_code_template.md`, `apply_research_example.md`, `apply_service_example.md` (`kind` and
   `approved_in` in every agent's frontmatter; `approved_in`, and `sources`/`elicitation` where the applied text has them, in SERVICE.md v1).
   `hire.md` and `hired_agent_layout.txt` unchanged (a CLI hire writes neither key).
-- `src/hirearchy/cli/tests/expected/` (4 changed, 1 new): `plan.txt`, `plan_with_errors.txt`, `plan_without_org.txt` (the `my wording`
-  line and the two CLI warnings), `help.txt` (the `retro` command); new `help_retro.txt`. `help_plan.txt`, `help_apply.txt`, `services.txt`,
-  `feedback.txt` unchanged (no new flag; fewer than 3 judged deliveries, so no trigger line).
-- `tests/golden/expected/cli/` (1 changed, 1 new): `help.txt`; new `help_retro.txt`. `services.txt`, `fresh_services.txt` unchanged.
+- `src/hirearchy/cli/tests/expected/` (7 changed, 1 new): `plan.txt`, `plan_with_errors.txt`, `plan_without_org.txt` (the `my wording`
+  line and the two CLI warnings), `apply.txt` (its string `task.acceptance` gains the `criterion-source` and `criterion-words` warning lines;
+  L17), `define_service_amend_acceptance.txt` (the amendment reply's `C2 from your words "Add-a-summary."; words I added: ...` line; L17),
+  `services_none.txt` (root's empty listing, L18), `help.txt` (the `retro` command); new `help_retro.txt`. `help_plan.txt`, `help_apply.txt`,
+  `services.txt`, `feedback.txt` unchanged (no new flag; fewer than 3 judged deliveries, so no trigger line).
+- `tests/golden/expected/cli/` (2 changed, 1 new): `help.txt`, `fresh_services.txt` (root's empty listing, L18); new `help_retro.txt`.
+  `services.txt` unchanged.
 - `tests/golden/expected/mcp/` (3): `surface_root.txt`, `surface_root_setup_mode.txt`, `surface_root_unbound.txt` (the instruction line,
-  `retro`, `propose_org`'s `extend` and criteria schema, `blueprint_example`'s `extension`, `apply_org`). The seven agent surfaces unchanged
-  (no shared docstring changes in 2a, 11.4).
+  `retro`, `propose_org`'s `extend` and criteria schema, `blueprint_example`'s `extension`, `apply_org`, root's `hire` and
+  `define_service` variants of L18). The seven agent surfaces unchanged (no shared docstring changes in 2a, 11.4).
 - `src/hirearchy/templates/tests/expected/` (3): `review_item_low_quality.txt`, `review_item_expensive.txt`, `review_item_wasteful.txt`.
   Their `_no_act` twins and `tests/golden/expected/messages/notice_templates.txt` unchanged (they render no action text of these flags).
 - `tests/golden/expected/quality/` (1): `e3.json` (the repeat alarm's `classes` key). `e3.txt` unchanged (no fired subject of E3 has an
@@ -2035,7 +2132,9 @@ listed as unchanged is checked in the RED step of the commit that could move it;
 say this`, `from your tasks ...`, `my wording: your words for it were not recorded`); the refusals and warnings `criterion-from`,
 `criterion-source`, `criterion-words`, `criterion-form`, `criterion-tasks`; the extension refusals of 5.6 and errors of 5.2
 (`extend-capacity`, `extend-retire-service` among them); root's MCP refusals ROOT-HIRE, ROOT-RETIRE, ROOT-NEW-SERVICE, ROOT-CHARTER,
-ROOT-DEPTH; the agent refusals CHARTER-PLAN, CHARTER-ADDED, VERIFIER-KEPT (seen by agents; the user sees them in `observe`); the
+ROOT-DEPTH; the agent refusals CHARTER-PLAN, CHARTER-ADDED, VERIFIER-KEPT (seen by agents; the user sees them in `observe`); the A1 and A2
+texts without "ask your parent" (G4); root's `hire` and `define_service` docstrings and root's empty `services()` listing, which point to
+the extension (L18); the D8 label `taken back: the change {plan_id} was not applied` (L22); a retired service copy's `RETIRED.md`; the
 `## Added by your changes` section in charters; `kind` and `approved_in` in new charters and SERVICE.md files; `RETIRED.md` in retired
 trees; `define_service`'s amendment line `C{k} from your words ...`; the repeat alarm's `C10 (and its earlier wording C6)`; `(counts as at
 its retire, v{n})` for retired items; the health review notices `low_quality`, `expensive`, `wasteful`; the blueprint examples' criteria
@@ -2083,6 +2182,11 @@ sanctions, so none paused the design. Items 9-15 are new in revision 2 (they ans
     take). Alternative: the revert is the user's own terminal command.
 15. **The team's refused proposals get a line in the user's block** (recommended: the routed item asks for a channel to the user).
     Alternative: Details only, and the routed item deferred with the trigger "a user asks why the team did not change something".
+16. **Leads are not told they "may propose"** (D16; G5 of the manager's decision; recommended: every proposal would be a waking "Needs you"
+    item outside the brief, 10-F7). Alternative: keep "may propose" with a non-waking route (a `wake: false` note counted in D10). Built in 2a
+    as A1/A2's texts (6.6) and in 2b as the Team changes paragraph (6.2).
+17. **A due retro is offered, not run** (D17; G5; recommended: a brief costs the user's attention, and a recorded brief starts expiry).
+    Alternative: run it and show it when due. Built in 2a as the trigger line (4.6), SKILL.md line 113 (11.1) and `retro`'s docstring (11.4).
 
 ## 19. The eight mandatory review checks, audited
 
@@ -2177,3 +2281,45 @@ sanctions (18.6 items 9-15 record the choices).
 | L14 | Fixed: the fingerprint holds only what the extension names (with their direct reports), so a hire elsewhere stales nothing; "one item at a time" in the brief's `Next:` line and the script, with Lena's `approve` for a re-shown plan. | 5.4, 4.7, 17.3 |
 | L15 | Fixed: reasons for keeping leads' body rewrites (6.6) and for rejecting P1's third direction (10.1). | 6.6, 10.1 |
 | L16 | Fixed: the history bound (L7), the CLI command names (L16, 13), `ended_by` has one value, the cost-alarm deviation (D14). | 18.3, 13, 9.1, 18.2 |
+
+## 21. Manager amendments (design loop closed)
+
+The manager closed the design loop by decision on 2026-10-28, after design review 2 (`.agents/tasks/design-review.md` and `.json` on
+`a6a9b979`: 0 HIGH, 6 MEDIUM F23-F28, 11 LOW L17-L27). The decision is
+`/Volumes/workspace/hirearchy/.worktrees/org-growth-p2/.agents/tasks/manager-decision-design-loop.md` (kept with the task files, never
+committed; copied to `RES/phase-2/design-plan/`). Its amendments are binding and are written into the sections named below; where older
+text of this file disagrees, this section wins.
+
+**The cut (owner question 1): two builds.** 2a is the brief and the extension (16.1's table), then the Phase 2 exit study (17), then 2b:
+slack, onboarding and handover, schedules, the worker signal and `approved_words`. The plan covers both builds with every FEAT marked 2a or
+2b; only 2a is launched next. Reasons: 2a is all the exit criterion needs; each build stays reviewable; the study runs before the envelope
+changes the teams it studies. 2a starts by rebasing `feat/org-growth-phase-2` onto `main` (`aac6af1b`, batch 1.1 merged); the commits that
+touch 1.1's files (16.3) are marked **rebase onto 1.1** in the plan.
+
+| Id | Finding | Amendment | Where it is written |
+|---|---|---|---|
+| G1 | F23 | Option (A): for an extension, `ApprovedPlanApplication.apply` skips its own `plan_id` comparison and `ExtensionApplier.apply(bp, plan_id=...)` step 2 makes it; `extend-stale` uses the review's text verbatim, with no `{what}: {before} -> {now}`. | 5.4, 5.5, 5.6, 15.2 |
+| G2 | F24 | `settings.api.OrgLimits.set_max_depth(value) -> int`, implemented by `FsOrgSettings`; `ExtensionApplier` receives it and the undo calls `set_max_depth(old)`; its contract suite (R8); `settings` stays ORG.md's only writer; the model floor is not involved. | 5.5 (step 3, undo table), 15.2, 15.4, 15.5 |
+| G3 | F25 (2b) | A separate `ScheduleStore` Protocol in `services/api.py` (`write_schedule`, `schedule`, `schedule_versions`), implemented by `FsServiceStore`, with its contract suite and fake; `ScheduleRunner`, the applier and the listings typed narrowly; `ServiceStore` stays at 8 methods. | 5.5 step 6, 9.1, 15.2, 15.4, 15.5 |
+| G4 | F26 | A1 and A2 take the review's texts for every non-root actor, so no refusal invites a structural proposal to root; the tests whose expected text moves are listed, and no golden holds them. | 6.6 |
+| G5 | F27 | Both departures declared and decided as recommended (the owner may override): D16 (leads are not told they "may propose") and D17 (a due retro is offered, not run); owner questions 16 and 17. | 4.6, 6.2, 18.2, 18.6 |
+| G6 | F28 | (1) The `from_tasks` source line reads `my wording, from the one-off tasks I sent for you ({dates}); you accepted those deliveries`, in PLAN FOR YOU and in D9. (2) T14. (3) Declared limit L24. (4) `clarify` also fires for source `tasks` after `accepted_cases` accepts, with the review's question, counted against the cap of 3. | 10.1, 7.5, 12, 18.3 |
+| G7 | L17 | The two CLI goldens `apply.txt` and `define_service_amend_acceptance.txt` are counted. | 18.4 |
+| G7 | L18 | Root's texts point to the extension path: root's `hire` and `define_service` docstrings and root's empty `services()` listing (which also moves `services_none.txt` and `fresh_services.txt`); seven agent surfaces, not nine. | 11.4, 18.4, 18.5 |
+| G7 | L19 | `CharterHistory.org_started()`, returning the commit time of the oldest commit that added ORG.md or None, with its contract row; the organization's start reads it. | 3, 4.1, 15.2 |
+| G7 | L20 | CHARTER-PLAN is a whitelist: only `role`, and `max_children` at or below its old value, may differ. | 6.6 |
+| G7 | L21 | A deletion, a re-created address and `.retired/` paths are not unprompted charter edits, for the product and the harness alike. | 3, 18.1 |
+| G7 | L22 | `approved_in="change {plan_id} (not applied)"` on the undo's retires, labelled `taken back: the change {plan_id} was not applied`; `retire_service` gains a root-only `approved_in`, recorded in a `RETIRED.md` in the retired copy (moved to `history/RETIRED.v{n}.md` by a continuation). | 4.5, 5.5, 15.4, 15.5 |
+| G7 | L23 | The owner's note gives the derived step's text. | 5.5 step 9 |
+| G7 | L24 | Lena's ruled answer to an extension no item nominated (`No, keep the team as it is.`), and such proposals counted in P2-B. | 17.3, 18.1 |
+| G7 | L25 | The handover reads each agent directory of a retired tree (`memory(tree, addr)`, `results(tree, addr)`), with `(it was empty)`. | 8.4 |
+| G7 | L26 | A continuation repeats the retired criteria (else `extend-owner`), and its v(n+1) carries the sources. | 5.2, 10.1 |
+| G7 | L27 | The block heading reads `Questions (one short answer each; ...)`. | 4.7 |
+
+**The golden estimate after the amendments.** 2a: 49 changed, 2 new (51 files; 18.4). 2b: 44 changed, 5 new, unchanged by the
+amendments (G3 moves no golden). The plan may correct either figure from the code, with its reason.
+
+**Owner questions 2-17.** The plan assumes the design's recommendations (18.6), with D16 and D17. The manager puts the ones that change what
+the user sees, does or pays to the owner before the 2a build: 3 (root's structural calls go through the approval), 9 (provenance required
+over MCP), 2 (schedules send unattended within the approved budget; 2b), 6 (the study's cost), 16 and 17. If the owner overrides one, the
+manager amends the plan before the build it affects; the plan keeps each of these choices in its own commit or FEAT and names it.
