@@ -140,17 +140,22 @@ def pending_rejection(records: Records, rejection: str, _seen: frozenset[str] = 
     return any(pending_rejection(records, x, _seen | {rejection}) for x in named)
 
 
-def answer_time(records: Records, a: Assertion) -> datetime:
-    """When the rejection ``a`` was answered (B4): the earlier of its first human link and its answering version's ``defined``; for a corrected
-    link (a second human link), the time of the link that is effective. ``EPOCH`` for a rejection with no answer."""
-    notes = human_notes(a)
+def answered_at(notes: Sequence[Message], contracts: Sequence[Contract], rejection: str) -> datetime:
+    """When a rejection was answered (B4): the earlier of its first human link (``notes``, oldest first) and the ``defined`` of the first contract
+    version whose ``answers`` is the rejection's note id ``rejection``; for a corrected link (a second human link), the time of the link that is
+    effective. ``EPOCH`` for a rejection with no answer."""
     if len(notes) > 1:
         return when_of(notes[-1])
-    answer = answering(records, a)
+    answer = next((c for c in contracts if c.answers == rejection), None)
     times = [when_of(notes[0])] if notes else []
     if answer is not None:
         times.append(answer.defined or EPOCH)
     return min(times, default=EPOCH)
+
+
+def answer_time(records: Records, a: Assertion) -> datetime:
+    """When the rejection ``a`` was answered (B4): ``answered_at`` over its human link notes and the stored versions."""
+    return answered_at(human_notes(a), records.contracts, a.verdict.message.id)
 
 
 def lineage_as_of(contracts: Sequence[Contract], criterion: str, when: datetime) -> tuple[str, ...]:

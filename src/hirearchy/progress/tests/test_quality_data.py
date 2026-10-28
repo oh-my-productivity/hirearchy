@@ -16,7 +16,7 @@ from hirearchy.reflection import (
     Assertion, BarChanges, Case, Cause, CharterMark, ContractMark, Delivery, ItemWatch, ModelMark, PlaybookMark, QualityThresholds, ServiceRecord, TopUpMark,
 )
 
-from ._quality_records import case, delivery, mid, record, request, top_ups, verdict
+from ._quality_records import case, delivery, lineage_record, mid, record, request, top_ups, verdict
 
 T = QualityThresholds()
 
@@ -109,6 +109,14 @@ def test_the_top_level_and_the_thresholds() -> None:
     assert out["notes"] == ["a note"] and [s["service"] for s in out["services"]] == ["weekly-memo"]
     assert out["one_off"]["service"] == "" and out["one_off"]["budget"] is None and out["one_off"]["owner"] == ""
     assert out["nested"] == [{"owner": "lead/writer", "service": "draft", "client": "lead", "cases": 0, "delivered": 0, "agent_verdicts": 0, "error": ""}]
+
+
+def test_the_repeat_alarm_names_a_class_only_where_a_fired_subject_has_an_earlier_wording() -> None:
+    fired = data(QualityView(QualityThresholds(min_judged=2), (), (RecordView(lineage_record()),), (), None))
+    repeat = fired["services"][0]["alarms"]["repeat"]
+    assert repeat["fired"] == ["C10"] and repeat["classes"] == {"C10": ["C6", "C10"]}
+    assert problems(fired) == []
+    assert "classes" not in data(rich())["services"][0]["alarms"]["repeat"]  # the key is absent when nothing fired with an earlier wording
 
 
 def test_ratio_is_the_two_decimal_string() -> None:

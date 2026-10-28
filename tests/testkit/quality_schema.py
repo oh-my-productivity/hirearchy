@@ -120,9 +120,16 @@ VERIFIER = shape(
     addr=STR, judged=INT, escapes=shape(counted=counts(INT), not_its=counts(INT)), pass_precision=pair(INT, INT), rechecks=null(INT), rework_runs=null(INT),
     fails_error=STR,
 )
-REPEAT = shape(
+_REPEAT = dict(
     state=choice("fires", "no", "n/a", "does not apply"), judged=INT, window=IDS, subjects=counts(INT), fired=IDS, not_counted=counts(IDS),
 )
+
+
+def REPEAT(value: Any, path: str) -> list[str]:
+    """The repeat alarm; ``classes`` (a fired subject to the ids of its class) is there only when a fired subject has an earlier wording (10.5)."""
+    return shape(**_REPEAT, classes=counts(IDS))(value, path) if isinstance(value, dict) and "classes" in value else shape(**_REPEAT)(value, path)
+
+
 COST = shape(
     state=choice("fires", "no", "n/a"), judged=INT, compared=INT,
     cases=items(shape(case=STR, user_cost=INT, user_approved=INT, ratio=RATIO, relayed_runs=INT, total=INT)),

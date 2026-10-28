@@ -241,6 +241,7 @@ class DerivedCaseRecords(CaseRecords):
             owner, name, client, kind, contract=contract.version, playbook=playbooks[-1].version if playbooks else 0, budget=contract.budget,
             cases=tuple(cases), deliveries=deliveries, assertions=tuple(assertions), escapes=escapes,
             timeline=tuple(sorted(marks, key=_when)), history=_scoped(bars, set(self._agents.subtree(owner))), files_error=files_error, watch=watch,
+            contracts=facts.contracts,
         )
 
     def _one_off(self, mail: _Boxes, findings: Sequence[DeliverableFinding], files_error: str, bars: BarChanges) -> ServiceRecord:

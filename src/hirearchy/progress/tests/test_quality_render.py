@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from dataclasses import replace
 from datetime import datetime, timezone
 from fractions import Fraction
 from typing import Any
@@ -17,7 +18,7 @@ from hirearchy.reflection import (
 )
 
 from ._quality_records import (
-    OWNER, case, contract_mark, delivery, mid, record, request, top_ups, verdict,
+    OWNER, case, contract_mark, delivery, lineage_record, mid, record, request, top_ups, verdict,
 )
 
 T = QualityThresholds()
@@ -436,6 +437,15 @@ def test_the_repeat_alarm_in_each_state() -> None:
     d3 = delivery(c3, 0, result_n=31, verdicts=(relayed,))
     below = record(cases=[c3], deliveries=(d3,), assertions=(Assertion("R1", c3.id, relayed, (), "unconfirmed"),))
     assert alarms(below, few)[0] == "    repeat: n/a (1 of 2 judged cases); not counted: R1's reading C6, C3 (not confirmed)"
+
+
+def test_a_fired_class_reads_c10_and_its_earlier_wording_c6() -> None:
+    few = QualityThresholds(min_judged=2)
+    r = lineage_record()
+    one, two = r.cases
+    assert alarms(r, few)[0] == f"    repeat: FIRES: C10 (and its earlier wording C6) failed in 2 of the last 2 judged cases (cases {one.id}, {two.id})"
+    plain = lineage_record()
+    assert alarms(replace(plain, contracts=()), few)[0] == "    repeat: no (2 judged cases; counted: R1, R2, C6, C10)"  # without the lineage: two subjects
 
 
 # ------------------------------------------------------------------------------------------------------------------------ the timeline

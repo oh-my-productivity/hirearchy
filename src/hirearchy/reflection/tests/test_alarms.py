@@ -11,10 +11,13 @@ from fractions import Fraction
 import pytest
 
 from hirearchy.kernel import Message, latest_results, link_ids, msg_time, verdict_tier
+from hirearchy.services import Contract
 from hirearchy.reflection import (
     QUALITY_DEFAULTS, Case, CostAlarm, CostCase, QualityThresholds, RepeatAlarm, ServiceRecord, Verdict, case_spend, cost_alarm, deliveries_of, judged_cases,
     over_cost, regressions, repeat_alarm, user_approved, user_cost,
 )
+
+from ._watch_kit import contract
 
 OWNER = "ceo"
 T = QualityThresholds()  # min_judged 3, window 3, failures 2, ratio 1.25
@@ -66,7 +69,7 @@ class Spec:
     own: tuple[str, ...] = ()  # the rejection's own `criterion` field: the assistant's reading, before any link note
 
 
-def make(specs: list[Spec], *, budget: int = 10, service: str = "s", client_kind: str = "human") -> ServiceRecord:
+def make(specs: list[Spec], *, budget: int = 10, service: str = "s", client_kind: str = "human", contracts: tuple[Contract, ...] = ()) -> ServiceRecord:
     cases: list[Case] = []
     finals: list[Message] = []
     for k, spec in enumerate(specs, start=1):
@@ -92,7 +95,10 @@ def make(specs: list[Spec], *, budget: int = 10, service: str = "s", client_kind
         cases.append(replace(case, **(spec.over or {})))  # type: ignore[arg-type]  # the fields a test overrides are the Case's own
     results = latest_results(finals)
     deliveries = tuple(d for c in cases for d in deliveries_of(c, results, {}))
-    return ServiceRecord(OWNER if service else "", service, "root", client_kind, budget=budget, cases=tuple(cases), deliveries=deliveries, assertions=tuple(regressions(cases)))
+    record = ServiceRecord(
+        OWNER if service else "", service, "root", client_kind, budget=budget, cases=tuple(cases), deliveries=deliveries, assertions=tuple(regressions(cases)),
+    )
+    return replace(record, contracts=contracts) if contracts else record
 
 
 def rejecting(*links: str, **kw: object) -> Spec:
@@ -221,6 +227,58 @@ def test_a_reading_that_a_human_link_names_too_is_confirmed_and_not_listed() -> 
 
 def test_the_thresholds_are_the_defaults_of_the_design() -> None:
     assert (T.min_judged, T.repeat_window, T.repeat_failures, T.cost_ratio) == (3, 3, 2, Fraction("1.25")) and QUALITY_DEFAULTS["min_judged"] == 3
+
+
+# ------------------------------------------------------------------------------------------------------------------------ repeat, by lineage (10.5)
+
+NINE = ["w", "x", "y", "z", "u", "v", "q", "r", "s"]  # C1-C9: "v" is C6
+TEN = [*NINE[:5], "ten", *NINE[6:]]  # C6 replaced by C10
+
+
+def replaced_c6(rejection_note: str, tick: int = 150) -> tuple[Contract, Contract]:
+    """Contract v1 (C1-C9) and v2, which answers the rejection ``rejection_note`` by replacing C6 with C10."""
+    return contract(1, NINE, 0), contract(2, TEN, tick, answers=rejection_note)
+
+
+def note_id(case: int) -> str:
+    """The id of the verdict note of case ``case`` (1-based) that ``make`` builds."""
+    return ident(100 * case + 20, "root")
+
+
+def test_two_rejections_in_one_lineage_count_as_one_subject() -> None:
+    # R1 is about C6 and is answered by v2, which replaces C6 with C10; R2 is about C10: one criterion, two wordings
+    record = make([rejecting("C6"), rejecting("C10"), Spec("accept")], contracts=replaced_c6(note_id(1)))
+    alarm = repeat_alarm(record, T)
+    assert alarm.state == "fires" and alarm.fired == ("C10",)
+    assert alarm.subjects == (("R1", 1), ("R2", 1), ("C10", 2))  # C6 is not a subject of its own
+    assert alarm.cases == (("C10", tuple(c.id for c in record.cases[:2])),)
+    assert repeat_alarm(replace(record, contracts=()), T).state == "no"  # the alarm without the lineage: two subjects, once each
+
+
+def test_a_fired_subject_lists_the_ids_of_its_class() -> None:
+    record = make([rejecting("C6"), rejecting("C10"), Spec("accept")], contracts=replaced_c6(note_id(1)))
+    assert repeat_alarm(record, T).classes == (("C10", ("C6", "C10")),)  # each fired subject with its class, by number
+    plain = make([rejecting("C1"), rejecting("C1"), Spec("accept")], contracts=replaced_c6(note_id(1)))
+    assert repeat_alarm(plain, T).classes == (("C1", ("C1",)),)  # a criterion with no earlier wording is its own class
+    assert repeat_alarm(make([rejecting("C1"), rejecting("C2"), rejecting("C3")]), T).classes == ()  # nothing fired
+
+
+def test_a_p1_shaped_stream_fires_on_the_lineage_it_could_not_see() -> None:
+    """P1: the client rejected C6, the answer replaced it with C10, and a later delivery was rejected on C10 (F-P1-15)."""
+    record = make([rejecting("C6"), Spec("accept"), rejecting("C10")], contracts=replaced_c6(note_id(1)))
+    alarm = repeat_alarm(record, T)
+    assert (alarm.state, alarm.fired) == ("fires", ("C10",))
+    assert alarm.cases == (("C10", (record.cases[0].id, record.cases[2].id)),)
+    blind = repeat_alarm(replace(record, contracts=()), T)  # what the alarm saw before: C6 once, C10 once
+    assert (blind.state, blind.fired, blind.classes) == ("no", (), ())
+
+
+def test_an_e7_shaped_stream_keeps_its_pinned_state() -> None:
+    """E7: one rejection, linked to C9, which v2 added in place of C2; nothing else was rejected, so the alarm reads `no` with R1 and C9 once each."""
+    v1 = contract(1, ["a", "b", "c", "d", "e", "f", "g", "h"], 0)
+    v2 = contract(2, ["a", "nine", "c", "d", "e", "f", "g", "h"], 150, answers=note_id(1))
+    alarm = repeat_alarm(make([rejecting("C9"), Spec("accept"), Spec("accept")], contracts=(v1, v2)), T)
+    assert (alarm.state, alarm.subjects, alarm.fired, alarm.classes) == ("no", (("R1", 1), ("C9", 1)), (), ())
 
 
 # ------------------------------------------------------------------------------------------------------------------------ cost

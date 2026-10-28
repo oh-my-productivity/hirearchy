@@ -22,7 +22,7 @@ from types import MappingProxyType
 from typing import Protocol, TypeAlias, runtime_checkable
 
 from ..kernel import ClientItems, Message, client_items, clip_line, msg_time
-from ..services import Criterion, ItemWatch
+from ..services import Contract, Criterion, ItemWatch
 from ._deliverables import FOLDER_SHOWN, NAME_SHOWN, shown_name
 from ._ports import BarChanges
 
@@ -990,7 +990,9 @@ class RepeatAlarm:
     number of window cases it failed in (``R`` ids first, then ``C`` ids, each by number); ``fired`` the subjects in at least ``repeat_failures``
     cases, with ``cases`` the window cases of each. ``not_counted`` has, under every state, the readings the alarm ignored: for a rejection, its ``R<k>``
     and the ids of the assistant's own reading (a relayed link, or the rejection's own ``criterion``) that no human link confirms, in the order it
-    recorded them; a human link that names another criterion does not hide the reading (DR2-3)."""
+    recorded them; a human link that names another criterion does not hide the reading (DR2-3). A criterion counts with its lineage class (10.5): the
+    criteria the answers that added its text replaced, as of the answer to the rejection, so two rejections in one lineage are one subject. ``subjects``
+    and ``fired`` name the newest wording the window's rejections named; ``classes`` has each fired subject with the ids of its class, by number."""
 
     state: str
     judged: int = 0
@@ -999,6 +1001,7 @@ class RepeatAlarm:
     fired: tuple[str, ...] = ()
     cases: tuple[tuple[str, tuple[str, ...]], ...] = ()
     not_counted: tuple[tuple[str, tuple[str, ...]], ...] = ()
+    classes: tuple[tuple[str, tuple[str, ...]], ...] = ()
 
 
 @dataclass(frozen=True)
@@ -1065,6 +1068,7 @@ class ServiceRecord:
     history: BarChanges = BarChanges()
     files_error: str = ""
     watch: tuple[ItemWatch, ...] = ()  # the watch of every item of the playbook, one derivation (``ServiceEvidence.watch``); () when none (design 14.4)
+    contracts: tuple[Contract, ...] = ()  # the stored contract versions, oldest first: the lineage of a criterion is read from them (10.5); () for one-off tasks
 
 
 @runtime_checkable

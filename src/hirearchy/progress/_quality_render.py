@@ -13,7 +13,7 @@ from typing import TypeVar
 
 from ..kernel import ROOT, JsonObject, clip_line, msg_time
 from ..reflection import (
-    Case, Cause, CharterMark, ContractMark, ItemWatch, Mark, ModelMark, PlaybookMark, QualityThresholds, ServiceRecord, TopUpMark, case_spend, cost_alarm,
+    Case, Cause, CharterMark, ContractMark, ItemWatch, Mark, ModelMark, PlaybookMark, QualityThresholds, RepeatAlarm, ServiceRecord, TopUpMark, case_spend, cost_alarm,
     attribution, failure_class, repeat_alarm, shown_name, user_cost, watch_entry,
 )
 from ._quality_facts import (
@@ -266,12 +266,24 @@ def _runs_lines(view: RecordView) -> list[str]:
     return lines + ([f"    and {more} earlier case(s), counted above"] if more else [])
 
 
+def _earlier_wordings(a: RepeatAlarm, subject: str) -> list[str]:
+    """The ids of the class of a fired ``subject`` other than itself: its earlier wordings (10.5)."""
+    return [x for x in dict(a.classes).get(subject, ()) if x != subject]
+
+
+def _earlier(a: RepeatAlarm, subject: str) -> str:
+    found = _earlier_wordings(a, subject)
+    return f" (and its earlier {'wordings' if len(found) > 1 else 'wording'} {', '.join(found)})" if found else ""
+
+
 def _repeat_text(view: RecordView, t: QualityThresholds) -> str:
     a = repeat_alarm(view.record, t)
     if a.state == "does not apply":
         return "does not apply (one-off tasks name no criterion ids)"
     if a.state == "fires":
-        text = "FIRES: " + "; ".join(f"{s} failed in {len(ids)} of the last {len(a.window)} judged cases (cases {', '.join(ids)})" for s, ids in a.cases)
+        text = "FIRES: " + "; ".join(
+            f"{s}{_earlier(a, s)} failed in {len(ids)} of the last {len(a.window)} judged cases (cases {', '.join(ids)})" for s, ids in a.cases
+        )
     elif a.state == "no":
         text = f"no ({len(a.window)} judged cases; counted: {', '.join(s for s, _ in a.subjects) or 'none'})"
     else:
@@ -532,6 +544,7 @@ def _alarm_data(view: RecordView, t: QualityThresholds) -> JsonObject:
         "repeat": {
             "state": repeat.state, "judged": repeat.judged, "window": list(repeat.window), "subjects": dict(repeat.subjects), "fired": list(repeat.fired),
             "not_counted": {r: list(ids) for r, ids in repeat.not_counted},
+            **({"classes": classes} if (classes := {s: list(ids) for s, ids in repeat.classes if len(ids) > 1}) else {}),
         },
         "cost": {
             "state": cost.state, "judged": cost.judged, "compared": cost.compared,

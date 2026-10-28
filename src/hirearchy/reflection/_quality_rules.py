@@ -11,7 +11,7 @@ from collections import Counter
 from collections.abc import Collection, Mapping, Sequence
 from fractions import Fraction
 
-from ..kernel import Message, link_ids
+from ..kernel import Message, link_ids, verdict_tier
 from .api import (
     Case, CostAlarm, CostCase, Delivery, QualityThresholds, RepeatAlarm, ServiceRecord, Verdict, case_spend, user_approved, user_cost,
 )
@@ -199,11 +199,34 @@ def _not_counted(record: ServiceRecord, cases: Sequence[Case]) -> tuple[tuple[st
     return tuple(sorted(found.items(), key=lambda item: _number(item[0])))
 
 
+def _groups(classes: Mapping[str, frozenset[str]]) -> dict[str, frozenset[str]]:
+    """The groups the lineage classes join (pure): each id in ``classes`` to every id of the connected set of classes it belongs to."""
+    parent: dict[str, str] = {}
+
+    def find(x: str) -> str:
+        parent.setdefault(x, x)
+        while parent[x] != x:
+            parent[x] = parent[parent[x]]
+            x = parent[x]
+        return x
+
+    for cid, members in classes.items():
+        for other in members:
+            parent[find(other)] = find(cid)
+    joined: dict[str, set[str]] = {}
+    for x in list(parent):
+        joined.setdefault(find(x), set()).add(x)
+    return {cid: frozenset(joined[find(cid)]) for cid in classes}
+
+
 def repeat_alarm(record: ServiceRecord, t: QualityThresholds) -> RepeatAlarm:
-    """The repeat alarm of ``record`` (pure; 6): the last ``t.repeat_window`` judged cases, and the subjects that failed in at least ``t.repeat_failures``
+    """The repeat alarm of ``record`` (pure; 6, 10.5): the last ``t.repeat_window`` judged cases, and the subjects that failed in at least ``t.repeat_failures``
     of them. The subjects of a case are, for each counted human-tier rejection, its assertion ``R<k>``, the ``C<k>`` of its human link notes, what the
     assertion is about (a "same as R<j>" resolved) and the ``R<j>`` its human link names; a criterion that only a relayed reading names is no subject
-    and is listed in ``not_counted``, under every state, unless a human link confirms it."""
+    and is listed in ``not_counted``, under every state, unless a human link confirms it. A criterion is counted with its lineage class as of the answer to
+    the rejection (``record.contracts``): rejections about criteria whose classes meet count as one subject, named by the newest wording they named."""
+    from ._watch import answered_at, lineage_class  # late: ``_watch`` imports this module's ``deliveries_of``
+
     judged = judged_cases(record)
     if not record.service:
         return RepeatAlarm("does not apply", len(judged))  # root's one-off tasks name no criterion ids
@@ -211,15 +234,27 @@ def repeat_alarm(record: ServiceRecord, t: QualityThresholds) -> RepeatAlarm:
         return RepeatAlarm("n/a", len(judged), not_counted=_not_counted(record, judged))
     window = judged[-t.repeat_window:]
     in_case: dict[str, set[str]] = {c.id: set() for c in window}
+    classes: dict[str, frozenset[str]] = {}
     for case, v, assertion, about, _ in _rejections(record, window):
-        in_case[case] |= {assertion, *v.confirmed, *about}
+        found = {assertion, *v.confirmed, *about}
         if v.links_tier == "human":
-            in_case[case] |= {x for x in v.links if x[:1] == "R" and x[1:].isdigit()}
+            found |= {x for x in v.links if x[:1] == "R" and x[1:].isdigit()}
+        in_case[case] |= found
+        notes = tuple(sorted((m for m in v.link_notes if verdict_tier(m) == "human" and link_ids(m)), key=lambda m: m.id))
+        when = answered_at(notes, record.contracts, v.message.id)
+        for cid in (x for x in found if x.startswith("C")):
+            classes[cid] = classes.get(cid, frozenset()) | lineage_class(record.contracts, cid, when)
+    group = _groups(classes)
+    named = {x for found in in_case.values() for x in found}
+    newest = {cid: max((x for x in members if x in named), key=_number) for cid, members in group.items()}  # a group is named by its newest named wording
+    for case, found in in_case.items():
+        in_case[case] = {newest.get(x, x) for x in found}
     count = Counter(subject for subjects in in_case.values() for subject in subjects)
     subjects = tuple(sorted(count.items(), key=lambda item: _number(item[0])))
     fired = tuple(subject for subject, n in subjects if n >= t.repeat_failures)
     where = tuple((subject, tuple(case for case, found in in_case.items() if subject in found)) for subject in fired)
-    return RepeatAlarm("fires" if fired else "no", len(judged), tuple(in_case), subjects, fired, where, _not_counted(record, window))
+    of_class = tuple((subject, tuple(sorted(group.get(subject, frozenset({subject})), key=_number))) for subject in fired)
+    return RepeatAlarm("fires" if fired else "no", len(judged), tuple(in_case), subjects, fired, where, _not_counted(record, window), of_class)
 
 
 def over_cost(case: Case, approved: int, ratio: Fraction) -> bool:

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Any
 
@@ -88,3 +89,30 @@ def record(
 
 def top_ups(*items: tuple[str, str, int]) -> TopUps:
     return TopUps(tuple(TopUp(i, kind, amount) for i, kind, amount in items))
+
+
+@dataclass(frozen=True)
+class StoredVersion:
+    """The fields of a stored contract version that the lineage of a criterion reads (``progress`` may not import ``services``, where ``Contract`` is)."""
+
+    version: int
+    acceptance: list[str]
+    defined: datetime
+    answers: str = ""
+    defined_by: str = ROOT
+    initiated: str = ""
+
+
+def lineage_record() -> ServiceRecord:
+    """R1 is about C6, which contract v2 replaced with C10; R2, later, is about C10: the repeat alarm reads them as one criterion (design 10.5)."""
+    t1, t2 = request(3), request(9)
+    v1_, v2_ = verdict(t1, 5, "reject", "No.", confirmed=("C6",)), verdict(t2, 11, "reject", "No again.", confirmed=("C10",))
+    link = Message(id=mid(12), sender=ROOT, to=OWNER, type="note", title="link", body="About.", reply_to=v2_.message.id, criterion="C10", source="human")
+    v2_.link_notes = (link,)
+    one, two = case([t1], verdicts=[v1_]), case([t2], verdicts=[v2_])
+    d1, d2 = delivery(one, 0, result_n=4, verdicts=(v1_,)), delivery(two, 0, result_n=10, verdicts=(v2_,))
+    nine = ["w", "x", "y", "z", "u", "v", "q", "r", "s"]  # C1-C9: "v" is C6
+    first = StoredVersion(1, nine, datetime(2026, 10, 21, 15, 0, tzinfo=timezone.utc))
+    second = StoredVersion(2, [*nine[:5], "ten", *nine[6:]], datetime(2026, 10, 21, 15, 7, tzinfo=timezone.utc), answers=v1_.message.id)
+    a1, a2 = Assertion("R1", one.id, v1_, ("C6",), "confirmed"), Assertion("R2", two.id, v2_, ("C10",), "confirmed")
+    return record(cases=[one, two], deliveries=(d1, d2), assertions=(a1, a2), contracts=(first, second))
