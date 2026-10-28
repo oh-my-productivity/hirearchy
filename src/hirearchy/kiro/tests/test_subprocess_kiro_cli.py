@@ -61,7 +61,12 @@ def test_an_overrun_is_none_within_the_timeout_plus_a_second(tmp_path: Path) -> 
 def test_an_overrun_kills_the_process_group(tmp_path: Path) -> None:
     pid_file = tmp_path / "grandchild.pid"
     body = f'sleep 30 &\necho $! > "{pid_file}"\nwait\n'
-    assert SubprocessKiroCli().run([script(tmp_path, body)], {"PATH": os.environ["PATH"]}, 0.5) is None
+    tool = script(tmp_path, body)
+    for _ in range(3):
+        assert SubprocessKiroCli().run([tool], {"PATH": os.environ["PATH"]}, 2) is None
+        if pid_file.exists() and pid_file.read_text(encoding="utf-8").strip():
+            break
+    assert pid_file.exists() and pid_file.read_text(encoding="utf-8").strip(), "the shell never started its grandchild before the deadline"
     pid = int(pid_file.read_text(encoding="utf-8"))
     for _ in range(40):
         if not alive(pid):
