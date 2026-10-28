@@ -17,6 +17,8 @@ workspace: <BASE>/proj
 inputs: []
 hired_by: root
 created: '2026-01-15T09:01:00+00:00'
+kind: manager
+approved_in: plan <PLAN_ID>
 ---
 # Role: Manager
 
@@ -90,6 +92,8 @@ workspace: <BASE>/proj
 inputs: []
 hired_by: lead
 created: '2026-01-15T09:01:00+00:00'
+kind: verifier
+approved_in: plan <PLAN_ID>
 ---
 # Role: Code Reviewer
 
@@ -143,6 +147,8 @@ workspace: <BASE>/proj
 inputs: []
 hired_by: lead
 created: '2026-01-15T09:01:00+00:00'
+kind: author
+approved_in: plan <PLAN_ID>
 ---
 # Role: Engineer
 
@@ -193,6 +199,8 @@ workspace: <BASE>/proj
 inputs: []
 hired_by: lead
 created: '2026-01-15T09:01:00+00:00'
+kind: verifier
+approved_in: plan <PLAN_ID>
 ---
 # Role: Tester
 

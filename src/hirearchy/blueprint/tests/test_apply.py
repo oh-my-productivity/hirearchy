@@ -112,6 +112,17 @@ def test_apply_hires_with_approved_so_a_planned_sub_lead_gets_can_hire(base, roo
     assert empty_org.charter("lead/sub/a")[0]["can_hire"] is False and empty_org.charter("lead/sub/a")[0]["max_children"] == 0
 
 
+def test_every_agent_of_an_applied_plan_has_its_kind_and_approved_in_plan_id(base, roots, empty_org):
+    plan_id = bpm.plan_id(base)  # the id propose_org returns for it
+    bpm.apply(empty_org, base, allowed_roots=roots)
+    kinds = {}
+    for addr in empty_org.agents():
+        meta, _ = empty_org.charter(addr)
+        assert meta["approved_in"] == f"plan {plan_id}", addr
+        kinds[addr] = meta["kind"]
+    assert kinds == {"lead": "manager", "lead/researcher": "author", "lead/writer": "author", "lead/factcheck": "verifier"}
+
+
 def test_apply_budget_plan_is_executable_by_the_manager(base, roots, empty_org):
     s = bpm.apply(empty_org, base, allowed_roots=roots)
     for name, n in (("researcher", 3), ("writer", 2), ("factcheck", 2)):

@@ -119,6 +119,7 @@ def apply_blueprint(tmp_path, clock, norm, text: str, label: str, roots=None) ->
     norm.add(org.root, "<ORG>")
     clock.tick()
     bp = org.runtime.blueprint_loader.load_text(text)
+    norm.add(org.runtime.plan_identity.plan_id(bp), "<PLAN_ID>")  # the id hashes the blueprint: the code template's holds the test's temporary folder
     summary = org.runtime.blueprint_applier.apply(bp, allowed_roots=roots)
     out = [f"##### summary\n{norm(summary.text())}\n"]
     for addr in org.agents():

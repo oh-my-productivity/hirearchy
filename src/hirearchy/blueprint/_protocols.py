@@ -194,8 +194,11 @@ class UserPlanning(Protocol):
 
 @runtime_checkable
 class TeamBuilding(Protocol):
-    def build(self, agents: Sequence[Agent], bp: Mapping[str, object], split: Mapping[str, Split], built: Built) -> None:
-        """Make the workspaces and hire the agents, parents first; ``built`` records each one the moment it exists."""
+    def build(
+        self, agents: Sequence[Agent], bp: Mapping[str, object], split: Mapping[str, Split], built: Built, approved_in: str | None = None,
+    ) -> None:
+        """Make the workspaces and hire the agents, parents first; ``built`` records each one the moment it exists. Each agent's charter records
+        its ``kind`` and, when ``approved_in`` is given (``plan {plan_id}``), the approval it rests on."""
         ...
 
 

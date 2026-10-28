@@ -75,5 +75,5 @@ def applier_over(
     return HiringBlueprintApplier(
         plan.basis, budgets, CharterTeamBuilder(hiring, plan.charters, provisioner),
         PlaybookServiceDefiner(commands, normalizer, plan.playbooks, budgets), FirstTaskGiver(tasks, commands),
-        RetiringRollback(agents, retirement, provisioner), snapshots,
+        RetiringRollback(agents, retirement, provisioner), snapshots, plan.identity,
     )

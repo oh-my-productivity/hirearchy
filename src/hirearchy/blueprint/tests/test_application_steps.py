@@ -62,12 +62,12 @@ def test_the_agents_are_hired_in_order_by_their_parent_with_the_charter_of_the_w
     builder, log, _, _ = team(tmp_path)
     built = Built()
     lead = agent("lead", can_hire=True, max_children=3, children=["lead/w"], tools=["read"], inputs=["/in"])
-    builder.build([lead, agent("lead/w", tools=["write"], workspace=str(tmp_path / "ws"))], {}, SPLIT, built)
+    builder.build([lead, agent("lead/w", tools=["write"], workspace=str(tmp_path / "ws"))], {}, SPLIT, built, "plan 0123456789ab")
     assert built.created == ["lead", "lead/w"]
     first, second = log.of("hire")
     assert first.args == ("root", "lead", "Lead", "charter of lead")
     assert first.kwargs == {"model": "m", "tools": ["read"], "can_hire": True, "max_children": 3, "workspace": None, "inputs": ["/in"],
-                            "approved": True}
+                            "approved": True, "kind": "author", "approved_in": "plan 0123456789ab"}  # commit 12: the kind and the approval
     assert second.args == ("lead", "w", "W", "charter of lead/w") and second.kwargs["workspace"] == str(tmp_path / "ws") and second.kwargs["inputs"] is None
 
 

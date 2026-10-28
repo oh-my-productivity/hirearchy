@@ -16,6 +16,8 @@ can_hire: true
 max_children: 3
 hired_by: root
 created: '2026-01-15T09:01:00+00:00'
+kind: manager
+approved_in: plan <PLAN_ID>
 ---
 # Role: Research lead
 
@@ -85,6 +87,8 @@ can_hire: false
 max_children: 0
 hired_by: lead
 created: '2026-01-15T09:01:00+00:00'
+kind: verifier
+approved_in: plan <PLAN_ID>
 ---
 # Role: Independent Fact-Checker
 
@@ -143,6 +147,8 @@ can_hire: false
 max_children: 0
 hired_by: lead
 created: '2026-01-15T09:01:00+00:00'
+kind: author
+approved_in: plan <PLAN_ID>
 ---
 # Role: Researcher
 
@@ -185,6 +191,8 @@ can_hire: false
 max_children: 0
 hired_by: lead
 created: '2026-01-15T09:01:00+00:00'
+kind: author
+approved_in: plan <PLAN_ID>
 ---
 # Role: Writer
 

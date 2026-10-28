@@ -344,7 +344,7 @@ class ScriptedHiring(Hiring):
     def hire(
         self, actor: str, name: str, role: str, charter: str, *, model: str | None = None, tools: Sequence[str] | None = None,
         can_hire: bool = False, max_children: int = 5, workspace: str | None = None, inputs: Sequence[str] | None = None,
-        approved: bool = False,
+        approved: bool = False, kind: str | None = None, approved_in: str | None = None,
     ) -> str:
         self.log.add("hire", actor, name, role, charter, model=model, tools=tools, can_hire=can_hire, max_children=max_children,
                      workspace=workspace, inputs=inputs, approved=approved)

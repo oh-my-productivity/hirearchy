@@ -69,6 +69,13 @@ def test_every_key_is_written_in_its_order_when_everything_is_given(w: Hierarchy
     )
 
 
+def test_hire_accepts_kind_and_approved_in(w: HierarchyWorld) -> None:
+    w.hiring.hire("root", "chk", "Independent Reviewer", "Check.", kind="verifier", approved_in="plan 0123456789ab")
+    w.hiring.hire("root", "plain", "Ops", "Run things.")
+    assert (meta_of(w, "chk")["kind"], meta_of(w, "chk")["approved_in"]) == ("verifier", "plan 0123456789ab")
+    assert "kind" not in meta_of(w, "plain") and "approved_in" not in meta_of(w, "plain")
+
+
 def test_a_charter_with_its_own_heading_keeps_it(w: HierarchyWorld) -> None:
     w.hiring.hire("root", "ops", "Ops", "  # Operator\n\nOwn heading wins.  ")
     assert w.read("ops/AGENT.md") is not None and w.read("ops/AGENT.md").endswith("---\n# Operator\n\nOwn heading wins.\n")  # type: ignore[union-attr]

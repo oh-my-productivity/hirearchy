@@ -9,13 +9,13 @@ from ..snapshots import OrgSnapshotter
 from ._protocols import BudgetPlanning, BuildUndoing, FirstTasking, PlanBasis, ServiceDefining, TeamBuilding
 from ._shapes import Built
 from ._view import s, task_of
-from .api import BlueprintApplier, BlueprintError, Summary, errors
+from .api import BlueprintApplier, BlueprintError, PlanIdentity, Summary, errors
 
 
 class HiringBlueprintApplier(BlueprintApplier):
     def __init__(
         self, basis: PlanBasis, budgets: BudgetPlanning, team: TeamBuilding, services: ServiceDefining, first_task: FirstTasking,
-        rollback: BuildUndoing, snapshots: OrgSnapshotter,
+        rollback: BuildUndoing, snapshots: OrgSnapshotter, identity: PlanIdentity,
     ) -> None:
         self._basis = basis
         self._budgets = budgets
@@ -24,6 +24,7 @@ class HiringBlueprintApplier(BlueprintApplier):
         self._first_task = first_task
         self._rollback = rollback
         self._snapshots = snapshots
+        self._identity = identity
 
     def apply(self, bp: Mapping[str, object], *, allowed_roots: Sequence[str | Path] | None = None, require_sources: bool = False) -> Summary:
         """Create the agents (parents first, as root through each parent), define the services, and give the first task.
@@ -45,7 +46,7 @@ class HiringBlueprintApplier(BlueprintApplier):
         built = Built()
         msg = None
         try:
-            self._team.build(agents, bp, split, built)
+            self._team.build(agents, bp, split, built, f"plan {self._identity.plan_id(bp)}")
             self._services.define(bp, agents, built)
             msg = self._first_task.give(bp, top, total)
         except Exception:

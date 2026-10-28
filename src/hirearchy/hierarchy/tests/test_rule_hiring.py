@@ -153,6 +153,21 @@ def test_what_is_not_given_is_left_out_of_the_meta() -> None:
     assert list(meta) == ["role", "tools", "can_hire", "max_children", "hired_by", "created"]
 
 
+def test_kind_and_approved_in_are_written_when_given() -> None:
+    rig = Rig()
+    rig.hiring.hire("root", "eng", "E", "c", kind="verifier", approved_in="plan 0123456789ab")
+    ((_, meta, _),) = rig.registry.created
+    assert list(meta) == ["role", "tools", "can_hire", "max_children", "hired_by", "created", "kind", "approved_in"]
+    assert (meta["kind"], meta["approved_in"]) == ("verifier", "plan 0123456789ab")
+
+
+def test_without_them_no_key_is_written() -> None:
+    rig = Rig()
+    rig.hiring.hire("root", "eng", "E", "c")
+    ((_, meta, _),) = rig.registry.created
+    assert "kind" not in meta and "approved_in" not in meta
+
+
 def test_the_created_time_is_the_injected_clock_s() -> None:
     rig = Rig()
     rig.clock.advance(86400)

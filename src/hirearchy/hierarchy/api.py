@@ -40,6 +40,8 @@ class Hiring(Protocol):
         workspace: str | None = None,
         inputs: Sequence[str] | None = None,
         approved: bool = False,
+        kind: str | None = None,
+        approved_in: str | None = None,
     ) -> str:
         """Create the direct report ``name`` of ``actor`` and return its address; emit ``agent.hire`` (with the model the new agent will run
         with). ``name`` is lowercase letters, digits and dashes (at most 32), not a reserved word, not already taken; ``tools`` are sorted and
@@ -49,7 +51,9 @@ class Hiring(Protocol):
         number >= 0 for every hirer (root included), else ``OrgError``; a report without ``can_hire`` gets 0, whoever hires it. A hirer other than
         root may not grant ``can_hire`` (and may not give a report a ``max_children`` above its own) unless ``approved``: the decision of a person,
         passed only by the blueprint applier (an approved plan), the CLI and the ``Org`` facade, never by an MCP tool; ``approved`` skips that grant
-        check and no other. ``OrgError`` for every refusal."""
+        check and no other. ``kind`` (``manager``, ``author``, ``verifier``) and ``approved_in`` (``plan {plan_id}``, ``change {plan_id}``: the approval
+        the hire rests on) are written into the charter's frontmatter after ``created`` when given, and left out when not; only the plan
+        appliers pass them. ``OrgError`` for every refusal."""
         ...
 
 

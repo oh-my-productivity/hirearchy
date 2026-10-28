@@ -57,6 +57,8 @@ class RuleHiring(Hiring):
         workspace: str | None = None,
         inputs: Sequence[str] | None = None,
         approved: bool = False,
+        kind: str | None = None,
+        approved_in: str | None = None,
     ) -> str:
         actor = self._agents.require(actor)
         if not NAME_RE.fullmatch(name) or name in RESERVED:
@@ -99,6 +101,8 @@ class RuleHiring(Hiring):
             "inputs": inputs,
             "hired_by": actor,
             "created": self._clock.now().isoformat(timespec="seconds"),
+            "kind": kind,
+            "approved_in": approved_in,
         }
         child_meta = {k: v for k, v in child_meta.items() if v is not None}
         self._registry.create(addr, child_meta, self._templates.charter_body(role, charter))
