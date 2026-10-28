@@ -18,6 +18,7 @@ from dataclasses import dataclass, field
 
 COPY_LIMIT = 4096  # bytes of non-JSON output copied to the log before the run starts
 DRAIN_SECONDS = 2.0  # how long output is read after kiro has exited (a background child may keep the pipe open)
+DRAIN_READS = 16  # the most reads of one drain of kiro's stderr
 SLICE_SECONDS = 1.0  # one select() turn
 CUT_INPUT, CUT_DENIAL, CUT_ERROR, CUT_PLAIN = 200, 300, 500, 2000  # longest piece of a tool input / denial / error / plain line
 USAGE = "usage: _launch.py --start-deadline SECONDS -- KIRO_ARGV..."
@@ -256,6 +257,50 @@ def emit(text: str) -> None:
 
 
 @dataclass
+class ErrPipe:
+    """Kiro's stderr, read by the launcher for the whole run and forwarded to its own fd 2 (the run log)."""
+
+    fd: int
+    open: bool = True
+
+
+def _forward(data: bytes) -> None:
+    """Kiro's stderr bytes to fd 2 at once, all of them, in the order they were read (an ``OSError`` is ignored, as in ``emit``)."""
+    try:
+        while data:
+            data = data[os.write(2, data) :]
+    except OSError:
+        pass
+
+
+def _read_err(err: ErrPipe) -> None:
+    """Read what kiro wrote to its stderr (up to 64 KB) and forward it; an empty read is the end of file."""
+    data = os.read(err.fd, 65536)
+    if not data:
+        err.open = False
+        return
+    _forward(data)
+
+
+def _drain_err(err: ErrPipe) -> None:
+    """Forward all of kiro's stderr that is in the pipe now (at most ``DRAIN_READS`` reads)."""
+    reads = 0
+    while err.open and reads < DRAIN_READS and select.select([err.fd], [], [], 0)[0]:
+        _read_err(err)
+        reads += 1
+
+
+def _forward_ready(err: ErrPipe | None) -> None:
+    """``_drain_err`` just before a closing line or a kill: a failure to read must not stop either."""
+    if err is None:
+        return
+    try:
+        _drain_err(err)
+    except (OSError, ValueError):
+        pass
+
+
+@dataclass
 class Start:
     outcome: str  # "started", "refused", "gave_up" or "ended"
     text: str = ""  # why, for "refused"
@@ -289,7 +334,7 @@ def _decide(first: dict[str, object], rest: bytes) -> Start:
     return Start("started", rest=rest)
 
 
-def _wait_for_start(fd: int, limit: float) -> Start:
+def _wait_for_start(fd: int, err: ErrPipe, limit: float) -> Start:
     stop = time.monotonic() + limit
     buffer, copied = b"", 0
     while True:
@@ -297,27 +342,34 @@ def _wait_for_start(fd: int, limit: float) -> Start:
         if left <= 0:
             _copy(buffer, COPY_LIMIT - copied)
             return Start("gave_up")
-        if not select.select([fd], [], [], min(left, SLICE_SECONDS))[0]:
-            continue
-        data = os.read(fd, 65536)
-        if not data:
-            _copy(buffer, COPY_LIMIT - copied)
-            return Start("ended")
-        buffer += data
-        while b"\n" in buffer:
-            raw, buffer = buffer.split(b"\n", 1)
-            first = _json_object(raw)
-            if first is not None:
-                return _decide(first, buffer)
-            copied += _copy(raw, COPY_LIMIT - copied)
-        if len(buffer) > 65536:  # a flood without a newline: what fits is copied, the rest is dropped
-            copied += _copy(buffer, COPY_LIMIT - copied)
-            buffer = b""
+        ready = select.select([fd, err.fd] if err.open else [fd], [], [], min(left, SLICE_SECONDS))[0]
+        if fd in ready:  # stdout first: a decision returns before any stderr line that follows it is read
+            data = os.read(fd, 65536)
+            if not data:
+                _copy(buffer, COPY_LIMIT - copied)
+                return Start("ended")
+            buffer += data
+            while b"\n" in buffer:
+                raw, buffer = buffer.split(b"\n", 1)
+                first = _json_object(raw)
+                if first is not None:
+                    return _decide(first, buffer)
+                copied += _copy(raw, COPY_LIMIT - copied)
+            if len(buffer) > 65536:  # a flood without a newline: what fits is copied, the rest is dropped
+                copied += _copy(buffer, COPY_LIMIT - copied)
+                buffer = b""
+        if err.open and err.fd in ready:
+            _read_err(err)
 
 
-def _stream(proc: subprocess.Popen[bytes], fd: int, rest: bytes) -> RenderState:
-    """Render kiro's output until its end, or until 2 s after kiro exited (a background child may hold the pipe open); what it learned."""
-    state, buffer, exited_at = RenderState(), rest, None
+def _stream(proc: subprocess.Popen[bytes], fd: int, err: ErrPipe, rest: bytes) -> tuple[RenderState, float | None]:
+    """Render kiro's output until its end, or until 2 s after kiro exited (a background child may hold a pipe open), forwarding its stderr
+    all the while; what it learned, and when kiro was first seen to have exited.
+
+    Kiro's stderr is drained before stdout bytes are rendered and after they were read, so a stderr line that kiro wrote before a stdout line
+    is logged before that line's rendering."""
+    state, buffer, exited_at, out_open = RenderState(), rest, None, True
+    _drain_err(err)
     while True:
         while b"\n" in buffer:
             raw, buffer = buffer.split(b"\n", 1)
@@ -327,26 +379,43 @@ def _stream(proc: subprocess.Popen[bytes], fd: int, rest: bytes) -> RenderState:
             exited_at = time.monotonic()
         if exited_at is not None and time.monotonic() - exited_at >= DRAIN_SECONDS:
             break
-        if select.select([fd], [], [], SLICE_SECONDS)[0]:
+        if not out_open and not err.open:
+            break
+        ready = select.select(([fd] if out_open else []) + ([err.fd] if err.open else []), [], [], SLICE_SECONDS)[0]
+        if out_open and fd in ready:
             data = os.read(fd, 65536)
             if not data:
-                break
-            buffer += data
+                out_open = False
+            else:
+                _drain_err(err)
+                buffer += data
+        elif err.open and err.fd in ready:
+            _read_err(err)
     if buffer:
         for text in render_line(state, buffer.decode("utf-8", errors="replace")):
             emit(text)
     for text in finish(state):
         emit(text)
-    return state
+    return state, exited_at
 
 
-def _exit_code(proc: subprocess.Popen[bytes]) -> int:
+def _exit_code(proc: subprocess.Popen[bytes], err: ErrPipe, exited_at: float | None = None) -> int:
+    """Kiro's exit code. While its stderr is open it is read and forwarded, until 2 s after kiro exited (in total across ``_stream`` and here)."""
+    while err.open:
+        if exited_at is None and proc.poll() is not None:
+            exited_at = time.monotonic()
+        left = SLICE_SECONDS if exited_at is None else DRAIN_SECONDS - (time.monotonic() - exited_at)
+        if left <= 0:
+            break
+        if select.select([err.fd], [], [], min(left, SLICE_SECONDS))[0]:
+            _read_err(err)
     code = proc.wait()
     return 128 - code if code < 0 else code  # killed by signal s: 128 + s
 
 
-def _end_run(proc: subprocess.Popen[bytes]) -> int:
+def _end_run(proc: subprocess.Popen[bytes], err: ErrPipe | None = None) -> int:
     """End the run after its ``# kiro:`` line: the whole process group when this launcher leads it, else the child alone."""
+    _forward_ready(err)
     if os.getpgrp() == os.getpid():
         try:
             os.killpg(os.getpgrp(), signal.SIGKILL)  # kiro, its MCP server and this launcher end together (exit -9)
@@ -357,27 +426,29 @@ def _end_run(proc: subprocess.Popen[bytes]) -> int:
     return 1
 
 
-def _supervise(proc: subprocess.Popen[bytes], limit: float) -> int:
+def _supervise(proc: subprocess.Popen[bytes], limit: float, err: ErrPipe) -> int:
     assert proc.stdout is not None
     fd = proc.stdout.fileno()
-    start = _wait_for_start(fd, limit)
+    start = _wait_for_start(fd, err, limit)
     if start.outcome == "refused":
+        _forward_ready(err)
         emit(f"# kiro: refused: {start.text}")
-        return _end_run(proc)
+        return _end_run(proc, err)
     if start.outcome == "gave_up":
+        _forward_ready(err)
         emit(
             f'# kiro: gave up after {limit:g}s: kiro-cli did not start the run (no "runStarted" event); without KIRO_API_KEY '
             'it may be waiting for a browser sign-in (see README, "Kiro integration")'
         )
-        return _end_run(proc)
+        return _end_run(proc, err)
     if start.outcome == "ended":
-        code = _exit_code(proc)
+        code = _exit_code(proc, err)
         emit(f"# kiro: kiro-cli exited with code {code} before the run started")
         return 1 if code in (0, THROTTLE_EXIT) else code  # 75 is the launcher's verdict alone
     emit("# kiro: run started (engine v3)")
-    state = _stream(proc, fd, start.rest)
+    state, exited_at = _stream(proc, fd, err, start.rest)
     proc.stdout.close()
-    code = _exit_code(proc)
+    code = _exit_code(proc, err, exited_at)
     if code != 0 and state.throttled and state.effects == 0:
         return THROTTLE_EXIT
     return 1 if code == THROTTLE_EXIT else code
@@ -400,12 +471,14 @@ def main(argv: list[str]) -> int:
         return 2
     limit, kiro = parsed
     try:
-        proc = subprocess.Popen(kiro, stdout=subprocess.PIPE)  # stdin (the prompt) and stderr (the run log) are inherited; same process group
+        # stdin (the prompt) is inherited; stderr is read and forwarded to fd 2 (the run log); same process group
+        proc = subprocess.Popen(kiro, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     except OSError as error:
         emit(f"# kiro: cannot start {kiro[0]}: {error}")
         return 127
     try:
-        return _supervise(proc, limit)
+        assert proc.stderr is not None
+        return _supervise(proc, limit, ErrPipe(proc.stderr.fileno()))
     except Exception as error:  # the launcher must never leave kiro running
         emit(f"# kiro: launcher error: {type(error).__name__}: {error}")
         return _end_run(proc)

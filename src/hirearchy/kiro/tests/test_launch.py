@@ -803,3 +803,20 @@ def test_a_background_child_holding_stderr_does_not_hold_the_run(tmp_path: Path)
                 os.kill(int((tmp_path / "pid").read_text(encoding="utf-8")), signal.SIGKILL)
             except ProcessLookupError:
                 pass
+
+
+def test_kiro_writes_its_stderr_into_a_pipe_of_the_launcher(tmp_path: Path) -> None:
+    body = "if [ -p /dev/fd/2 ]; then echo 'stderr: pipe'; else echo 'stderr: file'; fi\n" + START + FINISHED
+    code, log = launch_logged(tmp_path, body)
+    assert code == 0
+    assert log == ["stderr: pipe", "# kiro: run started (engine v3)", "[run finished] success (end_turn)"]
+
+
+def test_kiros_stderr_keeps_its_place_when_kiro_writes_without_pause(tmp_path: Path) -> None:
+    body = START + to_stderr("E1") + hello("Hello\n") + to_stderr("E2") + FINISHED
+    for attempt in range(10):
+        code, log = launch_logged(tmp_path, body)
+        assert code == 0, attempt
+        assert log[0] == "# kiro: run started (engine v3)", (attempt, log)
+        assert log.index("E1") < log.index("Hello"), (attempt, log)
+        assert log.index("E2") < log.index("[run finished] success (end_turn)"), (attempt, log)  # no order between Hello and E2 is asserted
