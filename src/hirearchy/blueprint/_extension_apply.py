@@ -9,14 +9,13 @@ from pathlib import Path
 
 from ..agents import AgentRegistry
 from ..hierarchy import Hiring, Retirement
-from ..kernel import ROOT, RUNTIME, EventSink, clip, join_frontmatter
-from ..dispatch import MessageSender
+from ..kernel import ROOT, EventSink, clip, join_frontmatter
 from ..services import ContractNormalizer, ServiceCommands
 from ..settings import OrgLimits
 from ..snapshots import OrgSnapshotter
 from ._added import checker_line, limits_line, with_changes
 from ._extension_org import Reads
-from ._protocols import Charters, ExtensionResolution, ExtensionUndoing, PlaybookWriting
+from ._protocols import Charters, ExtensionResolution, ExtensionUndoing, OwnerNotes, PlaybookWriting
 from ._shapes import Extension, Undo
 from ._view import criterion_source, needs_of, s, svc_criteria, svc_criteria_entries, svc_deliverable
 from .api import BlueprintError, ExtensionApplying, PlanIdentity, errors
@@ -49,7 +48,7 @@ class ExtensionApplier(ExtensionApplying):
     def __init__(
         self, reads: Reads, resolver: ExtensionResolution, identity: PlanIdentity, charters: Charters, playbooks: PlaybookWriting,
         normalizer: ContractNormalizer, hiring: Hiring, retirement: Retirement, registry: AgentRegistry, commands: ServiceCommands, limits: OrgLimits,
-        sender: MessageSender, undo: ExtensionUndoing, snapshots: OrgSnapshotter, events: EventSink,
+        notes: OwnerNotes, undo: ExtensionUndoing, snapshots: OrgSnapshotter, events: EventSink,
     ) -> None:
         self._reads = reads
         self._resolver = resolver
@@ -62,7 +61,7 @@ class ExtensionApplier(ExtensionApplying):
         self._registry = registry
         self._commands = commands
         self._limits = limits
-        self._sender = sender
+        self._owner_notes = notes
         self._undo = undo
         self._snapshots = snapshots
         self._events = events
@@ -209,7 +208,7 @@ class ExtensionApplier(ExtensionApplying):
                 *(NOTE_STEP.format(service=name, address=ch.agent, criteria=criteria, evidence=evidence) for name in ch.services),
             ])
             try:
-                self._sender.send(RUNTIME, ch.owner, body, type="note", title=NOTE_TITLE, wake=True)
+                self._owner_notes.tell(ch.owner, NOTE_TITLE, body)
             except Exception as error:
                 self._events.emit("team_note.failed", actor=ROOT, owner=ch.owner, agent=ch.agent, error=clip(str(error), 500))
                 told.append(NOT_TOLD.format(owner=ch.owner, error=str(error).rstrip(".")))

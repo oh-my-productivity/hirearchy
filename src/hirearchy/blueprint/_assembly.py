@@ -8,7 +8,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from ..agents import AgentDirectory, AgentRegistry
-from ..dispatch import MessageSender, TaskAssigner
+from ..dispatch import TaskAssigner
 from ..hierarchy import Hiring, Retirement
 from ..kernel import EventSink
 from ..services import ContractNormalizer, ServiceCommands
@@ -34,6 +34,7 @@ from ._protocols import (
     BudgetPlanning,
     Charters,
     OrgContext,
+    OwnerNotes,
     PlanBasis,
     PlaybookWriting,
     PlanWords,
@@ -94,10 +95,10 @@ def applier_over(
 
 def extension_applier_over(
     plan: PlanParts, reads: Reads, normalizer: ContractNormalizer, hiring: Hiring, retirement: Retirement, registry: AgentRegistry, commands: ServiceCommands,
-    limits: OrgLimits, sender: MessageSender, snapshots: OrgSnapshotter, events: EventSink,
+    limits: OrgLimits, notes: OwnerNotes, snapshots: OrgSnapshotter, events: EventSink,
 ) -> ExtensionApplying:
     """The applier of an extension of the current organization over the given plan, the ports it writes through and what its rules read."""
     return ExtensionApplier(
-        reads, ExtensionResolver(reads), plan.identity, plan.charters, plan.playbooks, normalizer, hiring, retirement, registry, commands, limits, sender,
+        reads, ExtensionResolver(reads), plan.identity, plan.charters, plan.playbooks, normalizer, hiring, retirement, registry, commands, limits, notes,
         ExtensionUndo(reads.agents, retirement, registry, commands, limits), snapshots, events,
     )

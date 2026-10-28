@@ -14,7 +14,7 @@ from typing import NamedTuple, Protocol
 
 from ..agents import AgentDirectory
 from ..agents.testing import MemoryAgents
-from ..dispatch import MessageSender, TaskAssigner
+from ..dispatch import TaskAssigner
 from ..hierarchy import Hiring, Retired, Retirement
 from ..kernel import NAME_RE, JsonObject, Message, OrgError, child_addr
 from ..kernel.testing import DictEnvironment, ListEventSink
@@ -48,6 +48,7 @@ from ._protocols import (
     ExtensionResolution,
     Fingerprinting,
     OrgContext,
+    OwnerNotes,
     PathChecking,
     RootTasks,
     ServiceRules,
@@ -666,20 +667,14 @@ def applier_over_a_script(tmp_path: Path) -> ExtensionApplyHarness:
     )
 
 
-class RecordingSender(MessageSender):
-    """The message sender of an application test: it delivers nothing and keeps what it was asked to send."""
+class RecordingOwnerNotes(OwnerNotes):
+    """The notes of an application test: nothing is delivered, what was to be told is kept."""
 
     def __init__(self, log: CallRecording) -> None:
         self._log = log
 
-    def send(
-        self, actor: str, to: str, body: str, *, type: str = "note", title: str = "", reply_to: str | None = None, status: str | None = None, budget: int = 0,
-        revises: str | None = None, supersedes: str | None = None, service: str | None = None, contract: int | None = None, playbook: int | None = None,
-        feedback: str | None = None, source: str | None = None, criterion: str | None = None, wake: bool = True, skip_route_check: bool = False,
-        inherited: str | None = None, acknowledges: str | None = None,
-    ) -> Message:
-        self._log.add("send", actor, to, body, type=type, title=title, wake=wake)
-        return Message(actor, to, type, body, title=title, wake=wake, id=f"note-{len(self._log.of('send'))}")
+    def tell(self, to: str, title: str, body: str) -> None:
+        self._log.add("tell", to, title, body)
 
 
 def applier_over_memory_ports(tmp_path: Path) -> ExtensionApplyHarness:
@@ -691,7 +686,7 @@ def applier_over_memory_ports(tmp_path: Path) -> ExtensionApplyHarness:
     retirement, commands, limits = RecordingRetirement(agents, log), RecordingServiceCommands(log), MemoryOrgSettings("---\nmax_depth: 4\n---\nrules\n")
     applier = ExtensionApplier(
         reads, ExtensionResolver(reads), HashPlanIdentity(OrgFingerprint(reads)), CharterWriter(), StepsPlaybookWriter(BudgetPlanner()),
-        contract_normalizer(tmp_path / "temp"), RecordingHiring(agents, log), retirement, agents, commands, limits, RecordingSender(log),
+        contract_normalizer(tmp_path / "temp"), RecordingHiring(agents, log), retirement, agents, commands, limits, RecordingOwnerNotes(log),
         ExtensionUndo(agents, retirement, agents, commands, limits), RecordingSnapshots(log), ListEventSink(),
     )
     bp = {"reason": "r", "extend": {"limits": [{"agent": "lead", "max_children": 3}]}}

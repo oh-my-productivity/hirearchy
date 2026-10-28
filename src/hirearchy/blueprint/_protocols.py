@@ -284,3 +284,11 @@ class ExtensionUndoing(Protocol):
         made retired again (labelled as taken back), a budget amendment answered with an amendment back. Never raises; returns the sentence about the
         contract versions a budget amendment left (``""`` when none)."""
         ...
+
+
+@runtime_checkable
+class OwnerNotes(Protocol):
+    def tell(self, to: str, title: str, body: str) -> None:
+        """A note from the runtime to the agent ``to`` that wakes it (it runs when the scheduler next picks it up). ``OrgError`` when it cannot be
+        delivered."""
+        ...

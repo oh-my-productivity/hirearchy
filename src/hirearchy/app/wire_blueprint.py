@@ -30,13 +30,15 @@ from ..blueprint._files import FsTextFiles
 from ..blueprint._loader import YamlBlueprintLoader
 from ..blueprint._org import NoOrgContext, PresentOrAbsentOrg, RuntimeOrgContext
 from ..blueprint._pathcheck import RootedPathChecker
+from ..blueprint._protocols import OwnerNotes
 from ..blueprint._provision import FsWorkspaceProvisioner
 from ..blueprint._resolver import AgentResolver
 from ..blueprint._roles import PackagedRoleLibrary
 from ..blueprint._roots import EnvironmentWorkspaceRoots
 from ..blueprint._service_rules import ServiceBlueprintRules
 from ..blueprint._validator import RuleBlueprintValidator
-from ..dispatch import MessageSender, TaskAssigner
+from ..delivery import MessageDelivery
+from ..dispatch import TaskAssigner
 from ..hierarchy import Hiring, Retirement
 from ..kernel import Environment, EventSink, OrgLayout
 from ..kiro import ConfinementPolicy
@@ -49,6 +51,7 @@ from ..settings import OrgLimits, OrgSettings
 from ..snapshots import OrgSnapshotter
 from ._builder import Builder
 from ._continued_criteria import RecordedContinuedCriteria
+from ._owner_notes import RuntimeOwnerNotes
 from ._root_tasks import MailRootTasks
 
 
@@ -83,6 +86,7 @@ def register(b: Builder) -> None:
     b.provide(WorkspaceProvisioner, lambda b: FsWorkspaceProvisioner())
     b.provide(BlueprintExamples, lambda b: TemplateBlueprintExamples())
     b.provide(BlueprintApplier, _applier)
+    b.provide(OwnerNotes, lambda b: RuntimeOwnerNotes(b.get(MessageDelivery)))
     b.provide(ExtensionApplying, _extension_applier)
 
 
@@ -144,5 +148,5 @@ def _applier(b: Builder) -> BlueprintApplier:
 def _extension_applier(b: Builder) -> ExtensionApplying:
     return extension_applier_over(
         _plan(b), _reads(b), b.get(ContractNormalizer), b.get(Hiring), b.get(Retirement), b.get(AgentRegistry), b.get(ServiceCommands), b.get(OrgLimits),
-        b.get(MessageSender), b.get(OrgSnapshotter), b.get(EventSink),
+        b.get(OwnerNotes), b.get(OrgSnapshotter), b.get(EventSink),
     )
