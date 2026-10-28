@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Protocol, runtime_checkable
 
 from ..kernel import JsonObject, Message
-from ._shapes import AccessFacts, Built, Estimate, Split
+from ._shapes import AccessFacts, Built, Estimate, Extension, Split
 from .api import Agent, Issue
 
 
@@ -228,4 +228,12 @@ class BuildUndoing(Protocol):
 class AccessWording(Protocol):
     def describe(self, a: Agent) -> str:
         """What the agent may touch, in plain words: the same facts as the ``Access:`` line of the details."""
+        ...
+
+
+@runtime_checkable
+class ExtensionResolution(Protocol):
+    def resolve(self, bp: Mapping[str, object], *, allowed_roots: Sequence[str | Path] | None = None, require_sources: bool = False) -> Extension:
+        """The extension blueprint ``bp`` read against the organization as it is now (design 5.2): its problems (``Extension.issues``, with the codes
+        of 5.2) and, when it is valid, what its entries mean. ``require_sources``: see ``BlueprintValidator.validate``. Writes nothing."""
         ...

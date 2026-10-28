@@ -6,6 +6,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import TypedDict
 
+from .api import Issue
+
 AgentRuns = TypedDict("AgentRuns", {"pass": int, "rework": int, "total": int})  # ``pass`` is a keyword: the functional form
 
 
@@ -42,3 +44,10 @@ class Built:
     created: list[str] = field(default_factory=list)  # addresses of the agents hired, parents first
     made_dirs: list[Path] = field(default_factory=list)  # directories made for workspaces, the deepest of each first
     defined: list[str] = field(default_factory=list)  # names of the services defined
+
+
+@dataclass
+class Extension:
+    """An extension blueprint read against the organization (design 5.2): its problems, and what its entries mean once they are valid."""
+
+    issues: list[Issue] = field(default_factory=list)

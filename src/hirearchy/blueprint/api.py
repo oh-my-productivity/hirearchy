@@ -53,6 +53,7 @@ __all__ = [
     "SummaryText",
     "WorkspaceProvisioner",
     "errors",
+    "is_extension",
     "is_verifier",
 ]
 
@@ -156,6 +157,12 @@ def is_verifier(meta: Mapping[str, object], roles: RoleLibrary) -> bool:
         if template is not None and template.kind == "verifier" and template.title == title:
             return True
     return False
+
+
+def is_extension(bp: object) -> bool:
+    """Whether ``bp`` extends the current organization (design 3, 5.1): a mapping with a top-level ``extend`` key, whatever it holds. Any other
+    blueprint is a full blueprint, which builds a new team. Pure: the one definition the plan renderer, the applier and the tools use."""
+    return isinstance(bp, Mapping) and "extend" in bp
 
 
 @runtime_checkable

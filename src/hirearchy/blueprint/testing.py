@@ -27,11 +27,12 @@ from ..snapshots import OrgSnapshotter
 from ._access import PolicyAccessReport
 from ._assembly import PlanParts, applier_over, plan_parts
 from ._budgeting import BudgetPlanner
+from ._extension import ExtensionResolver
 from ._files import FsTextFiles
 from ._loader import YamlBlueprintLoader
 from ._org import NoOrgContext, PresentOrAbsentOrg
 from ._pathcheck import RootedPathChecker
-from ._protocols import AccessReport, AgentResolution, OrgContext, PathChecking, ServiceRules, TextFiles, WorkspaceRoots
+from ._protocols import AccessReport, AgentResolution, ExtensionResolution, OrgContext, PathChecking, ServiceRules, TextFiles, WorkspaceRoots
 from ._provision import FsWorkspaceProvisioner
 from ._resolver import AgentResolver
 from ._roles import PackagedRoleLibrary
@@ -568,6 +569,20 @@ def validator_over_memory_roles(tmp_path: Path) -> ValidatorHarness:
 
 
 @dataclass(frozen=True)
+class ExtensionHarness:
+    resolver: ExtensionResolution
+    tmp: Path  # the directory of the suites
+
+
+def resolver_over_a_static_org(tmp_path: Path) -> ExtensionHarness:
+    return ExtensionHarness(ExtensionResolver(StaticOrgContext(tmp_path / "org")), tmp_path)
+
+
+def resolver_over_memory_agents(tmp_path: Path) -> ExtensionHarness:
+    return ExtensionHarness(ExtensionResolver(AgentsOrgContext(tmp_path / "org", MemoryAgents())), tmp_path)
+
+
+@dataclass(frozen=True)
 class RendererHarness:
     renderer: PlanRenderer
     tmp: Path  # the only allowed root of the blueprints of the suites
@@ -663,6 +678,7 @@ IMPLEMENTATIONS: Mapping[type, Sequence[Callable[[Path], object]]] = {
     BlueprintLoader: [loader_over_memory, loader_over_disk],
     BlueprintValidator: [validator_over_packaged_roles, validator_over_memory_roles],
     PlanRenderer: [renderer_over_packaged_roles, renderer_over_memory_roles],
+    ExtensionResolution: [resolver_over_a_static_org, resolver_over_memory_agents],
     BlueprintApplier: [applier_over_memory_directories, applier_over_disk_directories],
     WorkspaceProvisioner: [provisioner_on_disk, provisioner_in_memory],
 }
