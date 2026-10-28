@@ -126,7 +126,7 @@ _text _timeutil _paths _ports`; its file adapters are in `_system.py`).
 
 ### 2.2 The package map
 
-42 packages: `kernel`, 36 feature packages, 4 entry points, `app`. "Allowed dependencies" is the complete list of
+43 packages: `kernel`, 37 feature packages, 4 entry points, `app`. "Allowed dependencies" is the complete list of
 packages a package may import (always through their `api`); it is the source of the import-linter `layers` contract. `L<n>` is the
 level in the dependency DAG (4.1).
 
@@ -166,14 +166,15 @@ level in the dependency DAG (4.1).
 | 32 | `review` (L8) | feature | Turns flagged health into notes for the responsible managers on a schedule. | `.runtime/reviews.json` | - | kernel, agents, runs, settings, templates, mail, delivery, budget, eligibility, health |
 | 33 | `daemon` (L9) | feature | Manages the organization's scheduler process (start, stop, status). | `.runtime/scheduler.pid`, `.runtime/scheduler.exit`, `.runtime/scheduler.log` | process table (through `processes`) | kernel, processes, snapshots, mail, attention |
 | 34 | `prompts` (L9) | feature | Builds the texts an agent is shown (whoami, state summary, run prompt). | - (consumes the one-time stray notice through `strays`) | - | kernel, agents, settings, access, mail, strays, budget, eligibility, services, reflection |
-| 35 | `observability` (L10) | feature | Answers what the runtime did (now, trace, metrics, events, check) from the files alone. | - | all of the above, read-only | kernel, agents, eventlog, processes, runs, settings, mail, budget, eligibility, attention, daemon |
-| 36 | `progress` (L10) | feature | Reports on the tasks the human gave, optionally waiting for a change. | - | - | kernel, agents, runs, mail, budget, eligibility, attention, reflection, daemon |
-| 37 | `dashdata` (L11) | feature | Builds UI-free, cached snapshots of the organization for display. | - | - | kernel, agents, eventlog, runs, settings, access, mail, budget, eligibility, health, services, attention, reflection, daemon, observability, progress |
-| 38 | `scheduler` (L10) | entry | Runs the heartbeat loop that executes agent runs. | - (all writes go through feature interfaces) | - | kernel, agents, processes, runs, settings, snapshots, templates, access, mail, telemetry, kiro, strays, delivery, budget, eligibility, stalls, attention, review, daemon, prompts |
-| 39 | `mcp_server` (L11) | entry | Serves the organization's tools over MCP for one identity. | - | - | kernel, agents, locator, settings, access, bootstrap, mail, telemetry, orgfiles, traces, budget, dispatch, hierarchy, health, services, attention, blueprint, overview, reflection, daemon, prompts, observability, progress |
-| 40 | `cli` (L12) | entry | Parses command lines, invokes features. | - | - | kernel, agents, locator, settings, skill, snapshots, bootstrap, mail, telemetry, upgrade, kiro, dispatch, eligibility, hierarchy, health, services, blueprint, overview, reflection, review, daemon, observability, progress, dashdata |
-| 41 | `dashboard` (L12) | entry | Renders the terminal dashboard as a Textual user interface. | - | - | kernel, dashdata |
-| 42 | `app` | app | Is the composition root: assembles every object graph. | - | - | everything (the only importer of `_` modules) |
+| 35 | `retro` (L9) | feature | Derives the human's periodic retro brief from the files. | `.runtime/retros.json` | the git history of `*/AGENT.md` and `ORG.md` (through `CharterHistory`, implemented in `app` over `snapshots.OrgHistory`) | kernel, agents, eventlog, runs, settings, mail, budget, eligibility, health, services, attention, reflection, blueprint |
+| 36 | `observability` (L10) | feature | Answers what the runtime did (now, trace, metrics, events, check) from the files alone. | - | all of the above, read-only | kernel, agents, eventlog, processes, runs, settings, mail, budget, eligibility, attention, daemon |
+| 37 | `progress` (L10) | feature | Reports on the tasks the human gave, optionally waiting for a change. | - | - | kernel, agents, runs, mail, budget, eligibility, attention, reflection, daemon |
+| 38 | `dashdata` (L11) | feature | Builds UI-free, cached snapshots of the organization for display. | - | - | kernel, agents, eventlog, runs, settings, access, mail, budget, eligibility, health, services, attention, reflection, daemon, observability, progress |
+| 39 | `scheduler` (L10) | entry | Runs the heartbeat loop that executes agent runs. | - (all writes go through feature interfaces) | - | kernel, agents, processes, runs, settings, snapshots, templates, access, mail, telemetry, kiro, strays, delivery, budget, eligibility, stalls, attention, review, daemon, prompts |
+| 40 | `mcp_server` (L11) | entry | Serves the organization's tools over MCP for one identity. | - | - | kernel, agents, locator, settings, access, bootstrap, mail, telemetry, orgfiles, traces, budget, dispatch, hierarchy, health, services, attention, blueprint, overview, reflection, daemon, prompts, retro, observability, progress |
+| 41 | `cli` (L12) | entry | Parses command lines, invokes features. | - | - | kernel, agents, locator, settings, skill, snapshots, bootstrap, mail, telemetry, upgrade, kiro, dispatch, eligibility, hierarchy, health, services, blueprint, overview, reflection, review, daemon, retro, observability, progress, dashdata |
+| 42 | `dashboard` (L12) | entry | Renders the terminal dashboard as a Textual user interface. | - | - | kernel, dashdata |
+| 43 | `app` | app | Is the composition root: assembles every object graph. | - | - | everything (the only importer of `_` modules) |
 
 ### 2.3 On-disk ownership (single writer per file)
 
@@ -1493,7 +1494,7 @@ this table and fails on any upward or sideways import, which is the *machine* pr
 | L6 | `dispatch`, `eligibility`, `hierarchy` |
 | L7 | `health`, `services`, `stalls` |
 | L8 | `attention`, `blueprint`, `overview`, `reflection`, `review` |
-| L9 | `daemon`, `prompts` |
+| L9 | `daemon`, `prompts`, `retro` |
 | L10 | `observability`, `progress` |
 | L11 | `dashdata` |
 | E | `scheduler`, `mcp_server`, `cli`, `dashboard` (mutually independent) |
@@ -1507,7 +1508,7 @@ any feature: features emit through the kernel `EventSink` port, so the event log
 ### 4.2 Picture
 
 Edges to the foundation services every higher package uses (`agents settings mail runs templates snapshots eligibility budget
-access eventlog processes delivery traces`) are omitted for legibility (137 of 205 edges); they are all in 4.3. Arrows point from
+access eventlog processes delivery traces`) are omitted for legibility (144 of 219 edges); they are all in 4.3. Arrows point from
 the dependent to the dependency.
 
 ```mermaid
@@ -1546,6 +1547,7 @@ flowchart BT
   review
   daemon
   prompts
+  retro
   observability
   progress
   scheduler
@@ -1559,6 +1561,11 @@ flowchart BT
   prompts --> strays
   prompts --> services
   prompts --> reflection
+  retro --> health
+  retro --> services
+  retro --> attention
+  retro --> reflection
+  retro --> blueprint
   review --> health
   attention --> stalls
   daemon --> attention
@@ -1595,6 +1602,7 @@ flowchart BT
   mcp_server --> orgfiles
   mcp_server --> overview
   mcp_server --> prompts
+  mcp_server --> retro
   mcp_server --> health
   mcp_server --> progress
   mcp_server --> observability
@@ -1616,6 +1624,7 @@ flowchart BT
   cli --> skill
   cli --> review
   cli --> daemon
+  cli --> retro
   cli --> telemetry
   cli --> observability
   cli --> kiro
@@ -1734,6 +1743,18 @@ flowchart BT
 | `prompts` | `eligibility` | AgentStates |
 | `prompts` | `services` | ServiceCatalog |
 | `prompts` | `reflection` | ServicePromptSections |
+| `retro` | `agents` | AgentDirectory, CharterReader, RetiredArchive |
+| `retro` | `eventlog` | EventReader |
+| `retro` | `runs` | RunLogReader |
+| `retro` | `settings` | OrgSettings |
+| `retro` | `mail` | MailboxReader |
+| `retro` | `budget` | (allowed by design 2; no interface used yet) |
+| `retro` | `eligibility` | (allowed by design 2; no interface used yet) |
+| `retro` | `health` | HealthAnalyzer |
+| `retro` | `services` | ServiceStore, ServiceCatalog, ServiceHints |
+| `retro` | `attention` | (allowed by design 2; no interface used yet) |
+| `retro` | `reflection` | CaseRecords, lineage_class, repeat_alarm, gate_refusal_kind |
+| `retro` | `blueprint` | RoleLibrary, is_verifier |
 | `observability` | `agents` | AgentDirectory, RetiredArchive |
 | `observability` | `eventlog` | EventReader, EventFollowers |
 | `observability` | `processes` | OrphanJudge |
@@ -1806,6 +1827,7 @@ flowchart BT
 | `mcp_server` | `reflection` | ServiceReports |
 | `mcp_server` | `daemon` | SchedulerStatus, SchedulerControl |
 | `mcp_server` | `prompts` | Whoami |
+| `mcp_server` | `retro` | RetroBriefs, RetroDue |
 | `mcp_server` | `observability` | ObservabilityText |
 | `mcp_server` | `progress` | ProgressReporter |
 | `cli` | `agents` | AgentDirectory |
@@ -1828,6 +1850,7 @@ flowchart BT
 | `cli` | `reflection` | ServiceReports |
 | `cli` | `review` | HealthReviewer |
 | `cli` | `daemon` | SchedulerStatus |
+| `cli` | `retro` | RetroBriefs, RetroDue |
 | `cli` | `observability` | ObservabilityText |
 | `cli` | `progress` | ProgressReporter |
 | `cli` | `dashdata` | SnapshotRenderer |

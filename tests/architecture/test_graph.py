@@ -13,10 +13,10 @@ from . import document, graph, ownership
 pytestmark = pytest.mark.architecture
 
 
-def test_there_are_42_packages():
-    assert len(graph.ALL_PACKAGES) == 42
+def test_there_are_43_packages():
+    assert len(graph.ALL_PACKAGES) == 43
     assert graph.ALL_PACKAGES[0] == "kernel" and graph.ALL_PACKAGES[-1] == "app"
-    assert len(graph.FEATURES) == 36 and graph.ENTRY_POINTS == ("scheduler", "mcp_server", "cli", "dashboard")
+    assert len(graph.FEATURES) == 37 and graph.ENTRY_POINTS == ("scheduler", "mcp_server", "cli", "dashboard")
 
 
 def test_graph_matches_the_package_map(architecture_text):
@@ -29,10 +29,10 @@ def test_graph_matches_the_package_map(architecture_text):
         assert (package.kind, package.deps) == (row.kind, row.deps), row.name
 
 
-def test_graph_edges_are_the_205_edges_of_4_3(architecture_text):
+def test_graph_edges_are_the_219_edges_of_4_3(architecture_text):
     in_document = document.edge_rows(architecture_text)
     assert graph.edges() == in_document
-    assert len(in_document) == 205
+    assert len(in_document) == 219
 
 
 def test_levels_are_the_levels_of_4_1(architecture_text):
@@ -42,7 +42,7 @@ def test_levels_are_the_levels_of_4_1(architecture_text):
 
 
 def test_the_graph_is_acyclic_and_every_package_reaches_the_kernel():
-    assert len(graph.PACKAGES) == 41  # kernel + 36 features + 4 entry points (app is the 42nd and is not in the graph)
+    assert len(graph.PACKAGES) == 42  # kernel + 37 features + 4 entry points (app is the 43rd and is not in the graph)
     for name, package in graph.PACKAGES.items():
         assert name == graph.KERNEL or graph.KERNEL in package.deps, name
         for dep in package.deps:

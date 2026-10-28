@@ -2,7 +2,7 @@
 
 This is the single source the generators and the checks read: ``gen_importlinter`` turns it into import-linter contracts,
 ``test_graph`` proves it equals the document (2.2, 4.3 and the levels of 4.1) so the two cannot drift. Feature steps do not
-edit it (it is complete for all 42 packages from step M0 on).
+edit it (it is complete for all 43 packages from build 2a on).
 
 ``kernel`` is level 0 and implicit for everyone; ``entry`` packages (scheduler, mcp_server, cli, dashboard) form one layer above
 all features and are independent of each other; ``app`` (the composition root) may import everything and is not listed here.
@@ -71,6 +71,7 @@ PACKAGES: dict[str, Package] = dict([
     # --- L9
     _p("daemon", "feature", "kernel processes snapshots mail attention"),
     _p("prompts", "feature", "kernel agents settings access mail strays budget eligibility services reflection"),
+    _p("retro", "feature", "kernel agents eventlog runs settings mail budget eligibility health services attention reflection blueprint"),
     # --- L10
     _p("observability", "feature", "kernel agents eventlog processes runs settings mail budget eligibility attention daemon"),
     _p("progress", "feature", "kernel agents runs mail budget eligibility attention reflection daemon"),
@@ -81,16 +82,16 @@ PACKAGES: dict[str, Package] = dict([
     _p("scheduler", "entry", "kernel agents processes runs settings snapshots templates access mail telemetry kiro strays delivery "
                              "budget eligibility stalls attention review daemon prompts"),
     _p("mcp_server", "entry", "kernel agents locator settings access bootstrap mail telemetry orgfiles traces budget dispatch "
-                              "hierarchy health services attention blueprint overview reflection daemon prompts observability "
+                              "hierarchy health services attention blueprint overview reflection daemon prompts retro observability "
                               "progress"),
     _p("cli", "entry", "kernel agents locator settings skill snapshots bootstrap mail telemetry upgrade kiro dispatch eligibility "
-                       "hierarchy health services blueprint overview reflection review daemon observability progress dashdata"),
+                       "hierarchy health services blueprint overview reflection review daemon retro observability progress dashdata"),
     _p("dashboard", "entry", "kernel dashdata"),
 ])
 
 FEATURES: tuple[str, ...] = tuple(n for n, p in PACKAGES.items() if p.kind == "feature")
 ENTRY_POINTS: tuple[str, ...] = tuple(n for n, p in PACKAGES.items() if p.kind == "entry")
-ALL_PACKAGES: tuple[str, ...] = tuple(PACKAGES) + (APP,)  # the 42 packages of section 2.2
+ALL_PACKAGES: tuple[str, ...] = tuple(PACKAGES) + (APP,)  # the 43 packages of section 2.2
 
 
 def level(name: str) -> int:
@@ -108,7 +109,7 @@ def feature_levels() -> dict[int, tuple[str, ...]]:
 
 
 def edges() -> set[tuple[str, str]]:
-    """Every (importer, imported) pair allowed between non-kernel packages (205 in section 4.3)."""
+    """Every (importer, imported) pair allowed between non-kernel packages (219 in section 4.3)."""
     return {(n, d) for n, p in PACKAGES.items() for d in p.deps if d != KERNEL}
 
 

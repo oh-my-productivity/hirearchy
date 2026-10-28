@@ -97,7 +97,7 @@ def test_nothing_is_generated_when_no_package_exists(tmp_path):
 
 
 def test_every_package_of_the_map_is_known_to_the_generator():
-    assert len(graph.PACKAGES) == 41
+    assert len(graph.PACKAGES) == 42
     assert set(gen_importlinter.GRAPH) == set(graph.PACKAGES)
 
 

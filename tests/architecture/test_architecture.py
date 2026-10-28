@@ -48,7 +48,7 @@ def test_each_ledger_name_has_one_owner(real_tree):
 
 def test_responsibilities_have_no_and(architecture_text):
     assert not (found := checks.responsibilities(architecture_text)), report(found)
-    assert len(checks.responsibility_sentences(architecture_text)) == 42
+    assert len(checks.responsibility_sentences(architecture_text)) == 43
 
 
 def test_init_reexports_exactly_api(real_tree):
