@@ -398,6 +398,9 @@ class AllowingStructureGuard(StructureGuard):
     def retire(self, me: str, name: str) -> None:
         pass
 
+    def new_service(self, me: str, owner: str, name: str) -> None:
+        pass
+
 
 class StaticNaming(ToolNaming):
     """The names of the tools: ``read`` / ``write``, except for the agents in ``shadowed``, whose built-ins hide them (``org_read`` / ``org_write``)."""

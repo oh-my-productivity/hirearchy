@@ -365,7 +365,7 @@ def test_tools_are_registered_by_role(org):
 
 def test_the_services_tool_describes_what_you_can_request_and_offer(org):
     server = build_server(org, ROOT)
-    assert "No services yet" in call(server, "services") and "define_service" in call(server, "services")
+    assert "No services yet" in call(server, "services") and "add_services" in call(server, "services")  # (root's way to a new service: the extension)
     define(org, playbook="Steps.")
     t1 = request(org, "ai")
     deliver(org, "ceo", t1, runs=3)
@@ -394,8 +394,8 @@ def test_the_services_tool_describes_what_you_can_request_and_offer(org):
 def test_define_request_report_reject_reflect_revise_and_compare_versions(org):
     root = build_server(org, ROOT)
 
-    out = call(root, "define_service", owner="ceo", name="weekly-brief", description=BRIEF["description"],
-               acceptance=BRIEF["acceptance"], deliverable=BRIEF["deliverable"], budget=10, inputs=BRIEF["inputs"])
+    out = org.define_service(ROOT, "ceo", "weekly-brief", description=BRIEF["description"],  # (the first definition is the programs' path: root's MCP one is refused)
+                             acceptance=BRIEF["acceptance"], deliverable=BRIEF["deliverable"], budget=10, inputs=BRIEF["inputs"])
     assert "defined service `weekly-brief`" in out
     ceo = build_server(org, "ceo")  # the owner's run starts after the definition: it now has revise_playbook
     out = call(root, "request", service="weekly-brief", inputs={"topic": "ai"})

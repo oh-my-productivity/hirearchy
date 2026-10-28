@@ -13,7 +13,7 @@ from hirearchy.agents.testing import MemoryAgents
 from hirearchy.kernel import ROOT, Message, OrgError
 from hirearchy.mcp_server._instructions import InstructionText
 from hirearchy.mcp_server._tools_services import DirectoryServiceRoles, ServiceTools
-from hirearchy.mcp_server.testing import HeldBudgets, MemoryBinding, ScriptedReports, ScriptedSteps, agents_in
+from hirearchy.mcp_server.testing import AllowingStructureGuard, HeldBudgets, MemoryBinding, ScriptedReports, ScriptedSteps, agents_in
 from hirearchy.services import BASE_HEADING, Admission, Contract, Criterion, Playbook, PlaybookChange, ServiceCatalog, ServiceCommands
 
 from ._support import call, described, fails, names, serve
@@ -90,7 +90,7 @@ def tools(agents: MemoryAgents | None = None, offered: dict[str, list[str]] | No
     roles = DirectoryServiceRoles(InstructionText(MemoryBinding(Path("/o"), exists=exists)), lambda: agents, lambda: agents, lambda: Catalog(offered or {}))
     return ServiceTools(
         roles, lambda: reports or ScriptedReports("SERVICES", {"req-1": "case total: 3 of 9"}), lambda: commands, lambda: HeldBudgets({"ceo": 5}),
-        lambda: steps or ScriptedSteps(),
+        lambda: steps or ScriptedSteps(), AllowingStructureGuard(),
     ), commands
 
 
@@ -218,7 +218,7 @@ def test_a_missing_organization_is_the_refusal_of_a_client_tool() -> None:
         raise OrgError("no organization at /o yet: call create_org(mission=...) first")
 
     roles = DirectoryServiceRoles(InstructionText(MemoryBinding(Path("/o"))), gone, gone, gone)  # type: ignore[arg-type]
-    group = ServiceTools(roles, gone, gone, gone, gone)  # type: ignore[arg-type]
+    group = ServiceTools(roles, gone, gone, gone, gone, AllowingStructureGuard())  # type: ignore[arg-type]
     assert "call create_org" in fails(serve(group, ROOT), "services")
 
 

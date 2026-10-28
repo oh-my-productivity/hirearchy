@@ -384,6 +384,11 @@ def test_retire_team_hire_and_define_continues_on_every_surface(svc, capsys, sur
         assert "refused: retiring ceo changes the organization, so the user approves it in a plan" in said and "Nothing was retired." in said, said
     before = service_files(svc)
     refused_it, got = amend_on(svc, surface, capsys, acceptance=["A different criterion"])
+    if surface == "mcp":  # root's MCP definition of a name ceo no longer offers is a new service: refused (ROOT-NEW-SERVICE, design 13) before the gate
+        assert refused_it and "refused: ceo offers no service `weekly-brief`, and a new service changes the organization" in got, got
+        assert 'propose_org(blueprint=<an extension with add_services>, extend="current")' in got and "Nothing was written." in got
+        assert service_files(svc) == before and svc.service_names("ceo") == []
+        return  # (the gate itself is the CLI's and the facade's, and the extension's `extend-owner`)
     path = re.search(r"kept at (\S+) \(", got).group(1)
     assert re.fullmatch(r"\.retired/ceo-\d{8}T\d{6}/services/weekly-brief", path)
     assert refused_it and CONTINUES_TEXT.format(path=path, what=CRITERIA) in got, got

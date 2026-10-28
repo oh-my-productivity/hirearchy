@@ -8,7 +8,8 @@ and the programs' own acts and are not refused here. An agent is never refused: 
 
 from __future__ import annotations
 
-from ..kernel import ROOT, OrgError, norm
+from ..kernel import ROOT, OrgError, Provider, norm
+from ..services import ServiceCatalog
 from ._ports import StructureGuard
 
 ROOT_HIRE = (
@@ -20,10 +21,18 @@ ROOT_RETIRE = (
     "refused: retiring {addr} changes the organization, so the user approves it in a plan: propose_org(blueprint=<an extension with retire: "
     '[{{agent: {addr}, reason: ...}}]>, extend="current"), show its PLAN FOR YOU block, then apply it after their approval. Nothing was retired.'
 )
+ROOT_NEW_SERVICE = (
+    "refused: {owner} offers no service `{name}`, and a new service changes the organization, so the user approves it in a plan: "
+    'propose_org(blueprint=<an extension with add_services>, extend="current"). A change to an existing service\'s criteria stays '
+    "define_service with the user's words. Nothing was written."
+)
 
 
 class RootStructureGuard(StructureGuard):
     """Refuses root, only root, the calls of ``ROOT_*``; every other actor passes."""
+
+    def __init__(self, catalog: Provider[ServiceCatalog]) -> None:
+        self._catalog = catalog
 
     def hire(self, me: str) -> None:
         if me == ROOT:
@@ -32,3 +41,7 @@ class RootStructureGuard(StructureGuard):
     def retire(self, me: str, name: str) -> None:
         if me == ROOT:
             raise OrgError(ROOT_RETIRE.format(addr=norm(name)))
+
+    def new_service(self, me: str, owner: str, name: str) -> None:
+        if me == ROOT and name not in self._catalog().service_names(norm(owner)):
+            raise OrgError(ROOT_NEW_SERVICE.format(owner=norm(owner), name=name))

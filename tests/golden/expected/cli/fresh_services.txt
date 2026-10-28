@@ -1,3 +1,3 @@
-No services yet. A parent defines a standing service for a direct report with define_service(owner, name, description, acceptance, deliverable, budget, inputs): the contract. Then request(service, inputs) asks for it, and feedback(task_id, verdict) tells the owner how it went.
+No services yet. A new standing service is added to the organization in a plan the user approves: propose_org(blueprint=<an extension with add_services>, extend="current") (at the terminal: hirearchy plan and hirearchy apply of that file). Then request(service, inputs) asks for it, and feedback(task_id, verdict) tells the owner how it went.
 
 [exit 0]

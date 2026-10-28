@@ -11,7 +11,7 @@ from ..budget import BudgetQuery
 from ..kernel import ROOT, Message, OrgError, Provider
 from ..reflection import ServiceReports, ServiceSteps
 from ..services import BASE_HEADING, ServiceCatalog, ServiceCommands, acknowledge_reply, playbook_reply
-from ._ports import ServiceRoles, SetupMode, ToolGroup
+from ._ports import ServiceRoles, SetupMode, StructureGuard, ToolGroup
 
 if TYPE_CHECKING:
     from mcp.server.fastmcp import FastMCP
@@ -52,13 +52,14 @@ def _step(make: Callable[[], str]) -> str:
 class ServiceTools(ToolGroup):
     def __init__(
         self, roles: ServiceRoles, reports: Provider[ServiceReports], commands: Provider[ServiceCommands], budgets: Provider[BudgetQuery],
-        steps: Provider[ServiceSteps],
+        steps: Provider[ServiceSteps], guard: StructureGuard,
     ) -> None:
         self._roles = roles
         self._reports = reports
         self._commands = commands
         self._budgets = budgets
         self._steps = steps
+        self._guard = guard
 
     def register(self, mcp: FastMCP, me: str) -> None:
         manager, owner = self._roles.manager(me), self._roles.owner(me)
@@ -113,14 +114,11 @@ class ServiceTools(ToolGroup):
             about: str | None = None,
             words: str | None = None,
         ) -> str:
-            """Define a standing service of one of your direct reports (root: a top-level agent), or amend its contract.
+            """Amend the contract of a service of a top-level agent. A new service changes the organization, so the user approves it in a plan:
+        propose_org(blueprint=<an extension with add_services>, extend="current"); a first definition here is refused.
 
         You are the client: the contract is yours; the owner cannot change it. owner: the report. name: lowercase-dashed,
-        unique among your reports' services. FIRST definition needs description (one line), acceptance (concrete,
-        checkable criteria that travel with every request), deliverable ({description, format?, max_words?, path?
-        (absolute)}) and budget (runs handed down with each request); optional: inputs ([{name, description, required
-        (default true)}] the requester fills in), playbook (markdown workflow, first definition only), locked (true = the
-        owner may not revise the playbook), notes (free text for the owner).
+        unique among your reports' services.
         AMENDMENT (the service exists): pass only what changes, the rest stays. To add a lasting requirement:
         `add_acceptance=[<criterion>]`; to drop one: `remove_acceptance=[<its exact text>]`; `acceptance` replaces
         all (not together with add/remove). The old contract is archived and the owner quietly told what changed; the
@@ -131,6 +129,7 @@ class ServiceTools(ToolGroup):
         request, verbatim> alone (never admits a playbook revision). An answer may retire a watched playbook rule; the
         reply says so. Every delivered request of the service needs its verdict first.
         """
+            self._guard.new_service(me, owner, name)
             reply = self._commands().define_service(
                 me, owner, name, description=description, inputs=inputs, acceptance=acceptance,
                 deliverable=deliverable, budget=budget, playbook=playbook, locked=locked, notes=notes,

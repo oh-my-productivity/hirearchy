@@ -19,6 +19,11 @@ NO_SERVICES = (
     "name, description, acceptance, deliverable, budget, inputs): the contract. Then request(service, inputs) "
     "asks for it, and feedback(task_id, verdict) tells the owner how it went."
 )
+NO_SERVICES_ROOT = (  # root's listing (design 11.4, L18): a new service goes through the extension
+    "No services yet. A new standing service is added to the organization in a plan the user approves: "
+    'propose_org(blueprint=<an extension with add_services>, extend="current") (at the terminal: hirearchy plan and hirearchy apply of that '
+    "file). Then request(service, inputs) asks for it, and feedback(task_id, verdict) tells the owner how it went."
+)
 
 
 @pytest.fixture(params=[fs_world, memory_world], ids=lambda f: f.__name__)
@@ -36,8 +41,13 @@ def reports(request: pytest.FixtureRequest, tmp_path: Path) -> ServiceReports:
 # ------------------------------------------------------------------------------ services_text
 
 
-def test_without_services_the_text_says_how_to_define_one(w: ReflectionWorld) -> None:
-    assert w.reports.services_text("root") == NO_SERVICES == w.reports.services_text("ceo")
+def test_roots_empty_listing_points_to_the_extension(w: ReflectionWorld) -> None:
+    assert w.reports.services_text("root") == NO_SERVICES_ROOT
+
+
+def test_an_agents_empty_listing_is_unchanged(w: ReflectionWorld) -> None:
+    """GREEN when written: an agent still defines the service of its report itself."""
+    assert w.reports.services_text("ceo") == NO_SERVICES
 
 
 def test_an_unknown_actor_is_refused(w: ReflectionWorld) -> None:
@@ -131,7 +141,7 @@ def test_a_request_of_a_retired_service_has_no_total(w: ReflectionWorld) -> None
 
 
 def test_the_implementations_agree_on_an_empty_organization(reports: ServiceReports) -> None:
-    assert reports.services_text("root") == NO_SERVICES
+    assert reports.services_text("root") == NO_SERVICES_ROOT
 
 
 def test_case_total_warns_only_when_more_runs_were_used_than_the_contract_gives(w: ReflectionWorld) -> None:

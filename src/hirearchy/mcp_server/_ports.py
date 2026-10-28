@@ -164,6 +164,11 @@ class StructureGuard(Protocol):
         """The same for ``retire`` of ``name`` (a short name or an address)."""
         ...
 
+    def new_service(self, me: str, owner: str, name: str) -> None:
+        """The same for ``define_service`` of ``name`` for ``owner``, when ``owner`` offers no service of that name (a first definition). An
+        amendment of a service that exists is never refused here."""
+        ...
+
 
 @runtime_checkable
 class InstalledSkill(Protocol):

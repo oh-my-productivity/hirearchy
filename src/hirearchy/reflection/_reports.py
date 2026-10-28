@@ -5,12 +5,24 @@ from __future__ import annotations
 from collections.abc import Collection, Sequence
 
 from ..agents import AgentDirectory
-from ..kernel import Message, OrgError, clip_line
+from ..kernel import ROOT, Message, OrgError, clip_line
 from ..services import Contract, Criterion, Playbook, ServiceCatalog, ServiceEvidence, confirmed_amendments, criteria_of
 from ._ports import ServicePaths
 from ._watch_text import in_its_watch, watch_entry
 from .api import (
     Assertion, CaseHistory, ServiceReports, case_spend, confirmed_criteria, regressions, summarize, user_approved, user_cost,
+)
+
+# The listing of an agent with no service, and root's (design 11.4, L18: root's new service goes through the extension, an agent's own definition does not).
+NO_SERVICES = (
+    "No services yet. A parent defines a standing service for a direct report with define_service(owner, "
+    "name, description, acceptance, deliverable, budget, inputs): the contract. Then request(service, inputs) "
+    "asks for it, and feedback(task_id, verdict) tells the owner how it went."
+)
+ROOT_NO_SERVICES = (
+    "No services yet. A new standing service is added to the organization in a plan the user approves: "
+    'propose_org(blueprint=<an extension with add_services>, extend="current") (at the terminal: hirearchy plan and hirearchy apply of that '
+    "file). Then request(service, inputs) asks for it, and feedback(task_id, verdict) tells the owner how it went."
 )
 
 CLIP_ASSERTION = 160  # characters of the client's words shown for an assertion in the listing
@@ -152,11 +164,7 @@ class TextServiceReports(ServiceReports):
         actor = self._agents.require(actor)
         asks, offers = self._catalog.requestable_services(actor), self._catalog.owned_services(actor)
         if not asks and not offers:
-            return (
-                "No services yet. A parent defines a standing service for a direct report with define_service(owner, "
-                "name, description, acceptance, deliverable, budget, inputs): the contract. Then request(service, inputs) "
-                "asks for it, and feedback(task_id, verdict) tells the owner how it went."
-            )
+            return ROOT_NO_SERVICES if actor == ROOT else NO_SERVICES
         out: list[str] = []
         if asks:
             out.append("Services you can request (from your direct reports):")

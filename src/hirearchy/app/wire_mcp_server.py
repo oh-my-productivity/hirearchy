@@ -166,7 +166,7 @@ def server_factory(binding: OrgBindingPort, scheduler_control: Callable[[Schedul
         return provide(binding, port)
 
     resources, environment = process_resources(), OsEnvironment()
-    structure = RootStructureGuard()  # root's structural calls over MCP are refused in favour of the extension (design 13)
+    structure = RootStructureGuard(of(ServiceCatalog))  # root's structural calls over MCP are refused in favour of the extension (design 13)
     plan_time = CachedPlanTime()
     text = InstructionText(binding)  # the instructions, and the setup state
     directory = of(AgentDirectory)
@@ -197,7 +197,7 @@ def server_factory(binding: OrgBindingPort, scheduler_control: Callable[[Schedul
         ),
         ServiceTools(
             DirectoryServiceRoles(text, directory, of(CharterReader), of(ServiceCatalog)), of(ServiceReports), of(ServiceCommands), of(BudgetQuery),
-            of(ServiceSteps),
+            of(ServiceSteps), structure,
         ),
     ]
     root_only = [
