@@ -26,7 +26,8 @@ Items 2 and 3 were approved as proposed.
 This is iteration 2. It resolves the ten findings of the design review (`.agents/tasks/design-review.md`); section 9 answers each one.
 Three of the fixes change what the manager approved: text E is reworded, declared limit 6 (a stop faked by an agent with `shell`) is
 new, and the run log now places kiro's stderr lines where the launcher reads them. The manager approved all three before this design
-was committed (section 9.3).
+was committed (section 9.3). The manager then closed the design loop after review 2 and made its ten findings binding amendments E1-E10;
+section 10 lists each one and where it landed.
 
 The technology stack is locked as it is: Python 3 standard library in the launcher (`os`, `select`, `subprocess`, `signal`, `re`), the
 existing packages `kiro`, `scheduler`, `budget` and `kernel`, pytest. No new dependency.
@@ -75,8 +76,9 @@ Across all 73 warned runs (P1 and G0):
 - it comes before the first `[tool ...]` line (73 of 73) and before the first `[KRS] ... done` line (73 of 73);
 - it is the only extra line: the start of a warned log has 13-14 lines between `run started` and the first tool line, an unwarned one 12-13.
 
-The first tool line of every kept run is read-only: 670 of 670 logs, of which 666 are `[tool ok] Tool Load {"tool_ids":["hirearchy::*"]}`,
-2 are `[tool] Read File` and 2 are `[tool] List Directory`. So a stop at the warning comes before any tool effect in every kept run.
+The first tool line of every kept run is read-only: 670 of 670 logs: 666 are `[tool ok] Tool Load` (642 of them
+`{"tool_ids":["hirearchy::*"]}`, 24 a list of named hirearchy tools), 2 are `[tool] Read File` and 2 are `[tool] List Directory` (E2). So a
+stop at the warning comes before any tool effect in every kept run.
 
 The session timestamps time the turn, not the warning. The `user` message is stored a median 0.67-0.69 s after the session is created,
 the turn starts about 0.01 s later, and the first tool call comes at least 1.46 s after the turn start in P1 (1.57 s in G0, 1.73 s in P1's
@@ -192,7 +194,8 @@ effort warning. It strips trailing whitespace, applies `EFFORT_LINE.match`, and 
 `CUT_WARNING`. Nothing else is changed, so the quote is kiro's text as it came. Both the launcher's scan and `effort_stop` (2.3) use it, so
 the two can never disagree.
 
-New data: `@dataclass class ErrPipe: fd: int; open: bool = True; partial: bytes = b""; warning: str = ""`.
+New data: `@dataclass class ErrPipe: fd: int; open: bool = True; partial: bytes = b""; warning: str = ""; skipping: bool = False` (`skipping`:
+E5, the rest of an over-long line is not scanned).
 
 **The drain rule (manager's condition 2).** From the `Popen` to the end of `_supervise`, every place where the launcher waits also reads
 kiro's stderr while that pipe is open: the start wait, the stream, the exit wait, the stop and the reads before a closing `# kiro:` line.
@@ -237,7 +240,9 @@ New functions:
   land in the log in the order the launcher writes them.
 - `_read_err(err: ErrPipe) -> None` reads up to 64 KB from `err.fd`. Empty means end of file: the remaining `partial` is scanned as a
   line and `err.open = False`. Otherwise it forwards the bytes, appends them to `partial`, splits off the complete lines and scans each. A
-  `partial` longer than `ERR_LINE_LIMIT` is dropped from the scan (it was already forwarded).
+  `partial` longer than `ERR_LINE_LIMIT` is dropped from the scan (it was already forwarded): `partial = b""` and `skipping = True`. While
+  `skipping`, the bytes up to and including the next `\n` are dropped from the scan, then `skipping = False`, so the tail of an over-long line
+  is never scanned as a line of its own. Forwarding is unchanged (E5).
 - Scanning a line: decode UTF-8 with replacement. If `err.warning` is empty, set `err.warning = effort_warning(line)`. Only the first
   warning counts; the scan never changes what was forwarded.
 - `_drain_err(err: ErrPipe) -> None`: while `err.open` and `select([err.fd], [], [], 0)` says readable, `_read_err(err)`, at most
@@ -427,10 +432,10 @@ title=run_credit_title(addr, stem)`) and its own body (2.10, text C). The title 
 
 | Case | What happens |
 |---|---|
-| The relaunch gets the warning again | It is stopped again. Its credit is `counted`, so it is not charged but it is a failure. Every later stop in a row is also `counted`. With `max_failures` = 3 (the default) a streak is at most 4 stopped launches (1 free, 3 counted); then the agent is paused and its parent and root get the existing "keeps failing" notice. With `max_failures` = 0 the first counted stop pauses it (the existing rule). At G0's rate (17 %), 4 in a row is about 0.08 %. |
+| The relaunch gets the warning again | It is stopped again. Its credit is `counted`, so it is not charged but it is a failure. Every later stop in a row is also `counted`. With `max_failures` = 3 (the default) a streak is at most 4 stopped launches (1 free, 3 counted); then the agent is paused and its parent and root get the existing "keeps failing" notice. With `max_failures` = 0 the first counted stop pauses it (the existing rule). At G0's rate (17 %), 4 in a row is about 0.08 %. Its note C still says 'the run is started again', as the throttle note does. The agent runs again once it is resumed (E9). |
 | The warning comes before `runStarted` | The same stop, `tool effects: none`, and no `# kiro: run started` line (never seen: 0 of 73). |
 | The warning comes after a tool effect that kiro reported | The run is stopped anyway, because the floor beats the work. The mark says `tool effects: <n>`, there is no credit, and the run is charged and counted like any failed run; its messages go back to the inbox and the existing failure rule retries it. Never seen: 0 of 73. |
-| A tool effect that kiro reports only after its warning | Possible only if the tool ran but kiro wrote its completed update after the warning: that effect is not counted, and the run is credited. Every update written before the warning is counted, because the stop reads stdout to its end after the warning (`_last_output`). In the kept runs the warning always came before the first tool line, and that call was read-only (1.3). A hirearchy effect that sends mail is caught by the mail check. |
+| A tool effect that kiro reports only after its warning | Possible only if the tool ran but kiro wrote its completed update after the warning. An update that kiro writes after the launcher's last stdout read, or does not write before the kill, is not counted, and the run is credited. Every update written before the warning is counted (`_last_output`), and so is one written after it that reaches the pipe before that last read (E4). In the kept runs the warning always came before the first tool line, and that call was read-only (1.3). A hirearchy effect that sends mail is caught by the mail check. |
 | The warning is read after kiro exited, or in `_exit_code` | It is not acted on, because nothing is left to stop. The line stays in the log, and the run ends by today's rules. Never seen. |
 | A stderr line contains the prefix but does not start with it (after an optional level tag) | No stop. |
 | The prefix is followed by a reason never seen before | The same stop; the mark and the event quote the new reason as it came. |
@@ -441,6 +446,7 @@ title=run_credit_title(addr, stem)`) and its own body (2.10, text C). The title 
 | The run sent a message before the stop (race) | No credit, charged, counted: the existing belt-and-braces check. |
 | An agent with `shell` fakes the warning and the mark and SIGKILLs its own launcher | Credited if it sent no mail: declared limit 6. |
 | The scheduler's `--max-runs` cap is reached by the stopped launch | The messages wait in the inbox for the next scheduler, as for a throttled run. |
+| The scheduler dies after the stop and before it settles the run | The next scheduler redelivers its batch (`run.orphan`, `redelivered`, `scheduler/_orphans.py:61-63`). No credit is given and the run is charged, as for a throttled run (E8). |
 | The agent is retired during the run | Today's retired branch runs first; no credit is given. |
 | A timeout, retirement or shutdown kill | `run.killed`: not an effort stop. |
 | A refused or silent start, or a launcher error (also exit -9) | The tail holds no effort mark, so the run takes today's path. If its log cannot be read, line E (`run log not read for the effort check`) is said and the run takes today's path. |
@@ -470,7 +476,9 @@ unchanged; only its `error` string is new.
 
 - **Budget (runs):** a stopped launch with no tool effect costs nothing. Its credit note returns the run, and the case totals, the
   overspend warning and `runs n of m` leave it out. A stop after a tool effect is charged one run, like any failed run. Observability's run
-  counts and failure rates include stopped launches, because they ran.
+  counts and failure rates include stopped launches, because they ran. `health` counts a stopped launch as a failed run: its `(+M failed)`
+  count includes it, and its efficiency flags leave it out, as for a credited throttle (`health/_render.py:37`, `health/_analyzer.py:59-62`;
+  E7).
 - **The user's Kiro credits:** each stopped launch pays for an engine start (no model credits) and at most one model request cut off at its
   start. P1 averaged 0.21 credits per request (430.38 credits over 2,053 requests) and G0 0.22 (252.12 over 1,131). Whether Kiro bills a
   request cut off this way is not recorded. The relaunch costs what the original run would have cost anyway. Upper bound at the kept rates:
@@ -513,7 +521,14 @@ unchanged; only its `error` string is new.
 
 `src/hirearchy/kiro/_launch.py`, `kiro/api.py`, `kiro/__init__.py`; `src/hirearchy/scheduler/_ports.py`, `_effort.py` (new), `_credit.py`
 (new), `_throttle.py`, `_reaper.py`, `_assembly.py`, `testing.py`; `src/hirearchy/budget/_credit.py`, `budget/api.py`,
-`budget/__init__.py`; `tests/testkit/fake_agent.py` (`FAKE_EFFORT_STOP_RUNS`, 5); `README.md` (text G). No golden is expected to change:
+`budget/__init__.py`; `tests/testkit/fake_agent.py` (`FAKE_EFFORT_STOP_RUNS`, 5); `README.md` (text G); `ARCHITECTURE.md`, in the docs
+commit (E6), with three edits:
+- `:1292`: the new exports `EFFORT_PREFIX`, `EffortStop`, `effort_stop` and `effort_warning`;
+- `:1293-1294`: the launcher reads kiro's stderr, forwards it to fd 2 and stops the run at the warning (mark A, exit -9);
+- `:1361`: `EffortStops` (`CreditingEffortStops(logs, mail, delivery, console)`), asked by `RunSettlement` on exit -9 of a run that was
+  not killed, with `return_run` shared with the throttle credit.
+
+No golden is expected to change:
 the stub kiro-cli and the fake agent write nothing to stderr unless a test asks, and no golden holds a `run.end` error. Any golden diff is
 a finding, not a regeneration.
 
@@ -589,10 +604,11 @@ def group_gone(group: int, within: float = 20.0) -> bool:
 - `test_a_spinner_without_a_newline_is_given_up_on_the_same_way` has the same pid race. Its pid check gets the same change, and its body
   loses `echo $$ > pid`. Its check that the spinner text reached the log still needs the shell to print within the 1-s deadline. That
   check has never failed in a kept log and stays as it is (out of the brief's scope).
-- New `test_a_kiro_killed_before_its_first_line_leaves_no_process` (group leader only) reproduces the flake on purpose: body `sleep 3\necho
-  $$ > pid\nexec sleep 30\n`, deadline 1. It asserts `code == -9`, that `tmp_path / "pid"` does not exist (the kill came first), and
-  `group_gone(group)`. The old `read_pid` assertion fails on this body every time; the new one passes. It is leader-only because in the
-  `not-leader` case the launcher kills only its child, so the shell's `sleep 3` child would outlive it.
+- New `test_a_kiro_killed_before_its_first_line_leaves_no_process` (group leader only) reproduces the flake on purpose: body `sleep 15\necho
+  $$ > pid\nexec sleep 30\n`, deadline 1 (E3: the kill still comes at about 1 s, so the run's length does not change, and
+  `launch_in_group`'s 20-s timeout still bounds a failing kill). It asserts `code == -9`, that `tmp_path / "pid"` does not exist (the kill
+  came first), and `group_gone(group)`. The old `read_pid` assertion fails on this body every time; the new one passes. It is leader-only
+  because in the `not-leader` case the launcher kills only its child, so the shell's `sleep 15` child would outlive it.
 - `read_pid` and `gone` stay for the tests whose fake writes its pid before the event the launcher acts on (`test_engine_v2_is_refused`,
   `test_a_first_event_that_is_not_run_started_is_refused`).
 
@@ -622,20 +638,44 @@ shows a readiness refusal. The value does not tie in with item 1: the effort rac
 readiness call starts one. **No product change is proposed**, so the manager's yes is not needed.
 
 **The fix (test-only).** Neither test is about readiness. Each now runs with kiro-cli declared ready through the existing seam, so it makes
-no stub call that could time out:
+no stub call that could time out. Each also proves that no readiness call was made (E1). Nothing else in either test calls kiro-cli:
+readiness runs only in `LoopSchedulerRunner.run` (`app/wire_cli.py:228`), `--max-runs 0` starts no run, `ScrubbedLaunchEnvironment` passes
+`KIRO_STUB_LOG` to the child (`daemon/_site.py:41-45`), and the stub writes each call's argv to that file (`tests/testkit/fixtures.py:23`).
 - `test_wire_cli.py::test_the_scheduler_runner_runs_the_loop_until_there_is_nothing_to_do`: both `runner.run(...)` calls go inside `with
   wiring.overriding({RuntimeReadiness: FixedReadiness(None)}):`, the idiom of the file's `refuse` helper and of
-  `test_a_ready_kiro_cli_starts_the_loop_and_leaves_no_marker` (:189-194). Every name is already imported.
+  `test_a_ready_kiro_cli_starts_the_loop_and_leaves_no_marker` (:189-194). Every name of the override is already imported. After the two
+  calls it asserts the stub log holds no `--version` line (the assertion below; `import os` is the file's one new import).
 - `test_exit_assistant.py::test_a_real_until_done_scheduler_process_exits_by_itself` keeps a real scheduler process. Before `start`, the
   test reopens the runtime with `testkit.health_world.with_ports(org, {SchedulerCommand: FixedSchedulerCommand([sys.executable, "-c",
   READY_SCHEDULER, "--root", str(org.root), "run", "--max-runs", "0", "--until-done"])})`, the pattern of the daemon's `STAND_IN`
-  (`daemon/testing.py:434-482`). `READY_SCHEDULER` is one line, because the process inspector reads command lines line by line:
-  `"import sys; from hirearchy import main; from hirearchy.app import wiring; from hirearchy.kiro import RuntimeReadiness; from
-  hirearchy.kiro.testing import FixedReadiness; wiring.overriding({RuntimeReadiness: FixedReadiness(None)}).__enter__(); main(sys.argv[1:])"`.
+  (`daemon/testing.py:434-482`). `READY_SCHEDULER` is one command line, because the process inspector reads command lines line by line.
+  It binds the context manager to a name for the life of the process (E1): an unbound `wiring.overriding(...).__enter__()` is freed at the
+  end of its statement, Python closes its generator, and the `finally` of `wiring.overriding` (`app/wiring.py:72-86`) restores the empty
+  overrides before `main` runs. Adjacent string literals keep it one line:
+
+  ```python
+  READY_SCHEDULER = (
+      "import sys; from hirearchy import main; from hirearchy.app import wiring; from hirearchy.kiro import RuntimeReadiness; "
+      "from hirearchy.kiro.testing import FixedReadiness; ready = wiring.overriding({RuntimeReadiness: FixedReadiness(None)}); "
+      "ready.__enter__(); main(sys.argv[1:])"
+  )
+  ```
+
   The process is the real `hirearchy run --until-done` with its pidfile, exit marker and log, and `SchedulerIdentity` still recognises it
   (`run` and the org root are on its command line, `daemon/_identity.py:33-36`). New imports: `SchedulerCommand` from `hirearchy.daemon`
   (the test already imports `EXIT_FILE` from there), `FixedSchedulerCommand` from `hirearchy.daemon.testing`, `with_ports` from
-  `testkit.health_world`. The assertions stay as they are.
+  `testkit.health_world`, and `from pathlib import Path`. The existing assertions stay as they are, and after them it asserts that the child
+  made no readiness call.
+- The assertion, the same in both tests (E1):
+
+  ```python
+  stub_log = Path(os.environ["KIRO_STUB_LOG"])
+  assert not stub_log.exists() or "--version" not in stub_log.read_text(encoding="utf-8").splitlines()  # no readiness call
+  ```
+
+  These are item 3's two REDs. In `test_exit_assistant.py` the assertion fails on today's test and with the unbound one-liner, and passes
+  with the bound manager. In `test_wire_cli.py` it fails today and passes once the two calls run inside `with wiring.overriding(...)`.
+  Each RED is seen to fail before its fix is applied.
 
 **Still exposed, never recorded failing.** Other tests run the real readiness against the stub: in-process through the CLI
 (`cli/tests/test_run_command.py`, `test_run_command_assistant.py`, `test_progress_command_assistant.py`, `test_announce.py`,
@@ -714,8 +754,11 @@ Integration tests (real processes, fake kiro, no credits):
   - Before an early end: the fake closes stdout (`exec 1>&-`), writes 2,000 stderr lines and exits 4. Asserts exit 4, all 2,000 lines in
     the log, and `# kiro: kiro-cli exited with code 4 before the run started` as the last line. After the pipe change and without the
     stderr loop of `_exit_code`, this test times out, because kiro blocks on the full pipe while the launcher waits for it.
-  - 2,000 stderr lines, then the warning: the run is stopped, and the log holds the 2,000 lines, the warning and mark A, in that order.
-    RED: `subprocess.TimeoutExpired`.
+  - `START`, then 2,000 stderr lines, then the warning: out is `["# kiro: run started (engine v3)", A]`, and the log holds the 2,000
+    lines, the warning and A, in that order (E10). RED: `subprocess.TimeoutExpired`.
+  - The tail of an over-long stderr line (E5): a 70,000-byte stderr line whose last 80 bytes are `failed to set effort ...` gives no stop.
+    The unit case feeds `_read_err` through a pipe in pieces, so `partial` passes `ERR_LINE_LIMIT` before the line's last bytes arrive. RED:
+    without `skipping`, the tail is scanned as a line of its own and sets `err.warning`.
   - A background child holding stderr after kiro exits (`sleep 30 >/dev/null &`): the run ends within 5 s, the twin of the stdout test.
     The launcher stops reading 2 s after it sees kiro exit, counted once across `_stream` and `_exit_code`, so the 5-s bound keeps the
     stdout twin's margin.
@@ -732,7 +775,11 @@ Integration tests (real processes, fake kiro, no credits):
   - RED: the fake agent ignores the variable, so no credit.
 - Item 2: the hardened tests and `test_a_kiro_killed_before_its_first_line_leaves_no_process` (3). There is no RED for a test-only
   hardening; the new test shows the old assertion failing on the reproduced race.
-- Item 3: the two hardened tests (4). There is no RED for a test-only hardening.
+- Item 3: the two hardened tests (4), each with its RED (E1): the `KIRO_STUB_LOG` "no `--version` call" assertion fails on today's
+  `test_exit_assistant.py::test_a_real_until_done_scheduler_process_exits_by_itself` and with the unbound one-liner, and passes with the
+  bound `ready = wiring.overriding(...)`; the same assertion fails on today's
+  `test_wire_cli.py::test_the_scheduler_runner_runs_the_loop_until_there_is_nothing_to_do` and passes once its two `runner.run` calls run
+  inside `with wiring.overriding(...)`.
 
 Existing tests that stay unchanged and green (condition 3; a reviewer checks with `git diff main -- <file>`):
 - `kiro/tests/test_launch.py`: every existing test except the two that item 2 hardens. That covers the throttle section (from :425),
@@ -756,8 +803,10 @@ Existing tests that stay unchanged and green (condition 3; a reviewer checks wit
 3. The scheduler's output gains lines D and E.
 4. The agent's next prompt holds credit note C.
 5. Budget: a stopped launch without a tool effect is not charged, and case totals and `runs n of m` leave it out. An agent with `shell`
-   can fake such a stop (limit 6).
-6. README gains sentence G.
+   can fake such a stop (limit 6). `health` counts a stopped launch as a failed run: its `(+M failed)` count includes it, and its
+   efficiency flags leave it out, as for a credited throttle (E7).
+6. README gains sentence G. ARCHITECTURE.md's kiro section and scheduler ports describe the new exports, the launcher's stderr reading and
+   stop, and `EffortStops` (2.13, E6).
 7. Nothing changes in `status`, `progress`, `whoami`, the plan block, ORG.md, the profiles or the MCP tools. Items 2 and 3 change no
    user-visible behaviour.
 
@@ -837,3 +886,32 @@ stderr lines in the run log. All three were approved on 2026-10-28 (`.agents/tas
    2's design), not this batch's.
 3. Placing kiro's stderr lines by read time is approved, because a stderr line written before a stdout line still comes first and
    `test_each_launcher_line_comes_before_the_next_line_of_kiros_stderr` stays unchanged.
+
+## 10. Manager amendments (design loop closed)
+
+Design review 2 (`.agents/tasks/design-review.md` and `.json`, on `d363fa7a`) returned CHANGES_REQUESTED with 1 HIGH, 0 MEDIUM and 9 NIT.
+The manager closed the design loop by decision, with no third pass, and made the review's ten findings binding amendments E1-E10:
+`/Volumes/workspace/hirearchy/.worktrees/org-1-1-effort/.agents/tasks/manager-decision-design-loop.md` (2026-10-28). The HIGH is a
+test-only defect in item 3 that the reviewer verified by running it, with an exact fix and a deterministic RED; item 1's design, texts,
+cost and limits verified clean. Each fix is adopted as the review words it. Where an amendment and older text of this file differ, the
+amendment wins. The plan (`.agents/tasks/plan.md`) carries E1's two REDs and E5's unit case as named test commits, and E6 in its docs
+commit.
+
+| Amendment | Finding | What binds | Where it landed |
+|---|---|---|---|
+| E1 | 1 (HIGH) | `READY_SCHEDULER` binds the context manager to a name (`ready = wiring.overriding(...); ready.__enter__()`), one command line through adjacent string literals. The `KIRO_STUB_LOG` "no `--version` call" assertion is added to `test_exit_assistant.py::test_a_real_until_done_scheduler_process_exits_by_itself`, and after the two `runner.run` calls of `test_wire_cli.py::test_the_scheduler_runner_runs_the_loop_until_there_is_nothing_to_do`, which then run inside `with wiring.overriding(...)`. These are item 3's two REDs; each is seen to fail on today's test (and, for the first, with the unbound one-liner) before its fix | 4 (the fix); 5 (item 3) |
+| E2 | 2 | 666 first tool lines are `[tool ok] Tool Load`: 642 with `{"tool_ids":["hirearchy::*"]}`, 24 with a list of named hirearchy tools; 2 Read File, 2 List Directory. 2.1 keeps "666 Tool Load, 4 reads" | 1.3 |
+| E3 | 3 | `test_a_kiro_killed_before_its_first_line_leaves_no_process` uses the body `sleep 15\necho $$ > pid\nexec sleep 30\n` | 3 |
+| E4 | 4 | An update that kiro writes after the launcher's last stdout read, or does not write before the kill, is not counted, and the run is credited; every update written before the warning is counted (`_last_output`) | 2.9 |
+| E5 | 5 | `ErrPipe.skipping`: after an over-long `partial` is dropped, the scan skips bytes up to and including the next `\n`; forwarding is unchanged. One unit case: a 70,000-byte stderr line whose last 80 bytes are `failed to set effort ...` gives no stop | 2.2 (`ErrPipe`, `_read_err`); 5 |
+| E6 | 6 | `ARCHITECTURE.md` gets three edits in the docs commit: `:1292` the new kiro exports; `:1293-1294` the launcher reads kiro's stderr, forwards it to fd 2 and stops the run at the warning (mark A, exit -9); `:1361` `EffortStops` (`CreditingEffortStops(logs, mail, delivery, console)`), asked by `RunSettlement` on exit -9 of a run that was not killed, with `return_run` shared with the throttle credit | 2.13; 6 item 6 |
+| E7 | 7 | `health` counts a stopped launch as a failed run: its `(+M failed)` count includes it, and its efficiency flags leave it out, as for a credited throttle | 2.11; 6 item 5 |
+| E8 | 8 | The scheduler dies after the stop and before it settles the run: the next scheduler redelivers its batch (`run.orphan`, `redelivered`); no credit, charged, as for a throttled run | 2.9 |
+| E9 | 9 | Text C is unchanged. At the stop that pauses the agent, note C still says "the run is started again", as the throttle note does; the agent runs again once it is resumed | 2.9 (the repeat row) |
+| E10 | 10 | The drain test: `START`, then 2,000 stderr lines, then the warning: out is `["# kiro: run started (engine v3)", A]`, and the log holds the 2,000 lines, the warning and A, in that order | 5 |
+
+Accepted as stated (the same decision file): review 2's unverified assumption 4, that kiro-cli also writes the warning when its stderr is a
+pipe, was not seen live; if it did not, detection fails open to today's behaviour, which declared limit 3 covers, and no live run is added.
+Earlier decisions stand: option (a), the bound, conditions 1-3, text E, limit 6 and stderr placed by read time
+(`.agents/tasks/manager-decision-item1.md`). Unchanged by the amendments: the user-visible texts A-G, the cost, the declared limits, SKILL.md
+(section 7) and `READINESS_TIMEOUT`.
