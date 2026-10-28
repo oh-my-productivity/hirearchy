@@ -154,7 +154,9 @@ class BlueprintTools(ToolGroup):
 
         kind: "research" (facts from the web with source URLs, fact-checked), "documents" (write from the user's local
         files, no web; uses `needs.inputs`, read-only folders), "code" (software in a repo workspace, with tests and
-        local commits) or "analysis" (the user's data files, read-only, analysed by a checked script). Replace every
+        local commits), "analysis" (the user's data files, read-only, analysed by a checked script) or "extension" (a change to the existing
+        organization: new agents, services, lines in a charter, limits, budgets, retires; the template of the extension that propose_org(blueprint,
+        extend="current") takes, with every field explained). Replace every
         <PLACEHOLDER> with what the user told you (ask for what is missing; do not invent lists), delete what does not apply, then call propose_org with the text. Read-only.
 
         service: true for work the user wants again and again ("every week", "whenever I..."): the template then offers it

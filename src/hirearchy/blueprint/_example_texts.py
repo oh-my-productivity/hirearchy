@@ -357,3 +357,60 @@ SERVICE_BODIES = {
 """,
 }
 SERVICE_BUDGETS = {"research": 24, "documents": 22, "code": 25, "analysis": 25}
+
+
+EXTENSION = """\
+# Extension schema in one paragraph. An extension changes the organization that exists (a full blueprint builds a new team). It is YAML with
+# `reason` (one line: the brief's item or the user's own words), `needs` (only `elicitation`, the user's answers verbatim, and `budget_runs`, their cap per
+# request) and `extend`, with one or more sections: add_agents, add_services, add_charter_lines, remove_charter_lines, limits, budgets, retire_services,
+# retire. It cannot change the criteria or the playbook of an existing service, the tools, model, workspace or inputs of an existing agent, an existing
+# charter's text (only the lines it adds under "## Added by your changes"), or an ORG.md setting other than max_depth. Replace every <PLACEHOLDER>; delete
+# the sections and the fields that do not apply. Then call propose_org(blueprint, extend="current") with the edited text, show the plan to the user and wait.
+reason: <ONE LINE, THE ITEM OF THE BRIEF (B3.1) OR THE USER'S OWN WORDS>   # why the user is asked; shown as "Why:" in the plan
+needs:
+  elicitation: <THE USER'S ANSWERS, VERBATIM>   # needed when a criterion below says `from:`; each `from:` is a quote of it (a plan of defaults: their request in their words)
+  budget_runs: 25                  # optional: the user's cap in runs for ONE request of a new service
+extend:
+  add_agents:                      # new agents, each under an agent that exists (or under root for a new team)
+    - parent: <ADDRESS OF AN EXISTING AGENT, OR root>   # the agent it reports to; it must have room (see limits)
+      name: <NAME OF THE NEW AGENT>   # lowercase letters, digits and dashes; the address is parent/name
+      template: <ROLE TEMPLATE>    # manager, researcher, writer, reviewer, fact-checker, engineer, tester, code-reviewer, analyst or data-checker; or `charter: <TEXT>`
+      # role, model, tools, workspace, inputs, children, can_hire, max_children: as in a blueprint. Tools, workspace and inputs must lie inside the parent's.
+      # Without `inputs` the new agent gets its parent's inputs, and a verifier also the workspaces of its parent's authors.
+      charter_extra: <WHAT THE NEW AGENT IS ASKED TO DO, IN ITS OWN INSTRUCTIONS>   # appended under "## Additional instructions"
+  add_services:                    # new standing services, each offered by an agent that reports to root
+    - owner: <ADDRESS OF A TOP-LEVEL AGENT>
+      name: <SERVICE NAME>         # lowercase letters, digits and dashes; requests name the service only, so it is unique
+      description: <WHAT ONE REQUEST PRODUCES, ON ONE LINE>
+      inputs:                      # what the requester provides
+        - {name: <INPUT NAME>, description: <WHAT IT IS>, required: true}
+      acceptance:                  # the contract: exact and checkable; only the user can change it afterwards
+        # each criterion: text, and from: <the user's exact words> (asked: <your question>), default: true (your proposal), or from_tasks: [<ids of your one-off tasks>]
+        - text: <EXACT, CHECKABLE CRITERION>
+          from: <THE USER'S EXACT WORDS>
+      deliverable: {description: <WHAT THE RESULT IS>, format: markdown}
+      budget: 20                   # runs per request; at least the estimate for the owner's team after this change
+  add_charter_lines:               # one line added to an existing agent's charter, under "## Added by your changes"
+    - agent: <ADDRESS OF AN EXISTING AGENT>
+      line: <ONE LINE, AT MOST 300 CHARACTERS>
+  remove_charter_lines:            # a line an earlier change added, taken out again (the revert of an added line)
+    - agent: <ADDRESS OF AN EXISTING AGENT>
+      line: <THE LINE AS IT WAS ADDED, WITHOUT ITS TAG>
+  limits:                          # hiring limits of agents that exist, and the organization's depth
+    - agent: <ADDRESS OF AN EXISTING AGENT>
+      can_hire: true               # optional
+      max_children: 4              # optional: at least its direct reports now
+    - org: max_depth
+      value: 5                     # at least the depth of the deepest agent
+  budgets:                         # the runs per request of a service that exists
+    - owner: <ADDRESS OF A TOP-LEVEL AGENT>
+      service: <SERVICE NAME>
+      budget: 24
+  retire_services:                 # a service taken out of use; its contract, playbook and cases are kept
+    - owner: <ADDRESS OF A TOP-LEVEL AGENT>
+      service: <SERVICE NAME>
+      reason: <WHY>
+  retire:                          # an agent and its team, taken out of use
+    - agent: <ADDRESS OF AN EXISTING AGENT>
+      reason: <WHY>
+"""

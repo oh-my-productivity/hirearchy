@@ -6,6 +6,7 @@ from pathlib import Path
 
 from ..kernel import OrgError
 from ._example_texts import (
+    EXTENSION,
     SCHEMA,
     SERVICE_BODIES,
     SERVICE_BUDGETS,
@@ -15,6 +16,9 @@ from ._example_texts import (
     TEMPLATES,
 )
 from .api import EXAMPLE_KINDS, BlueprintExamples
+
+
+EXTENSION_KIND = "extension"
 
 
 def _without_block(text: str, header: str) -> str:
@@ -45,9 +49,12 @@ class TemplateBlueprintExamples(BlueprintExamples):
     def example(self, kind: str = "research", base: Path | str = ".", service: bool = False) -> str:
         """The template text for ``kind`` with absolute paths under ``base``; ``service=True``: as a standing service."""
         key = (kind or "research").strip().lower()
+        if key == EXTENSION_KIND:  # beside the four full kinds, which EXAMPLE_KINDS keeps (PC-17): a change to the organization, not a team
+            return EXTENSION
         if key not in TEMPLATES:
             raise OrgError(f"unknown kind '{kind}': use one of {', '.join(EXAMPLE_KINDS)} "
-                           "(research = web sources, documents = write from the user's local files, code = repo workspace with tests, analysis = data files analysed with a checked script)")
+                           "(research = web sources, documents = write from the user's local files, code = repo workspace with tests, analysis = data files analysed with a checked script); "
+                           "kind extension is the template of a change to the existing organization")
         base_text = str(base).rstrip("/") or "/"
         if service:
             return _service_template(key).format(service_schema=SERVICE_SCHEMA, base=base_text)

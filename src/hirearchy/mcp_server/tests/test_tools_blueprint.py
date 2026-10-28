@@ -439,3 +439,13 @@ def test_a_full_blueprint_keeps_todays_plan_id_refusal() -> None:
     assert str(info.value) == ("not applied: plan_id does not match this blueprint, so this is not the plan the user approved. Call propose_org(blueprint), "
                                "show the PLAN FOR YOU block to the user, get their explicit approval, then call apply_org(blueprint, approved=True, "
                                "plan_id=<the plan_id from that propose_org>) with the same blueprint")
+
+
+def test_blueprint_example_offers_kind_extension() -> None:
+    group = BlueprintTools(TemplateExampleText(lambda: Examples(), EnvironmentExampleLocation(DictEnvironment(cwd=Path("/w")), MemoryBinding(HERE))),
+                           extension_proposal(), extension_application())
+    server = serve(group, ROOT)
+    text = " ".join(described(server)["blueprint_example"].split())
+    assert '"extension" (a change to the existing organization: new agents, services, lines in a charter, limits, budgets, retires;' in text
+    assert 'the template of the extension that propose_org(blueprint, extend="current") takes, with every field explained)' in text
+    assert call(server, "blueprint_example", kind="extension") == "EXAMPLE extension /w False"

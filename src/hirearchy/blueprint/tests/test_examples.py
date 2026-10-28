@@ -347,3 +347,78 @@ def test_a_filled_template_has_no_provenance_issue(kind, service, tmp_path):
     assert not [i for i in found if i.code.startswith("criterion-")], [i.render() for i in found]
     raw = bpm.validate(bpm.load_text(ex.example(kind, tmp_path, service=service)), allowed_roots=[tmp_path])
     assert {i.code for i in raw if i.code.startswith("criterion-")} <= {"criterion-from"}  # the raw template says the quotes are still to be filled in
+
+
+# ------------------------------------------------------------------------------------------- the extension template (design 5.1, PC-17)
+
+import yaml  # noqa: E402
+
+from hirearchy.blueprint import EXAMPLE_KINDS, is_extension  # noqa: E402
+
+from ._extension_world import world  # noqa: E402
+
+SECTIONS = ("add_agents", "add_services", "add_charter_lines", "remove_charter_lines", "limits", "budgets", "retire_services", "retire")
+
+
+def test_extension_is_not_one_of_the_full_example_kinds(tmp_path):
+    assert EXAMPLE_KINDS == ("research", "documents", "code", "analysis") and "extension" not in EXAMPLE_KINDS  # PC-17: the full kinds keep their four
+    assert ex.example("extension", tmp_path) != ex.example("research", tmp_path)
+    assert ex.example("  Extension ", tmp_path) == ex.example("extension", tmp_path)
+    with pytest.raises(OrgError, match=r"unknown kind 'poetry': use one of research, documents, code, analysis \(research = web sources"):
+        ex.example("poetry", tmp_path)
+
+
+def test_the_extension_template_explains_every_section(tmp_path):
+    text = ex.example("extension", tmp_path)
+    header = text.split("\nreason:")[0]
+    assert all(section in header for section in SECTIONS) and "schedules" not in text  # the schema paragraph names them; schedules are not in this version
+    for line in text.splitlines():
+        stripped = line.strip()
+        if stripped.endswith(":") or stripped.startswith("- ") and stripped.endswith(":"):
+            continue
+        for section in SECTIONS:
+            if stripped.startswith(f"{section}:"):
+                assert "#" in stripped, f"{section} is not explained"
+    for field in ("parent", "name", "template", "charter_extra", "owner", "description", "acceptance", "deliverable", "budget", "agent", "line", "can_hire",
+                  "max_children", "org", "service", "reason"):
+        assert f"{field}:" in text, field
+    assert "from_tasks" in text and "from: <THE USER'S EXACT WORDS>" in text and "default: true" in text
+    assert all(re.search(r"<[A-Z]", line) for line in text.splitlines() if "<" in line and not line.lstrip().startswith("#") and "<THE USER'S" not in line)
+    assert is_extension(yaml.safe_load(text))
+
+
+FILLED = {
+    "<ONE LINE, THE ITEM OF THE BRIEF (B3.1) OR THE USER'S OWN WORDS>": "B1.1 three cases failed one criterion",
+    "<THE USER'S ANSWERS, VERBATIM>": "At most 3 pages. Notes, please.",
+    "<ADDRESS OF AN EXISTING AGENT, OR root>": "lead", "<NAME OF THE NEW AGENT>": "checker", "<ROLE TEMPLATE>": "reviewer",
+    "<WHAT THE NEW AGENT IS ASKED TO DO, IN ITS OWN INSTRUCTIONS>": "Check every date item by item.",
+    "<SERVICE NAME>": "daily", "<ADDRESS OF A TOP-LEVEL AGENT>": "lead", "<WHAT ONE REQUEST PRODUCES, ON ONE LINE>": "A monthly note",
+    "<INPUT NAME>": "topic", "<WHAT IT IS>": "the topic", "<EXACT, CHECKABLE CRITERION>": "Notes in at most 3 pages.",
+    "<THE USER'S EXACT WORDS>": "At most 3 pages.", "<WHAT THE RESULT IS>": "a note", "<ONE LINE, AT MOST 300 CHARACTERS>": "Cite the source.",
+    "<THE LINE AS IT WAS ADDED, WITHOUT ITS TAG>": "Date every row.", "<ADDRESS OF AN EXISTING AGENT>": "lead/writer", "<WHY>": "not needed",
+}
+
+
+def test_the_extension_template_filled_validates_against_an_organization(tmp_path):
+    from testkit.reach.hirearchy.core import ROOT as R
+
+    w = world(tmp_path, lead_reports=4)
+    w.org.hire(R, "old", "Old", "x", tools=["read"])
+    w.org.define_service(R, "lead", "weekly", description="d", inputs=[], acceptance=["Every row has a date."], deliverable={"description": "x"}, budget=9, playbook="s")
+    w.org.define_service(R, "lead", "daily", description="d", inputs=[], acceptance=["Every row has a date."], deliverable={"description": "x"}, budget=9, playbook="s")
+    meta, body = w.org.charter("lead/writer")
+    from hirearchy.kernel import join_frontmatter
+
+    w.org.runtime.agent_registry.rewrite_charter("lead/writer", join_frontmatter(meta, body + "\n\n## Added by your changes\n- Date every row. [change abc123def456]\n"))
+    text = ex.example("extension", tmp_path)
+    for placeholder, value in FILLED.items():
+        text = text.replace(placeholder, value)
+    bp = yaml.safe_load(text)
+    # one entry of each section, made to fit this organization: a service of its own, another service to retire, an agent to retire
+    bp["extend"]["add_services"][0].update(owner="solo", name="monthly")
+    bp["extend"]["budgets"][0].update(owner="lead", service="weekly")
+    bp["extend"]["retire_services"][0].update(owner="lead", service="daily")
+    bp["extend"]["retire"][0].update(agent="old")
+    bp["extend"]["limits"][0].update(agent="lead", max_children=5)
+    assert not [p for p in re.findall(r"<[A-Z][^>]*>", yaml.safe_dump(bp))]
+    assert w.errors(bp) == [], w.errors(bp)
