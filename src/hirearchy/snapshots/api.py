@@ -80,6 +80,11 @@ class OrgHistory(Protocol):
         """The commit ``HEAD`` names now (the key under which a caller memoizes a None answer: it can change only with a new commit)."""
         ...
 
+    def subject(self, commit: str) -> str | None:
+        """The first line of the message of ``commit``; None when it is no commit of the history (an unknown id, an id of another kind of
+        object)."""
+        ...
+
     def changes(self, paths: Sequence[str], limit: int) -> list[Change] | None:
         """The paths among ``paths`` that each of the newest ``limit`` commits changed, newest commit first (git's order inside a commit): one
         ``Change`` per commit and path. A path that cannot be asked of the history is left out, and with none left the answer is ``[]`` without
@@ -119,8 +124,9 @@ class GitClient(Protocol):
         ...
 
     def cat(self, root: Path, obj: str, limit: int) -> bytes | None:
-        """The content of the blob ``obj`` (a full object id) when its size is at most ``limit`` bytes (the size is asked before the blob is
-        read); None when it is larger, is no blob, on a failure or a timeout; never raises."""
+        """The content of the blob ``obj`` (a full object id), or, when ``obj`` is a commit, the text of the commit object (its header lines, a
+        blank line, then its message), when its size is at most ``limit`` bytes (the size is asked before the object is read); None when it is
+        larger, is neither a blob nor a commit, on a failure or a timeout; never raises."""
         ...
 
     def log(self, root: Path, paths: Sequence[str], limit: int) -> bytes | None:

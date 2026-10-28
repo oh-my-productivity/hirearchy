@@ -173,6 +173,9 @@ class SlowText(OrgHistory):
     def head(self) -> str | None:
         return self.inner.head()
 
+    def subject(self, commit: str) -> str | None:
+        return self.inner.subject(commit)
+
     def changes(self, paths: Sequence[str], limit: int) -> list[Change] | None:
         return self.inner.changes(paths, limit)
 

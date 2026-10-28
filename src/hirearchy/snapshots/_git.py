@@ -15,6 +15,7 @@ from .api import Change, GitClient, OrgHistory, OrgSnapshotter
 _OBJECT_ID = re.compile(r"[0-9a-f]{40}|[0-9a-f]{64}")  # sha1 and sha256 repositories
 _NOT_IN_A_PATH = (":", "^", "~", "@{", "\\", "\0")  # revision syntax (``<commit>:<path>``) and a byte no argument can hold
 READ_TIMEOUT = 2.0  # seconds a read question to git may take
+COMMIT_LIMIT = 65536  # bytes of a commit object ``GitOrgHistory.subject`` reads (a message longer than this has no subject)
 
 
 def is_object_id(text: str) -> bool:
@@ -81,7 +82,8 @@ class SubprocessGit(GitClient):
         size = self._read(root, "cat-file", "-s", obj)
         if size is None or not size.strip().isdigit() or int(size) > limit:
             return None  # too large, not an object: the blob is not read
-        return self._read(root, "cat-file", "blob", obj)
+        data = self._read(root, "cat-file", "blob", obj)
+        return data if data is not None else self._read(root, "cat-file", "commit", obj)  # R7 caps GitClient: a commit's message is read here
 
     def log(self, root: Path, paths: Sequence[str], limit: int) -> bytes | None:
         asked = [path for path in paths if is_history_path(path)]
@@ -144,6 +146,17 @@ class GitOrgHistory(OrgHistory):
 
     def head(self) -> str | None:
         return self._git.object_id(self._paths.root, "HEAD") if self._repository() else None
+
+    def subject(self, commit: str) -> str | None:
+        if not (is_object_id(commit) and self._repository()):
+            return None
+        raw = self._git.cat(self._paths.root, commit, COMMIT_LIMIT)
+        if raw is None:
+            return None
+        head, blank, message = raw.decode("utf-8", "replace").partition("\n\n")  # the header lines end at the first blank line
+        if not blank or not head.startswith("tree "):
+            return None  # not a commit object (a blob that happens to hold a blank line)
+        return message.partition("\n")[0]
 
     def changes(self, paths: Sequence[str], limit: int) -> list[Change] | None:
         if not self._repository():

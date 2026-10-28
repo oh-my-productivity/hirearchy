@@ -146,6 +146,16 @@ def test_cat_checks_the_size_before_reading_the_blob(h: GitHarness) -> None:
         assert h.git.cat(h.root, bad, 10_000) is None, bad
 
 
+def test_cat_reads_a_commit_object_whose_message_follows_a_blank_line(h: GitHarness) -> None:
+    h.git.init(h.root)
+    first = commit(h, "first subject\n\nand a body", "a.txt")
+    text = h.git.cat(h.root, first, 10_000)
+    assert text is not None and text.decode().partition("\n\n")[2].startswith("first subject\n\nand a body")
+    assert h.git.cat(h.root, first, 10) is None  # over the limit: not read
+    tree = h.git.object_id(h.root, f"{first}:")  # a tree is no blob and no commit
+    assert tree is None or h.git.cat(h.root, tree, 10_000) is None
+
+
 def test_read_methods_answer_none_on_a_failure_or_a_timeout(h: GitHarness) -> None:
     # no repository yet
     assert (h.git.added_by(h.root, "a.txt"), h.git.object_id(h.root, "HEAD"), h.git.cat(h.root, "0" * COMMIT_ID, 10)) == (None, None, None)

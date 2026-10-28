@@ -96,6 +96,44 @@ def test_no_repository_runs_no_git(tmp_path: Path) -> None:
     assert git.reads == []
 
 
+# ------------------------------------------------------------------------------ subject (the first line of a commit's message)
+
+
+def test_subject_is_the_first_line_of_the_commit_message(h: HistoryHarness) -> None:
+    first = h.commit({"a.md": b"1\n"}, message="root: applied extension 0123456789ab")
+    second = h.commit({"a.md": b"2\n"}, message="ceo: edited a charter\n\nA body that is not the subject.\nNor this line.")
+    assert h.history.subject(first) == "root: applied extension 0123456789ab"
+    assert h.history.subject(second) == "ceo: edited a charter"
+    assert h.history.subject(h.history.head() or "") == "ceo: edited a charter"
+
+
+def test_subject_is_none_for_an_invalid_commit_or_without_a_repository(h: HistoryHarness) -> None:
+    assert h.history.subject("0" * 40) is None  # no repository yet
+    commit = h.commit({"a.md": b"a\n"}, message="first")
+    for bad in BAD_COMMITS:
+        assert h.history.subject(bad) is None, bad
+    assert h.history.subject("0" * 40) is None  # well formed, but no such commit
+    assert h.history.subject(blob_id(b"a\n")) is None  # an object that is no commit
+    assert h.history.subject(commit) == "first"  # and the good one still answers
+
+
+def test_subject_runs_no_git_for_an_input_that_cannot_be_a_commit(tmp_path: Path) -> None:
+    root = tmp_path / "org"
+    root.mkdir()
+    git = RecordingGit()
+    git.init(root)
+    git.touch(root, "a.md", b"a\n")
+    git.commit_all(root, "first")
+    commit = git.object_id(root, "HEAD")
+    assert commit is not None
+    history = GitOrgHistory(OrgPaths(root), git)
+    git.reads.clear()
+    for bad in BAD_COMMITS:
+        assert history.subject(bad) is None
+    assert git.reads == []
+    assert history.subject(commit) == "first" and [read[0] for read in git.reads] == ["cat"]
+
+
 # ------------------------------------------------------------------------------ changes (the commits that changed some paths)
 
 

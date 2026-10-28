@@ -112,7 +112,14 @@ class RecordingGit(GitClient):
         if not is_object_id(obj):
             return None
         found = next((data for _, tree in self._history(root) for data in tree.values() if blob_id(data, len(obj)) == obj), None)
+        if found is None:  # a commit: the text git prints for it, its message after the blank line
+            history = self._history(root)
+            found = next((self._commit_text(root, position) for position, (made, _) in enumerate(history) if made == obj), None)
         return found if found is not None and len(found) <= limit else None
+
+    def _commit_text(self, root: Path, position: int) -> bytes:
+        stamp = f"{int(commit_time(position).timestamp())} +0000"
+        return f"tree {'0' * 40}\nauthor {AUTHOR} {stamp}\ncommitter {AUTHOR} {stamp}\n\n{self.commits[root][position].message}\n".encode()
 
     def log(self, root: Path, paths: Sequence[str], limit: int) -> bytes | None:
         self.reads.append(("log", str(root), str(limit), *paths))
@@ -174,10 +181,11 @@ class MemoryOrgHistory(OrgHistory):
     def __init__(self) -> None:
         self._commits: list[tuple[str, dict[str, bytes]]] = []
         self._changed: list[tuple[datetime, frozenset[str]]] = []  # per commit: its time and the paths whose content it changed
+        self._messages: dict[str, str] = {}  # commit id -> message
 
-    def commit(self, files: Mapping[str, bytes | None], when: datetime | None = None) -> str:
+    def commit(self, files: Mapping[str, bytes | None], when: datetime | None = None, message: str = "test commit") -> str:
         """A new commit: the tree of the last one with ``files`` changed (a value of None deletes the file). Returns its id. ``when`` is its time
-        (``commit_time`` of its position, with its offset, when omitted)."""
+        (``commit_time`` of its position, with its offset, when omitted); ``message`` its message."""
         before = self._commits[-1][1] if self._commits else {}
         tree = dict(before)
         for name, data in files.items():
@@ -188,6 +196,7 @@ class MemoryOrgHistory(OrgHistory):
         made = hashlib.sha1(f"memory commit {len(self._commits)}".encode(), usedforsecurity=False).hexdigest()
         self._changed.append((commit_time(len(self._commits)) if when is None else when, frozenset(n for n in files if before.get(n) != tree.get(n))))
         self._commits.append((made, tree))
+        self._messages[made] = message
         return made
 
     def first_commit_with(self, path: str) -> str | None:
@@ -203,6 +212,9 @@ class MemoryOrgHistory(OrgHistory):
 
     def head(self) -> str | None:
         return self._commits[-1][0] if self._commits else None
+
+    def subject(self, commit: str) -> str | None:
+        return self._messages[commit].partition("\n")[0] if is_object_id(commit) and commit in self._messages else None
 
     def changes(self, paths: Sequence[str], limit: int) -> list[Change] | None:
         if not self._commits:
@@ -251,7 +263,7 @@ class SnapshotHarness:
 @dataclass(frozen=True)
 class HistoryHarness:
     history: OrgHistory
-    commit: Callable[[Mapping[str, bytes | None]], str]  # a commit with these files changed (None deletes one); the first makes the repository; its id
+    commit: Callable[..., str]  # (files, message="test commit"): a commit with these files changed (None deletes one); the first makes the repository; its id
     # before the first ``commit`` there is no repository: every question is answered None
 
 
@@ -406,7 +418,7 @@ def real_org_history(tmp_path: Path) -> HistoryHarness:
     root = _organization(tmp_path)
     git = SubprocessGit()
 
-    def commit(files: Mapping[str, bytes | None]) -> str:
+    def commit(files: Mapping[str, bytes | None], message: str = "test commit") -> str:
         if not git.has_repository(root):
             git.init(root)
         for name, data in files.items():
@@ -415,7 +427,7 @@ def real_org_history(tmp_path: Path) -> HistoryHarness:
             else:
                 (root / name).parent.mkdir(parents=True, exist_ok=True)
                 (root / name).write_bytes(data)
-        git.commit_all(root, "test commit")
+        git.commit_all(root, message)
         head = git.object_id(root, "HEAD")
         assert head is not None
         return head

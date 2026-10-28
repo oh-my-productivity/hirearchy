@@ -53,6 +53,10 @@ class CountingHistory(OrgHistory):
         self.calls.append(("head",))
         return self.inner.head()
 
+    def subject(self, commit: str) -> str | None:
+        self.calls.append(("subject", commit))
+        return self.inner.subject(commit)
+
     def changes(self, paths: Sequence[str], limit: int) -> list[Change] | None:
         self.calls.append(("changes", str(limit), *paths))
         return self.inner.changes(paths, limit)
