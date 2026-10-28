@@ -16,6 +16,7 @@ mission: >
 needs:
   kind: code
   scope: "<What the software does and what it deliberately does not do, in the user's words.>"
+  elicitation: <THE USER'S ANSWERS, VERBATIM>   # what the user said, verbatim; every `from:` below is a quote of it
   deliverable:
     description: <What is delivered, e.g. a Python package with a command-line tool>
     format: python package         # no path needed: the result is the workspace folder itself
@@ -46,7 +47,12 @@ task:
     <Implement the software in the workspace with tests, have it tested and reviewed independently, apply every
     required change and report.>
   acceptance:
-    - "`uv run pytest -q` passes with at least 5 tests."
-    - <The exact command or behavior that shows the main feature works, e.g. a command and its expected output.>
-    - The tester ran the software against every criterion and the engineer applied every required change.
-    - Work is committed locally in the workspace and nothing was pushed.
+    # each criterion: text, and from: <the user's exact words> (asked: <your question>) or default: true (your proposal); put their answers, verbatim, in needs.elicitation
+    - text: "`uv run pytest -q` passes with at least 5 tests."
+      default: true
+    - text: <The exact command or behavior that shows the main feature works, e.g. a command and its expected output.>
+      from: <THE USER'S EXACT WORDS>
+    - text: The tester ran the software against every criterion and the engineer applied every required change.
+      default: true
+    - text: Work is committed locally in the workspace and nothing was pushed.
+      default: true

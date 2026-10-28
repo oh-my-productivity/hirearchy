@@ -29,7 +29,8 @@ def fill(text: str, base: Path, *, uncomment: bool = False) -> str:
         (base / n).mkdir(exist_ok=True)
     text = (text.replace("<folder-with-your-files>", "docs").replace("<folder-with-your-data>", "data")
             .replace("<project-folder>", "proj").replace("<name>", "briefs").replace("<service-name>", "my-service")
-            .replace("<input-name>", "topic"))
+            .replace("<input-name>", "topic").replace("<THE USER'S EXACT WORDS>", "Sample text")
+            .replace("<THE USER'S ANSWERS, VERBATIM>", "Sample text"))
     if uncomment:
         text = "\n".join(re.sub(r"^# (task:|  )", r"\1", line) if line.startswith(("# task:", "#   ")) else line
                          for line in text.split("\n"))
@@ -40,7 +41,7 @@ def filled_service(kind: str, base: Path, **kw) -> dict:
     return bpm.load_text(fill(ex.example(kind, base, service=True), base, **kw))
 
 
-ALLOWED_WARNINGS = {"path-delivery", "path-parent", "workspace-new", "shell-unconfined", "criterion-source", "criterion-words"}
+ALLOWED_WARNINGS = {"path-delivery", "path-parent", "workspace-new", "shell-unconfined"}
 
 
 @pytest.mark.parametrize("kind", ex.KINDS)
@@ -110,9 +111,9 @@ def test_the_plain_templates_are_unchanged_by_the_service_option(tmp_path):
 def _criteria_of_every_example(base: Path):
     for kind in ex.KINDS:
         plain = bpm.load_text(fill(ex.example(kind, base), base))
-        yield kind, "task", plain["task"]["acceptance"]
+        yield kind, "task", [c["text"] for c in plain["task"]["acceptance"]]
         service = bpm.load_text(fill(ex.example(kind, base, service=True), base))
-        yield kind, "service", service["services"][0]["acceptance"]
+        yield kind, "service", [c["text"] for c in service["services"][0]["acceptance"]]
 
 
 def test_no_example_criterion_counts_the_criteria_it_belongs_to(tmp_path):
@@ -260,7 +261,7 @@ def test_the_shipped_service_example_validates_plans_and_applies(tmp_path):
     bp = bpm.load_text(text)
     found = bpm.validate(bp, allowed_roots=[tmp_path])
     assert not bpm.errors(found), [i.render() for i in found]
-    assert codes(found) - {"criterion-source", "criterion-words"} <= {"path-delivery", "path-parent"}, [i.render() for i in found]
+    assert codes(found) <= {"path-delivery", "path-parent"}, [i.render() for i in found]
     assert bpm._is_request(bp) and bp["services"][0]["name"] == "weekly-brief" and not bpm._plain(bp)
     block = bpm.plan_for_user(bp, found, allowed_roots=[tmp_path])
     assert len(without_source_lines(block)) <= 42 and "Services (kept ready" in block
@@ -285,3 +286,64 @@ def test_the_shipped_service_example_header_commands_are_real():
     head = EXAMPLE.read_text().split("mission:")[0]
     for command in ("hirearchy plan examples/blueprint-service.yaml", "hirearchy apply examples/blueprint-service.yaml", "hirearchy request weekly-brief"):
         assert command in head, command
+
+
+# ------------------------------------------------------------------------------------------------ provenance (design 10.1, 11.3)
+
+CRITERIA_COMMENT = (
+    "# each criterion: text, and from: <the user's exact words> (asked: <your question>) or default: true (your proposal); "
+    "put their answers, verbatim, in needs.elicitation"
+)
+ELICITATION = "<THE USER'S ANSWERS, VERBATIM>"
+QUOTE = "<THE USER'S EXACT WORDS>"
+SHIPPED = (testkit.REPO / "examples" / "blueprint-research.yaml", testkit.REPO / "examples" / "blueprint-service.yaml")
+
+
+def _acceptance_lists(bp):
+    """Every list of criteria of a blueprint: the task's and each service's."""
+    task = bp.get("task", {})
+    return ([task["acceptance"]] if "acceptance" in task else []) + [s["acceptance"] for s in bp.get("services", [])]
+
+
+@pytest.mark.parametrize("service", [False, True])
+@pytest.mark.parametrize("kind", ex.KINDS)
+def test_every_template_has_needs_elicitation_and_every_criterion_a_source(kind, service, tmp_path):
+    bp = bpm.load_text(ex.example(kind, tmp_path, service=service))
+    assert bp["needs"]["elicitation"] == ELICITATION
+    (criteria,) = _acceptance_lists(bp)
+    assert criteria and all(isinstance(c, dict) and set(c) in ({"text", "from"}, {"text", "default"}) for c in criteria), criteria
+    for c in criteria:  # a criterion that states the user's own choice holds a placeholder for what they told: it is theirs to quote
+        assert ("from" in c) == ("<" in c["text"]), c
+        assert c.get("from", QUOTE) == QUOTE and c.get("default", True) is True, c
+    assert any("from" in c for c in criteria) or kind == "analysis" and service
+
+
+@pytest.mark.parametrize("service", [False, True])
+@pytest.mark.parametrize("kind", ex.KINDS)
+def test_every_template_explains_from_and_default_in_its_criterion_comment(kind, service, tmp_path):
+    text = ex.example(kind, tmp_path, service=service)
+    lines = text.splitlines()
+    i = next(n for n, line in enumerate(lines) if line.strip() == CRITERIA_COMMENT)
+    assert lines[i - 1].strip().startswith("acceptance:") and lines[i + 1].strip().startswith("- text: ")
+
+
+@pytest.mark.parametrize("path", SHIPPED, ids=lambda p: p.name)
+def test_the_shipped_examples_validate_with_no_provenance_warning(path, tmp_path):
+    (tmp_path / "deliverables").mkdir()
+    text = path.read_text().replace("~/deliverables", str(tmp_path / "deliverables"))
+    bp = bpm.load_text(text)
+    found = bpm.validate(bp, allowed_roots=[tmp_path])
+    assert not bpm.errors(found), [i.render() for i in found]
+    assert not [i for i in found if i.code.startswith("criterion-")], [i.render() for i in found]
+    assert bp["needs"]["elicitation"].strip() and all(isinstance(c, dict) for lst in _acceptance_lists(bp) for c in lst)
+    assert all(c["from"] in " ".join(bp["needs"]["elicitation"].split()) for lst in _acceptance_lists(bp) for c in lst if "from" in c)
+
+
+@pytest.mark.parametrize("service", [False, True])
+@pytest.mark.parametrize("kind", ex.KINDS)
+def test_a_filled_template_has_no_provenance_issue(kind, service, tmp_path):
+    bp = bpm.load_text(fill(ex.example(kind, tmp_path, service=service), tmp_path))
+    found = bpm.validate(bp, allowed_roots=[tmp_path])
+    assert not [i for i in found if i.code.startswith("criterion-")], [i.render() for i in found]
+    raw = bpm.validate(bpm.load_text(ex.example(kind, tmp_path, service=service)), allowed_roots=[tmp_path])
+    assert {i.code for i in raw if i.code.startswith("criterion-")} <= {"criterion-from"}  # the raw template says the quotes are still to be filled in

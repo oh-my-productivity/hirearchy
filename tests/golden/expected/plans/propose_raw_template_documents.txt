@@ -22,23 +22,21 @@ Deliverable: <What the document is, e.g. an onboarding guide with one section pe
   Delivered to: <CWD>/deliverables/<name>.md (I copy it there after checking it)
 Done when ALL of these hold:
   1. Covers <the topics the user listed, named exactly> and nothing else.
-     my wording: your words for it were not recorded
+     from your words "<THE USER'S EXACT WORDS>"; words I added: covers, topics, listed, named, exactly, and, nothing, else
   2. At most 1500 words as counted by read.
-     my wording: your words for it were not recorded
+     my default: you did not say this
   3. Every statement is traceable to a named input file, and gaps or conflicts between files are listed in a final section titled "Open questions".
-     my wording: your words for it were not recorded
+     my default: you did not say this
   4. Every statement is checked against its named input file in the reviewer's report, and the writer applied every required change.
-     my wording: your words for it were not recorded
+     my default: you did not say this
 Checkpoints: approval - Plan first; ask before any spend beyond the budget; progress - One line when I ask; any spend beyond the budget needs your OK.
-Warnings (8):
+Warnings (3):
 - has built-in read but no workspace or inputs, so it can read nothing outside the organization; set needs.inputs or needs.workspace if it must read files
 - has built-in read but no workspace or inputs, so it can read nothing outside the organization; set needs.inputs or needs.workspace if it must read files
 - has built-in read but no workspace or inputs, so it can read nothing outside the organization; set needs.inputs or needs.workspace if it must read files
-- criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-- criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-- ... and 3 more (see the details)
-Errors (1):
+Errors (2):
 - needs.inputs: input <CWD>/<folder-with-your-files> does not exist; inputs are read-only sources and must be there already
+- task.acceptance[1]: criterion 1 quotes words that are not in needs.elicitation: "<THE USER'S EXACT WORDS>". Quote the user's own words exactly, or mark it default: true.
 Cannot apply yet.
 
 --- machine marker: the user block ends above; do not show this line or anything below it ---
@@ -83,33 +81,29 @@ Deliverable:
 
 First task: to lead: <Short title of the document>
   1. Covers <the topics the user listed, named exactly> and nothing else.
-     my wording: your words for it were not recorded
+     from your words "<THE USER'S EXACT WORDS>"; words I added: covers, topics, listed, named, exactly, and, nothing, else
   2. At most 1500 words as counted by read.
-     my wording: your words for it were not recorded
+     my default: you did not say this
   3. Every statement is traceable to a named input file, and gaps or conflicts between files are listed in a final section titled "Open questions".
-     my wording: your words for it were not recorded
+     my default: you did not say this
   4. Every statement is checked against its named input file in the reviewer's report, and the writer applied every required change.
-     my wording: your words for it were not recorded
+     my default: you did not say this
 
 Checkpoints:
 - Approval: Plan first; ask before any spend beyond the budget.
 - Progress: One line when I ask.
 - Any spend beyond the budget needs your OK.
 
-Warnings (10):
+Warnings (5):
 - agents[lead]: has built-in read but no workspace or inputs, so it can read nothing outside the organization; set needs.inputs or needs.workspace if it must read files
 - agents[lead/reader]: has built-in read but no workspace or inputs, so it can read nothing outside the organization; set needs.inputs or needs.workspace if it must read files
 - agents[lead/reviewer]: has built-in read but no workspace or inputs, so it can read nothing outside the organization; set needs.inputs or needs.workspace if it must read files
-- task.acceptance[1]: criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-- task.acceptance[2]: criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-- task.acceptance[3]: criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-- task.acceptance[4]: criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-- needs.elicitation: this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.
 - needs.deliverable.path: no agent can write to <CWD>/deliverables/<name>.md (agents write only inside their own directory or workspace); the assistant must copy the final artifact there and verify it on completion (the plan lists this step)
 - needs.deliverable.path: <CWD>/deliverables does not exist; the copy step will create it
 
-Errors (1) - must be fixed before this can be applied:
+Errors (2) - must be fixed before this can be applied:
 - needs.inputs: input <CWD>/<folder-with-your-files> does not exist; inputs are read-only sources and must be there already
+- task.acceptance[1]: criterion 1 quotes words that are not in needs.elicitation: "<THE USER'S EXACT WORDS>". Quote the user's own words exactly, or mark it default: true.
 
 Cannot apply yet: tell me what to change.
 

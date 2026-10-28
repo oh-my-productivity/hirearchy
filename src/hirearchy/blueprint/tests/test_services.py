@@ -114,7 +114,7 @@ def test_a_services_only_blueprint_needs_no_deliverable_task_or_acceptance(svc_b
     """D-E5-2: the services-only blueprint asks for 24 runs per request (the estimate 17 plus one client round of 7), so it gets no budget warning."""
     found = issues(mutate(svc_bp, lambda b: b["services"][0].update(budget=24)), roots)
     assert not bpm.errors(found), [i.render() for i in found]
-    assert codes(found, "warning") - {"criterion-source", "criterion-words"} <= {"path-delivery", "path-parent"}
+    assert codes(found, "warning") - {"criterion-source"} <= {"path-delivery", "path-parent"}  # (the service of this file lists plain strings)
 
 
 def test_plain_task_blueprints_are_unchanged(svc_bp, roots, plain_bp):

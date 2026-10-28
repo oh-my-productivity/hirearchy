@@ -2,11 +2,6 @@
 created 4 agents: lead, lead/dev, lead/qa, lead/cr
 task 20260115T090100000000-root-0000 -> lead (budget 23)
 warning: agents: lead, lead/dev, lead/qa, lead/cr hold shell. kiro cannot confine shell by path: staying inside the workspace (and leaving inputs alone) is instructed in the charter and prompt, not enforced. Built-in read/write ARE confined; only shell is not
-warning: task.acceptance[1]: criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-warning: task.acceptance[2]: criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-warning: task.acceptance[3]: criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-warning: task.acceptance[4]: criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-warning: needs.elicitation: this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.
 
 ##### lead/AGENT.md
 ---

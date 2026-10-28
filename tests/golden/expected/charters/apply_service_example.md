@@ -2,12 +2,6 @@
 created 4 agents: lead, lead/researcher, lead/writer, lead/factcheck
 defined 1 service(s) of lead: weekly-brief (contract and playbook v1)
 first request: service weekly-brief, task 20260115T090100000000-root-0000 -> lead (budget 24)
-warning: services[weekly-brief].acceptance[1]: criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-warning: services[weekly-brief].acceptance[2]: criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-warning: services[weekly-brief].acceptance[3]: criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-warning: services[weekly-brief].acceptance[4]: criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-warning: services[weekly-brief].acceptance[5]: criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-warning: needs.elicitation: this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.
 warning: services[weekly-brief].deliverable.path: no agent can write to <HOME>/deliverables/weekly-briefs (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)
 warning: services[weekly-brief].deliverable.path: <HOME>/deliverables does not exist; the copy step will create it
 

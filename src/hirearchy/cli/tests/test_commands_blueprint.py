@@ -78,6 +78,8 @@ def test_plan_shows_the_my_wording_line_and_both_warnings(tmp_path: Path, capsys
 
     bp = yaml.safe_load((testkit.REPO / "examples" / "blueprint-research.yaml").read_text())
     (tmp_path / "deliverables").mkdir()
+    bp["task"]["acceptance"] = [c["text"] for c in bp["task"]["acceptance"]]  # plain strings, and none of the user's words
+    del bp["needs"]["elicitation"]
     bp["needs"]["deliverable"]["path"] = str(tmp_path / "deliverables" / "competitors.md")
     (tmp_path / "bp.yaml").write_text(yaml.safe_dump(bp, sort_keys=False), encoding="utf-8")
     main(["plan", str(tmp_path / "bp.yaml"), "--allow-root", str(tmp_path)])

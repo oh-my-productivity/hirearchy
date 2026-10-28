@@ -712,54 +712,6 @@
  "org:default-model-below-floor": [
   [
    "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "needs.deliverable.path",
    "no agent can write to <TMP>/deliverables/competitors.md (agents write only inside their own directory or workspace); the assistant must copy the final artifact there and verify it on completion (the plan lists this step)",
    "path-delivery"
@@ -772,54 +724,6 @@
   ]
  ],
  "org:effort-below-floor": [
-  [
-   "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
   [
    "warning",
    "needs.deliverable.path",
@@ -903,12 +807,6 @@
    "criterion-source"
   ],
   [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
    "error",
    "services[weekly-brief]",
    "a service called 'weekly-brief' already exists in this organization; requests name the service only, so pick another name",
@@ -948,12 +846,6 @@
   ],
   [
    "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "services[weekly-brief].deliverable.path",
    "no agent can write to <TMP>/deliverables/briefs (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)",
    "path-delivery"
@@ -980,108 +872,12 @@
   ],
   [
    "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "needs.deliverable.path",
    "no agent can write to <TMP>/deliverables/competitors.md (agents write only inside their own directory or workspace); the assistant must copy the final artifact there and verify it on completion (the plan lists this step)",
    "path-delivery"
   ]
  ],
  "org:widened-model-set": [
-  [
-   "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
   [
    "warning",
    "needs.deliverable.path",
@@ -1208,54 +1004,6 @@
   ],
   [
    "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "needs.deliverable.path",
    "no agent can write to <TMP>/deliverables/competitors.md (agents write only inside their own directory or workspace); the assistant must copy the final artifact there and verify it on completion (the plan lists this step)",
    "path-delivery"
@@ -1279,54 +1027,6 @@
    "agents",
    "no agents: add the top-level agent (usually a manager) with its team under children",
    "agents"
-  ],
-  [
-   "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
   ],
   [
    "warning",
@@ -1362,54 +1062,6 @@
   ],
   [
    "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "needs.deliverable.path",
    "no agent can write to <TMP>/deliverables/competitors.md (agents write only inside their own directory or workspace); the assistant must copy the final artifact there and verify it on completion (the plan lists this step)",
    "path-delivery"
@@ -1428,54 +1080,6 @@
   ]
  ],
  "research:bad-cap": [
-  [
-   "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
   [
    "warning",
    "needs.deliverable.path",
@@ -1501,54 +1105,6 @@
    "agents",
    "no agents: add the top-level agent (usually a manager) with its team under children",
    "agents"
-  ],
-  [
-   "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
   ],
   [
    "warning",
@@ -1578,108 +1134,12 @@
   ],
   [
    "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "needs.deliverable.path",
    "no agent can write to <TMP>/deliverables/competitors.md (agents write only inside their own directory or workspace); the assistant must copy the final artifact there and verify it on completion (the plan lists this step)",
    "path-delivery"
   ]
  ],
  "research:cheap-lead": [
-  [
-   "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
   [
    "warning",
    "needs.deliverable.path",
@@ -1758,12 +1218,6 @@
   ],
   [
    "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "needs.deliverable.path",
    "no agent can write to <TMP>/deliverables/competitors.md (agents write only inside their own directory or workspace); the assistant must copy the final artifact there and verify it on completion (the plan lists this step)",
    "path-delivery"
@@ -1772,57 +1226,9 @@
  "research:criterion-told-to-edit": [
   [
    "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
    "task.acceptance[8]",
    "criterion 8 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
    "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
   ],
   [
    "warning",
@@ -1840,108 +1246,12 @@
  "research:current-facts-no-web": [
   [
    "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "needs.deliverable.path",
    "no agent can write to <TMP>/deliverables/competitors.md (agents write only inside their own directory or workspace); the assistant must copy the final artifact there and verify it on completion (the plan lists this step)",
    "path-delivery"
   ]
  ],
  "research:custom-charter": [
-  [
-   "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
   [
    "warning",
    "needs.deliverable.path",
@@ -1958,108 +1268,12 @@
   ],
   [
    "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "needs.deliverable.path",
    "no agent can write to <TMP>/deliverables/competitors.md (agents write only inside their own directory or workspace); the assistant must copy the final artifact there and verify it on completion (the plan lists this step)",
    "path-delivery"
   ]
  ],
  "research:deliverable-in-kiro": [
-  [
-   "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
   [
    "error",
    "needs.deliverable.path",
@@ -2076,108 +1290,12 @@
   ],
   [
    "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "needs.deliverable.path",
    "no agent can write to <TMP>/deliverables/competitors.md (agents write only inside their own directory or workspace); the assistant must copy the final artifact there and verify it on completion (the plan lists this step)",
    "path-delivery"
   ]
  ],
  "research:deliverable-outside-roots": [
-  [
-   "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
   [
    "error",
    "needs.deliverable.path",
@@ -2186,54 +1304,6 @@
   ]
  ],
  "research:deliverable-parent-missing": [
-  [
-   "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
   [
    "warning",
    "needs.deliverable.path",
@@ -2249,54 +1319,6 @@
  ],
  "research:deliverable-relative-path": [
   [
-   "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
    "error",
    "needs.deliverable.path",
    "deliverable path 'out/report.md' must be an absolute path; give the full path",
@@ -2309,54 +1331,6 @@
    "needs.deliverable.format",
    "no format given (e.g. markdown with a comparison table); the writer will guess",
    "deliverable-format"
-  ],
-  [
-   "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
   ]
  ],
  "research:deliverable-unknown-key": [
@@ -2365,54 +1339,6 @@
    "needs.deliverable",
    "unknown key 'colour' is ignored; check the spelling (known: description, format, max_words, path)",
    "unknown-key"
-  ],
-  [
-   "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
   ],
   [
    "warning",
@@ -2427,54 +1353,6 @@
    "agents[lead/writer]",
    "duplicate name 'writer' among siblings; rename one",
    "name"
-  ],
-  [
-   "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
   ],
   [
    "warning",
@@ -2578,54 +1456,6 @@
   ],
   [
    "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "needs.deliverable.path",
    "no agent can write to <TMP>/deliverables/competitors.md (agents write only inside their own directory or workspace); the assistant must copy the final artifact there and verify it on completion (the plan lists this step)",
    "path-delivery"
@@ -2637,54 +1467,6 @@
    "needs.inputs",
    "input <TMP>/not-there does not exist; inputs are read-only sources and must be there already",
    "inputs"
-  ],
-  [
-   "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
   ],
   [
    "warning",
@@ -2702,54 +1484,6 @@
   ],
   [
    "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "needs.deliverable.path",
    "no agent can write to <TMP>/deliverables/competitors.md (agents write only inside their own directory or workspace); the assistant must copy the final artifact there and verify it on completion (the plan lists this step)",
    "path-delivery"
@@ -2764,108 +1498,12 @@
   ],
   [
    "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "needs.deliverable.path",
    "no agent can write to <TMP>/deliverables/competitors.md (agents write only inside their own directory or workspace); the assistant must copy the final artifact there and verify it on completion (the plan lists this step)",
    "path-delivery"
   ]
  ],
  "research:lead-shares-drafter-model": [
-  [
-   "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
   [
    "warning",
    "needs.deliverable.path",
@@ -2912,108 +1550,12 @@
   ],
   [
    "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "needs.deliverable.path",
    "no agent can write to <TMP>/deliverables/competitors.md (agents write only inside their own directory or workspace); the assistant must copy the final artifact there and verify it on completion (the plan lists this step)",
    "path-delivery"
   ]
  ],
  "research:low-cap": [
-  [
-   "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
   [
    "warning",
    "needs.deliverable.path",
@@ -3036,54 +1578,6 @@
   ],
   [
    "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "needs.deliverable.path",
    "no agent can write to <TMP>/deliverables/competitors.md (agents write only inside their own directory or workspace); the assistant must copy the final artifact there and verify it on completion (the plan lists this step)",
    "path-delivery"
@@ -3098,108 +1592,12 @@
   ],
   [
    "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "needs.deliverable.path",
    "no agent can write to <TMP>/deliverables/competitors.md (agents write only inside their own directory or workspace); the assistant must copy the final artifact there and verify it on completion (the plan lists this step)",
    "path-delivery"
   ]
  ],
  "research:model-mix-no-policy": [
-  [
-   "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
   [
    "warning",
    "needs.deliverable.path",
@@ -3234,54 +1632,6 @@
   ],
   [
    "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "needs.deliverable.path",
    "no agent can write to <TMP>/deliverables/competitors.md (agents write only inside their own directory or workspace); the assistant must copy the final artifact there and verify it on completion (the plan lists this step)",
    "path-delivery"
@@ -3302,54 +1652,6 @@
  "research:no-author": [
   [
    "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "needs.deliverable.path",
    "no agent can write to <TMP>/deliverables/competitors.md (agents write only inside their own directory or workspace); the assistant must copy the final artifact there and verify it on completion (the plan lists this step)",
    "path-delivery"
@@ -3362,54 +1664,6 @@
   ]
  ],
  "research:no-cap": [
-  [
-   "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
   [
    "warning",
    "needs.deliverable.path",
@@ -3449,105 +1703,9 @@
    "needs.deliverable",
    "state the deliverable: description, format, length and where it should end up (needs.deliverable.description)",
    "deliverable"
-  ],
-  [
-   "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
   ]
  ],
  "research:no-elicited": [
-  [
-   "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
   [
    "warning",
    "needs.deliverable.path",
@@ -3582,54 +1740,6 @@
   ],
   [
    "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "needs.deliverable.path",
    "no agent can write to <TMP>/deliverables/competitors.md (agents write only inside their own directory or workspace); the assistant must copy the final artifact there and verify it on completion (the plan lists this step)",
    "path-delivery"
@@ -3649,46 +1759,28 @@
    "deliverable"
   ],
   [
-   "warning",
+   "error",
    "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
+   "criterion 1 quotes the user, but needs.elicitation is missing: put their answers there, verbatim.",
+   "criterion-from"
   ],
   [
-   "warning",
+   "error",
    "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
+   "criterion 2 quotes the user, but needs.elicitation is missing: put their answers there, verbatim.",
+   "criterion-from"
   ],
   [
-   "warning",
+   "error",
    "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
+   "criterion 3 quotes the user, but needs.elicitation is missing: put their answers there, verbatim.",
+   "criterion-from"
   ],
   [
-   "warning",
+   "error",
    "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
+   "criterion 4 quotes the user, but needs.elicitation is missing: put their answers there, verbatim.",
+   "criterion-from"
   ],
   [
    "warning",
@@ -3728,54 +1820,6 @@
   ]
  ],
  "research:no-review-decision": [
-  [
-   "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
   [
    "warning",
    "needs.deliverable.path",
@@ -3836,54 +1880,6 @@
   ],
   [
    "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "needs.deliverable.path",
    "no agent can write to <TMP>/deliverables/competitors.md (agents write only inside their own directory or workspace); the assistant must copy the final artifact there and verify it on completion (the plan lists this step)",
    "path-delivery"
@@ -3904,108 +1900,12 @@
   ],
   [
    "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "needs.deliverable.path",
    "no agent can write to <TMP>/deliverables/competitors.md (agents write only inside their own directory or workspace); the assistant must copy the final artifact there and verify it on completion (the plan lists this step)",
    "path-delivery"
   ]
  ],
  "research:no-verifier": [
-  [
-   "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
   [
    "warning",
    "needs.deliverable.path",
@@ -4028,54 +1928,6 @@
  "research:no-web-tools": [
   [
    "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "needs.deliverable.path",
    "no agent can write to <TMP>/deliverables/competitors.md (agents write only inside their own directory or workspace); the assistant must copy the final artifact there and verify it on completion (the plan lists this step)",
    "path-delivery"
@@ -4084,108 +1936,12 @@
  "research:offline-current": [
   [
    "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "needs.deliverable.path",
    "no agent can write to <TMP>/deliverables/competitors.md (agents write only inside their own directory or workspace); the assistant must copy the final artifact there and verify it on completion (the plan lists this step)",
    "path-delivery"
   ]
  ],
  "research:partial-web-tools": [
-  [
-   "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
   [
    "warning",
    "needs.deliverable.path",
@@ -4214,54 +1970,6 @@
   ],
   [
    "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "needs.deliverable.path",
    "no agent can write to <TMP>/deliverables/competitors.md (agents write only inside their own directory or workspace); the assistant must copy the final artifact there and verify it on completion (the plan lists this step)",
    "path-delivery"
@@ -4279,54 +1987,6 @@
    "agents",
    "no agents: add the top-level agent (usually a manager) with its team under children",
    "agents"
-  ],
-  [
-   "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
   ],
   [
    "warning",
@@ -4350,108 +2010,12 @@
  "research:review-text-no": [
   [
    "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "needs.deliverable.path",
    "no agent can write to <TMP>/deliverables/competitors.md (agents write only inside their own directory or workspace); the assistant must copy the final artifact there and verify it on completion (the plan lists this step)",
    "path-delivery"
   ]
  ],
  "research:reviewer-told-to-edit": [
-  [
-   "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
   [
    "warning",
    "needs.deliverable.path",
@@ -4474,108 +2038,12 @@
   ],
   [
    "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "needs.deliverable.path",
    "no agent can write to <TMP>/deliverables/competitors.md (agents write only inside their own directory or workspace); the assistant must copy the final artifact there and verify it on completion (the plan lists this step)",
    "path-delivery"
   ]
  ],
  "research:scale-two": [
-  [
-   "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
   [
    "warning",
    "needs.deliverable.path",
@@ -4589,54 +2057,6 @@
    "agents[lead/researcher]",
    "scale must be a whole number >= 1",
    "scale"
-  ],
-  [
-   "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
   ],
   [
    "warning",
@@ -4666,108 +2086,12 @@
   ],
   [
    "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "needs.deliverable.path",
    "no agent can write to <TMP>/deliverables/competitors.md (agents write only inside their own directory or workspace); the assistant must copy the final artifact there and verify it on completion (the plan lists this step)",
    "path-delivery"
   ]
  ],
  "research:task-budget-low": [
-  [
-   "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
   [
    "warning",
    "needs.deliverable.path",
@@ -4784,54 +2108,6 @@
  "research:task-budget-over-cap": [
   [
    "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "needs.deliverable.path",
    "no agent can write to <TMP>/deliverables/competitors.md (agents write only inside their own directory or workspace); the assistant must copy the final artifact there and verify it on completion (the plan lists this step)",
    "path-delivery"
@@ -4846,54 +2122,6 @@
  "research:task-budget-tight": [
   [
    "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "needs.deliverable.path",
    "no agent can write to <TMP>/deliverables/competitors.md (agents write only inside their own directory or workspace); the assistant must copy the final artifact there and verify it on completion (the plan lists this step)",
    "path-delivery"
@@ -4905,54 +2133,6 @@
    "task.budget",
    "budget must be a whole number of runs >= 1",
    "task"
-  ],
-  [
-   "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
   ],
   [
    "warning",
@@ -5014,108 +2194,12 @@
   ],
   [
    "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "needs.deliverable.path",
    "no agent can write to <TMP>/deliverables/competitors.md (agents write only inside their own directory or workspace); the assistant must copy the final artifact there and verify it on completion (the plan lists this step)",
    "path-delivery"
   ]
  ],
  "research:tiered": [
-  [
-   "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
   [
    "warning",
    "needs.deliverable.path",
@@ -5138,54 +2222,6 @@
  "research:tiered-single-model": [
   [
    "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "needs.deliverable.path",
    "no agent can write to <TMP>/deliverables/competitors.md (agents write only inside their own directory or workspace); the assistant must copy the final artifact there and verify it on completion (the plan lists this step)",
    "path-delivery"
@@ -5198,54 +2234,6 @@
   ]
  ],
  "research:tiered-weak-reviewer": [
-  [
-   "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
   [
    "warning",
    "needs.deliverable.path",
@@ -5292,54 +2280,6 @@
   ],
   [
    "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "needs.deliverable.path",
    "no agent can write to <TMP>/deliverables/competitors.md (agents write only inside their own directory or workspace); the assistant must copy the final artifact there and verify it on completion (the plan lists this step)",
    "path-delivery"
@@ -5351,54 +2291,6 @@
    "agents",
    "exactly one top-level agent is allowed (budget flows down from the agent that gets the task); make the others its children",
    "agents"
-  ],
-  [
-   "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
   ],
   [
    "warning",
@@ -5416,54 +2308,6 @@
   ],
   [
    "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "needs.deliverable.path",
    "no agent can write to <TMP>/deliverables/competitors.md (agents write only inside their own directory or workspace); the assistant must copy the final artifact there and verify it on completion (the plan lists this step)",
    "path-delivery"
@@ -5475,54 +2319,6 @@
    "needs",
    "unknown key 'colour' is ignored; check the spelling (known: approval, budget_runs, code, deliverable, elicitation, inputs, kind, model_policy, models, progress, quality_bar, review, scope, sources, workspace)",
    "unknown-key"
-  ],
-  [
-   "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
   ],
   [
    "warning",
@@ -5540,54 +2336,6 @@
   ],
   [
    "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "needs.deliverable.path",
    "no agent can write to <TMP>/deliverables/competitors.md (agents write only inside their own directory or workspace); the assistant must copy the final artifact there and verify it on completion (the plan lists this step)",
    "path-delivery"
@@ -5599,54 +2347,6 @@
    "agents[lead/researcher]",
    "unknown template 'wizard'; available: analyst, code-reviewer, data-checker, engineer, fact-checker, manager, researcher, reviewer, tester, writer",
    "template"
-  ],
-  [
-   "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
   ],
   [
    "warning",
@@ -5664,54 +2364,6 @@
   ],
   [
    "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "needs.deliverable.path",
    "no agent can write to <TMP>/deliverables/competitors.md (agents write only inside their own directory or workspace); the assistant must copy the final artifact there and verify it on completion (the plan lists this step)",
    "path-delivery"
@@ -5720,108 +2372,12 @@
  "research:valid": [
   [
    "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "needs.deliverable.path",
    "no agent can write to <TMP>/deliverables/competitors.md (agents write only inside their own directory or workspace); the assistant must copy the final artifact there and verify it on completion (the plan lists this step)",
    "path-delivery"
   ]
  ],
  "research:verifier-no-web": [
-  [
-   "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
   [
    "warning",
    "needs.deliverable.path",
@@ -5844,54 +2400,6 @@
   ],
   [
    "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "needs.deliverable.path",
    "no agent can write to <TMP>/deliverables/competitors.md (agents write only inside their own directory or workspace); the assistant must copy the final artifact there and verify it on completion (the plan lists this step)",
    "path-delivery"
@@ -5906,54 +2414,6 @@
   ],
   [
    "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "needs.deliverable.path",
    "no agent can write to <TMP>/deliverables/competitors.md (agents write only inside their own directory or workspace); the assistant must copy the final artifact there and verify it on completion (the plan lists this step)",
    "path-delivery"
@@ -5965,54 +2425,6 @@
    "needs.workspace",
    "<TMP>/fresh-ws does not exist yet; apply will create it",
    "workspace-new"
-  ],
-  [
-   "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
   ],
   [
    "warning",
@@ -6036,54 +2448,6 @@
   ],
   [
    "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "needs.deliverable.path",
    "no agent can write to <TMP>/deliverables/competitors.md (agents write only inside their own directory or workspace); the assistant must copy the final artifact there and verify it on completion (the plan lists this step)",
    "path-delivery"
@@ -6095,54 +2459,6 @@
    "needs.workspace",
    "workspace 'rel/ws' must be an absolute path; give the full path",
    "path"
-  ],
-  [
-   "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
   ],
   [
    "warning",
@@ -6169,54 +2485,6 @@
    "agents[lead/writer]",
    "has write but no workspace, so nothing confines what it may touch; set needs.workspace or the agent's workspace",
    "workspace-confinement"
-  ],
-  [
-   "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
   ],
   [
    "warning",
@@ -6249,54 +2517,6 @@
    "agents[lead/writer]",
    "has write/shell but no workspace, so nothing confines what it may touch; set needs.workspace or the agent's workspace",
    "workspace-confinement"
-  ],
-  [
-   "warning",
-   "task.acceptance[1]",
-   "criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[2]",
-   "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[3]",
-   "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[4]",
-   "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[5]",
-   "criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[6]",
-   "criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "task.acceptance[7]",
-   "criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
-   "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
   ],
   [
    "warning",
@@ -6384,12 +2604,6 @@
   ],
   [
    "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "services[weekly-brief].acceptance[1]",
    "'Good quality' is not checkable; state the exact number, section, format or path that decides pass/fail",
    "vague-criterion"
@@ -6425,12 +2639,6 @@
    "services[Weekly Brief].acceptance[3]",
    "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
    "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
   ],
   [
    "error",
@@ -6472,12 +2680,6 @@
   ],
   [
    "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "services[weekly-brief].deliverable.path",
    "no agent can write to <TMP>/deliverables/briefs (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)",
    "path-delivery"
@@ -6501,12 +2703,6 @@
    "services[weekly-brief].acceptance[3]",
    "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
    "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
   ],
   [
    "warning",
@@ -6542,12 +2738,6 @@
   ],
   [
    "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "services[weekly-brief].deliverable.path",
    "no agent can write to <TMP>/deliverables/briefs (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)",
    "path-delivery"
@@ -6577,12 +2767,6 @@
    "services[weekly-brief].acceptance[3]",
    "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
    "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
   ],
   [
    "warning",
@@ -6618,12 +2802,6 @@
   ],
   [
    "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "services[weekly-brief].deliverable.path",
    "no agent can write to <TMP>/deliverables/briefs (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)",
    "path-delivery"
@@ -6653,12 +2831,6 @@
    "services[weekly-brief].acceptance[3]",
    "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
    "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
   ],
   [
    "warning",
@@ -6694,12 +2866,6 @@
   ],
   [
    "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "services[weekly-brief].deliverable.path",
    "no agent can write to <TMP>/deliverables/briefs (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)",
    "path-delivery"
@@ -6729,12 +2895,6 @@
    "services[weekly-brief].acceptance[2]",
    "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
    "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
   ],
   [
    "error",
@@ -6805,12 +2965,6 @@
    "criterion-source"
   ],
   [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
    "error",
    "services[weekly-brief].deliverable",
    "deliverable.max_words must be a whole number of at least 1",
@@ -6841,12 +2995,6 @@
    "services[weekly-brief].acceptance[3]",
    "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
    "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
   ],
   [
    "error",
@@ -6882,12 +3030,6 @@
   ],
   [
    "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "services[weekly-brief].deliverable.format",
    "no format given (e.g. markdown with a comparison table); the writer will guess",
    "deliverable-format"
@@ -6917,12 +3059,6 @@
    "services[weekly-brief].acceptance[3]",
    "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
    "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
   ],
   [
    "warning",
@@ -6963,12 +3099,6 @@
    "criterion-source"
   ],
   [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
    "error",
    "services[weekly-brief].deliverable",
    "deliverable.path must be an absolute path (got 'relative/dir')",
@@ -6999,12 +3129,6 @@
    "services[weekly-brief].acceptance[3]",
    "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
    "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
   ],
   [
    "warning",
@@ -7039,12 +3163,6 @@
    "criterion-source"
   ],
   [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
    "error",
    "services[weekly-brief].deliverable",
    "unknown key(s) in deliverable: colour. Use description, format, max_words, path",
@@ -7075,12 +3193,6 @@
    "services[weekly-brief].acceptance[3]",
    "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
    "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
   ],
   [
    "error",
@@ -7119,12 +3231,6 @@
    "services[weekly-brief].acceptance[3]",
    "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
    "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
   ],
   [
    "error",
@@ -7181,12 +3287,6 @@
    "services[weekly-brief].acceptance[3]",
    "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
    "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
   ],
   [
    "warning",
@@ -7271,12 +3371,6 @@
    "criterion-source"
   ],
   [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
    "error",
    "services[0]",
    "invalid service name '': use lowercase letters, digits and dashes (max 32, starting with a letter), e.g. weekly-brief",
@@ -7313,12 +3407,6 @@
    "services[weekly-brief].acceptance[3]",
    "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
    "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
   ],
   [
    "error",
@@ -7359,12 +3447,6 @@
    "criterion-source"
   ],
   [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
    "error",
    "services[weekly-brief].inputs",
    "inputs must be a list of {name, description, required} (or may be empty)",
@@ -7403,12 +3485,6 @@
    "criterion-source"
   ],
   [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
    "error",
    "services[weekly-brief].inputs",
    "input name used twice: topic",
@@ -7445,12 +3521,6 @@
    "services[weekly-brief].acceptance[3]",
    "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
    "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
   ],
   [
    "error",
@@ -7536,12 +3606,6 @@
   ],
   [
    "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "services[weekly-brief].deliverable.path",
    "no agent can write to <TMP>/deliverables/briefs (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)",
    "path-delivery"
@@ -7580,12 +3644,6 @@
   ],
   [
    "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "services[weekly-brief].deliverable.path",
    "no agent can write to <TMP>/deliverables/briefs (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)",
    "path-delivery"
@@ -7615,12 +3673,6 @@
    "services[weekly-brief].acceptance[3]",
    "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
    "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
   ],
   [
    "error",
@@ -7653,12 +3705,6 @@
    "services[weekly-brief].acceptance[2]",
    "criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
    "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
   ],
   [
    "warning",
@@ -7700,12 +3746,6 @@
   ],
   [
    "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "services[weekly-brief].deliverable.path",
    "no agent can write to <TMP>/deliverables/briefs (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)",
    "path-delivery"
@@ -7735,12 +3775,6 @@
    "services[weekly-brief].acceptance[3]",
    "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
    "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
   ],
   [
    "warning",
@@ -7852,12 +3886,6 @@
   ],
   [
    "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "services[weekly-brief].deliverable.path",
    "no agent can write to <TMP>/deliverables/briefs (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)",
    "path-delivery"
@@ -7887,12 +3915,6 @@
    "services[weekly-brief].acceptance[3]",
    "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
    "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
   ],
   [
    "error",
@@ -7946,12 +3968,6 @@
   ],
   [
    "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "services[weekly-brief].deliverable.path",
    "no agent can write to <TMP>/deliverables/briefs (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)",
    "path-delivery"
@@ -7981,12 +3997,6 @@
    "services[weekly-brief].acceptance[3]",
    "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
    "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
   ],
   [
    "warning",
@@ -8028,12 +4038,6 @@
   ],
   [
    "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "services[weekly-brief].deliverable.path",
    "no agent can write to <TMP>/deliverables/briefs (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)",
    "path-delivery"
@@ -8072,12 +4076,6 @@
   ],
   [
    "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "services[weekly-brief].deliverable.path",
    "no agent can write to <TMP>/deliverables/briefs (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)",
    "path-delivery"
@@ -8110,12 +4108,6 @@
   ],
   [
    "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "services[weekly-brief].deliverable.path",
    "no agent can write to <TMP>/deliverables/briefs (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)",
    "path-delivery"
@@ -8145,12 +4137,6 @@
    "services[weekly-brief].acceptance[3]",
    "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
    "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
   ],
   [
    "error",
@@ -8192,12 +4178,6 @@
   ],
   [
    "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "services[weekly-brief].deliverable.path",
    "no agent can write to <TMP>/deliverables/briefs (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)",
    "path-delivery"
@@ -8236,12 +4216,6 @@
   ],
   [
    "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "services[weekly-brief].deliverable.path",
    "no agent can write to <TMP>/deliverables/briefs (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)",
    "path-delivery"
@@ -8277,12 +4251,6 @@
    "services[weekly-brief].acceptance[3]",
    "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
    "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
   ],
   [
    "warning",
@@ -8374,12 +4342,6 @@
   ],
   [
    "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "services[weekly-brief].deliverable.path",
    "no agent can write to <TMP>/deliverables/briefs (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)",
    "path-delivery"
@@ -8409,12 +4371,6 @@
    "services[weekly-brief].acceptance[3]",
    "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
    "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
   ],
   [
    "warning",
@@ -8456,12 +4412,6 @@
   ],
   [
    "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "services[weekly-brief].deliverable.path",
    "no agent can write to <TMP>/deliverables/briefs (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)",
    "path-delivery"
@@ -8497,12 +4447,6 @@
    "services[weekly-brief].acceptance[3]",
    "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
    "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
   ],
   [
    "warning",
@@ -8562,12 +4506,6 @@
   ],
   [
    "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "services[weekly-brief].deliverable.path",
    "no agent can write to <TMP>/deliverables/briefs (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)",
    "path-delivery"
@@ -8609,12 +4547,6 @@
    "services[weekly-brief].acceptance[4]",
    "criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
    "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
   ],
   [
    "error",
@@ -8674,12 +4606,6 @@
   ],
   [
    "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "services[weekly-brief].deliverable.path",
    "no agent can write to <TMP>/deliverables/briefs (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)",
    "path-delivery"
@@ -8718,12 +4644,6 @@
   ],
   [
    "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
-  ],
-  [
-   "warning",
    "services[weekly-brief]",
    "unknown key 'schedule' is ignored; check the spelling (known: acceptance, budget, deliverable, description, inputs, locked, name, owner, playbook)",
    "unknown-key"
@@ -8759,12 +4679,6 @@
    "services[weekly-brief].acceptance[3]",
    "criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.",
    "criterion-source"
-  ],
-  [
-   "warning",
-   "needs.elicitation",
-   "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.",
-   "criterion-words"
   ],
   [
    "warning",

@@ -27,6 +27,7 @@ mission: >
 needs:
   kind: research
   scope: "<The exact items in scope, as the user listed them. Ask for the list; do not invent one.>"
+  elicitation: <THE USER'S ANSWERS, VERBATIM>   # what the user said, verbatim; every `from:` below is a quote of it
   deliverable:
     description: <What the file contains, e.g. a comparison table plus a closing recommendation section labelled as our assessment>
     format: markdown               # what the user can open: markdown, plain text, csv, ...
@@ -55,13 +56,21 @@ task:
     <Research the scope, write the deliverable, have the claims independently fact-checked, apply every required
     change and report the final file.>
   acceptance:                      # exact and checkable; the assistant checks each one at the end
-    - Covers exactly the items listed in the scope and no others.
-    - At most 1500 words as counted by read.
-    - Contains <the sections or table the user asked for, named exactly>, and the closing recommendation section is marked as our assessment (judgement).
-    - Every sentence with a number, name, version, license, price, date or "no/only/all" is a factual claim and cites the URL of the page that states it; the fact-checker fetched that page and quoted the sentence.
-    - The recommendation section is judgement. It has no citations or new facts and rests only on claims verified elsewhere in the document.
-    - "The fact-checker's final coverage line reads 'n of m factual claims verified' with n = m (none wrong, unsupported or not-checkable) and 'each resting on verified facts: yes' for its judgement statements, and the writer applied every required change."
-    - The final report pastes that coverage line verbatim, with the path of the fact-checker's ledger.
+    # each criterion: text, and from: <the user's exact words> (asked: <your question>) or default: true (your proposal); put their answers, verbatim, in needs.elicitation
+    - text: Covers exactly the items listed in the scope and no others.
+      default: true
+    - text: At most 1500 words as counted by read.
+      default: true
+    - text: Contains <the sections or table the user asked for, named exactly>, and the closing recommendation section is marked as our assessment (judgement).
+      from: <THE USER'S EXACT WORDS>
+    - text: Every sentence with a number, name, version, license, price, date or "no/only/all" is a factual claim and cites the URL of the page that states it; the fact-checker fetched that page and quoted the sentence.
+      default: true
+    - text: The recommendation section is judgement. It has no citations or new facts and rests only on claims verified elsewhere in the document.
+      default: true
+    - text: "The fact-checker's final coverage line reads 'n of m factual claims verified' with n = m (none wrong, unsupported or not-checkable) and 'each resting on verified facts: yes' for its judgement statements, and the writer applied every required change."
+      default: true
+    - text: The final report pastes that coverage line verbatim, with the path of the fact-checker's ledger.
+      default: true
 """
 
 DOCUMENTS = """\
@@ -72,6 +81,7 @@ mission: >
 needs:
   kind: writing
   scope: "<What the document covers and what it leaves out, in the user's words.>"
+  elicitation: <THE USER'S ANSWERS, VERBATIM>   # what the user said, verbatim; every `from:` below is a quote of it
   inputs:                          # read-only folders with the user's files; the team can read them, never change them
     - {base}/<folder-with-your-files>
   deliverable:
@@ -111,10 +121,15 @@ task:
     <Read the input files, write the document, have it checked against the files, apply every required change and
     report the final file.>
   acceptance:
-    - Covers <the topics the user listed, named exactly> and nothing else.
-    - At most 1500 words as counted by read.
-    - Every statement is traceable to a named input file, and gaps or conflicts between files are listed in a final section titled "Open questions".
-    - "Every statement is checked against its named input file in the reviewer's report, and the writer applied every required change."
+    # each criterion: text, and from: <the user's exact words> (asked: <your question>) or default: true (your proposal); put their answers, verbatim, in needs.elicitation
+    - text: Covers <the topics the user listed, named exactly> and nothing else.
+      from: <THE USER'S EXACT WORDS>
+    - text: At most 1500 words as counted by read.
+      default: true
+    - text: Every statement is traceable to a named input file, and gaps or conflicts between files are listed in a final section titled "Open questions".
+      default: true
+    - text: "Every statement is checked against its named input file in the reviewer's report, and the writer applied every required change."
+      default: true
 """
 
 CODE = """\
@@ -125,6 +140,7 @@ mission: >
 needs:
   kind: code
   scope: "<What the software does and what it deliberately does not do, in the user's words.>"
+  elicitation: <THE USER'S ANSWERS, VERBATIM>   # what the user said, verbatim; every `from:` below is a quote of it
   deliverable:
     description: <What is delivered, e.g. a Python package with a command-line tool>
     format: python package         # no path needed: the result is the workspace folder itself
@@ -155,10 +171,15 @@ task:
     <Implement the software in the workspace with tests, have it tested and reviewed independently, apply every
     required change and report.>
   acceptance:
-    - "`uv run pytest -q` passes with at least 5 tests."
-    - <The exact command or behavior that shows the main feature works, e.g. a command and its expected output.>
-    - The tester ran the software against every criterion and the engineer applied every required change.
-    - Work is committed locally in the workspace and nothing was pushed.
+    # each criterion: text, and from: <the user's exact words> (asked: <your question>) or default: true (your proposal); put their answers, verbatim, in needs.elicitation
+    - text: "`uv run pytest -q` passes with at least 5 tests."
+      default: true
+    - text: <The exact command or behavior that shows the main feature works, e.g. a command and its expected output.>
+      from: <THE USER'S EXACT WORDS>
+    - text: The tester ran the software against every criterion and the engineer applied every required change.
+      default: true
+    - text: Work is committed locally in the workspace and nothing was pushed.
+      default: true
 """
 
 ANALYSIS = """\
@@ -169,6 +190,7 @@ mission: >
 needs:
   kind: analysis
   scope: "<The question and the outcome to explain, e.g. what drives product returns; which file(s) and period.>"
+  elicitation: <THE USER'S ANSWERS, VERBATIM>   # what the user said, verbatim; every `from:` below is a quote of it
   inputs:                          # read-only folders with the user's data; the team can read them, never change them
     - {base}/<folder-with-your-data>
   workspace: {base}/analysis-work  # a scratch folder OUTSIDE the data folder: scripts and outputs live here
@@ -200,13 +222,21 @@ task:
     <Analyse the data for the question, explore the outcome against every dimension and pair, have the key figures
     recomputed independently, write the report from the labelled output, apply every required change and report the final file.>
   acceptance:
-    - Uses only <the data file(s)> in the data folder, and the checker confirmed the data files are unchanged (same checksums before and after).
-    - One script in the workspace regenerates every figure in the report; running it twice from a clean state gives identical output.
-    - The script explores <the outcome> against every available column and against every pair of the strongest dimensions (for example reason x region); the report lists the strongest effects with their counts (n and share).
-    - Each number in the report appears together with its label in the script output; the checker verified every label and number pair, not only that the number occurs.
-    - No conclusion is drawn from a slice with fewer than 30 rows; such slices are marked "too small".
-    - At most 1000 words as counted by read; the recommendations are in a section labelled as our assessment (judgement), without figures that are not in the script output.
-    - "The checker's line reads 'Figures checked: n of m match' with n = m, and also 'dimensions covered: k of d' with k = d, strongest pairs scanned: yes, reproducible: yes, data unchanged: yes; the writer applied every required change."
+    # each criterion: text, and from: <the user's exact words> (asked: <your question>) or default: true (your proposal); put their answers, verbatim, in needs.elicitation
+    - text: Uses only <the data file(s)> in the data folder, and the checker confirmed the data files are unchanged (same checksums before and after).
+      from: <THE USER'S EXACT WORDS>
+    - text: One script in the workspace regenerates every figure in the report; running it twice from a clean state gives identical output.
+      default: true
+    - text: The script explores <the outcome> against every available column and against every pair of the strongest dimensions (for example reason x region); the report lists the strongest effects with their counts (n and share).
+      from: <THE USER'S EXACT WORDS>
+    - text: Each number in the report appears together with its label in the script output; the checker verified every label and number pair, not only that the number occurs.
+      default: true
+    - text: No conclusion is drawn from a slice with fewer than 30 rows; such slices are marked "too small".
+      default: true
+    - text: At most 1000 words as counted by read; the recommendations are in a section labelled as our assessment (judgement), without figures that are not in the script output.
+      default: true
+    - text: "The checker's line reads 'Figures checked: n of m match' with n = m, and also 'dimensions covered: k of d' with k = d, strongest pairs scanned: yes, reproducible: yes, data unchanged: yes; the writer applied every required change."
+      default: true
 """
 
 TEMPLATES = {"research": RESEARCH, "documents": DOCUMENTS, "code": CODE, "analysis": ANALYSIS}
@@ -255,11 +285,17 @@ SERVICE_TAIL = """\
 SERVICE_BODIES = {
     "research": """\
     acceptance:                    # the contract: exact and checkable; only the user can change it, the lead can never lower it
-      - At most 600 words as counted by read.
-      - Contains <the sections or table the user asked for, named exactly>.
-      - Every sentence with a number, name, version, license, price, date or "no/only/all" is a factual claim and cites the URL of the page that states it; the fact-checker fetched that page and quoted the sentence.
-      - Judgement is in a section labelled as our assessment, with no citations or new facts, and rests only on claims verified elsewhere in the document.
-      - "The fact-checker's final coverage line reads 'n of m factual claims verified' with n = m, and the lead's report pastes it verbatim."
+      # each criterion: text, and from: <the user's exact words> (asked: <your question>) or default: true (your proposal); put their answers, verbatim, in needs.elicitation
+      - text: At most 600 words as counted by read.
+        default: true
+      - text: Contains <the sections or table the user asked for, named exactly>.
+        from: <THE USER'S EXACT WORDS>
+      - text: Every sentence with a number, name, version, license, price, date or "no/only/all" is a factual claim and cites the URL of the page that states it; the fact-checker fetched that page and quoted the sentence.
+        default: true
+      - text: Judgement is in a section labelled as our assessment, with no citations or new facts, and rests only on claims verified elsewhere in the document.
+        default: true
+      - text: "The fact-checker's final coverage line reads 'n of m factual claims verified' with n = m, and the lead's report pastes it verbatim."
+        default: true
     deliverable:
       description: <What one request produces, e.g. one markdown file with the brief>
       format: markdown
@@ -268,10 +304,15 @@ SERVICE_BODIES = {
 """,
     "documents": """\
     acceptance:                    # the contract: exact and checkable; only the user can change it, the lead can never lower it
-      - Covers <the topic of the request> and nothing else.
-      - At most 1500 words as counted by read.
-      - Every statement is traceable to a named input file, and gaps or conflicts between files are listed in a final section titled "Open questions".
-      - "Every statement is checked against its named input file in the reviewer's report, and the writer applied every required change."
+      # each criterion: text, and from: <the user's exact words> (asked: <your question>) or default: true (your proposal); put their answers, verbatim, in needs.elicitation
+      - text: Covers <the topic of the request> and nothing else.
+        from: <THE USER'S EXACT WORDS>
+      - text: At most 1500 words as counted by read.
+        default: true
+      - text: Every statement is traceable to a named input file, and gaps or conflicts between files are listed in a final section titled "Open questions".
+        default: true
+      - text: "Every statement is checked against its named input file in the reviewer's report, and the writer applied every required change."
+        default: true
     deliverable:
       description: <What one request produces, e.g. one markdown section for the topic>
       format: markdown
@@ -280,22 +321,34 @@ SERVICE_BODIES = {
 """,
     "code": """\
     acceptance:                    # the contract: exact and checkable; only the user can change it, the lead can never lower it
-      - "`uv run pytest -q` passes, including at least one new test for the requested change."
-      - <The exact command or behavior that shows the requested change works, e.g. a command and its expected output.>
-      - The tester ran the software against every criterion and the engineer applied every required change.
-      - The change is committed locally in the workspace and nothing was pushed.
+      # each criterion: text, and from: <the user's exact words> (asked: <your question>) or default: true (your proposal); put their answers, verbatim, in needs.elicitation
+      - text: "`uv run pytest -q` passes, including at least one new test for the requested change."
+        default: true
+      - text: <The exact command or behavior that shows the requested change works, e.g. a command and its expected output.>
+        from: <THE USER'S EXACT WORDS>
+      - text: The tester ran the software against every criterion and the engineer applied every required change.
+        default: true
+      - text: The change is committed locally in the workspace and nothing was pushed.
+        default: true
     deliverable:
       description: <What one request produces, e.g. the requested change, tested and committed in the workspace>
       format: code and tests in the workspace   # no path needed: the result is the workspace folder itself
 """,
     "analysis": """\
     acceptance:                    # the contract: exact and checkable; only the user can change it, the lead can never lower it
-      - Uses only the data files in the data folder, and the checker confirmed they are unchanged (same checksums before and after).
-      - One script in the workspace regenerates every figure in the report; running it twice from a clean state gives identical output.
-      - Each number in the report appears together with its label in the script output; the checker verified every label and number pair.
-      - No conclusion is drawn from a slice with fewer than 30 rows; such slices are marked "too small".
-      - At most 1000 words as counted by read; recommendations are in a section labelled as our assessment (judgement).
-      - "The checker's line reads 'Figures checked: n of m match' with n = m, and the writer applied every required change."
+      # each criterion: text, and from: <the user's exact words> (asked: <your question>) or default: true (your proposal); put their answers, verbatim, in needs.elicitation
+      - text: Uses only the data files in the data folder, and the checker confirmed they are unchanged (same checksums before and after).
+        default: true
+      - text: One script in the workspace regenerates every figure in the report; running it twice from a clean state gives identical output.
+        default: true
+      - text: Each number in the report appears together with its label in the script output; the checker verified every label and number pair.
+        default: true
+      - text: No conclusion is drawn from a slice with fewer than 30 rows; such slices are marked "too small".
+        default: true
+      - text: At most 1000 words as counted by read; recommendations are in a section labelled as our assessment (judgement).
+        default: true
+      - text: "The checker's line reads 'Figures checked: n of m match' with n = m, and the writer applied every required change."
+        default: true
     deliverable:
       description: <What one request produces, e.g. a report on the question of the request>
       format: markdown

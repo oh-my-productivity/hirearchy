@@ -16,6 +16,7 @@ mission: >
 needs:
   kind: writing
   scope: "<What the document covers and what it leaves out, in the user's words.>"
+  elicitation: <THE USER'S ANSWERS, VERBATIM>   # what the user said, verbatim; every `from:` below is a quote of it
   inputs:                          # read-only folders with the user's files; the team can read them, never change them
     - <CWD>/<folder-with-your-files>
   deliverable:
@@ -55,7 +56,12 @@ task:
     <Read the input files, write the document, have it checked against the files, apply every required change and
     report the final file.>
   acceptance:
-    - Covers <the topics the user listed, named exactly> and nothing else.
-    - At most 1500 words as counted by read.
-    - Every statement is traceable to a named input file, and gaps or conflicts between files are listed in a final section titled "Open questions".
-    - "Every statement is checked against its named input file in the reviewer's report, and the writer applied every required change."
+    # each criterion: text, and from: <the user's exact words> (asked: <your question>) or default: true (your proposal); put their answers, verbatim, in needs.elicitation
+    - text: Covers <the topics the user listed, named exactly> and nothing else.
+      from: <THE USER'S EXACT WORDS>
+    - text: At most 1500 words as counted by read.
+      default: true
+    - text: Every statement is traceable to a named input file, and gaps or conflicts between files are listed in a final section titled "Open questions".
+      default: true
+    - text: "Every statement is checked against its named input file in the reviewer's report, and the writer applied every required change."
+      default: true

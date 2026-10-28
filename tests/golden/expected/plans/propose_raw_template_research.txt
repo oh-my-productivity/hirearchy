@@ -1,8 +1,6 @@
 Target organization: <ORG> (exists, 0 agent(s) besides root; apply_org adds to it)
 
-Show the block below to the user exactly as written, from its first line up to (not including) the marker line; one plain-words intro line before it is fine.
-
-PLAN FOR YOU
+DRAFT - NOT READY (it has errors: fix the blueprint and propose again; do not show this to the user)
 Goal: <One paragraph: what the organization produces and for whom, e.g. a sourced comparison of the items below.>
 What I understood you need:
 - Scope: <The exact items in scope, as the user listed them. Ask for the list; do not invent one.>
@@ -23,28 +21,23 @@ Deliverable: <What the file contains, e.g. a comparison table plus a closing rec
   Delivered to: <CWD>/deliverables/<name>.md (I copy it there after checking it)
 Done when ALL of these hold:
   1. Covers exactly the items listed in the scope and no others.
-     my wording: your words for it were not recorded
+     my default: you did not say this
   2. At most 1500 words as counted by read.
-     my wording: your words for it were not recorded
+     my default: you did not say this
   3. Contains <the sections or table the user asked for, named exactly>, and the closing recommendation section is marked as our assessment (judgement).
-     my wording: your words for it were not recorded
+     from your words "<THE USER'S EXACT WORDS>"; words I added: contains, sections, or, table, asked, for, named, exactly, +10 more
   4. Every sentence with a number, name, version, license, price, date or "no/only/all" is a factual claim and cites the URL of the page that states it; the fact-checker fetched that page and quoted the sentence.
-     my wording: your words for it were not recorded
+     my default: you did not say this
   5. The recommendation section is judgement. It has no citations or new facts and rests only on claims verified elsewhere in the document.
-     my wording: your words for it were not recorded
+     my default: you did not say this
   6. The fact-checker's final coverage line reads 'n of m factual claims verified' with n = m (none wrong, unsupported or not-checkable) and 'each resting on verified facts: yes' for its judgement statements, and the writer applied every required change.
-     my wording: your words for it were not recorded
+     my default: you did not say this
   7. The final report pastes that coverage line verbatim, with the path of the fact-checker's ledger.
-     my wording: your words for it were not recorded
+     my default: you did not say this
 Checkpoints: approval - Plan first; ask before any spend beyond the budget; progress - One line when I ask; any spend beyond the budget needs your OK.
-Warnings (8):
-- criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-- criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-- criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-- criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-- criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-- ... and 3 more (see the details)
-Nothing is created or started until you approve. Reply 'approve', or tell me what to change.
+Errors (1):
+- task.acceptance[3]: criterion 3 quotes words that are not in needs.elicitation: "<THE USER'S EXACT WORDS>". Quote the user's own words exactly, or mark it default: true.
+Cannot apply yet.
 
 --- machine marker: the user block ends above; do not show this line or anything below it ---
 
@@ -85,38 +78,32 @@ Deliverable:
 
 First task: to lead: <Short title of the work>
   1. Covers exactly the items listed in the scope and no others.
-     my wording: your words for it were not recorded
+     my default: you did not say this
   2. At most 1500 words as counted by read.
-     my wording: your words for it were not recorded
+     my default: you did not say this
   3. Contains <the sections or table the user asked for, named exactly>, and the closing recommendation section is marked as our assessment (judgement).
-     my wording: your words for it were not recorded
+     from your words "<THE USER'S EXACT WORDS>"; words I added: contains, sections, or, table, asked, for, named, exactly, +10 more
   4. Every sentence with a number, name, version, license, price, date or "no/only/all" is a factual claim and cites the URL of the page that states it; the fact-checker fetched that page and quoted the sentence.
-     my wording: your words for it were not recorded
+     my default: you did not say this
   5. The recommendation section is judgement. It has no citations or new facts and rests only on claims verified elsewhere in the document.
-     my wording: your words for it were not recorded
+     my default: you did not say this
   6. The fact-checker's final coverage line reads 'n of m factual claims verified' with n = m (none wrong, unsupported or not-checkable) and 'each resting on verified facts: yes' for its judgement statements, and the writer applied every required change.
-     my wording: your words for it were not recorded
+     my default: you did not say this
   7. The final report pastes that coverage line verbatim, with the path of the fact-checker's ledger.
-     my wording: your words for it were not recorded
+     my default: you did not say this
 
 Checkpoints:
 - Approval: Plan first; ask before any spend beyond the budget.
 - Progress: One line when I ask.
 - Any spend beyond the budget needs your OK.
 
-Warnings (10):
-- task.acceptance[1]: criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-- task.acceptance[2]: criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-- task.acceptance[3]: criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-- task.acceptance[4]: criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-- task.acceptance[5]: criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-- task.acceptance[6]: criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-- task.acceptance[7]: criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-- needs.elicitation: this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.
+Warnings (2):
 - needs.deliverable.path: no agent can write to <CWD>/deliverables/<name>.md (agents write only inside their own directory or workspace); the assistant must copy the final artifact there and verify it on completion (the plan lists this step)
 - needs.deliverable.path: <CWD>/deliverables does not exist; the copy step will create it
 
-Reply 'approve' or tell me what to change.
+Errors (1) - must be fixed before this can be applied:
+- task.acceptance[3]: criterion 3 quotes words that are not in needs.elicitation: "<THE USER'S EXACT WORDS>". Quote the user's own words exactly, or mark it default: true.
 
-plan_id: <PLAN_ID>
-Next: show the PLAN FOR YOU block above to the user exactly as written (a plain-words intro line before it is fine) and wait for their explicit approval. Then apply_org(blueprint=<this exact YAML>, approved=True, plan_id="<PLAN_ID>"). If you change the blueprint, call propose_org again: the plan_id changes.
+Cannot apply yet: tell me what to change.
+
+plan_id: none (the blueprint has errors). Fix them and call propose_org again; do not ask the user to approve this.

@@ -26,23 +26,17 @@ Services (kept ready, requested whenever you want):
   Each request: up to 22 runs
   Checks:
     1. Covers <the topic of the request> and nothing else.
-       my wording: your words for it were not recorded
+       from your words "Sample text"; words I added: covers, <, the, topic, of, request, >, and, +2 more
     2. At most 1500 words as counted by read.
-       my wording: your words for it were not recorded
+       my default: you did not say this
     3. Every statement is traceable to a named input file, and gaps or conflicts between files are listed in a final section titled "Open questions".
-       my wording: your words for it were not recorded
+       my default: you did not say this
     4. Every statement is checked against its named input file in the reviewer's report, and the writer applied every required change.
-       my wording: your words for it were not recorded
+       my default: you did not say this
   Delivered to: <CWD>/deliverables/briefs (I copy each result there after checking it)
 After each request the lead records lessons; before the next one it reviews them with your feedback and may improve how the team works (its playbook). It cannot change these checks: only you can, through me.
 Nothing runs until you ask for a request: approving only creates the team and the services.
 Checkpoints: approval - Plan first; ask before any spend beyond the budget; progress - One line when I ask; any spend beyond the budget needs your OK.
-Warnings (5):
-- criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-- criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-- criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-- criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-- this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.
 Nothing is created or started until you approve. Reply 'approve', or tell me what to change.
 
 --- machine marker: the user block ends above; do not show this line or anything below it ---
@@ -93,13 +87,13 @@ Services (1), offered by lead and defined by root (the contract: only root can c
   deliverable: Sample text [markdown, max 1500 words]; delivered to: <CWD>/deliverables/briefs (I copy each result there after checking it)
   acceptance (the contract, travels with every request):
     1. Covers <the topic of the request> and nothing else.
-       my wording: your words for it were not recorded
+       from your words "Sample text"; words I added: covers, <, the, topic, of, request, >, and, +2 more
     2. At most 1500 words as counted by read.
-       my wording: your words for it were not recorded
+       my default: you did not say this
     3. Every statement is traceable to a named input file, and gaps or conflicts between files are listed in a final section titled "Open questions".
-       my wording: your words for it were not recorded
+       my default: you did not say this
     4. Every statement is checked against its named input file in the reviewer's report, and the writer applied every required change.
-       my wording: your words for it were not recorded
+       my default: you did not say this
   playbook v1: generated from the team (steps, budget plan):
     ## Steps
     1. Read the request in your prompt: its inputs, every acceptance criterion and the deliverable. The criteria come from the contract and can only be met, never changed; copy the relevant ones verbatim into every task you delegate.
@@ -125,12 +119,7 @@ Checkpoints:
 - Progress: One line when I ask.
 - Any spend beyond the budget needs your OK.
 
-Warnings (7):
-- services[my-service].acceptance[1]: criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-- services[my-service].acceptance[2]: criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-- services[my-service].acceptance[3]: criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-- services[my-service].acceptance[4]: criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-- needs.elicitation: this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.
+Warnings (2):
 - services[my-service].deliverable.path: no agent can write to <CWD>/deliverables/briefs (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)
 - services[my-service].deliverable.path: <CWD>/deliverables does not exist; the copy step will create it
 

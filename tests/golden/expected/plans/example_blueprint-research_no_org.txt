@@ -23,27 +23,20 @@ Deliverable: Competitor analysis with a comparison table and a closing "Where we
   Delivered to: ~/deliverables/competitors.md (I copy it there after checking it)
 Done when ALL of these hold:
   1. Covers exactly Obsidian, Logseq, Joplin, Trilium and AnyType, and no other app.
-     my wording: your words for it were not recorded
+     from your words "Compare Obsidian, Logseq, Joplin, Trilium and AnyType only" (my question: "Which apps are in scope?"); words I added: covers, exactly, no, other, app
   2. At most 1500 words as counted by read.
-     my wording: your words for it were not recorded
+     from your words "Keep it under 1500 words"; words I added: at, most, as, counted, by, read
   3. Contains a comparison table with one row per app and a final section titled "Where we can win" that is marked as our assessment (judgement).
-     my wording: your words for it were not recorded
+     from your words "with a comparison table and a closing "Where we can win" section that you mark as your own assessment"; words I added: contains, one, row, per, app, final, titled, is, +3 more
   4. Every sentence with a number, name, version, license, price, date or "no/only/all" is a factual claim and cites the URL of the page that states it; the fact-checker fetched that page and quoted the sentence.
-     my wording: your words for it were not recorded
+     from your words "Every claim needs a source, and opinions must be labelled as opinions" (my question: "How strict should the sourcing be?"); words I added: sentence, with, number, name, version, license, price, date, +19 more
   5. The "Where we can win" section is judgement. It has no citations or new facts and rests only on claims verified elsewhere in the document.
-     my wording: your words for it were not recorded
+     my default: you did not say this
   6. The fact-checker's final coverage line reads 'n of m factual claims verified' with n = m (none wrong, unsupported or not-checkable) and 'each resting on verified facts: yes' for its judgement statements, and the writer applied every required change.
-     my wording: your words for it were not recorded
+     my default: you did not say this
   7. The final report names the path of the deliverable inside the organization, and pastes that coverage line verbatim.
-     my wording: your words for it were not recorded
+     my default: you did not say this
 Checkpoints: approval - Approve this plan before anything is created or started; ask before spending beyond the budget; progress - One line when I ask; tell me when it is done. No digging through files; any spend beyond the budget needs your OK.
-Warnings (8):
-- criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-- criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-- criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-- criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-- criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-- ... and 3 more (see the details)
 Nothing is created or started until you approve. Reply 'approve', or tell me what to change.
 
 --- machine marker: the user block ends above; do not show this line or anything below it ---
@@ -85,38 +78,30 @@ Deliverable:
 
 First task: to lead: Competitor analysis of five self-hosted note-taking apps
   1. Covers exactly Obsidian, Logseq, Joplin, Trilium and AnyType, and no other app.
-     my wording: your words for it were not recorded
+     from your words "Compare Obsidian, Logseq, Joplin, Trilium and AnyType only" (my question: "Which apps are in scope?"); words I added: covers, exactly, no, other, app
   2. At most 1500 words as counted by read.
-     my wording: your words for it were not recorded
+     from your words "Keep it under 1500 words"; words I added: at, most, as, counted, by, read
   3. Contains a comparison table with one row per app and a final section titled "Where we can win" that is marked as our assessment (judgement).
-     my wording: your words for it were not recorded
+     from your words "with a comparison table and a closing "Where we can win" section that you mark as your own assessment"; words I added: contains, one, row, per, app, final, titled, is, +3 more
   4. Every sentence with a number, name, version, license, price, date or "no/only/all" is a factual claim and cites the URL of the page that states it; the fact-checker fetched that page and quoted the sentence.
-     my wording: your words for it were not recorded
+     from your words "Every claim needs a source, and opinions must be labelled as opinions" (my question: "How strict should the sourcing be?"); words I added: sentence, with, number, name, version, license, price, date, +19 more
   5. The "Where we can win" section is judgement. It has no citations or new facts and rests only on claims verified elsewhere in the document.
-     my wording: your words for it were not recorded
+     my default: you did not say this
   6. The fact-checker's final coverage line reads 'n of m factual claims verified' with n = m (none wrong, unsupported or not-checkable) and 'each resting on verified facts: yes' for its judgement statements, and the writer applied every required change.
-     my wording: your words for it were not recorded
+     my default: you did not say this
   7. The final report names the path of the deliverable inside the organization, and pastes that coverage line verbatim.
-     my wording: your words for it were not recorded
+     my default: you did not say this
 
 Checkpoints:
 - Approval: Approve this plan before anything is created or started; ask before spending beyond the budget.
 - Progress: One line when I ask; tell me when it is done. No digging through files.
 - Any spend beyond the budget needs your OK.
 
-Warnings (10):
-- task.acceptance[1]: criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-- task.acceptance[2]: criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-- task.acceptance[3]: criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-- task.acceptance[4]: criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-- task.acceptance[5]: criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-- task.acceptance[6]: criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-- task.acceptance[7]: criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-- needs.elicitation: this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.
+Warnings (2):
 - needs.deliverable.path: no agent can write to <HOME>/deliverables/competitors.md (agents write only inside their own directory or workspace); the assistant must copy the final artifact there and verify it on completion (the plan lists this step)
 - needs.deliverable.path: <HOME>/deliverables does not exist; the copy step will create it
 
 Reply 'approve' or tell me what to change.
 
-plan_id: 3f9a09d31a1b
-Next: show the PLAN FOR YOU block above to the user exactly as written (a plain-words intro line before it is fine) and wait for their explicit approval. Then apply_org(blueprint=<this exact YAML>, approved=True, plan_id="3f9a09d31a1b"). If you change the blueprint, call propose_org again: the plan_id changes.
+plan_id: 129bc53fe563
+Next: show the PLAN FOR YOU block above to the user exactly as written (a plain-words intro line before it is fine) and wait for their explicit approval. Then apply_org(blueprint=<this exact YAML>, approved=True, plan_id="129bc53fe563"). If you change the blueprint, call propose_org again: the plan_id changes.

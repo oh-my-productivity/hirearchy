@@ -19,6 +19,7 @@ mission: >
 needs:
   kind: analysis
   scope: "<The question and the outcome to explain, e.g. what drives product returns; which file(s) and period.>"
+  elicitation: <THE USER'S ANSWERS, VERBATIM>   # what the user said, verbatim; every `from:` below is a quote of it
   inputs:                          # read-only folders with the user's data; the team can read them, never change them
     - <CWD>/<folder-with-your-data>
   workspace: <CWD>/analysis-work  # a scratch folder OUTSIDE the data folder: scripts and outputs live here
@@ -47,12 +48,19 @@ services:                          # work the lead offers again and again; each 
         description: <What the requester gives>
         required: true             # false = optional
     acceptance:                    # the contract: exact and checkable; only the user can change it, the lead can never lower it
-      - Uses only the data files in the data folder, and the checker confirmed they are unchanged (same checksums before and after).
-      - One script in the workspace regenerates every figure in the report; running it twice from a clean state gives identical output.
-      - Each number in the report appears together with its label in the script output; the checker verified every label and number pair.
-      - No conclusion is drawn from a slice with fewer than 30 rows; such slices are marked "too small".
-      - At most 1000 words as counted by read; recommendations are in a section labelled as our assessment (judgement).
-      - "The checker's line reads 'Figures checked: n of m match' with n = m, and the writer applied every required change."
+      # each criterion: text, and from: <the user's exact words> (asked: <your question>) or default: true (your proposal); put their answers, verbatim, in needs.elicitation
+      - text: Uses only the data files in the data folder, and the checker confirmed they are unchanged (same checksums before and after).
+        default: true
+      - text: One script in the workspace regenerates every figure in the report; running it twice from a clean state gives identical output.
+        default: true
+      - text: Each number in the report appears together with its label in the script output; the checker verified every label and number pair.
+        default: true
+      - text: No conclusion is drawn from a slice with fewer than 30 rows; such slices are marked "too small".
+        default: true
+      - text: At most 1000 words as counted by read; recommendations are in a section labelled as our assessment (judgement).
+        default: true
+      - text: "The checker's line reads 'Figures checked: n of m match' with n = m, and the writer applied every required change."
+        default: true
     deliverable:
       description: <What one request produces, e.g. a report on the question of the request>
       format: markdown

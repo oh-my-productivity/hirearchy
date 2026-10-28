@@ -10,11 +10,11 @@ import testkit.reach.yaml as yaml
 from testkit.reach.hirearchy.core import ROOT, Org
 from testkit.mcp_server_world import build_server, resolve_binding, skill_source
 from testkit.mcp_server_world import blueprint as bp_mod
-from testkit.blueprint_world import without_source_lines
+from testkit.blueprint_world import with_user_words, without_source_lines
 
 from hirearchy.mcp_server._instructions import ROOT_INSTRUCTIONS
 
-ALLOWED_WARNINGS = {"path-delivery", "path-parent", "workspace-new", "shell-unconfined", "criterion-source", "criterion-words"}  # shell-unconfined: the code example grants shell
+ALLOWED_WARNINGS = {"path-delivery", "path-parent", "workspace-new", "shell-unconfined"}  # shell-unconfined: the code example grants shell
 
 
 def call(server, tool, **args):
@@ -51,7 +51,8 @@ def setup(tmp_path, monkeypatch):
 
 
 def example(server, kind="research") -> str:
-    return call(server, "blueprint_example", kind=kind)
+    """The template as the assistant uses it: its placeholders for the user's words filled in (a raw one is a draft: see test_provenance)."""
+    return with_user_words(call(server, "blueprint_example", kind=kind))
 
 
 def plan_id_in(text: str) -> str:
@@ -188,6 +189,14 @@ def test_every_example_validates_and_round_trips_through_propose_org(setup, kind
     assert text.lstrip().startswith("# Blueprint schema in one paragraph")
 
 
+def test_a_raw_template_is_a_draft_until_the_users_words_are_filled_in(setup):
+    """Design 11.3: the quote and the recorded words of a template are placeholders; unfilled, the quote is not in the words (guard)."""
+    server, _ = setup
+    out = call(server, "propose_org", blueprint=call(server, "blueprint_example", kind="research"))
+    assert bp_mod.PLAN_DRAFT_HEADING in out and "plan_id: none" in out
+    assert "quotes words that are not in needs.elicitation: \"<THE USER'S EXACT WORDS>\"" in out
+
+
 def test_example_kinds_differ_in_what_they_need(setup):
     server, _ = setup
     research, docs, code = (bp_mod.load_text(example(server, k)) for k in ("research", "documents", "code"))
@@ -213,7 +222,7 @@ def test_unknown_example_kind_lists_the_kinds(setup):
 
 def test_example_works_in_setup_mode_and_is_the_default_research(setup):
     server, target = setup
-    assert call(server, "blueprint_example") == example(server, "research") and not target.exists()
+    assert call(server, "blueprint_example") == call(server, "blueprint_example", kind="research") and not target.exists()
 
 
 def test_tool_descriptions_and_instructions_point_at_no_repo_files(setup):

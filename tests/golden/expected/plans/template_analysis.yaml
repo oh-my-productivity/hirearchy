@@ -16,6 +16,7 @@ mission: >
 needs:
   kind: analysis
   scope: "<The question and the outcome to explain, e.g. what drives product returns; which file(s) and period.>"
+  elicitation: <THE USER'S ANSWERS, VERBATIM>   # what the user said, verbatim; every `from:` below is a quote of it
   inputs:                          # read-only folders with the user's data; the team can read them, never change them
     - <CWD>/<folder-with-your-data>
   workspace: <CWD>/analysis-work  # a scratch folder OUTSIDE the data folder: scripts and outputs live here
@@ -47,10 +48,18 @@ task:
     <Analyse the data for the question, explore the outcome against every dimension and pair, have the key figures
     recomputed independently, write the report from the labelled output, apply every required change and report the final file.>
   acceptance:
-    - Uses only <the data file(s)> in the data folder, and the checker confirmed the data files are unchanged (same checksums before and after).
-    - One script in the workspace regenerates every figure in the report; running it twice from a clean state gives identical output.
-    - The script explores <the outcome> against every available column and against every pair of the strongest dimensions (for example reason x region); the report lists the strongest effects with their counts (n and share).
-    - Each number in the report appears together with its label in the script output; the checker verified every label and number pair, not only that the number occurs.
-    - No conclusion is drawn from a slice with fewer than 30 rows; such slices are marked "too small".
-    - At most 1000 words as counted by read; the recommendations are in a section labelled as our assessment (judgement), without figures that are not in the script output.
-    - "The checker's line reads 'Figures checked: n of m match' with n = m, and also 'dimensions covered: k of d' with k = d, strongest pairs scanned: yes, reproducible: yes, data unchanged: yes; the writer applied every required change."
+    # each criterion: text, and from: <the user's exact words> (asked: <your question>) or default: true (your proposal); put their answers, verbatim, in needs.elicitation
+    - text: Uses only <the data file(s)> in the data folder, and the checker confirmed the data files are unchanged (same checksums before and after).
+      from: <THE USER'S EXACT WORDS>
+    - text: One script in the workspace regenerates every figure in the report; running it twice from a clean state gives identical output.
+      default: true
+    - text: The script explores <the outcome> against every available column and against every pair of the strongest dimensions (for example reason x region); the report lists the strongest effects with their counts (n and share).
+      from: <THE USER'S EXACT WORDS>
+    - text: Each number in the report appears together with its label in the script output; the checker verified every label and number pair, not only that the number occurs.
+      default: true
+    - text: No conclusion is drawn from a slice with fewer than 30 rows; such slices are marked "too small".
+      default: true
+    - text: At most 1000 words as counted by read; the recommendations are in a section labelled as our assessment (judgement), without figures that are not in the script output.
+      default: true
+    - text: "The checker's line reads 'Figures checked: n of m match' with n = m, and also 'dimensions covered: k of d' with k = d, strongest pairs scanned: yes, reproducible: yes, data unchanged: yes; the writer applied every required change."
+      default: true

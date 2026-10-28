@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Any
 
 import pytest
 import testkit
@@ -148,20 +149,21 @@ P1_LINE = (
 def research(tmp_path: Path, *criteria: object, elicitation: object = None) -> dict[str, object]:
     """The shipped research blueprint with its deliverable inside the allowed root, the given task criteria and (when given) the user's words."""
     (tmp_path / "deliverables").mkdir(exist_ok=True)
-    bp = yaml.safe_load(EXAMPLE.read_text())
+    bp: dict[str, Any] = yaml.safe_load(EXAMPLE.read_text())
     bp["needs"]["deliverable"]["path"] = str(tmp_path / "deliverables" / "competitors.md")
     bp["task"]["acceptance"] = list(criteria)
+    bp["needs"].pop("elicitation", None)
     if elicitation is not None:
         bp["needs"]["elicitation"] = elicitation
     return bp
 
 
 def block(bp: dict[str, object], tmp_path: Path) -> str:
-    return bpm.plan_for_user(bp, allowed_roots=[tmp_path])
+    return str(bpm.plan_for_user(bp, allowed_roots=[tmp_path]))
 
 
 def details(bp: dict[str, object], tmp_path: Path) -> str:
-    return bpm.render_plan(bp, allowed_roots=[tmp_path])
+    return str(bpm.render_plan(bp, allowed_roots=[tmp_path]))
 
 
 def test_a_from_criterion_shows_the_quote_the_question_and_the_words_root_added(tmp_path: Path) -> None:
@@ -231,7 +233,7 @@ def test_a_plan_with_criteria_and_no_elicitation_shows_my_wording_at_the_termina
     bp = research(tmp_path, "At most 1500 words as counted by read.")
     issues = bpm.validate(bp, allowed_roots=[tmp_path])
     assert {i.code: i.level for i in issues if i.code.startswith("criterion-")} == {"criterion-source": "warning", "criterion-words": "warning"}
-    assert not bpm.errors(issues)
+    assert not [i for i in issues if i.level == "error"]
     assert "     my wording: your words for it were not recorded" in details(bp, tmp_path)
     assert "criterion 1 does not say where it comes from" in details(bp, tmp_path)
 

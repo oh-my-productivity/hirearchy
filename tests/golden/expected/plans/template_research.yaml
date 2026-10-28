@@ -16,6 +16,7 @@ mission: >
 needs:
   kind: research
   scope: "<The exact items in scope, as the user listed them. Ask for the list; do not invent one.>"
+  elicitation: <THE USER'S ANSWERS, VERBATIM>   # what the user said, verbatim; every `from:` below is a quote of it
   deliverable:
     description: <What the file contains, e.g. a comparison table plus a closing recommendation section labelled as our assessment>
     format: markdown               # what the user can open: markdown, plain text, csv, ...
@@ -44,10 +45,18 @@ task:
     <Research the scope, write the deliverable, have the claims independently fact-checked, apply every required
     change and report the final file.>
   acceptance:                      # exact and checkable; the assistant checks each one at the end
-    - Covers exactly the items listed in the scope and no others.
-    - At most 1500 words as counted by read.
-    - Contains <the sections or table the user asked for, named exactly>, and the closing recommendation section is marked as our assessment (judgement).
-    - Every sentence with a number, name, version, license, price, date or "no/only/all" is a factual claim and cites the URL of the page that states it; the fact-checker fetched that page and quoted the sentence.
-    - The recommendation section is judgement. It has no citations or new facts and rests only on claims verified elsewhere in the document.
-    - "The fact-checker's final coverage line reads 'n of m factual claims verified' with n = m (none wrong, unsupported or not-checkable) and 'each resting on verified facts: yes' for its judgement statements, and the writer applied every required change."
-    - The final report pastes that coverage line verbatim, with the path of the fact-checker's ledger.
+    # each criterion: text, and from: <the user's exact words> (asked: <your question>) or default: true (your proposal); put their answers, verbatim, in needs.elicitation
+    - text: Covers exactly the items listed in the scope and no others.
+      default: true
+    - text: At most 1500 words as counted by read.
+      default: true
+    - text: Contains <the sections or table the user asked for, named exactly>, and the closing recommendation section is marked as our assessment (judgement).
+      from: <THE USER'S EXACT WORDS>
+    - text: Every sentence with a number, name, version, license, price, date or "no/only/all" is a factual claim and cites the URL of the page that states it; the fact-checker fetched that page and quoted the sentence.
+      default: true
+    - text: The recommendation section is judgement. It has no citations or new facts and rests only on claims verified elsewhere in the document.
+      default: true
+    - text: "The fact-checker's final coverage line reads 'n of m factual claims verified' with n = m (none wrong, unsupported or not-checkable) and 'each resting on verified facts: yes' for its judgement statements, and the writer applied every required change."
+      default: true
+    - text: The final report pastes that coverage line verbatim, with the path of the fact-checker's ledger.
+      default: true

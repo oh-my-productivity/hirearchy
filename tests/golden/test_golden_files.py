@@ -108,7 +108,8 @@ def fill(text: str, base: Path) -> str:
         (base / name).mkdir(exist_ok=True)
     for placeholder, value in (("<folder-with-your-files>", "docs"), ("<folder-with-your-data>", "data"),
                                ("<project-folder>", "proj"), ("<name>", "briefs"), ("<service-name>", "my-service"),
-                               ("<input-name>", "topic")):
+                               ("<input-name>", "topic"), ("<THE USER'S EXACT WORDS>", "Sample text"),
+                               ("<THE USER'S ANSWERS, VERBATIM>", "Sample text")):
         text = text.replace(placeholder, value)
     return text
 

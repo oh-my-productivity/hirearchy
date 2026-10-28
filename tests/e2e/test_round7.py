@@ -6,6 +6,7 @@ import pytest
 import testkit
 import yaml
 from testkit.cli_world import main
+from testkit.blueprint_world import with_user_words
 from testkit.e2e_world import ROOT_INSTRUCTIONS, binding_at, bpm, build_server, ex, file_confinement, resolve_binding, skill_source
 
 from hirearchy.core import ROOT, Org
@@ -82,7 +83,7 @@ def filled(kind: str, base: Path) -> dict:
     """An example with its path placeholders replaced by real folders (prose placeholders are valid YAML as they are)."""
     for name in ("docs", "data", "proj", "deliverables"):
         (base / name).mkdir(exist_ok=True)
-    text = ex.example(kind, base)
+    text = with_user_words(ex.example(kind, base))
     text = (text.replace("<folder-with-your-files>", "docs").replace("<folder-with-your-data>", "data")
             .replace("<project-folder>", "proj").replace("<name>", "result"))
     return yaml.safe_load(text)
@@ -159,7 +160,7 @@ def fill_text(server, kind: str, base: Path) -> str:
     """What the assistant does: fetch the example and replace the placeholders it needs with the user's values."""
     for name in ("docs", "data", "proj", "deliverables"):
         (base / name).mkdir(exist_ok=True)
-    text = call(server, "blueprint_example", kind=kind)
+    text = with_user_words(call(server, "blueprint_example", kind=kind))
     return (text.replace("<folder-with-your-files>", "docs").replace("<folder-with-your-data>", "data")
             .replace("<project-folder>", "proj").replace("<name>", "result"))
 
@@ -182,12 +183,12 @@ def test_example_criteria_match_the_exhaustive_verifier_templates(root_server, c
     for kind, needle in (("research", "n of m factual claims verified' with n = m"),
                          ("documents", "Every statement is checked against its named input file in the reviewer's report"),
                          ("analysis", "Figures checked: n of m match' with n = m")):
-        criteria = yaml.safe_load(fill_text(root_server, kind, cwd))["task"]["acceptance"]
+        criteria = [c["text"] for c in yaml.safe_load(fill_text(root_server, kind, cwd))["task"]["acceptance"]]
         assert any(needle in c for c in criteria), kind
         assert not any("at least 6" in c for c in criteria), kind
     assert "at least 6" not in (EXAMPLES_DIR / "blueprint-research.yaml").read_text()
     research = yaml.safe_load((EXAMPLES_DIR / "blueprint-research.yaml").read_text())
-    assert any("n of m factual claims verified' with n = m" in c for c in research["task"]["acceptance"])
+    assert any("n of m factual claims verified' with n = m" in c["text"] for c in research["task"]["acceptance"])
     # the wording asks for what the templates report
     assert "n of m factual claims verified" in bpm.get_role("fact-checker").body and "criteria met: n of m" in bpm.get_role("reviewer").body
     assert "Figures checked: n of m match" in bpm.get_role("data-checker").body

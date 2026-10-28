@@ -107,12 +107,13 @@ def criterion_issues(bp: Mapping[str, object], *, extension: bool, require_sourc
             words = None  # reported once here; no quote is judged against words that are not usable
             issues.append(Issue("error", "needs.elicitation", BAD_ELICITATION, "criterion-words"))
     lists: list[tuple[str, list[object]]] = []
-    task = mapping_or_empty(bp.get("task"))
-    if isinstance(task.get("acceptance"), list):
-        lists.append(("task.acceptance", task["acceptance"]))
+    task_criteria = mapping_or_empty(bp.get("task")).get("acceptance")
+    if isinstance(task_criteria, list):
+        lists.append(("task.acceptance", task_criteria))
     for n, sv in enumerate(services_of(bp)):
-        if isinstance(sv.get("acceptance"), list):
-            lists.append((f"services[{s(sv.get('name')) or n}].acceptance", sv["acceptance"]))
+        service_criteria = sv.get("acceptance")
+        if isinstance(service_criteria, list):
+            lists.append((f"services[{s(sv.get('name')) or n}].acceptance", service_criteria))
     for where, criteria in lists:
         for i, c in enumerate(criteria, 1):
             if not isinstance(c, dict):

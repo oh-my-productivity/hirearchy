@@ -22,29 +22,27 @@ Deliverable: <What the report contains, e.g. the strongest effects with counts, 
   Delivered to: <CWD>/deliverables/<name>.md (I copy it there after checking it)
 Done when ALL of these hold:
   1. Uses only <the data file(s)> in the data folder, and the checker confirmed the data files are unchanged (same checksums before and after).
-     my wording: your words for it were not recorded
+     from your words "<THE USER'S EXACT WORDS>"; words I added: uses, only, data, file, in, folder, and, checker, +8 more
   2. One script in the workspace regenerates every figure in the report; running it twice from a clean state gives identical output.
-     my wording: your words for it were not recorded
+     my default: you did not say this
   3. The script explores <the outcome> against every available column and against every pair of the strongest dimensions (for example reason x region); the report lists the strongest effects with their counts (n and share).
-     my wording: your words for it were not recorded
+     from your words "<THE USER'S EXACT WORDS>"; words I added: script, explores, outcome, against, every, available, column, and, +17 more
   4. Each number in the report appears together with its label in the script output; the checker verified every label and number pair, not only that the number occurs.
-     my wording: your words for it were not recorded
+     my default: you did not say this
   5. No conclusion is drawn from a slice with fewer than 30 rows; such slices are marked "too small".
-     my wording: your words for it were not recorded
+     my default: you did not say this
   6. At most 1000 words as counted by read; the recommendations are in a section labelled as our assessment (judgement), without figures that are not in the script output.
-     my wording: your words for it were not recorded
+     my default: you did not say this
   7. The checker's line reads 'Figures checked: n of m match' with n = m, and also 'dimensions covered: k of d' with k = d, strongest pairs scanned: yes, reproducible: yes, data unchanged: yes; the writer applied every required change.
-     my wording: your words for it were not recorded
+     my default: you did not say this
 Checkpoints: approval - Plan first; ask before any spend beyond the budget; progress - One line when I ask; any spend beyond the budget needs your OK.
-Warnings (10):
+Warnings (2):
 - <CWD>/analysis-work does not exist yet; apply will create it
 - lead, lead/analyst, lead/checker hold shell. kiro cannot confine shell by path: staying inside the workspace (and leaving inputs alone) is instructed in the charter and prompt, not enforced. Built-in read/write ARE confined; only shell is not
-- criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-- criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-- criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-- ... and 5 more (see the details)
-Errors (1):
+Errors (3):
 - needs.inputs: input <CWD>/<folder-with-your-data> does not exist; inputs are read-only sources and must be there already
+- task.acceptance[1]: criterion 1 quotes words that are not in needs.elicitation: "<THE USER'S EXACT WORDS>". Quote the user's own words exactly, or mark it default: true.
+- task.acceptance[3]: criterion 3 quotes words that are not in needs.elicitation: "<THE USER'S EXACT WORDS>". Quote the user's own words exactly, or mark it default: true.
 Cannot apply yet.
 
 --- machine marker: the user block ends above; do not show this line or anything below it ---
@@ -90,41 +88,35 @@ Deliverable:
 
 First task: to lead: <Short title of the analysis>
   1. Uses only <the data file(s)> in the data folder, and the checker confirmed the data files are unchanged (same checksums before and after).
-     my wording: your words for it were not recorded
+     from your words "<THE USER'S EXACT WORDS>"; words I added: uses, only, data, file, in, folder, and, checker, +8 more
   2. One script in the workspace regenerates every figure in the report; running it twice from a clean state gives identical output.
-     my wording: your words for it were not recorded
+     my default: you did not say this
   3. The script explores <the outcome> against every available column and against every pair of the strongest dimensions (for example reason x region); the report lists the strongest effects with their counts (n and share).
-     my wording: your words for it were not recorded
+     from your words "<THE USER'S EXACT WORDS>"; words I added: script, explores, outcome, against, every, available, column, and, +17 more
   4. Each number in the report appears together with its label in the script output; the checker verified every label and number pair, not only that the number occurs.
-     my wording: your words for it were not recorded
+     my default: you did not say this
   5. No conclusion is drawn from a slice with fewer than 30 rows; such slices are marked "too small".
-     my wording: your words for it were not recorded
+     my default: you did not say this
   6. At most 1000 words as counted by read; the recommendations are in a section labelled as our assessment (judgement), without figures that are not in the script output.
-     my wording: your words for it were not recorded
+     my default: you did not say this
   7. The checker's line reads 'Figures checked: n of m match' with n = m, and also 'dimensions covered: k of d' with k = d, strongest pairs scanned: yes, reproducible: yes, data unchanged: yes; the writer applied every required change.
-     my wording: your words for it were not recorded
+     my default: you did not say this
 
 Checkpoints:
 - Approval: Plan first; ask before any spend beyond the budget.
 - Progress: One line when I ask.
 - Any spend beyond the budget needs your OK.
 
-Warnings (12):
+Warnings (4):
 - needs.workspace: <CWD>/analysis-work does not exist yet; apply will create it
 - agents: lead, lead/analyst, lead/checker hold shell. kiro cannot confine shell by path: staying inside the workspace (and leaving inputs alone) is instructed in the charter and prompt, not enforced. Built-in read/write ARE confined; only shell is not
-- task.acceptance[1]: criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-- task.acceptance[2]: criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-- task.acceptance[3]: criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-- task.acceptance[4]: criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-- task.acceptance[5]: criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-- task.acceptance[6]: criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-- task.acceptance[7]: criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-- needs.elicitation: this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.
 - needs.deliverable.path: no agent can write to <CWD>/deliverables/<name>.md (agents write only inside their own directory or workspace); the assistant must copy the final artifact there and verify it on completion (the plan lists this step)
 - needs.deliverable.path: <CWD>/deliverables does not exist; the copy step will create it
 
-Errors (1) - must be fixed before this can be applied:
+Errors (3) - must be fixed before this can be applied:
 - needs.inputs: input <CWD>/<folder-with-your-data> does not exist; inputs are read-only sources and must be there already
+- task.acceptance[1]: criterion 1 quotes words that are not in needs.elicitation: "<THE USER'S EXACT WORDS>". Quote the user's own words exactly, or mark it default: true.
+- task.acceptance[3]: criterion 3 quotes words that are not in needs.elicitation: "<THE USER'S EXACT WORDS>". Quote the user's own words exactly, or mark it default: true.
 
 Cannot apply yet: tell me what to change.
 

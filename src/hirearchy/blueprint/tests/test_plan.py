@@ -60,7 +60,7 @@ def test_render_plan_contents(base, roots):
     for expected in ("Goal:", "Obsidian, Logseq, Joplin", "max 1500 words", "lead/researcher", "model=claude-sonnet-5.5",
                      "model=claude-opus-5.5", "tools=web_fetch,web_search", "Budget: 22 runs planned (your cap: 25), estimate 17",
                      "factcheck", "nobody edits another agent's file", "competitors.md", "copied there by the assistant",
-                     "1. Covers exactly", "Checkpoints:", "Warnings (9):", "Reply 'approve' or tell me what to change."):
+                     "1. Covers exactly", "Checkpoints:", "Warnings (1):", "Reply 'approve' or tell me what to change."):
         assert expected in text, expected
     assert text.rstrip().endswith("Reply 'approve' or tell me what to change.")
     assert len(text.splitlines()) < 70

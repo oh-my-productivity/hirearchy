@@ -25,26 +25,21 @@ Services (kept ready, requested whenever you want):
   Each request: up to 20 runs
   Checks:
     1. At most 600 words as counted by read.
-       my wording: your words for it were not recorded
+       from your words "At most 600 words"; words I added: as, counted, by, read
     2. Has exactly the sections "This week", "Changes since last week" and "Our assessment", in that order.
-       my wording: your words for it were not recorded
+       from your words "with the sections "This week", "Changes since last week" and "Our assessment", in that order"; words I added: has, exactly
     3. Every sentence with a number, name, version, date, price or "no/only/all" is a factual claim and cites the URL of the page that states it; the fact-checker fetched that page and quoted the sentence.
-       my wording: your words for it were not recorded
+       from your words "Every claim needs a source, and opinions must be labelled as opinions" (my question: "How strict should the sourcing be?"); words I added: sentence, with, number, name, version, date, price, or, +18 more
     4. The "Our assessment" section is judgement, with no citations or new facts, and rests only on claims verified elsewhere in the brief.
-       my wording: your words for it were not recorded
+       my default: you did not say this
     5. The fact-checker's final coverage line reads 'n of m factual claims verified' with n = m, and the lead's report pastes it verbatim.
-       my wording: your words for it were not recorded
+       my default: you did not say this
   Delivered to: ~/deliverables/weekly-briefs (I copy each result there after checking it)
 After each request the lead records lessons; before the next one it reviews them with your feedback and may improve how the team works (its playbook). It cannot change these checks: only you can, through me.
 First request, started on approval: weekly-brief (topic: solid-state batteries).
 Checkpoints: approval - Approve this plan before anything is created or started; ask before spending beyond a request's budget; progress - One line when I ask; any spend beyond the budget needs your OK.
-Warnings (7):
-- criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-- criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-- criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-- criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-- criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-- ... and 2 more (see the details)
+Warnings (1):
+- 20 runs per request covers one pass and one internal rework (the estimate is 17), not a round of your questions or a rejection, which takes about 7 more (1, plus 2 for each agent below lead): 24 per request covers one such round
 Nothing is created or started until you approve. Reply 'approve', or tell me what to change.
 Use 24 runs per request (covers one round of your questions or a rejection), or keep 20?
 
@@ -92,15 +87,15 @@ Services (1), offered by lead and defined by root (the contract: only root can c
   deliverable: One markdown file with the brief [markdown, max 600 words]; delivered to: ~/deliverables/weekly-briefs (I copy each result there after checking it)
   acceptance (the contract, travels with every request):
     1. At most 600 words as counted by read.
-       my wording: your words for it were not recorded
+       from your words "At most 600 words"; words I added: as, counted, by, read
     2. Has exactly the sections "This week", "Changes since last week" and "Our assessment", in that order.
-       my wording: your words for it were not recorded
+       from your words "with the sections "This week", "Changes since last week" and "Our assessment", in that order"; words I added: has, exactly
     3. Every sentence with a number, name, version, date, price or "no/only/all" is a factual claim and cites the URL of the page that states it; the fact-checker fetched that page and quoted the sentence.
-       my wording: your words for it were not recorded
+       from your words "Every claim needs a source, and opinions must be labelled as opinions" (my question: "How strict should the sourcing be?"); words I added: sentence, with, number, name, version, date, price, or, +18 more
     4. The "Our assessment" section is judgement, with no citations or new facts, and rests only on claims verified elsewhere in the brief.
-       my wording: your words for it were not recorded
+       my default: you did not say this
     5. The fact-checker's final coverage line reads 'n of m factual claims verified' with n = m, and the lead's report pastes it verbatim.
-       my wording: your words for it were not recorded
+       my default: you did not say this
   playbook v1: generated from the team (steps, budget plan):
     ## Steps
     1. Read the request in your prompt: its inputs, every acceptance criterion and the deliverable. The criteria come from the contract and can only be met, never changed; copy the relevant ones verbatim into every task you delegate.
@@ -126,18 +121,12 @@ Checkpoints:
 - Progress: One line when I ask.
 - Any spend beyond the budget needs your OK.
 
-Warnings (9):
-- services[weekly-brief].acceptance[1]: criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-- services[weekly-brief].acceptance[2]: criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-- services[weekly-brief].acceptance[3]: criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-- services[weekly-brief].acceptance[4]: criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-- services[weekly-brief].acceptance[5]: criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
-- needs.elicitation: this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.
+Warnings (3):
 - services[weekly-brief].deliverable.path: no agent can write to <HOME>/deliverables/weekly-briefs (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)
 - services[weekly-brief].deliverable.path: <HOME>/deliverables does not exist; the copy step will create it
 - services[weekly-brief].budget: 20 runs per request covers one pass and one internal rework (the estimate is 17), not a round of your questions or a rejection, which takes about 7 more (1, plus 2 for each agent below lead): 24 per request covers one such round
 
 Reply 'approve' or tell me what to change.
 
-plan_id: d70a3414bf22
-Next: show the PLAN FOR YOU block above to the user exactly as written (a plain-words intro line before it is fine) and wait for their explicit approval. Then apply_org(blueprint=<this exact YAML>, approved=True, plan_id="d70a3414bf22"). If you change the blueprint, call propose_org again: the plan_id changes.
+plan_id: fb3685b022e6
+Next: show the PLAN FOR YOU block above to the user exactly as written (a plain-words intro line before it is fine) and wait for their explicit approval. Then apply_org(blueprint=<this exact YAML>, approved=True, plan_id="fb3685b022e6"). If you change the blueprint, call propose_org again: the plan_id changes.

@@ -5,6 +5,11 @@ mission: >
   Produce a sourced competitor analysis of five self-hosted note-taking apps for a small team choosing one.
 needs:
   scope: "Obsidian, Logseq, Joplin, Trilium and AnyType only; self-hosting, licensing, sync/E2EE, mobile support, extensibility."
+  elicitation: >   # the user's answers, verbatim; every `from:` below quotes them
+    We are a small team choosing one self-hosted note-taking app. Compare Obsidian, Logseq, Joplin, Trilium and AnyType only,
+    on self-hosting, licensing, sync/E2EE, mobile support and extensibility. Keep it under 1500 words, with a comparison table
+    and a closing "Where we can win" section that you mark as your own assessment. Every claim needs a source, and opinions
+    must be labelled as opinions.
   deliverable:
     description: Competitor analysis with a comparison table and a closing "Where we can win" section marked as our assessment
     format: markdown
@@ -34,10 +39,20 @@ task:
     Research Obsidian, Logseq, Joplin, Trilium and AnyType, write the analysis, have the claims independently
     fact-checked, apply the required corrections, and report the final file.
   acceptance:
-    - Covers exactly Obsidian, Logseq, Joplin, Trilium and AnyType, and no other app.
-    - At most 1500 words as counted by read.
-    - Contains a comparison table with one row per app and a final section titled "Where we can win" that is marked as our assessment (judgement).
-    - Every sentence with a number, name, version, license, price, date or "no/only/all" is a factual claim and cites the URL of the page that states it; the fact-checker fetched that page and quoted the sentence.
-    - The "Where we can win" section is judgement. It has no citations or new facts and rests only on claims verified elsewhere in the document.
-    - "The fact-checker's final coverage line reads 'n of m factual claims verified' with n = m (none wrong, unsupported or not-checkable) and 'each resting on verified facts: yes' for its judgement statements, and the writer applied every required change."
-    - The final report names the path of the deliverable inside the organization, and pastes that coverage line verbatim.
+    # each criterion: text, and from: <the user's exact words> (asked: <your question>) or default: true (your proposal); put their answers, verbatim, in needs.elicitation
+    - text: Covers exactly Obsidian, Logseq, Joplin, Trilium and AnyType, and no other app.
+      from: Compare Obsidian, Logseq, Joplin, Trilium and AnyType only
+      asked: Which apps are in scope?
+    - text: At most 1500 words as counted by read.
+      from: Keep it under 1500 words
+    - text: Contains a comparison table with one row per app and a final section titled "Where we can win" that is marked as our assessment (judgement).
+      from: with a comparison table and a closing "Where we can win" section that you mark as your own assessment
+    - text: Every sentence with a number, name, version, license, price, date or "no/only/all" is a factual claim and cites the URL of the page that states it; the fact-checker fetched that page and quoted the sentence.
+      from: Every claim needs a source, and opinions must be labelled as opinions
+      asked: How strict should the sourcing be?
+    - text: The "Where we can win" section is judgement. It has no citations or new facts and rests only on claims verified elsewhere in the document.
+      default: true
+    - text: "The fact-checker's final coverage line reads 'n of m factual claims verified' with n = m (none wrong, unsupported or not-checkable) and 'each resting on verified facts: yes' for its judgement statements, and the writer applied every required change."
+      default: true
+    - text: The final report names the path of the deliverable inside the organization, and pastes that coverage line verbatim.
+      default: true

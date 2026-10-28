@@ -36,6 +36,7 @@ from hirearchy.blueprint._roles import PackagedRoleLibrary
 from hirearchy.blueprint._validator import RuleBlueprintValidator
 from hirearchy.blueprint.testing import ScriptedConfinementPolicy
 from hirearchy.blueprint.tests import _corpus
+from testkit.blueprint_world import with_user_words
 from hirearchy.kiro import ConfinementPolicy
 
 REPO = Path(__file__).resolve().parents[4]
@@ -147,7 +148,7 @@ def test_the_applier_of_the_runtime_builds_with_the_ports_it_is_given(tmp_path: 
     runtime = wiring.open_runtime(org.root, {Hiring: flaky})
     base = tmp_path / "base"
     (base / "deliverables").mkdir(parents=True)
-    bp = runtime.blueprint_loader.load_text(runtime.blueprint_examples.example("research", str(base)))
+    bp = runtime.blueprint_loader.load_text(with_user_words(runtime.blueprint_examples.example("research", str(base))))
     with pytest.raises(OrgError, match="disk full"):
         runtime.blueprint_applier.apply(bp, allowed_roots=[base])
     assert org.agents() == []  # the first hire was taken back

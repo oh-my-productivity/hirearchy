@@ -8,6 +8,10 @@ mission: >
   Offer a weekly, sourced one-page brief on a topic the requester names, and get better at it with every request.
 needs:
   scope: "One topic per request; news and developments of the past week only; sources are public web pages."
+  elicitation: >   # the user's answers, verbatim; every `from:` below quotes them
+    I want a short brief on a topic I name, every week. News and developments of the past week only, from public web pages.
+    At most 600 words, with the sections "This week", "Changes since last week" and "Our assessment", in that order.
+    Every claim needs a source, and opinions must be labelled as opinions.
   quality_bar: Every factual claim cites the page that states it; opinions are labelled as judgement, without citations.
   sources: Web access to news sites, official sites and documentation; a source URL per claim.
   budget_runs: 25   # the user's cap for ONE request; the service below asks for 24
@@ -33,11 +37,18 @@ services:
       - {name: topic, description: what the brief is about, required: true}
       - {name: week, description: ISO week such as 2026-W43; default the current one, required: false}
     acceptance:                        # the contract: only the user can change it; the lead may not lower it
-      - At most 600 words as counted by read.
-      - Has exactly the sections "This week", "Changes since last week" and "Our assessment", in that order.
-      - Every sentence with a number, name, version, date, price or "no/only/all" is a factual claim and cites the URL of the page that states it; the fact-checker fetched that page and quoted the sentence.
-      - The "Our assessment" section is judgement, with no citations or new facts, and rests only on claims verified elsewhere in the brief.
-      - "The fact-checker's final coverage line reads 'n of m factual claims verified' with n = m, and the lead's report pastes it verbatim."
+      # each criterion: text, and from: <the user's exact words> (asked: <your question>) or default: true (your proposal); put their answers, verbatim, in needs.elicitation
+      - text: At most 600 words as counted by read.
+        from: At most 600 words
+      - text: Has exactly the sections "This week", "Changes since last week" and "Our assessment", in that order.
+        from: with the sections "This week", "Changes since last week" and "Our assessment", in that order
+      - text: Every sentence with a number, name, version, date, price or "no/only/all" is a factual claim and cites the URL of the page that states it; the fact-checker fetched that page and quoted the sentence.
+        from: Every claim needs a source, and opinions must be labelled as opinions
+        asked: How strict should the sourcing be?
+      - text: The "Our assessment" section is judgement, with no citations or new facts, and rests only on claims verified elsewhere in the brief.
+        default: true
+      - text: "The fact-checker's final coverage line reads 'n of m factual claims verified' with n = m, and the lead's report pastes it verbatim."
+        default: true
     deliverable:
       description: One markdown file with the brief
       format: markdown

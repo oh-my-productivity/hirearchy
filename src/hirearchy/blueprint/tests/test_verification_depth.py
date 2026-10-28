@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 import testkit
 import yaml
-from testkit.blueprint_world import ex
+from testkit.blueprint_world import ex, with_user_words
 from testkit.reach.hirearchy.core import Org, OrgError
 
 from testkit.blueprint_world import bpm
@@ -17,7 +17,7 @@ EXAMPLE_YAML = testkit.REPO / "examples" / "blueprint-research.yaml"
 def filled(kind: str, base: Path) -> dict:
     for name in ("docs", "data", "proj", "deliverables"):
         (base / name).mkdir(exist_ok=True)
-    text = ex.example(kind, base)
+    text = with_user_words(ex.example(kind, base))
     text = (text.replace("<folder-with-your-files>", "docs").replace("<folder-with-your-data>", "data")
             .replace("<project-folder>", "proj").replace("<name>", "result"))
     return yaml.safe_load(text)
@@ -40,8 +40,8 @@ def codes(issues) -> set[str]:
 @pytest.fixture(params=["example-tool", "example-yaml"])
 def research_criteria(request, cwd):
     if request.param == "example-tool":
-        return filled("research", cwd)["task"]["acceptance"]
-    return yaml.safe_load(EXAMPLE_YAML.read_text())["task"]["acceptance"]
+        return [c["text"] for c in filled("research", cwd)["task"]["acceptance"]]
+    return [c["text"] for c in yaml.safe_load(EXAMPLE_YAML.read_text())["task"]["acceptance"]]
 
 
 def test_research_criteria_separate_facts_from_judgement(research_criteria):
@@ -71,7 +71,7 @@ def test_research_example_yaml_is_clean_and_names_the_section_as_judgement(tmp_p
     (tmp_path / "out").mkdir()
     assert not bpm.errors(bpm.validate(bp, allowed_roots=[tmp_path]))
     assert "marked as our assessment" in bp["needs"]["deliverable"]["description"]
-    assert any('"Where we can win"' in c and "judgement" in c for c in bp["task"]["acceptance"])
+    assert any('"Where we can win"' in c["text"] and "judgement" in c["text"] for c in bp["task"]["acceptance"])
 
 
 def test_judgement_section_wording_is_consistent_across_writer_checker_and_manager():
@@ -86,7 +86,7 @@ def test_analysis_example_is_a_known_kind_and_proposes_cleanly_once_filled(cwd):
     bp = filled("analysis", cwd)
     issues = bpm.validate(bp, allowed_roots=[cwd.parent])
     assert not bpm.errors(issues), [i.render() for i in issues]
-    assert codes(issues) - {"criterion-source", "criterion-words"} <= {"path-delivery", "path-parent", "workspace-new", "shell-unconfined"}
+    assert codes(issues) <= {"path-delivery", "path-parent", "workspace-new", "shell-unconfined"}
     out = bpm.propose_text(bp, allowed_roots=[cwd.parent])
     assert bpm.PLAN_HEADING in out and "Errors (" not in out
 
@@ -107,7 +107,7 @@ def test_analysis_example_roles_inputs_and_workspace(cwd):
 
 
 def test_analysis_example_criteria_are_reproducible_complete_label_bound_and_sample_safe(cwd):
-    crit = filled("analysis", cwd)["task"]["acceptance"]
+    crit = [c["text"] for c in filled("analysis", cwd)["task"]["acceptance"]]
     text = " ".join(crit)
     for needle in ("One script in the workspace regenerates every figure", "running it twice", "identical output",
                    "every available column and against every pair of the strongest dimensions", "(for example reason x region)",

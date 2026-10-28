@@ -19,6 +19,7 @@ from hirearchy.kernel import ROOT, OrgError
 from hirearchy.mcp_server import BindingResolver, McpServerFactory, McpServerRunner, OrgBindingPort
 from hirearchy.mcp_server._instructions import INSTRUCTIONS, ROOT_INSTRUCTIONS
 from hirearchy.telemetry import ProcessLabel
+from testkit.blueprint_world import with_user_words
 from testkit.mcp_server_world import OrgBinding, build_server, resolve_binding
 
 
@@ -111,7 +112,7 @@ def test_the_plan_is_proposed_before_there_is_an_organization_and_applied_after_
     monkeypatch.chdir(tmp_path)
     binding = OrgBinding(tmp_path / "org", None, pinned=True)
     server = cast(FastMCP, wire_mcp_server.server_factory(binding).build(ROOT))
-    blueprint = call(server, "blueprint_example", kind="research")
+    blueprint = with_user_words(call(server, "blueprint_example", kind="research"))
     proposal = call(server, "propose_org", blueprint=blueprint)
     assert "PLAN FOR YOU" in proposal and f"Target organization: {tmp_path / 'org'} (none yet:" in proposal
     plan_id = next(line.split(": ", 1)[1] for line in proposal.splitlines() if line.startswith("plan_id: "))

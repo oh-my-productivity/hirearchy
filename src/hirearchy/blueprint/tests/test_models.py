@@ -9,7 +9,7 @@ import testkit
 import yaml
 from testkit.blueprint_world import ex
 from testkit.reach.hirearchy.core import DEFAULT_MODEL, Org
-from testkit.blueprint_world import kiro_runner
+from testkit.blueprint_world import kiro_runner, with_user_words
 
 from testkit.blueprint_world import bpm
 
@@ -64,11 +64,11 @@ def test_a_tier_missing_from_needs_models_uses_the_orgs_default_model(research, 
 def test_the_default_policy_is_single_model_and_raises_no_warning(research, tmp_path):
     found = bpm.validate(research, allowed_roots=[tmp_path])
     assert not bpm.errors(found)
-    assert codes(found) - {"criterion-source", "criterion-words"} <= {"path-delivery"}  # only the delivery note of the example; nothing about models
+    assert codes(found) <= {"path-delivery"}  # only the delivery note of the example; nothing about models
     unmapped = copy.deepcopy(research)
     unmapped["needs"].pop("models")
     unmapped["needs"].pop("model_policy")
-    assert not codes(bpm.validate(unmapped, allowed_roots=[tmp_path])) - {"path-delivery", "criterion-source", "criterion-words"}
+    assert not codes(bpm.validate(unmapped, allowed_roots=[tmp_path])) - {"path-delivery"}
     assert set(models_of(research, tmp_path).values()) == {DEFAULT_MODEL}
 
 
@@ -126,9 +126,9 @@ def test_apply_pins_the_resolved_model_in_the_charters(research, tmp_path):
 def fill(text: str, base: Path) -> str:
     for n in ("docs", "data", "proj", "deliverables"):
         (base / n).mkdir(exist_ok=True)
-    return (text.replace("<folder-with-your-files>", "docs").replace("<folder-with-your-data>", "data")
-            .replace("<project-folder>", "proj").replace("<name>", "briefs").replace("<service-name>", "my-service")
-            .replace("<input-name>", "topic"))
+    return with_user_words(text.replace("<folder-with-your-files>", "docs").replace("<folder-with-your-data>", "data")
+                           .replace("<project-folder>", "proj").replace("<name>", "briefs").replace("<service-name>", "my-service")
+                           .replace("<input-name>", "topic"))
 
 
 @pytest.mark.parametrize("service", [False, True])

@@ -19,6 +19,7 @@ mission: >
 needs:
   kind: writing
   scope: "<What the document covers and what it leaves out, in the user's words.>"
+  elicitation: <THE USER'S ANSWERS, VERBATIM>   # what the user said, verbatim; every `from:` below is a quote of it
   inputs:                          # read-only folders with the user's files; the team can read them, never change them
     - <CWD>/<folder-with-your-files>
   quality_bar: Every statement comes from the input files; where the files disagree or are silent, the document says so.
@@ -55,10 +56,15 @@ services:                          # work the lead offers again and again; each 
         description: <What the requester gives>
         required: true             # false = optional
     acceptance:                    # the contract: exact and checkable; only the user can change it, the lead can never lower it
-      - Covers <the topic of the request> and nothing else.
-      - At most 1500 words as counted by read.
-      - Every statement is traceable to a named input file, and gaps or conflicts between files are listed in a final section titled "Open questions".
-      - "Every statement is checked against its named input file in the reviewer's report, and the writer applied every required change."
+      # each criterion: text, and from: <the user's exact words> (asked: <your question>) or default: true (your proposal); put their answers, verbatim, in needs.elicitation
+      - text: Covers <the topic of the request> and nothing else.
+        from: <THE USER'S EXACT WORDS>
+      - text: At most 1500 words as counted by read.
+        default: true
+      - text: Every statement is traceable to a named input file, and gaps or conflicts between files are listed in a final section titled "Open questions".
+        default: true
+      - text: "Every statement is checked against its named input file in the reviewer's report, and the writer applied every required change."
+        default: true
     deliverable:
       description: <What one request produces, e.g. one markdown section for the topic>
       format: markdown

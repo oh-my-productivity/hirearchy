@@ -224,3 +224,9 @@ def server_of_the_environment():
 def without_source_lines(text: str) -> list[str]:
     """The lines of a plan without the source line under each criterion: the compactness of the block is counted on the rest."""
     return [line for line in text.splitlines() if not SOURCE_LINE.match(line)]
+
+
+def with_user_words(text: str) -> str:
+    """A template with the placeholders for the user's words filled in, as the assistant does (design 11.3): the quotes of the criteria and
+    ``needs.elicitation`` read ``Sample text``, so every quote is in the recorded words."""
+    return text.replace("<THE USER'S EXACT WORDS>", "Sample text").replace("<THE USER'S ANSWERS, VERBATIM>", "Sample text")
