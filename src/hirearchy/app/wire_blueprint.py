@@ -25,7 +25,6 @@ from ..blueprint._assembly import PlanParts, applier_over, plan_parts
 from ..blueprint._budgeting import BudgetPlanner
 from ..blueprint._examples import TemplateBlueprintExamples
 from ..blueprint._extension_org import Reads
-from ..blueprint._fingerprint import OrgFingerprint
 from ..blueprint._files import FsTextFiles
 from ..blueprint._loader import YamlBlueprintLoader
 from ..blueprint._org import NoOrgContext, PresentOrAbsentOrg, RuntimeOrgContext
@@ -129,8 +128,7 @@ def _reads(b: Builder) -> Reads:
 def _plan(b: Builder) -> PlanParts:
     c = _checking(b)
     return plan_parts(
-        b.get(BlueprintLoader), b.get(BlueprintValidator), c.resolver, c.roots, c.budgets, c.access, b.get(ContractNormalizer), c.org,
-        OrgFingerprint(_reads(b)),
+        b.get(BlueprintLoader), b.get(BlueprintValidator), c.resolver, c.roots, c.budgets, c.access, b.get(ContractNormalizer), c.org, _reads(b),
     )
 
 

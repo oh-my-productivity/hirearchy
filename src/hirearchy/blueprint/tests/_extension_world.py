@@ -15,7 +15,14 @@ from hirearchy.blueprint._org import RuntimeOrgContext
 from hirearchy.blueprint._pathcheck import RootedPathChecker
 from hirearchy.blueprint._resolver import AgentResolver
 from hirearchy.blueprint._roots import EnvironmentWorkspaceRoots
+from hirearchy.blueprint._access import PolicyAccessReport
+from hirearchy.blueprint._accesswords import PlainAccessWords
 from hirearchy.blueprint._budgeting import BudgetPlanner
+from hirearchy.blueprint._charters import CharterWriter
+from hirearchy.blueprint._extension_plan import TextExtensionPlan
+from hirearchy.blueprint._fingerprint import OrgFingerprint
+from hirearchy.blueprint._identity import HashPlanIdentity
+from hirearchy.blueprint._words import ServiceWords
 from hirearchy.blueprint._service_rules import ServiceBlueprintRules
 from hirearchy.blueprint._shapes import RootTask
 from hirearchy.blueprint.testing import ScriptedContinuedCriteria, ScriptedRootTasks
@@ -37,10 +44,25 @@ class World:
     org: Org
     tmp: Path
     resolver: ExtensionResolver
+    reads: Reads | None = None
+
+    def planner(self) -> TextExtensionPlan:
+        """The plan text of an extension over this organization (and the one-off tasks of ``using``)."""
+        reads, rt = self.reads or reads_of(self.org), self.org.runtime
+        fingerprint = OrgFingerprint(reads)
+        return TextExtensionPlan(
+            self.resolver, reads, PlainAccessWords(PolicyAccessReport(rt.confinement_policy)), ServiceWords(rt.contract_normalizer), CharterWriter(),
+            HashPlanIdentity(fingerprint), fingerprint,
+        )
+
+    def plan(self, bp: dict[str, object], *, require_sources: bool = False) -> str:
+        """The block for the user of ``bp``, with the temporary directory written ``<TMP>``."""
+        return self.planner().plan(bp, allowed_roots=[self.tmp], require_sources=require_sources).block.replace(str(self.tmp), "<TMP>")
 
     def using(self, tasks: list[RootTask] | None = None, continued: dict[tuple[str, str], list[str]] | None = None) -> World:
         """The same organization with these one-off tasks of root and these retired copies to continue."""
-        return replace(self, resolver=ExtensionResolver(reads_of(self.org, tasks, continued)))
+        reads = reads_of(self.org, tasks, continued)
+        return replace(self, resolver=ExtensionResolver(reads), reads=reads)
 
     def issues(self, bp: dict[str, object], *, level: str | None = None) -> list[Issue]:
         found = self.resolver.resolve(bp, allowed_roots=[self.tmp]).issues

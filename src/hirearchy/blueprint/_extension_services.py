@@ -252,14 +252,16 @@ def charter_lines(
     return added, removed
 
 
-def checkers_of(reads: Reads, agents: Sequence[Agent], added_service_names: Mapping[str, Sequence[str]]) -> list[AddedChecker]:
-    """The verifiers added under an agent that offers services (those it has, and those this extension adds)."""
+def checkers_of(
+    reads: Reads, agents: Sequence[Agent], added_service_names: Mapping[str, Sequence[str]], retiring: Collection[tuple[str, str]] = (),
+) -> list[AddedChecker]:
+    """The verifiers added under an agent that offers services (those it has, and those this extension adds; not those it retires)."""
     found: list[AddedChecker] = []
     for a in agents:
         owner = a.parent
         if a.kind != "verifier" or owner is None or not reads.agents.exists(owner):
             continue
-        names = tuple(dict.fromkeys([*reads.services.service_names(owner), *added_service_names.get(owner, ())]))
+        names = tuple(n for n in dict.fromkeys([*reads.services.service_names(owner), *added_service_names.get(owner, ())]) if (owner, n) not in retiring)
         if names:
             found.append(AddedChecker(a.addr, owner, names))
     return found

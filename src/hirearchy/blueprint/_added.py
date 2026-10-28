@@ -47,3 +47,13 @@ def holds_line(body: str, line: str) -> bool:
 
 def keys(lines: Sequence[str]) -> list[str]:
     return [line_key(x) for x in lines]
+
+
+CHECKER_LINE = "{agent} ({role}) was added to your team to check {services}{why}"
+
+
+def checker_line(agent: str, role: str, services: Sequence[str], extra: str) -> str:
+    """The line an extension adds to the charter of the agent a new verifier joins (design 5.5 step 4): who joined, and what for (the first sentence of
+    the verifier's own instructions, when it has any)."""
+    first = re.split(r"(?<=[.!?])\s", " ".join(extra.split()), maxsplit=1)[0] if extra.strip() else ""
+    return CHECKER_LINE.format(agent=agent, role=role, services=", ".join(services), why=f": {first}" if first else ".")

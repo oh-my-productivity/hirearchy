@@ -158,3 +158,12 @@ class Extension:
     checkers: list[AddedChecker] = field(default_factory=list)
     teams: dict[str, list[Agent]] = field(default_factory=dict)  # owner -> its team after the extension (the agents that stay, then the added ones)
     cap: int | None = None  # needs.budget_runs
+
+
+@dataclass(frozen=True)
+class ExtensionText:
+    """The plan of an extension as text: the block for the user, the details for the assistant, and the problems both came from."""
+
+    block: str
+    details: str
+    issues: list[Issue]

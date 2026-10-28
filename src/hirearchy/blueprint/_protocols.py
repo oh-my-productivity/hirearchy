@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Protocol, runtime_checkable
 
 from ..kernel import JsonObject, Message
-from ._shapes import AccessFacts, Built, Estimate, Extension, RootTask, Split
+from ._shapes import AccessFacts, Built, Estimate, Extension, ExtensionText, RootTask, Split
 from .api import Agent, Issue
 
 
@@ -170,6 +170,11 @@ class Charters(Protocol):
         """The charter of an agent: its template, then the assignment from the approved plan, then the additional instructions."""
         ...
 
+    def extension_charter(self, a: Agent, team: Sequence[Agent], plan_id: str, extra: str) -> str:
+        """The charter of an agent an extension adds (design 5.5 step 4): its template, then the assignment from the user's change ``plan_id``
+        (``team``: the agents the change adds below it), then ``extra`` (the entry's ``charter_extra``) as additional instructions."""
+        ...
+
 
 @runtime_checkable
 class PlaybookWriting(Protocol):
@@ -261,4 +266,12 @@ class Fingerprinting(Protocol):
         """The parts of the organization the extension ``bp`` depends on, as canonical text (design 5.4): for each agent it names, what it holds and who
         reports to it; whether each address it creates is free; for each service it names, the versions of its contract and playbook and its budget;
         the depth. Equal while none of them changes. ``BlueprintError`` when the organization cannot be read. Reads only."""
+        ...
+
+
+@runtime_checkable
+class ExtensionPlanning(Protocol):
+    def plan(self, bp: Mapping[str, object], *, allowed_roots: Sequence[str | Path] | None = None, require_sources: bool = False) -> ExtensionText:
+        """The plan of the extension ``bp`` as text (design 5.3): the block headed ``PLAN FOR YOU (a change to your organization)`` (headed as a draft when
+        there are errors), the details for the assistant, and the issues. Writes nothing."""
         ...

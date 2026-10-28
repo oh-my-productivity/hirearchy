@@ -68,3 +68,22 @@ class CharterWriter(Charters):
         if a.extra:
             parts.append(("## Additional instructions\n" if a.template else "") + a.extra)
         return "\n\n".join(parts)
+
+    def extension_charter(self, a: Agent, team: Sequence[Agent], plan_id: str, extra: str) -> str:
+        """Its template (or the charter text the entry gave), then the assignment from the user's change, then the additional instructions."""
+        parts = [a.template.body if a.template else a.extra]
+        asg = [f"## Assignment (from the user's change {plan_id})", f"Reports to: {a.parent or 'root (the human)'}"]
+        if a.workspace:
+            asg.append(f"Workspace: {a.workspace}. Everything you read, write or run outside hirearchy stays inside it; nothing else on the machine, and nothing under ~/.kiro or the organization directory. Relative paths in kiro tools resolve there; your org files (MEMORY.md, work/) are written with hirearchy `write`, never into the workspace.")
+        if a.inputs:
+            asg.append(f"Read-only inputs: {', '.join(a.inputs)}. Read them (kiro `read`, or hirearchy `read` by absolute path); never create, edit or delete anything there.")
+        if "shell" in a.tools:
+            asg.append("shell is not confined by the runtime: keep every command inside your workspace, and never write to the inputs, the organization directory or anywhere else.")
+        if a.children:
+            asg.append("Your team (fixed by the change; you cannot change it):")
+            by = {x.addr: x for x in team}
+            asg += [f"- {c}: {by[c].role} ({by[c].kind}; tools: {', '.join(by[c].tools) or 'none'}; model: {by[c].model})" for c in a.children if c in by]
+        parts.append("\n".join(asg))
+        if extra.strip():
+            parts.append("## Additional instructions\n" + extra.strip())
+        return "\n\n".join(p for p in parts if p)

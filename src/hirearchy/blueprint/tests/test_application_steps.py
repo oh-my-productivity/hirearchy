@@ -35,6 +35,9 @@ class FixedCharters:
     def charter(self, a: Agent, agents: object, bp: object, split: object) -> str:
         return f"charter of {a.addr}"
 
+    def extension_charter(self, a: Agent, team: object, plan_id: str, extra: str) -> str:
+        return f"charter of {a.addr} from {plan_id}"
+
 
 def agent(addr: str, **over: object) -> Agent:
     name = addr.rsplit("/", 1)[-1]

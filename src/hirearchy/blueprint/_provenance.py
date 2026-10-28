@@ -39,6 +39,8 @@ NO_RECORD = (
 FROM_LINE = 'from your words "{quote}"{asked}; words I added: {added}'
 ASKED_LINE = ' (my question: "{asked}")'
 DEFAULT_LINE = "my default: you did not say this"
+TASKS_LINE = "my wording, from the one-off tasks I sent for you ({dates}); you accepted those deliveries"
+TASKS_LINE_NO_DATES = "my wording, from the one-off tasks I sent for you; you accepted those deliveries"
 UNRECORDED_LINE = "my wording: your words for it were not recorded"
 BAD_ELICITATION = "needs.elicitation is the user's answers, verbatim: a text of 1 to " + str(ELICITATION_MAX) + " characters."
 
@@ -74,10 +76,12 @@ def _form_problem(c: Mapping[str, object], i: int, extension: bool) -> str | Non
     return None
 
 
-def source_line(entry: object) -> str:
-    """The line the gate shows under a criterion (design 10.1 step 4): the user's words it rests on and the words root added, root's default, or
-    that its source was not recorded. ``entry`` is the criterion as written (a string or a mapping)."""
+def source_line(entry: object, dates: str = "") -> str:
+    """The line the gate shows under a criterion (design 10.1 step 4): the user's words it rests on and the words root added, root's default, the
+    one-off tasks it was copied from (``dates``: when root sent them), or that its source was not recorded. ``entry`` is the criterion as written."""
     if isinstance(entry, dict):
+        if "from_tasks" in entry and not any(k in entry for k in ("from", "default")):
+            return TASKS_LINE.format(dates=dates) if dates else TASKS_LINE_NO_DATES
         quote = entry.get("from")
         if isinstance(quote, str) and quote.strip():
             asked = entry.get("asked")

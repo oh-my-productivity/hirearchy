@@ -48,3 +48,21 @@ def test_a_template_charter_comes_first_and_the_extra_text_gets_a_heading() -> N
     a = Agent(addr="w", name="w", parent=None, where="agents[w]", role="Writer", template=template, extra="Extra.", model="m")
     text = CharterWriter().charter(a, [a], {"mission": "M"}, {"w": {"grant": 1, "keeps": 1}})
     assert text.startswith("You write.\n\n## Assignment (from the approved plan)\nMission: M") and text.endswith("\n\n## Additional instructions\nExtra.")
+
+
+def test_the_extension_charter_has_the_users_change_heading() -> None:
+    reviewer = Agent("lead/checker", "checker", "lead", "extend.add_agents[0]", role="Independent Reviewer", template=role("reviewer", title="Independent Reviewer", kind="verifier", body="# Role: Reviewer"),
+                     kind="verifier", tools=["read"], inputs=["/data/in"])
+    text = CharterWriter().extension_charter(reviewer, [], "abc123def456", "Check every date.")
+    assert text == (
+        "# Role: Reviewer\n\n## Assignment (from the user's change abc123def456)\nReports to: lead\n"
+        "Read-only inputs: /data/in. Read them (kiro `read`, or hirearchy `read` by absolute path); never create, edit or delete anything there.\n\n"
+        "## Additional instructions\nCheck every date."
+    )
+    lead = Agent("team", "team", None, "extend.add_agents[0]", role="Lead", template=role("manager", title="Manager", kind="manager", body="# Role: Manager"), kind="manager",
+                 children=["team/a"])
+    worker = Agent("team/a", "a", "team", "extend.add_agents[0]", role="Writer", kind="author", tools=["write"], model="claude-sonnet-5.5")
+    body = CharterWriter().extension_charter(lead, [worker], "p1", "")
+    assert "Reports to: root (the human)" in body and "- team/a: Writer (author; tools: write; model: claude-sonnet-5.5)" in body and "Additional" not in body
+    custom = Agent("solo", "solo", None, "w", role="Solo", extra="You work alone.", kind="author")
+    assert CharterWriter().extension_charter(custom, [], "p2", "").startswith("You work alone.\n\n## Assignment (from the user's change p2)")

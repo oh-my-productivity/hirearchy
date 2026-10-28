@@ -17,6 +17,10 @@ from ._applier import HiringBlueprintApplier
 from ._basis import ValidatedPlanBasis
 from ._charters import CharterWriter
 from ._details import TextPlanDetails
+from ._extension import ExtensionResolver
+from ._extension_org import Reads
+from ._extension_plan import TextExtensionPlan
+from ._fingerprint import OrgFingerprint
 from ._firsttask import FirstTaskGiver
 from ._identity import HashPlanIdentity
 from ._playbooks import StepsPlaybookWriter
@@ -26,7 +30,6 @@ from ._protocols import (
     AgentResolution,
     BudgetPlanning,
     Charters,
-    Fingerprinting,
     OrgContext,
     PlanBasis,
     PlaybookWriting,
@@ -57,16 +60,21 @@ class PlanParts:
 
 def plan_parts(
     loader: BlueprintLoader, validator: BlueprintValidator, resolver: AgentResolution, roots: WorkspaceRoots, budgets: BudgetPlanning,
-    access: AccessReport, normalizer: ContractNormalizer, org: OrgContext, fingerprint: Fingerprinting | None = None,
+    access: AccessReport, normalizer: ContractNormalizer, org: OrgContext, reads: Reads | None = None,
 ) -> PlanParts:
-    """The plan side of the package over the given parts: the one place that says how its classes are put together. ``fingerprint``: the organization an
-    extension is planned against (without it an extension's plan id covers the blueprint only)."""
+    """The plan side of the package over the given parts: the one place that says how its classes are put together. ``reads``: what the rules of an
+    extension read the organization through (without it a plan is for a full blueprint only, and an extension's plan id covers the blueprint alone)."""
     basis = ValidatedPlanBasis(validator, resolver, roots, org)
+    fingerprint = OrgFingerprint(reads) if reads is not None else None
     words, playbooks, identity = ServiceWords(normalizer), StepsPlaybookWriter(budgets), HashPlanIdentity(fingerprint)
-    access_words = PlainAccessWords(access)
+    access_words, charters = PlainAccessWords(access), CharterWriter()
     details = TextPlanDetails(basis, budgets, access, playbooks, words)
-    renderer = TextPlanRenderer(loader, basis, details, TextUserPlan(basis, budgets, access_words, words, org), identity)
-    return PlanParts(basis, words, playbooks, CharterWriter(), access_words, identity, renderer)
+    extensions = (
+        TextExtensionPlan(ExtensionResolver(reads), reads, access_words, words, charters, identity, fingerprint)
+        if reads is not None and fingerprint is not None else None
+    )
+    renderer = TextPlanRenderer(loader, basis, details, TextUserPlan(basis, budgets, access_words, words, org), identity, extensions)
+    return PlanParts(basis, words, playbooks, charters, access_words, identity, renderer)
 
 
 def applier_over(

@@ -65,7 +65,8 @@ class ExtensionResolver(ExtensionResolution):
         ext.service_retires = retired_services(reads, sections["retire_services"], ext.issues)
         ext.budgets = rebudgeted(reads, sections["budgets"], ext.teams, ext.cap, {(r.owner, r.service) for r in ext.service_retires}, ext.issues)
         ext.lines, ext.removals = charter_lines(reads, sections["add_charter_lines"], sections["remove_charter_lines"], ext.issues)
-        ext.checkers = checkers_of(reads, ext.agents, {o: [sv.name for sv in ext.services if sv.owner == o] for o in ext.teams})
+        ext.checkers = checkers_of(reads, ext.agents, {o: [sv.name for sv in ext.services if sv.owner == o] for o in ext.teams},
+                                   {(r.owner, r.service) for r in ext.service_retires})
         ext.issues += self._provenance(view, sections["add_services"], require_sources)
         self._lowers(ext, sections["retire"])
         return ext
