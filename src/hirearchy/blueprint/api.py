@@ -53,6 +53,7 @@ __all__ = [
     "SummaryText",
     "WorkspaceProvisioner",
     "errors",
+    "is_verifier",
 ]
 
 EXAMPLE_KINDS = ("research", "documents", "code", "analysis")  # the kinds of ready-to-edit blueprint templates
@@ -138,6 +139,23 @@ class RoleLibrary(Protocol):
     def get_role(self, name: str) -> Role | None:
         """The template ``name``; None when the name is not a valid agent name or there is no such template."""
         ...
+
+
+def is_verifier(meta: Mapping[str, object], roles: RoleLibrary) -> bool:
+    """Whether the agent whose AGENT.md frontmatter is ``meta`` is a verifier (a check): its stored ``kind`` is ``verifier``; an agent with no
+    ``kind`` key (one from before Phase 2, or one an agent hired without a template) is a verifier when its ``role`` is the ``title`` of a
+    template whose ``kind`` is ``verifier``. Any other agent is not. Pure: the one definition the extension rules, the labels and the signals use."""
+    kind = meta.get("kind")
+    if kind is not None:
+        return kind == "verifier"
+    title = meta.get("role")
+    if not isinstance(title, str) or not title:
+        return False
+    for name in roles.role_names():
+        template = roles.get_role(name)
+        if template is not None and template.kind == "verifier" and template.title == title:
+            return True
+    return False
 
 
 @runtime_checkable
