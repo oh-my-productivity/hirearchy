@@ -344,3 +344,19 @@ class ServiceFailures:
     criteria: Mapping[str, str]
     owner_facts: OwnerFacts
     taken: tuple[TakenFix, ...] = ()
+
+
+@dataclass(frozen=True)
+class EffectFacts:
+    """What the files show after the last brief (4.5, "effect of an item"): the services defined by an extension (``owner/name``), the owners that got a checker from one, the
+    ``agent|line_key`` of the lines in the added sections, the leads that got a worker, the retired agents, the agents whose runs were taken back, the criteria settled
+    (``service/C``) and the rejections answered."""
+
+    services: frozenset[str] = frozenset()
+    checkers: frozenset[str] = frozenset()
+    lines: frozenset[str] = frozenset()
+    workers: frozenset[str] = frozenset()
+    retired: frozenset[str] = frozenset()
+    reclaimed: frozenset[str] = frozenset()
+    clarified: frozenset[str] = frozenset()
+    answered: frozenset[str] = frozenset()
