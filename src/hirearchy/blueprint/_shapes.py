@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from datetime import datetime
 from pathlib import Path
 from typing import TypedDict
 
+from ..kernel import JsonObject
 from .api import Agent, Issue
 
 AgentRuns = TypedDict("AgentRuns", {"pass": int, "rework": int, "total": int})  # ``pass`` is a keyword: the functional form
@@ -84,6 +86,59 @@ class Retiring:
     team: tuple[str, ...]  # the agent and everything below it, the agent first
 
 
+@dataclass(frozen=True)
+class AddedService:
+    """A service an extension defines for an existing top-level agent."""
+
+    owner: str
+    name: str
+    entry: JsonObject  # the entry as written (its criteria in their forms)
+    where: str  # issue path
+    budget: int  # runs per request, resolved against the owner's team after the extension
+    continues: tuple[str, ...] | None = None  # the criteria of the retired copy the definition continues; None: a new service
+
+
+@dataclass(frozen=True)
+class BudgetChange:
+    owner: str
+    service: str
+    budget: int
+    was: int
+
+
+@dataclass(frozen=True)
+class ServiceRetire:
+    owner: str
+    service: str
+    reason: str
+
+
+@dataclass(frozen=True)
+class CharterLine:
+    """A line an extension adds to (or takes out of) the added section of an agent's charter."""
+
+    agent: str
+    line: str
+
+
+@dataclass(frozen=True)
+class AddedChecker:
+    """A verifier an extension adds under an agent that offers services: the agent is told, and gets a line about it."""
+
+    agent: str  # the verifier's address
+    owner: str  # the agent that offers the services
+    services: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class RootTask:
+    """A one-off task of root as a criterion may be copied from it (design 5.2 ``criterion-tasks``)."""
+
+    id: str
+    created: datetime | None
+    criteria: tuple[str, ...]  # the lines of its ``## Acceptance criteria`` section
+
+
 @dataclass
 class Extension:
     """An extension blueprint read against the organization (design 5.2): its problems, and what its entries mean once they are valid."""
@@ -95,3 +150,11 @@ class Extension:
     limits: list[LimitChange] = field(default_factory=list)
     depth: DepthChange | None = None
     retires: list[Retiring] = field(default_factory=list)
+    services: list[AddedService] = field(default_factory=list)
+    budgets: list[BudgetChange] = field(default_factory=list)
+    service_retires: list[ServiceRetire] = field(default_factory=list)
+    lines: list[CharterLine] = field(default_factory=list)  # added to the added section, in the order written
+    removals: list[CharterLine] = field(default_factory=list)
+    checkers: list[AddedChecker] = field(default_factory=list)
+    teams: dict[str, list[Agent]] = field(default_factory=dict)  # owner -> its team after the extension (the agents that stay, then the added ones)
+    cap: int | None = None  # needs.budget_runs

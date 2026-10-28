@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -10,10 +11,11 @@ import testkit
 import yaml
 
 from hirearchy.blueprint._firsttask import FirstTaskGiver
-from hirearchy.blueprint._provenance import NO_RECORD, criterion_issues
+from hirearchy.blueprint._provenance import NO_RECORD, criterion_issues, task_copy_issues
+from hirearchy.blueprint._shapes import RootTask
 from hirearchy.blueprint._view import NEEDS_KEYS, criteria_of, svc_criteria
 from hirearchy.blueprint.api import Agent, Issue
-from hirearchy.blueprint.testing import CallLog, RecordingServiceCommands, RecordingTaskAssigner
+from hirearchy.blueprint.testing import CallLog, RecordingServiceCommands, RecordingTaskAssigner, ScriptedRootTasks
 from testkit.blueprint_world import bpm
 
 WORDS = "Use the words from the notes. Owners: initials."
@@ -256,3 +258,34 @@ def test_require_sources_turns_criterion_source_and_criterion_words_into_errors(
     assert {i.level for i in lenient} == {"warning"}  # (the same issues at the terminal)
     assert [i.level for i in bpm.validate(bp, require_sources=True) if i.code.startswith("criterion-")] == ["error", "error"]
     assert [i.level for i in bpm.validate(bp) if i.code.startswith("criterion-")] == ["warning", "warning"]
+
+
+# ------------------------------------------------------------------------------------------- criterion-tasks (design 5.2, 10.1; extension only)
+
+ONE_OFF = RootTask("20261101T100000000001-a", datetime(2026, 11, 1, tzinfo=timezone.utc), ("- Every row has a date.", "2. At most 3 pages."))
+OTHER = RootTask("20261102T100000000001-b", datetime(2026, 11, 2, tzinfo=timezone.utc), ("- Owners are named in full.",))
+
+
+def copying(*criteria: object, tasks: tuple[RootTask, ...] = (ONE_OFF, OTHER)) -> list[Issue]:
+    return task_copy_issues(serviced(*criteria, elicitation=None), ScriptedRootTasks(tasks))
+
+
+def test_from_tasks_names_root_one_off_case_heads_and_copies_one_of_their_lines() -> None:
+    assert copying({"text": "Every row has a date.", "from_tasks": [ONE_OFF.id]}) == []
+    assert copying({"text": "at most 3 pages", "from_tasks": [ONE_OFF.id, OTHER.id]}) == []  # by line_key, in any of the named tasks
+    assert copying({"text": "Owners are named in full.", "from_tasks": [ONE_OFF.id, OTHER.id]}) == []
+    wrong_task = copying({"text": "Every row has a date.", "from_tasks": ["not-a-task"]})
+    assert [(i.code, i.level) for i in wrong_task] == [("criterion-tasks", "error")] and "not-a-task is not a one-off task of root" in wrong_task[0].message
+    not_a_copy = copying({"text": "Every row has a date and a source.", "from_tasks": [ONE_OFF.id]})
+    assert [(i.code, i.level) for i in not_a_copy] == [("criterion-tasks", "error")] and "copy a line of one of those tasks exactly" in not_a_copy[0].message
+    assert not_a_copy[0].path == "services[brief].acceptance[1]"
+    assert copying({"text": "Owners are named in full.", "from_tasks": [ONE_OFF.id]})[0].code == "criterion-tasks"  # the line is in the other task only
+    assert copying("a plain string", {"text": "x", "default": True}) == []  # criteria that name no task are not read
+
+
+def test_an_extension_with_only_from_tasks_criteria_needs_no_elicitation() -> None:
+    bp = serviced({"text": "Every row has a date.", "from_tasks": [ONE_OFF.id]}, elicitation=None)
+    assert criterion_issues(bp, extension=True, require_sources=True) == []
+    mixed = serviced({"text": "Every row has a date.", "from_tasks": [ONE_OFF.id]}, {"text": "Short.", "default": True}, elicitation=None)
+    assert [i.code for i in criterion_issues(mixed, extension=True, require_sources=True)] == ["criterion-words"]
+    assert [i.code for i in criterion_issues(bp, extension=False, require_sources=True)] == ["criterion-form"]  # a full blueprint cannot copy tasks

@@ -8,7 +8,8 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 
-from ..services import added_words, listed_added_words
+from ..services import added_words, line_key, listed_added_words
+from ._protocols import RootTasks
 from ._view import mapping_or_empty, needs_of, s, services_of
 from .api import Issue
 
@@ -134,4 +135,28 @@ def criterion_issues(bp: Mapping[str, object], *, extension: bool, require_sourc
                 issues.append(Issue(level, f"{where}[{i}]", NO_SOURCE.format(i=i), "criterion-source"))
     if sourced and words == "":
         issues.append(Issue(level, "needs.elicitation", NO_RECORD, "criterion-words"))
+    return issues
+
+
+NOT_A_ONE_OFF = "criterion {i}: {id} is not a one-off task of root (a task root sent without a service that does not rework another)."
+NOT_A_COPY = "criterion {i}: its text is not a line of the acceptance criteria of {ids}: copy a line of one of those tasks exactly."
+
+
+def task_copy_issues(bp: Mapping[str, object], tasks: RootTasks) -> list[Issue]:
+    """``criterion-tasks`` (design 5.2): every ``from_tasks`` id of a service's criterion is a one-off task of root, and the criterion's text is a line
+    of the acceptance criteria of at least one of them (a refusal: the runtime checks the copy)."""
+    issues: list[Issue] = []
+    for n, sv in enumerate(services_of(bp)):
+        criteria = sv.get("acceptance")
+        for i, c in enumerate(criteria if isinstance(criteria, list) else [], 1):
+            ids = c.get("from_tasks") if isinstance(c, dict) else None
+            if not isinstance(ids, list) or not ids:
+                continue
+            where = f"services[{s(sv.get('name')) or n}].acceptance[{i}]"
+            found = [(x, tasks.task(s(x))) for x in ids]
+            missing = [x for x, task in found if task is None]
+            if missing:
+                issues += [Issue("error", where, NOT_A_ONE_OFF.format(i=i, id=s(x)), "criterion-tasks") for x in missing]
+            elif line_key(s(c.get("text"))) not in {line_key(line) for _, task in found if task is not None for line in task.criteria}:
+                issues.append(Issue("error", where, NOT_A_COPY.format(i=i, ids=", ".join(s(x) for x in ids)), "criterion-tasks"))
     return issues

@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Protocol, runtime_checkable
 
 from ..kernel import JsonObject, Message
-from ._shapes import AccessFacts, Built, Estimate, Extension, Split
+from ._shapes import AccessFacts, Built, Estimate, Extension, RootTask, Split
 from .api import Agent, Issue
 
 
@@ -236,4 +236,20 @@ class ExtensionResolution(Protocol):
     def resolve(self, bp: Mapping[str, object], *, allowed_roots: Sequence[str | Path] | None = None, require_sources: bool = False) -> Extension:
         """The extension blueprint ``bp`` read against the organization as it is now (design 5.2): its problems (``Extension.issues``, with the codes
         of 5.2) and, when it is valid, what its entries mean. ``require_sources``: see ``BlueprintValidator.validate``. Writes nothing."""
+        ...
+
+
+@runtime_checkable
+class RootTasks(Protocol):
+    def task(self, task_id: str) -> RootTask | None:
+        """Root's one-off task ``task_id`` (a task root sent without a ``service:`` that does not revise another: the head of a case), with its time
+        and the lines of its ``## Acceptance criteria`` section; None for any other message or an id that is none."""
+        ...
+
+
+@runtime_checkable
+class ContinuedCriteria(Protocol):
+    def criteria(self, owner: str, name: str) -> tuple[str, ...] | None:
+        """The acceptance criteria of the retired copy that defining ``owner``'s service ``name`` again would continue (the newest copy, when a
+        request of it has a result of any status), in the copy's order; None when the definition would start a new service."""
         ...

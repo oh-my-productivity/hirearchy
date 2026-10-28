@@ -9,10 +9,12 @@ from ..kernel import ROOT, norm
 from ._extension_agents import added_agents
 from ._extension_changes import limits_of, retires_of
 from ._extension_form import form_issues
-from ._extension_org import Reads, as_int, read_held
+from ._extension_org import Reads, as_int, read_held, retargeted
+from ._extension_services import added_services, cap_issue, charter_lines, checkers_of, rebudgeted, retired_services, team_of, team_owners
 from ._protocols import ExtensionResolution
+from ._provenance import criterion_issues, task_copy_issues
 from ._shapes import Extension
-from ._view import s
+from ._view import needs_of, s
 from .api import Issue
 
 EXTEND_NONE = (
@@ -41,7 +43,10 @@ class ExtensionResolver(ExtensionResolution):
         assert isinstance(extend, Mapping)
         ext.reason = s(bp.get("reason"))
         cfg = reads.org.config()
-        sections = {name: [(i, e) for i, e in enumerate(extend.get(name) or []) if isinstance(e, Mapping)] for name in NAMING_SECTIONS | {"retire": ""}}
+        needs = needs_of(bp)
+        sections = {name: [(i, e) for i, e in enumerate(extend.get(name) or []) if isinstance(e, Mapping)] for name in (*NAMING_SECTIONS, "retire")}
+        ext.cap = cap_issue(needs, ext.issues)
+        roots = reads.roots.roots(allowed_roots)
         ext.limits, ext.depth = limits_of(reads, sections["limits"], ext.issues)
         max_depth = ext.depth.value if ext.depth is not None else as_int(cfg.get("max_depth"), 4)
         ext.agents, ext.extras = added_agents(
@@ -51,8 +56,25 @@ class ExtensionResolver(ExtensionResolution):
             norm(s(e.get(key))): f"extend.{section}[{i}]" for section, key in NAMING_SECTIONS.items() for i, e in sections[section] if norm(s(e.get(key))) != ROOT
         }
         ext.retires = retires_of(reads, sections["retire"], named, ext.issues)
+        gone = {a for r in ext.retires for a in r.team}
+        view: dict[str, object] = {"needs": needs, "services": [dict(e) for _, e in sections["add_services"]]}
+        owners = [o for o in team_owners(ext.agents, gone, []) + [norm(s(e.get("owner"))) for _, e in sections["add_services"] + sections["budgets"]]
+                  if o != ROOT and "/" not in o and reads.agents.exists(o)]
+        ext.teams = {o: team_of(reads, o, gone, ext.agents) for o in dict.fromkeys(owners)}
+        ext.services = added_services(reads, sections["add_services"], ext.teams, ext.cap, roots, ext.issues)
+        ext.service_retires = retired_services(reads, sections["retire_services"], ext.issues)
+        ext.budgets = rebudgeted(reads, sections["budgets"], ext.teams, ext.cap, {(r.owner, r.service) for r in ext.service_retires}, ext.issues)
+        ext.lines, ext.removals = charter_lines(reads, sections["add_charter_lines"], sections["remove_charter_lines"], ext.issues)
+        ext.checkers = checkers_of(reads, ext.agents, {o: [sv.name for sv in ext.services if sv.owner == o] for o in ext.teams})
+        ext.issues += self._provenance(view, sections["add_services"], require_sources)
         self._lowers(ext, sections["retire"])
         return ext
+
+    def _provenance(self, view: Mapping[str, object], entries: Sequence[tuple[int, Mapping[str, object]]], require_sources: bool) -> list[Issue]:
+        """The provenance rules of 10.1 for the criteria of the added services, at the paths of their entries."""
+        where = {s(e.get("name")): f"extend.add_services[{i}]" for i, e in entries}
+        found = criterion_issues(view, extension=True, require_sources=require_sources) + task_copy_issues(view, self._reads.tasks)
+        return retargeted(found, where)
 
     def _lowers(self, ext: Extension, entries: Sequence[tuple[int, Mapping[str, object]]]) -> None:
         """``extend-lowers`` (warning): a retire takes away the last verifier of a team that keeps a service."""

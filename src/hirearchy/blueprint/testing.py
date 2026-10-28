@@ -34,7 +34,19 @@ from ._files import FsTextFiles
 from ._loader import YamlBlueprintLoader
 from ._org import NoOrgContext, PresentOrAbsentOrg
 from ._pathcheck import RootedPathChecker
-from ._protocols import AccessReport, AgentResolution, ExtensionResolution, OrgContext, PathChecking, ServiceRules, TextFiles, WorkspaceRoots
+from ._protocols import (
+    AccessReport,
+    AgentResolution,
+    ContinuedCriteria,
+    ExtensionResolution,
+    OrgContext,
+    PathChecking,
+    RootTasks,
+    ServiceRules,
+    TextFiles,
+    WorkspaceRoots,
+)
+from ._shapes import RootTask
 from ._provision import FsWorkspaceProvisioner
 from ._resolver import AgentResolver
 from ._roles import PackagedRoleLibrary
@@ -570,6 +582,35 @@ def validator_over_memory_roles(tmp_path: Path) -> ValidatorHarness:
     return _validator_harness(tmp_path, packaged=False)
 
 
+class ScriptedRootTasks(RootTasks):
+    """Root's one-off tasks as a script: the ones it is given, by id."""
+
+    def __init__(self, tasks: Sequence[RootTask] = ()) -> None:
+        self._tasks = {t.id: t for t in tasks}
+
+    def put(self, task: RootTask) -> None:
+        self._tasks[task.id] = task
+
+    def task(self, task_id: str) -> RootTask | None:
+        return self._tasks.get(task_id)
+
+
+class ScriptedContinuedCriteria(ContinuedCriteria):
+    """The retired copies a definition would continue, as a script: ``(owner, name)`` -> the criteria of the copy."""
+
+    def __init__(self, retired: Mapping[tuple[str, str], Sequence[str]] | None = None) -> None:
+        self._retired = {key: tuple(value) for key, value in (retired or {}).items()}
+
+    def criteria(self, owner: str, name: str) -> tuple[str, ...] | None:
+        return self._retired.get((owner, name))
+
+
+@dataclass(frozen=True)
+class RootTasksHarness:
+    tasks: RootTasks
+    put: Callable[[RootTask], None]  # a one-off task of root with this id, time and criteria lines
+
+
 @dataclass(frozen=True)
 class ExtensionHarness:
     resolver: ExtensionResolution
@@ -580,8 +621,17 @@ def _reads(tmp_path: Path, org: OrgContext, agents: MemoryAgents) -> Reads:
     """What an extension's rules read, over fakes: the agents in a ``MemoryAgents``, the services of a memory services world, the real resolver and roles."""
     environment = DictEnvironment(home=tmp_path, cwd=tmp_path)
     roles = role_library_of(packaged=True)
-    return Reads(org, agents, agents, roles, resolver_over(roles, paths_over(environment)), roots_over(environment, tmp_path / "temp"),
-                 memory_world(tmp_path / "services").catalog)
+    paths, budgets = paths_over(environment), BudgetPlanner()
+    world = memory_world(tmp_path / "services")
+    return Reads(
+        org, agents, agents, roles, resolver_over(roles, paths), roots_over(environment, tmp_path / "temp"), world.catalog, world.evidence, budgets,
+        service_rules_over(contract_normalizer(tmp_path / "temp"), paths), ScriptedRootTasks(), ScriptedContinuedCriteria(),
+    )
+
+
+def scripted_root_tasks(tmp_path: Path) -> RootTasksHarness:
+    fake = ScriptedRootTasks()
+    return RootTasksHarness(fake, fake.put)
 
 
 def resolver_over_a_static_org(tmp_path: Path) -> ExtensionHarness:
@@ -690,6 +740,7 @@ IMPLEMENTATIONS: Mapping[type, Sequence[Callable[[Path], object]]] = {
     BlueprintValidator: [validator_over_packaged_roles, validator_over_memory_roles],
     PlanRenderer: [renderer_over_packaged_roles, renderer_over_memory_roles],
     ExtensionResolution: [resolver_over_a_static_org, resolver_over_memory_agents],
+    RootTasks: [scripted_root_tasks],
     BlueprintApplier: [applier_over_memory_directories, applier_over_disk_directories],
     WorkspaceProvisioner: [provisioner_on_disk, provisioner_in_memory],
 }

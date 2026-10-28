@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import tempfile
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 
 from testkit.reach.hirearchy.core import ROOT, Org
@@ -15,14 +15,20 @@ from hirearchy.blueprint._org import RuntimeOrgContext
 from hirearchy.blueprint._pathcheck import RootedPathChecker
 from hirearchy.blueprint._resolver import AgentResolver
 from hirearchy.blueprint._roots import EnvironmentWorkspaceRoots
+from hirearchy.blueprint._budgeting import BudgetPlanner
+from hirearchy.blueprint._service_rules import ServiceBlueprintRules
+from hirearchy.blueprint._shapes import RootTask
+from hirearchy.blueprint.testing import ScriptedContinuedCriteria, ScriptedRootTasks
 
 
-def reads_of(org: Org) -> Reads:
+def reads_of(org: Org, tasks: list[RootTask] | None = None, continued: dict[tuple[str, str], list[str]] | None = None) -> Reads:
     rt = org.runtime
     context = RuntimeOrgContext(rt.settings, rt.agents, rt.service_catalog, rt.paths)
+    paths, budgets = RootedPathChecker(rt.environment), BudgetPlanner()
     return Reads(
-        context, rt.agents, rt.charters, rt.role_library, AgentResolver(rt.role_library, RootedPathChecker(rt.environment)),
-        EnvironmentWorkspaceRoots(rt.environment, lambda: Path(tempfile.gettempdir())), rt.service_catalog,
+        context, rt.agents, rt.charters, rt.role_library, AgentResolver(rt.role_library, paths),
+        EnvironmentWorkspaceRoots(rt.environment, lambda: Path(tempfile.gettempdir())), rt.service_catalog, rt.service_evidence, budgets,
+        ServiceBlueprintRules(rt.contract_normalizer, paths, budgets), ScriptedRootTasks(tasks or []), ScriptedContinuedCriteria(continued),
     )
 
 
@@ -31,6 +37,10 @@ class World:
     org: Org
     tmp: Path
     resolver: ExtensionResolver
+
+    def using(self, tasks: list[RootTask] | None = None, continued: dict[tuple[str, str], list[str]] | None = None) -> World:
+        """The same organization with these one-off tasks of root and these retired copies to continue."""
+        return replace(self, resolver=ExtensionResolver(reads_of(self.org, tasks, continued)))
 
     def issues(self, bp: dict[str, object], *, level: str | None = None) -> list[Issue]:
         found = self.resolver.resolve(bp, allowed_roots=[self.tmp]).issues

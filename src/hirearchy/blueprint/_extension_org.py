@@ -2,15 +2,17 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping
-from dataclasses import dataclass
+import re
+from collections.abc import Mapping, Sequence
+from dataclasses import dataclass, replace
 from typing import cast
 
 from ..agents import AgentDirectory, CharterReader
 from ..kernel import depth as org_depth
-from ..services import ServiceCatalog
-from ._protocols import AgentResolution, OrgContext, WorkspaceRoots
+from ..services import ServiceCatalog, ServiceEvidence
+from ._protocols import AgentResolution, BudgetPlanning, ContinuedCriteria, OrgContext, RootTasks, ServiceRules, WorkspaceRoots
 from ._shapes import Held
+from .api import Issue
 from .api import RoleLibrary, is_verifier
 
 
@@ -48,3 +50,21 @@ class Reads:
     resolver: AgentResolution
     roots: WorkspaceRoots
     services: ServiceCatalog
+    evidence: ServiceEvidence
+    budgets: BudgetPlanning
+    rules: ServiceRules
+    tasks: RootTasks
+    continued: ContinuedCriteria
+
+
+_SERVICE_PATH = re.compile(r"^services\[([^\]]*)\](.*)$")
+
+
+def retargeted(found: Sequence[Issue], where: Mapping[str, str]) -> list[Issue]:
+    """The issues of a blueprint's ``services`` rules (paths ``services[<name>]...``) as issues of the extension entries they came from (``where``:
+    service name -> the entry's path); an issue with another path is kept as it is."""
+    out: list[Issue] = []
+    for i in found:
+        m = _SERVICE_PATH.match(i.path)
+        out.append(replace(i, path=where[m.group(1)] + m.group(2)) if m and m.group(1) in where else i)
+    return out
