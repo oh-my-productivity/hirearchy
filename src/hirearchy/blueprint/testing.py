@@ -39,6 +39,7 @@ from ._protocols import (
     AgentResolution,
     ContinuedCriteria,
     ExtensionResolution,
+    Fingerprinting,
     OrgContext,
     PathChecking,
     RootTasks,
@@ -609,6 +610,24 @@ class ScriptedContinuedCriteria(ContinuedCriteria):
 class RootTasksHarness:
     tasks: RootTasks
     put: Callable[[RootTask], None]  # a one-off task of root with this id, time and criteria lines
+
+
+class ScriptedFingerprint(Fingerprinting):
+    """A fingerprint that is whatever it was told to be; it counts the extensions it was asked about."""
+
+    def __init__(self, value: str = "org") -> None:
+        self.value = value
+        self.asked: list[Mapping[str, object]] = []
+
+    def fingerprint(self, bp: Mapping[str, object]) -> str:
+        self.asked.append(bp)
+        return self.value
+
+
+@dataclass(frozen=True)
+class FingerprintHarness:
+    fingerprinting: Fingerprinting
+    change: Callable[[], None]  # something an extension that names the agent "lead" depends on changes
 
 
 @dataclass(frozen=True)

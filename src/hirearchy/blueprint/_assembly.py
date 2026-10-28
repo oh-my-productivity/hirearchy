@@ -26,6 +26,7 @@ from ._protocols import (
     AgentResolution,
     BudgetPlanning,
     Charters,
+    Fingerprinting,
     OrgContext,
     PlanBasis,
     PlaybookWriting,
@@ -56,11 +57,12 @@ class PlanParts:
 
 def plan_parts(
     loader: BlueprintLoader, validator: BlueprintValidator, resolver: AgentResolution, roots: WorkspaceRoots, budgets: BudgetPlanning,
-    access: AccessReport, normalizer: ContractNormalizer, org: OrgContext,
+    access: AccessReport, normalizer: ContractNormalizer, org: OrgContext, fingerprint: Fingerprinting | None = None,
 ) -> PlanParts:
-    """The plan side of the package over the given parts: the one place that says how its classes are put together."""
+    """The plan side of the package over the given parts: the one place that says how its classes are put together. ``fingerprint``: the organization an
+    extension is planned against (without it an extension's plan id covers the blueprint only)."""
     basis = ValidatedPlanBasis(validator, resolver, roots, org)
-    words, playbooks, identity = ServiceWords(normalizer), StepsPlaybookWriter(budgets), HashPlanIdentity()
+    words, playbooks, identity = ServiceWords(normalizer), StepsPlaybookWriter(budgets), HashPlanIdentity(fingerprint)
     access_words = PlainAccessWords(access)
     details = TextPlanDetails(basis, budgets, access, playbooks, words)
     renderer = TextPlanRenderer(loader, basis, details, TextUserPlan(basis, budgets, access_words, words, org), identity)

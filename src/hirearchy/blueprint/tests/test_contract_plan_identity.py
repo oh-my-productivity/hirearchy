@@ -65,3 +65,18 @@ def test_what_is_not_a_mapping_is_refused_like_the_loader_does(identity: PlanIde
 
     with pytest.raises(BlueprintError, match="a blueprint is a mapping"):
         identity.plan_id([])  # type: ignore[arg-type]
+
+
+def test_an_extensions_plan_id_is_12_hex_over_the_blueprint_and_the_fingerprint() -> None:
+    from hirearchy.blueprint.testing import ScriptedFingerprint
+
+    ext = {"reason": "r", "extend": {"limits": [{"agent": "lead", "max_children": 3}]}}
+    org, other = ScriptedFingerprint("org one"), ScriptedFingerprint("org two")
+    first, second = HashPlanIdentity(org).plan_id(ext), HashPlanIdentity(other).plan_id(ext)
+    assert re.fullmatch(r"[0-9a-f]{12}", first) and first != second  # the organization is part of the id
+    assert HashPlanIdentity(org).plan_id(ext) == first and len(org.asked) == 2
+    changed = {**ext, "reason": "another"}
+    assert HashPlanIdentity(org).plan_id(changed) != first  # so is the blueprint
+    assert HashPlanIdentity().plan_id(ext) == HashPlanIdentity().plan_id(copy.deepcopy(ext))  # without a fingerprint: the blueprint alone
+    full = {"mission": "m", "agents": [{"name": "lead"}]}
+    assert HashPlanIdentity(org).plan_id(full) == HashPlanIdentity().plan_id(full) and len(org.asked) == 3  # a full blueprint never asks for it

@@ -253,3 +253,12 @@ class ContinuedCriteria(Protocol):
         """The acceptance criteria of the retired copy that defining ``owner``'s service ``name`` again would continue (the newest copy, when a
         request of it has a result of any status), in the copy's order; None when the definition would start a new service."""
         ...
+
+
+@runtime_checkable
+class Fingerprinting(Protocol):
+    def fingerprint(self, bp: Mapping[str, object]) -> str:
+        """The parts of the organization the extension ``bp`` depends on, as canonical text (design 5.4): for each agent it names, what it holds and who
+        reports to it; whether each address it creates is free; for each service it names, the versions of its contract and playbook and its budget;
+        the depth. Equal while none of them changes. ``BlueprintError`` when the organization cannot be read. Reads only."""
+        ...

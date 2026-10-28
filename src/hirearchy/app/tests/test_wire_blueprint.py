@@ -153,3 +153,18 @@ def test_the_applier_of_the_runtime_builds_with_the_ports_it_is_given(tmp_path: 
         runtime.blueprint_applier.apply(bp, allowed_roots=[base])
     assert org.agents() == []  # the first hire was taken back
 
+
+
+def test_the_plan_identity_of_the_runtime_covers_an_extension_with_the_organization_it_touches(tmp_path: Path) -> None:
+    from hirearchy.app import Org
+
+    org = Org.init(tmp_path / "org", "mission")
+    org.hire("root", "lead", "Lead", "charter", can_hire=True, max_children=2)
+    extension = {"reason": "r", "extend": {"limits": [{"agent": "lead", "max_children": 3}]}}
+    elsewhere = {"reason": "r", "extend": {"limits": [{"agent": "other", "can_hire": True, "max_children": 3}]}}
+    before, other_before = org.runtime.plan_identity.plan_id(extension), org.runtime.plan_identity.plan_id(elsewhere)
+    org.hire("lead", "writer", "Writer", "charter")
+    assert org.runtime.plan_identity.plan_id(extension) != before  # a report of the agent it names
+    assert org.runtime.plan_identity.plan_id(elsewhere) == other_before  # an agent that does not exist is the same absence
+    full = {"mission": "m", "agents": [{"name": "lead"}]}
+    assert org.runtime.plan_identity.plan_id(full) == HashPlanIdentity().plan_id(full)  # a full blueprint's id never depends on the organization

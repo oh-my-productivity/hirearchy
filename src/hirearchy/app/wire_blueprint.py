@@ -9,7 +9,7 @@ import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 
-from ..agents import AgentDirectory
+from ..agents import AgentDirectory, CharterReader, RetiredArchive
 from ..blueprint import (
     BlueprintApplier,
     BlueprintExamples,
@@ -24,6 +24,8 @@ from ..blueprint._access import PolicyAccessReport
 from ..blueprint._assembly import PlanParts, applier_over, plan_parts
 from ..blueprint._budgeting import BudgetPlanner
 from ..blueprint._examples import TemplateBlueprintExamples
+from ..blueprint._extension_org import Reads
+from ..blueprint._fingerprint import OrgFingerprint
 from ..blueprint._files import FsTextFiles
 from ..blueprint._loader import YamlBlueprintLoader
 from ..blueprint._org import NoOrgContext, PresentOrAbsentOrg, RuntimeOrgContext
@@ -38,10 +40,16 @@ from ..dispatch import TaskAssigner
 from ..hierarchy import Hiring, Retirement
 from ..kernel import Environment, OrgLayout
 from ..kiro import ConfinementPolicy
-from ..services import ContractNormalizer, ServiceCatalog, ServiceCommands
+from ..mail import MailboxReader
+from ..services import ContractNormalizer, ServiceCatalog, ServiceCommands, ServiceEvidence
+from ..services._continue import RecordedContinuations
+from ..services._places import OrgServicePlaces
+from ..services._store import OsServiceFiles
 from ..settings import OrgSettings
 from ..snapshots import OrgSnapshotter
 from ._builder import Builder
+from ._continued_criteria import RecordedContinuedCriteria
+from ._root_tasks import MailRootTasks
 
 
 def package_dir() -> Path:
@@ -107,9 +115,23 @@ def _validator(b: Builder) -> BlueprintValidator:
     )
 
 
+def _reads(b: Builder) -> Reads:
+    """What the rules of an extension read the organization through: the real ports of the runtime."""
+    c = _checking(b)
+    places, mail = OrgServicePlaces(b.get(OrgLayout)), b.get(MailboxReader)
+    continued = RecordedContinuedCriteria(RecordedContinuations(places, b.get(RetiredArchive), mail, OsServiceFiles()))
+    return Reads(
+        c.org, b.get(AgentDirectory), b.get(CharterReader), b.get(RoleLibrary), c.resolver, c.roots, b.get(ServiceCatalog), b.get(ServiceEvidence), c.budgets,
+        ServiceBlueprintRules(b.get(ContractNormalizer), c.paths, c.budgets), MailRootTasks(mail), continued,
+    )
+
+
 def _plan(b: Builder) -> PlanParts:
     c = _checking(b)
-    return plan_parts(b.get(BlueprintLoader), b.get(BlueprintValidator), c.resolver, c.roots, c.budgets, c.access, b.get(ContractNormalizer), c.org)
+    return plan_parts(
+        b.get(BlueprintLoader), b.get(BlueprintValidator), c.resolver, c.roots, c.budgets, c.access, b.get(ContractNormalizer), c.org,
+        OrgFingerprint(_reads(b)),
+    )
 
 
 def _applier(b: Builder) -> BlueprintApplier:
