@@ -122,6 +122,20 @@ def svc_criteria_entries(sv: Mapping[str, object]) -> list[object]:
     return [c for c in acc if criterion_text(c)] if isinstance(acc, list) else []
 
 
+def criterion_source(entry: object) -> dict[str, object]:
+    """What the contract stores for one criterion as written (design 10.1 step 5): ``{from, asked}``, ``{default: true}``, ``{from_tasks: [...]}`` or
+    ``{}`` for a string and for a mapping that declares no source."""
+    if not isinstance(entry, dict):
+        return {}
+    if isinstance(entry.get("from"), str) and s(entry["from"]):
+        asked = s(entry.get("asked"))
+        return {"from": s(entry["from"]), **({"asked": asked} if asked else {})}
+    if entry.get("default") is True:
+        return {"default": True}
+    tasks = entry.get("from_tasks")
+    return {"from_tasks": [s(x) for x in tasks]} if isinstance(tasks, list) and tasks else {}
+
+
 def cap_of(needs: Mapping[str, object]) -> int | None:
     """The user's budget cap (runs) of one request, or None when there is none or it is not a whole number >= 1."""
     c = needs.get("budget_runs")

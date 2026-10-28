@@ -55,6 +55,15 @@ def test_a_first_definition_writes_the_contract_without_a_playbook(w: ServicesWo
     )
 
 
+def test_define_service_takes_sources_and_elicitation_for_root_only(w: ServicesWorld) -> None:
+    """Design 10.1 step 5: the sources of the criteria and the user's words are root's keywords of a first definition (over disk and memory)."""
+    with pytest.raises(OrgError, match="sources and elicitation are root's"):
+        define(w, owner="ceo/eng", actor="ceo", sources=[{}, {}], elicitation="Their words.")
+    define(w, sources=[{"from": "Their words.", "asked": "What?"}, {"default": True}], elicitation="Their words.")
+    meta, _ = meta_of(w, CONTRACT)
+    assert meta["sources"] == [{"from": "Their words.", "asked": "What?"}, {"default": True}] and meta["elicitation"] == "Their words."
+
+
 def test_a_first_definition_tells_nobody(w: ServicesWorld) -> None:
     define(w)
     assert w.d.inbox("ceo") == []

@@ -76,9 +76,11 @@ __all__ = [
     "content_words",
     "contract_of",
     "criteria_of",
+    "criterion_sources",
     "criterion_words",
     "item_words",
     "line_key",
+    "listed_added_words",
     "migrate_body",
     "normalize_evidence",
     "normalize_links",
@@ -307,6 +309,16 @@ def added_words(text: str, quote: str, asked: str) -> tuple[str, ...]:
     tokens of ``quote`` (the user's recorded words) and ``asked`` (the question they answered), in order, each once. ``()`` when there are none."""
     known = {*text_tokens(quote), *text_tokens(asked)}
     return tuple(dict.fromkeys(tok for tok in text_tokens(text) if tok not in known))
+
+
+SHOWN_ADDED_WORDS = 8  # the added words a line lists before it says how many more
+
+
+def listed_added_words(added: Sequence[str]) -> str:
+    """The added words of a criterion as a gate or a reply shows them (pure): up to 8, then ``+k more``; ``none`` when there are none."""
+    if not added:
+        return "none"
+    return ", ".join(added[:SHOWN_ADDED_WORDS]) + (f", +{len(added) - SHOWN_ADDED_WORDS} more" if len(added) > SHOWN_ADDED_WORDS else "")
 
 
 @dataclass(frozen=True)
@@ -540,7 +552,7 @@ class ServiceCommands(Protocol):
         self, actor: str, owner: str, name: str, *, description: str | None = None, inputs: object = None, acceptance: object = None,
         deliverable: Mapping[str, object] | None = None, budget: int | None = None, playbook: str | None = None, locked: bool | None = None,
         notes: str | None = None, add_acceptance: object = None, remove_acceptance: object = None, answers: str | None = None,
-        about: str | None = None, words: str | None = None,
+        about: str | None = None, words: str | None = None, sources: Sequence[Mapping[str, object]] | None = None, elicitation: str | None = None,
     ) -> str:
         """Define a service for ``owner`` (first definition), or amend its contract (the service exists). Returns a confirmation.
 
@@ -559,7 +571,13 @@ class ServiceCommands(Protocol):
 
         Root's definition of a name that has no live contract but a retired copy of the same owner with a recorded request (a request of it with a
         result of any status) continues that copy: it is restored, and the next contract version is written with the old ``created``, so the
-        cases, the playbook and the criteria ids continue. Such a call cannot pass ``playbook`` or change the set of criteria."""
+        cases, the playbook and the criteria ids continue. Such a call cannot pass ``playbook`` or change the set of criteria.
+
+        Root's ``sources`` and ``elicitation`` record where the criteria of a first definition come from (agents may not pass them; an amendment
+        records the user's ``words`` instead): ``sources`` has one entry for each criterion of ``acceptance``, in order: ``{from, asked}`` (a quote
+        of the user's recorded words, with the question it answered), ``{default: true}`` (root's proposal), ``{from_tasks: [...]}`` or ``{}`` (no
+        source); ``elicitation`` is the user's answers, verbatim (1 to 4000 characters). Both are written into SERVICE.md v1 and read back by
+        :func:`criterion_sources`. An amendment's reply adds ``C<k> from your words "<words>"; words I added: <...>.`` for each criterion it adds."""
         ...
 
     def retire_service(self, actor: str, owner: str, name: str, reason: str) -> str:
@@ -800,7 +818,7 @@ class CaseAllowance(Protocol):
 
 # Pure rules re-exported from their modules; they import the types above, so these imports come last.
 from ._acknowledge import acknowledge_reply  # noqa: E402
-from ._criteria import amendment_ids, version_in_force  # noqa: E402
+from ._criteria import amendment_ids, criterion_sources, version_in_force  # noqa: E402
 from ._items import migrate_body, render_items  # noqa: E402
 from ._parse import contract_of  # noqa: E402
 from ._reply import playbook_reply  # noqa: E402

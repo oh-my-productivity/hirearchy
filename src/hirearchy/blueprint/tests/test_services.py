@@ -507,6 +507,28 @@ def test_apply_services_only_defines_the_service_and_gives_no_task(svc_bp, roots
     assert "weekly-brief" in services_mod.services_text(empty_org, ROOT)
 
 
+def test_apply_passes_each_services_sources_and_elicitation_to_define_service(svc_bp, roots, empty_org):
+    """Design 10.1 step 5: the contract keeps where each criterion came from, parallel to its acceptance, and the user's words."""
+    from hirearchy.kernel import split_frontmatter
+
+    words = "Keep it under 600 words. Every claim needs a source."
+    sourced = mutate(svc_bp, lambda b: (b["needs"].update(elicitation=words), b["services"][0].update(acceptance=[
+        {"text": CRITERIA[0], "from": "under 600 words", "asked": "How long?"}, {"text": CRITERIA[1], "default": True}, CRITERIA[2]])))
+    bpm.apply(empty_org, sourced, allowed_roots=roots)
+    meta, _ = split_frontmatter((empty_org.dir("lead") / "services" / "weekly-brief" / "SERVICE.md").read_text())
+    assert meta["acceptance"] == CRITERIA  # a mapping criterion is its text alone
+    assert meta["sources"] == [{"from": "under 600 words", "asked": "How long?"}, {"default": True}, {}] and meta["elicitation"] == words
+
+
+def test_a_blueprint_of_plain_strings_defines_its_service_with_no_sources_key(svc_bp, roots, empty_org):
+    from hirearchy.kernel import split_frontmatter
+
+    svc_bp["needs"].pop("elicitation", None)
+    bpm.apply(empty_org, svc_bp, allowed_roots=roots)
+    meta, _ = split_frontmatter((empty_org.dir("lead") / "services" / "weekly-brief" / "SERVICE.md").read_text())
+    assert "sources" not in meta and "elicitation" not in meta
+
+
 def test_apply_writes_the_generated_v1_in_item_form(svc_bp, roots, empty_org):
     """`apply_org` writes the service through `define_service`, so the generated v1 is step items (`op: first`, no `admitted`)."""
     bpm.apply(empty_org, svc_bp, allowed_roots=roots)

@@ -10,7 +10,7 @@ from ..kernel import NAME_RE, ROOT, Clock, EventSink, JsonObject, Message, OrgEr
 from ._continue import copy_contracts, copy_playbook_version
 from ._criteria import amendment_ids, answering_version, in_force, stored_basis, stored_versions, unanswered
 from ._items import checked_body, item_extra, migrate_body, render_items
-from ._lines import criteria_lines
+from ._lines import criteria_lines, elicitation_text, source_entries
 from ._protocols import (
     ContinuedServices, ContractAmendment, ContractDefinitions, LinkNotes, OwnerAddresses, PlaybookTexts, PlaybookWriter, RetiredService,
     ServicePlaces, ServiceRestorer, WatchSettlement,
@@ -18,7 +18,7 @@ from ._protocols import (
 from ._watch import watch_before
 from .api import (
     DESCRIPTION_MAX, FEEDBACK_MAX, Contract, ContractNormalizer, Criterion, PlaybookSection, Rejection, ServiceCatalog, ServiceEvidence, ServiceStore,
-    criteria_of, number_criteria, quoting_lines, repeats_rejection,
+    added_words, criteria_of, listed_added_words, number_criteria, quoting_lines, repeats_rejection,
 )
 
 WORDS_CLIP = 160  # characters of the user's words in the reply and in the owner's note
@@ -31,6 +31,15 @@ NOT_AN_AMENDMENT = (
     "with acceptance, add_acceptance or remove_acceptance on an existing service (CLI: --acceptance, --add-acceptance, --remove-acceptance). "
     "Nothing was written."
 )
+ROOT_ONLY_SOURCES = (
+    "refused: sources and elicitation are root's: they record where the user's criteria come from. An agent client defines its report's contract "
+    "without them. Nothing was written."
+)
+AMENDMENT_SOURCES = (
+    "refused: sources and elicitation record a first definition's criteria; an amendment records the user's words with words "
+    "(CLI: --words). Nothing was written."
+)
+SOURCED_REPLY = 'C{k} from your words "{words}"; words I added: {added}.'
 PAIR = (
     "refused: answers and about go together: answers=<the rejection's message id>, about=<the C or R id your question named> "
     "(CLI: --answers, --about). Nothing was written."
@@ -170,6 +179,7 @@ class RuleContractDefiner(ContractDefinitions):
         self, actor: str, owner: str, name: str, *, description: str | None, inputs: object, acceptance: object,
         deliverable: Mapping[str, object] | None, budget: int | None, playbook: str | None, locked: bool | None, notes: str | None,
         add_acceptance: object, remove_acceptance: object, answers: str | None, about: str | None, words: str | None,
+        sources: Sequence[Mapping[str, object]] | None, elicitation: str | None,
     ) -> str:
         actor = self._agents.require(actor)
         owner = self._owners.resolve(actor, owner)
@@ -183,6 +193,8 @@ class RuleContractDefiner(ContractDefinitions):
             )
         if actor != ROOT and (answers is not None or about is not None or words is not None):
             raise OrgError(ROOT_ONLY)
+        if actor != ROOT and (sources is not None or elicitation is not None):
+            raise OrgError(ROOT_ONLY_SOURCES)
         answers_n, about_n, words_n = (answers or "").strip(), (about or "").strip().upper(), (words or "").strip()
         given = bool(answers_n or about_n or words_n)  # what root says about where an amendment comes from
         if not NAME_RE.fullmatch(name or ""):
@@ -200,6 +212,8 @@ class RuleContractDefiner(ContractDefinitions):
             old = copied[-1]  # the contract of the retired copy stands for the existing one in every rule below
         if old is None and given:
             raise OrgError(NOT_AN_AMENDMENT)
+        if (sources is not None or elicitation is not None) and old is not None and prior is None:
+            raise OrgError(AMENDMENT_SOURCES)
         if old is not None and playbook is not None and prior is None:
             raise OrgError(
                 f"the playbook belongs to {owner}, which revises it with revise_playbook: do not pass `playbook` when "
@@ -246,6 +260,8 @@ class RuleContractDefiner(ContractDefinitions):
             accept_n = self._amendment.amended_criteria(name, current, add_acceptance, remove_acceptance)
         if prior is not None and old is not None:
             self._check_continuation(owner, name, prior, old, playbook, accept_n, given)
+        sources_n = source_entries(sources, len(accept_n)) if sources is not None else None
+        elicitation_n = elicitation_text(elicitation) if elicitation is not None else None
         playbook_body = self._texts.body(playbook) if playbook is not None else None
 
         now = self._clock.now().isoformat(timespec="microseconds")
@@ -262,6 +278,10 @@ class RuleContractDefiner(ContractDefinitions):
             "deliverable": new.deliverable, "budget": new.budget, "locked": new.locked, "version": new.version, "defined_by": actor,
             "defined": now, "created": now if old is None or old.created is None else old.created.isoformat(timespec="microseconds"),
         }
+        if sources_n is not None:  # where each criterion of a first definition (or of a continuation's next version) comes from
+            meta["sources"] = sources_n
+        if elicitation_n is not None:
+            meta["elicitation"] = elicitation_n
         changes: list[str] = []
         confirmed: Collection[str] = frozenset()
         numbered = [*stored, (new.version, actor, accept_n)]  # the new version is numbered in memory, before it is written
@@ -336,6 +356,7 @@ class RuleContractDefiner(ContractDefinitions):
             "Changed:\n" + "\n".join(changes)
             + f"\nAcceptance criteria now ({len(accept_n)}):\n{self._amendment.listed(shown)}"
             + self._recorded(answered, link, about_n, words_n, added, removed)
+            + self._sourced(added, shown, words_n)
         )
 
     def _first_playbook(self, owner: str, name: str, actor: str, playbook_body: str) -> str:
@@ -457,6 +478,15 @@ class RuleContractDefiner(ContractDefinitions):
             tail = f": {', '.join(added)} {_are(added)} user-initiated" if added else ""
             return [ASKED_OWN.format(words=clip_line(words, WORDS_CLIP), tail=tail)]
         return []
+
+    @staticmethod
+    def _sourced(added: Sequence[str], shown: Sequence[Criterion], words: str) -> str:
+        """One line for each criterion the amendment added (design 10.1 step 6): the user's words it rests on and the words root added to them."""
+        texts = {c.id: c.text for c in shown}
+        return "".join(
+            "\n" + SOURCED_REPLY.format(k=i[1:], words=clip_line(words, WORDS_CLIP), added=listed_added_words(added_words(texts[i], words, "")))
+            for i in added if i in texts
+        )
 
     @staticmethod
     def _recorded(answered: Rejection | None, link: Message | None, about: str, words: str, added: Sequence[str], removed: Sequence[str]) -> str:

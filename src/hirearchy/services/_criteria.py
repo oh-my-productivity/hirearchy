@@ -5,8 +5,9 @@ from __future__ import annotations
 from collections.abc import Sequence
 from datetime import datetime
 
+from ..kernel import ROOT
 from ._parse import contract_of
-from .api import AmendmentBasis, Contract, Criterion, Rejection, ServiceStore, criteria_of, number_criteria
+from .api import AmendmentBasis, Contract, Criterion, CriterionSource, Rejection, ServiceStore, criteria_of, number_criteria
 
 
 def stored_versions(store: ServiceStore, owner: str, name: str) -> list[tuple[int, str, list[str]]]:
@@ -86,3 +87,44 @@ def in_force(store: ServiceStore, owner: str, name: str, when: datetime | None) 
         [(c.version, c.defined_by or "", c.acceptance) for c in contracts], {c.version: (c.answers, c.initiated == "user") for c in contracts},
     )
     return chosen.version, criteria_of(numbered, chosen.acceptance)
+
+
+def declared_source(entry: object) -> CriterionSource | None:
+    """The source one entry of a contract's ``sources`` declares; None for ``{}`` and for anything that declares none."""
+    if not isinstance(entry, dict):
+        return None
+    quote, asked, tasks = entry.get("from"), entry.get("asked"), entry.get("from_tasks")
+    if isinstance(quote, str) and quote.strip():
+        return CriterionSource("user", quote.strip(), asked.strip() if isinstance(asked, str) else "")
+    if entry.get("default") is True:
+        return CriterionSource("default")
+    if isinstance(tasks, list) and tasks:
+        return CriterionSource("tasks", tasks=tuple(str(x) for x in tasks))
+    return None
+
+
+def criterion_sources(store: ServiceStore, owner: str, name: str) -> dict[str, CriterionSource]:
+    """Where the words of every criterion the contract of this service ever had come from, by id (design 10.1 step 5): the source the versions'
+    ``sources`` declare for its text (the oldest declaration wins), else ``amendment`` when a version after the first added it with the user's
+    ``words`` (``about`` is the question), else ``unknown`` (a contract from before Phase 2, or a criterion declared with no source). Empty when
+    there is no such service."""
+    versions = store.versions(owner, name, "SERVICE")
+    contracts = [contract_of(owner, name, meta, body, None) for _, meta, body in versions]
+    declared: dict[str, CriterionSource] = {}
+    for (_, meta, _), contract in zip(versions, contracts):
+        listed = meta.get("sources")
+        for text, entry in zip(contract.acceptance, listed if isinstance(listed, list) else []):
+            source = declared_source(entry)
+            if source is not None:
+                declared.setdefault(text, source)
+    adding = {c.version: c for c in contracts}
+    found: dict[str, CriterionSource] = {}
+    for criterion in number_criteria([(c.version, c.defined_by or "", c.acceptance) for c in contracts]):
+        added_by = adding.get(criterion.since)
+        if criterion.text in declared:
+            found[criterion.id] = declared[criterion.text]
+        elif criterion.since >= 2 and added_by is not None and added_by.words and added_by.defined_by == ROOT:
+            found[criterion.id] = CriterionSource("amendment", added_by.words, added_by.about)
+        else:
+            found[criterion.id] = CriterionSource("unknown")
+    return found

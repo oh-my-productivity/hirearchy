@@ -283,6 +283,18 @@ version: 1
 defined_by: root
 defined: '2026-01-15T09:01:00.000000+00:00'
 created: '2026-01-15T09:01:00.000000+00:00'
+sources:
+- from: At most 600 words
+- from: with the sections "This week", "Changes since last week" and "Our assessment",
+    in that order
+- from: Every claim needs a source, and opinions must be labelled as opinions
+  asked: How strict should the sourcing be?
+- default: true
+- default: true
+elicitation: I want a short brief on a topic I name, every week. News and developments
+  of the past week only, from public web pages. At most 600 words, with the sections
+  "This week", "Changes since last week" and "Our assessment", in that order. Every
+  claim needs a source, and opinions must be labelled as opinions.
 ---
 
 

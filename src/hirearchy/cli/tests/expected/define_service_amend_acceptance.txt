@@ -6,6 +6,7 @@ Acceptance criteria now (2):
 C1: The note has a title.
 C2: Has-a-summary.
 Recorded as a change the user asked for on their own: "Add-a-summary.". C2 is user-initiated: it travels with every request but never admits a playbook revision (rule (c)).
+C2 from your words "Add-a-summary."; words I added: has.
 
 [stderr]
 org: <ORG>

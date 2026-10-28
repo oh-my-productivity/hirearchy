@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 
-from ..services import added_words
+from ..services import added_words, listed_added_words
 from ._view import mapping_or_empty, needs_of, s, services_of
 from .api import Issue
 
@@ -39,7 +39,6 @@ FROM_LINE = 'from your words "{quote}"{asked}; words I added: {added}'
 ASKED_LINE = ' (my question: "{asked}")'
 DEFAULT_LINE = "my default: you did not say this"
 UNRECORDED_LINE = "my wording: your words for it were not recorded"
-SHOWN_ADDED = 8  # the words a source line lists before it says how many more
 BAD_ELICITATION = "needs.elicitation is the user's answers, verbatim: a text of 1 to " + str(ELICITATION_MAX) + " characters."
 
 
@@ -83,8 +82,7 @@ def source_line(entry: object) -> str:
             asked = entry.get("asked")
             question = " ".join(asked.split()) if isinstance(asked, str) else ""
             added = added_words(s(entry.get("text")), quote, question)
-            listed = ", ".join(added[:SHOWN_ADDED]) + (f", +{len(added) - SHOWN_ADDED} more" if len(added) > SHOWN_ADDED else "") if added else "none"
-            return FROM_LINE.format(quote=" ".join(quote.split()), asked=ASKED_LINE.format(asked=question) if question else "", added=listed)
+            return FROM_LINE.format(quote=" ".join(quote.split()), asked=ASKED_LINE.format(asked=question) if question else "", added=listed_added_words(added))
         if entry.get("default") is True:
             return DEFAULT_LINE
     return UNRECORDED_LINE

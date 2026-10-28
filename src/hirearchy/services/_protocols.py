@@ -119,6 +119,7 @@ class ContractDefinitions(Protocol):
         self, actor: str, owner: str, name: str, *, description: str | None, inputs: object, acceptance: object,
         deliverable: Mapping[str, object] | None, budget: int | None, playbook: str | None, locked: bool | None, notes: str | None,
         add_acceptance: object, remove_acceptance: object, answers: str | None, about: str | None, words: str | None,
+        sources: Sequence[Mapping[str, object]] | None, elicitation: str | None,
     ) -> str:
         """Define or amend (see ``ServiceCommands.define_service``)."""
         ...

@@ -6,6 +6,7 @@ arguments is what it was. The rejections the definer is told about are the test'
 
 from __future__ import annotations
 
+import re
 from dataclasses import replace
 from pathlib import Path
 from typing import Any
@@ -343,28 +344,33 @@ def test_the_versions_record_answers_about_words_or_initiated_user(factory: Any,
     assert [c.user for c in w.catalog.criteria("ceo", SERVICE)] == [False, False, False, True]
 
 
+def without_sources(reply: str) -> str:
+    """The reply without the lines that show where each added criterion comes from (design 10.1 step 6; tested in test_define_sources)."""
+    return "\n".join(line for line in reply.splitlines() if not re.match(r"C\d+ from your words ", line))
+
+
 def test_the_reply_records_the_answer_or_the_users_own_request(factory: Any, tmp_path: Path) -> None:
     w, basis = build(factory, tmp_path)
     found = reject(w, basis)
     text = amend(w, add_acceptance=[RULE, "Names its week"], answers=found.note, about="C1", words=YES)
     link = next(m for m in inbox(w) if m.reply_to == found.note and m.criterion)
     assert text.splitlines()[0].startswith("redefined service `weekly-brief` of ceo: contract v1 -> v2")
-    assert text.endswith(
+    assert without_sources(text).endswith(
         f"\nRecorded as the user's answer to R1 (rejection {found.note}; your question named C1): link {link.id} names C3, C4. "
         "C3, C4 are client-confirmed: a playbook revision citing them may add their words (rule (c))."
     )
     one = amend(w, add_acceptance=["Third rule"], words="Add a third rule, please.")
-    assert one.endswith(
+    assert without_sources(one).endswith(
         '\nRecorded as a change the user asked for on their own: "Add a third rule, please.". C5 is user-initiated: it travels with every '
         "request but never admits a playbook revision (rule (c))."
     )
     two = amend(w, add_acceptance=["Fourth rule", "Fifth rule"], words="y" * 200)
-    assert two.endswith(
+    assert without_sources(two).endswith(
         f'\nRecorded as a change the user asked for on their own: "{"y" * 159}…". C6, C7 are user-initiated: they travel with every request but '
         "never admit a playbook revision (rule (c))."
     )
     removal = amend(w, remove_acceptance=["Fifth rule"], words="Drop the fifth.")
-    assert removal.endswith('\nRecorded as a change the user asked for on their own: "Drop the fifth.".')  # nothing added: nothing is user-initiated
+    assert without_sources(removal).endswith('\nRecorded as a change the user asked for on their own: "Drop the fifth.".')  # nothing added: nothing is user-initiated
 
 
 def test_the_owners_note_says_the_users_own_request_is_user_initiated(factory: Any, tmp_path: Path) -> None:
