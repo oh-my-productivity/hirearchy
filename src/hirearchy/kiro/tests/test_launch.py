@@ -820,3 +820,63 @@ def test_kiros_stderr_keeps_its_place_when_kiro_writes_without_pause(tmp_path: P
         assert log[0] == "# kiro: run started (engine v3)", (attempt, log)
         assert log.index("E1") < log.index("Hello"), (attempt, log)
         assert log.index("E2") < log.index("[run finished] success (end_turn)"), (attempt, log)  # no order between Hello and E2 is asserted
+
+
+# ------------------------------------------------------------- the launcher stops the run at the effort warning (batch 1.1)
+
+
+def stop_body(warning: str) -> str:
+    """The fake kiro: it starts the run, writes kiro's effort warning to its stderr and goes on (a run that would last 30 s)."""
+    return START + to_stderr(warning) + "exec sleep 30\n"
+
+
+def test_an_effort_warning_stops_the_run_before_any_tool_effect(tmp_path: Path, session: bool) -> None:
+    code, out, err, group = launch_in_group(tmp_path, stop_body(WARNING), deadline=30, leader=session)
+    assert code == (-9 if session else 1)
+    assert out == ["# kiro: run started (engine v3)", mark_a(QUOTED)]
+    assert WARNING in err.splitlines()  # kiro's own line is forwarded, as it came
+    assert group_gone(group)
+
+
+def test_the_other_known_reason_is_quoted_as_it_came(tmp_path: Path) -> None:
+    code, out, _, _ = launch_in_group(tmp_path, stop_body(OTHER_WARNING), deadline=30, leader=True)
+    assert code == -9 and out[-1] == mark_a(OTHER_QUOTED)
+
+
+def test_an_unknown_reason_after_the_prefix_stops_the_run_too(tmp_path: Path) -> None:
+    unknown = "failed to set effort 'xhigh': something new"
+    code, out, _, _ = launch_in_group(tmp_path, stop_body(unknown), deadline=30, leader=True)
+    assert code == -9 and out[-1] == mark_a(unknown)
+
+
+def test_a_warning_before_run_started_stops_the_run_without_a_start_line(tmp_path: Path) -> None:
+    code, out, _, group = launch_in_group(tmp_path, to_stderr(WARNING) + "exec sleep 30\n", deadline=30, leader=True)
+    assert code == -9
+    assert out == [mark_a(QUOTED)]
+    assert group_gone(group)
+
+
+def test_a_warning_after_a_completed_write_counts_one_tool_effect(tmp_path: Path) -> None:
+    body = START + say(call("w", "@hirearchy/write", raw={"tool_id": "hirearchy::write"}))
+    body += say(event("tool_call_update", toolCallId="w", status="completed")) + to_stderr(WARNING) + "exec sleep 30\n"
+    code, out, _, _ = launch_in_group(tmp_path, body, deadline=30, leader=True)
+    assert code == -9
+    assert out[-1] == mark_a(QUOTED, "1")
+
+
+def test_a_line_that_holds_the_prefix_but_does_not_start_with_it_is_no_stop(tmp_path: Path) -> None:
+    code, out, _ = launch(tmp_path, START + to_stderr("note: " + QUOTED) + FINISHED)
+    assert code == 0
+    assert out == ["# kiro: run started (engine v3)", "[run finished] success (end_turn)"]
+
+
+def test_the_effort_mark_is_no_closing_mark_of_the_run_log(tmp_path: Path) -> None:
+    _, out, _, _ = launch_in_group(tmp_path, stop_body(WARNING), deadline=30, leader=True)
+    assert out[-1].startswith("# kiro:") and not [line for line in out if line.startswith(CLOSING_MARKS)]
+
+
+def test_a_warning_after_more_than_a_pipe_buffer_of_stderr_stops_the_run(tmp_path: Path) -> None:
+    script, written = err_lines(1, 2000)
+    code, log = launch_logged(tmp_path, START + script + to_stderr(WARNING) + "exec sleep 30\n")
+    assert code == -9
+    assert log == ["# kiro: run started (engine v3)", *written, WARNING, mark_a(QUOTED)]

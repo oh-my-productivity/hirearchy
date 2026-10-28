@@ -19,6 +19,7 @@ from dataclasses import dataclass, field
 COPY_LIMIT = 4096  # bytes of non-JSON output copied to the log before the run starts
 DRAIN_SECONDS = 2.0  # how long output is read after kiro has exited (a background child may keep the pipe open)
 DRAIN_READS = 16  # the most reads of one drain of kiro's stderr
+ERR_LINE_LIMIT = 65536  # the longest stderr line of kiro that is scanned for the effort warning
 SLICE_SECONDS = 1.0  # one select() turn
 CUT_INPUT, CUT_DENIAL, CUT_ERROR, CUT_PLAIN = 200, 300, 500, 2000  # longest piece of a tool input / denial / error / plain line
 USAGE = "usage: _launch.py --start-deadline SECONDS -- KIRO_ARGV..."
@@ -262,6 +263,8 @@ class ErrPipe:
 
     fd: int
     open: bool = True
+    partial: bytes = b""  # the stderr line that is not finished yet
+    warning: str = ""  # the first effort warning kiro wrote, as the mark quotes it
 
 
 def _forward(data: bytes) -> None:
@@ -273,13 +276,26 @@ def _forward(data: bytes) -> None:
         pass
 
 
+def _scan(err: ErrPipe, line: bytes) -> None:
+    """Note the first effort warning among kiro's stderr lines (a line over ``ERR_LINE_LIMIT`` is not scanned)."""
+    if not err.warning and len(line) <= ERR_LINE_LIMIT:
+        err.warning = effort_warning(line.decode("utf-8", errors="replace"))
+
+
 def _read_err(err: ErrPipe) -> None:
-    """Read what kiro wrote to its stderr (up to 64 KB) and forward it; an empty read is the end of file."""
+    """Read what kiro wrote to its stderr (up to 64 KB), forward it, then scan its lines; an empty read is the end of file."""
     data = os.read(err.fd, 65536)
     if not data:
         err.open = False
+        _scan(err, err.partial)
+        err.partial = b""
         return
-    _forward(data)
+    _forward(data)  # before the scan: the warning is in the log before the launcher writes its mark
+    *lines, err.partial = (err.partial + data).split(b"\n")
+    for line in lines:
+        _scan(err, line)
+    if len(err.partial) > ERR_LINE_LIMIT:  # already forwarded; the rest of such a line is not worth keeping
+        err.partial = b""
 
 
 def _drain_err(err: ErrPipe) -> None:
@@ -302,7 +318,7 @@ def _forward_ready(err: ErrPipe | None) -> None:
 
 @dataclass
 class Start:
-    outcome: str  # "started", "refused", "gave_up" or "ended"
+    outcome: str  # "started", "refused", "gave_up", "ended" or "effort" (kiro's effort warning came before the start)
     text: str = ""  # why, for "refused"
     rest: bytes = b""  # output read after the start line
 
@@ -359,12 +375,37 @@ def _wait_for_start(fd: int, err: ErrPipe, limit: float) -> Start:
                 copied += _copy(buffer, COPY_LIMIT - copied)
                 buffer = b""
         if err.open and err.fd in ready:
+            if fd not in ready and select.select([fd], [], [], 0)[0]:
+                continue  # stdout came in while stderr was being looked at: stdout first
             _read_err(err)
+            if err.warning:
+                _copy(buffer, COPY_LIMIT - copied)
+                return Start("effort")
 
 
-def _stream(proc: subprocess.Popen[bytes], fd: int, err: ErrPipe, rest: bytes) -> tuple[RenderState, float | None]:
+def _last_output(fd: int, err: ErrPipe, state: RenderState, buffer: bytes) -> None:
+    """The stop's last look at stdout: every tool update that kiro wrote before its warning is in the pipe by now, so the mark counts it."""
+    reads = 0
+    try:
+        while reads < DRAIN_READS and select.select([fd], [], [], 0)[0]:
+            data = os.read(fd, 65536)
+            if not data:
+                break
+            reads += 1
+            _forward_ready(err)
+            buffer += data
+            while b"\n" in buffer:
+                raw, buffer = buffer.split(b"\n", 1)
+                for text in render_line(state, raw.decode("utf-8", errors="replace")):
+                    emit(text)
+    except (OSError, ValueError):
+        pass
+
+
+def _stream(proc: subprocess.Popen[bytes], fd: int, err: ErrPipe, rest: bytes) -> tuple[RenderState, bool, float | None]:
     """Render kiro's output until its end, or until 2 s after kiro exited (a background child may hold a pipe open), forwarding its stderr
-    all the while; what it learned, and when kiro was first seen to have exited.
+    all the while; what it learned, whether the run was stopped at kiro's effort warning (kiro is running and the warning is in), and when
+    kiro was first seen to have exited.
 
     Kiro's stderr is drained before stdout bytes are rendered and after they were read, so a stderr line that kiro wrote before a stdout line
     is logged before that line's rendering."""
@@ -375,6 +416,9 @@ def _stream(proc: subprocess.Popen[bytes], fd: int, err: ErrPipe, rest: bytes) -
             raw, buffer = buffer.split(b"\n", 1)
             for text in render_line(state, raw.decode("utf-8", errors="replace")):
                 emit(text)
+        if err.warning and proc.poll() is None:
+            _last_output(fd, err, state, buffer)
+            return state, True, None
         if exited_at is None and proc.poll() is not None:
             exited_at = time.monotonic()
         if exited_at is not None and time.monotonic() - exited_at >= DRAIN_SECONDS:
@@ -396,7 +440,7 @@ def _stream(proc: subprocess.Popen[bytes], fd: int, err: ErrPipe, rest: bytes) -
             emit(text)
     for text in finish(state):
         emit(text)
-    return state, exited_at
+    return state, False, exited_at
 
 
 def _exit_code(proc: subprocess.Popen[bytes], err: ErrPipe, exited_at: float | None = None) -> int:
@@ -426,6 +470,17 @@ def _end_run(proc: subprocess.Popen[bytes], err: ErrPipe | None = None) -> int:
     return 1
 
 
+def _stop(proc: subprocess.Popen[bytes], err: ErrPipe, state: RenderState | None) -> int:
+    """Stop the run at kiro's effort warning: the unfinished agent line, the mark, then the run ends as a refused one does."""
+    _forward_ready(err)
+    if state is not None:
+        for text in _flush(state):
+            emit(text)
+    effects = state.effects if state is not None else 0
+    emit(EFFORT_MARK + err.warning + "); tool effects: " + (str(effects) if effects else "none"))
+    return _end_run(proc, err)
+
+
 def _supervise(proc: subprocess.Popen[bytes], limit: float, err: ErrPipe) -> int:
     assert proc.stdout is not None
     fd = proc.stdout.fileno()
@@ -441,12 +496,16 @@ def _supervise(proc: subprocess.Popen[bytes], limit: float, err: ErrPipe) -> int
             'it may be waiting for a browser sign-in (see README, "Kiro integration")'
         )
         return _end_run(proc, err)
+    if start.outcome == "effort":
+        return _stop(proc, err, None)
     if start.outcome == "ended":
         code = _exit_code(proc, err)
         emit(f"# kiro: kiro-cli exited with code {code} before the run started")
         return 1 if code in (0, THROTTLE_EXIT) else code  # 75 is the launcher's verdict alone
     emit("# kiro: run started (engine v3)")
-    state, exited_at = _stream(proc, fd, err, start.rest)
+    state, stopped, exited_at = _stream(proc, fd, err, start.rest)
+    if stopped:
+        return _stop(proc, err, state)
     proc.stdout.close()
     code = _exit_code(proc, err, exited_at)
     if code != 0 and state.throttled and state.effects == 0:
