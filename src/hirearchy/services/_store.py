@@ -6,10 +6,11 @@ import fcntl
 import os
 import shutil
 import stat
+from collections.abc import Mapping
 from pathlib import Path
 
 from ..kernel import ROOT, AtomicWriter, JsonObject, join_frontmatter, norm, split_frontmatter, visible
-from ._parse import FILE_SHAPE, as_int, merged_versions, playbook_version
+from ._parse import as_int, merged_versions, playbook_version, restore_targets
 from ._protocols import RetiredService, ServiceFiles, ServicePlaces, ServiceRestorer
 from .api import PlaybookRace, ServiceStore
 
@@ -107,11 +108,12 @@ class FsServiceStore(ServiceStore, ServiceRestorer):
 
     def restore(self, owner: str, name: str, retired: RetiredService) -> None:
         directory = self._places.service_dir(owner, name)
-        shapes = [(rel, text) for rel, text in retired.files if FILE_SHAPE.fullmatch(rel)]
-        for rel, text in sorted(shapes, key=lambda file: file[0] == "SERVICE.md"):  # SERVICE.md last: until it is there, no service exists
+        for rel, text in restore_targets(retired.files):  # SERVICE.md last: until it is there, no service exists
             self._writer.write(directory / rel, text)
 
-    def retire(self, owner: str, name: str, stamp: str) -> str:
+    def retire(self, owner: str, name: str, stamp: str, record: Mapping[str, str] | None = None) -> str:
+        if record is not None:  # before the move: a record that cannot be written moves nothing
+            self._writer.write(self._places.service_dir(owner, name) / "RETIRED.md", join_frontmatter(dict(record), ""))
         dest = self._places.retired_dir(owner, name, stamp)
         dest.parent.mkdir(parents=True, exist_ok=True)
         shutil.move(str(self._places.service_dir(owner, name)), dest)

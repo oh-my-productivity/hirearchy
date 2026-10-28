@@ -32,7 +32,7 @@ from ._define import RuleContractDefiner
 from ._feedback import RuleClientFeedback, SenderLinkNotes
 from ._hints import ServiceReportHints
 from ._normalizer import TextContractNormalizer
-from ._parse import FILE_SHAPE, as_int, merged_versions, playbook_version
+from ._parse import as_int, merged_versions, playbook_version, restore_targets
 from ._places import OrgServicePlaces
 from ._ops import RuleItemReviser
 from ._protocols import (
@@ -109,12 +109,13 @@ class MemoryServiceStore(ServiceStore, ServiceRestorer):
 
     def restore(self, owner: str, name: str, retired: RetiredService) -> None:
         directory = self._places.service_dir(owner, name)
-        shapes = [(rel, text) for rel, text in retired.files if FILE_SHAPE.fullmatch(rel)]
-        for rel, text in sorted(shapes, key=lambda file: file[0] == "SERVICE.md"):  # SERVICE.md last
+        for rel, text in restore_targets(retired.files):  # SERVICE.md last
             self.files[directory / rel] = text
 
-    def retire(self, owner: str, name: str, stamp: str) -> str:
+    def retire(self, owner: str, name: str, stamp: str, record: Mapping[str, str] | None = None) -> str:
         source, dest = self._places.service_dir(owner, name), self._places.retired_dir(owner, name, stamp)
+        if record is not None:
+            self.files[source / "RETIRED.md"] = join_frontmatter(dict(record), "")
         for path in [p for p in self.files if source in p.parents]:
             self.files[dest / path.relative_to(source)] = self.files.pop(path)
         return self._places.rel(dest)

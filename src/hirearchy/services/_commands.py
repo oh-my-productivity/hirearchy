@@ -28,15 +28,17 @@ class RuleServiceCommands(ServiceCommands):
         deliverable: Mapping[str, object] | None = None, budget: int | None = None, playbook: str | None = None, locked: bool | None = None,
         notes: str | None = None, add_acceptance: object = None, remove_acceptance: object = None, answers: str | None = None,
         about: str | None = None, words: str | None = None, sources: Sequence[Mapping[str, object]] | None = None, elicitation: str | None = None,
+        approved_in: str | None = None,
     ) -> str:
         return self._definitions.define_service(
             actor, owner, name, description=description, inputs=inputs, acceptance=acceptance, deliverable=deliverable, budget=budget,
             playbook=playbook, locked=locked, notes=notes, add_acceptance=add_acceptance, remove_acceptance=remove_acceptance,
             answers=answers, about=about, words=words, sources=sources, elicitation=elicitation,
+            approved_in=approved_in,
         )
 
-    def retire_service(self, actor: str, owner: str, name: str, reason: str) -> str:
-        return self._retirement.retire_service(actor, owner, name, reason)
+    def retire_service(self, actor: str, owner: str, name: str, reason: str, approved_in: str = "") -> str:
+        return self._retirement.retire_service(actor, owner, name, reason, approved_in)
 
     def request(
         self, actor: str, service: str, inputs: Mapping[str, object] | None, *, title: str = "", note: str = "",

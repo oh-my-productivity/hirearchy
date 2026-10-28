@@ -104,7 +104,7 @@ class Commands(ServiceCommands):
         self.calls.append(("define_service", (actor, owner, name), kw))
         return "DEFINED"
 
-    def retire_service(self, actor: str, owner: str, name: str, reason: str) -> str:
+    def retire_service(self, actor: str, owner: str, name: str, reason: str, approved_in: str = "") -> str:
         self.calls.append(("retire_service", (actor, owner, name, reason), {}))
         return "RETIRED"
 

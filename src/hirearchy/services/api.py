@@ -500,8 +500,10 @@ class ServiceStore(Protocol):
         other bytes, ``PlaybookRace`` is raised and nothing is written."""
         ...
 
-    def retire(self, owner: str, name: str, stamp: str) -> str:
-        """Move the service to ``<owner>/services/.retired/<name>-<stamp>``; returns that directory relative to the organization."""
+    def retire(self, owner: str, name: str, stamp: str, record: Mapping[str, str] | None = None) -> str:
+        """Move the service to ``<owner>/services/.retired/<name>-<stamp>``; returns that directory relative to the organization. With ``record``
+        (``retired``, ``by``, ``reason`` and, when the approval is known, ``approved_in``) the copy also holds a ``RETIRED.md`` with it as its
+        frontmatter, written before the move, so that a failed write moves nothing."""
         ...
 
     def playbook_history(self, owner: str, name: str) -> list[tuple[int, JsonObject]]:
@@ -554,6 +556,7 @@ class ServiceCommands(Protocol):
         deliverable: Mapping[str, object] | None = None, budget: int | None = None, playbook: str | None = None, locked: bool | None = None,
         notes: str | None = None, add_acceptance: object = None, remove_acceptance: object = None, answers: str | None = None,
         about: str | None = None, words: str | None = None, sources: Sequence[Mapping[str, object]] | None = None, elicitation: str | None = None,
+        approved_in: str | None = None,
     ) -> str:
         """Define a service for ``owner`` (first definition), or amend its contract (the service exists). Returns a confirmation.
 
@@ -578,16 +581,22 @@ class ServiceCommands(Protocol):
         records the user's ``words`` instead): ``sources`` has one entry for each criterion of ``acceptance``, in order: ``{from, asked}`` (a quote
         of the user's recorded words, with the question it answered), ``{default: true}`` (root's proposal), ``{from_tasks: [...]}`` or ``{}`` (no
         source); ``elicitation`` is the user's answers, verbatim (1 to 4000 characters). Both are written into SERVICE.md v1 and read back by
-        :func:`criterion_sources`. An amendment's reply adds ``C<k> from your words "<words>"; words I added: <...>.`` for each criterion it adds."""
+        :func:`criterion_sources`. An amendment's reply adds ``C<k> from your words "<words>"; words I added: <...>.`` for each criterion it adds.
+
+        Root's ``approved_in`` (``plan {plan_id}`` or ``change {plan_id}``: the approval the definition rests on) is written into SERVICE.md of a first
+        definition (or of the next version of a continuation), and only the plan appliers pass it. An agent's call with it, and an amendment of a
+        live service with it, are refused."""
         ...
 
-    def retire_service(self, actor: str, owner: str, name: str, reason: str) -> str:
+    def retire_service(self, actor: str, owner: str, name: str, reason: str, approved_in: str = "") -> str:
         """Take a service out of use: it moves to ``<owner>/services/.retired/<name>-<timestamp>/``. Returns a confirmation.
 
         Same authority as ``define_service`` (the owner's parent). Afterwards the service is not listed and cannot be requested. Root retires a
         service only after every delivered request has a verdict and every rejection its answer (a refusal moves nothing). A service of the same
         name defined later for the same owner continues it (its contract, playbook and cases) when a request of it has a result of any status,
-        and starts fresh otherwise. The owner is told in a non-waking note."""
+        and starts fresh otherwise. The owner is told in a non-waking note. The copy holds a ``RETIRED.md`` (``retired``, ``by``, ``reason`` and
+        root's ``approved_in`` when given: the approval of a change; only root passes it, an agent's call with it is refused); a continuation moves
+        it to ``history/RETIRED.v<n>.md``."""
         ...
 
     def request(

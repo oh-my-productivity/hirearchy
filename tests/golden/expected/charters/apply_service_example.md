@@ -291,6 +291,7 @@ version: 1
 defined_by: root
 defined: '2026-01-15T09:01:00.000000+00:00'
 created: '2026-01-15T09:01:00.000000+00:00'
+approved_in: plan <PLAN_ID>
 sources:
 - from: At most 600 words
 - from: with the sections "This week", "Changes since last week" and "Our assessment",

@@ -520,6 +520,16 @@ def test_apply_passes_each_services_sources_and_elicitation_to_define_service(sv
     assert meta["sources"] == [{"from": "under 600 words", "asked": "How long?"}, {"default": True}, {}] and meta["elicitation"] == words
 
 
+def test_apply_passes_approved_in_plan_to_define_service(svc_bp, roots, empty_org):
+    """Design 4.5: a plan's service records the plan that defined it, the id propose_org returned."""
+    from hirearchy.kernel import split_frontmatter
+
+    plan_id = bpm.plan_id(svc_bp)
+    bpm.apply(empty_org, svc_bp, allowed_roots=roots)
+    meta, _ = split_frontmatter((empty_org.dir("lead") / "services" / "weekly-brief" / "SERVICE.md").read_text())
+    assert meta["approved_in"] == f"plan {plan_id}"
+
+
 def test_a_blueprint_of_plain_strings_defines_its_service_with_no_sources_key(svc_bp, roots, empty_org):
     from hirearchy.kernel import split_frontmatter
 

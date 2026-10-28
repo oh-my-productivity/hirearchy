@@ -22,7 +22,7 @@ class PlaybookServiceDefiner(ServiceDefining):
         self._playbooks = playbooks
         self._budgets = budgets
 
-    def define(self, bp: Mapping[str, object], agents: Sequence[Agent], built: Built) -> None:
+    def define(self, bp: Mapping[str, object], agents: Sequence[Agent], built: Built, approved_in: str | None = None) -> None:
         top = agents[0]
         budgets = self._budgets.service_budgets(bp, agents)
         words = s(needs_of(bp).get("elicitation"))
@@ -38,5 +38,6 @@ class PlaybookServiceDefiner(ServiceDefining):
                 ROOT, top.addr, name, description=s(sv.get("description")), inputs=self._normalizer.inputs(sv.get("inputs")),
                 acceptance=svc_criteria(sv), deliverable=d, budget=budgets[name], playbook=playbook, locked=sv.get("locked") is True,
                 sources=sources if any(sources) else None, elicitation=words or None,
+                approved_in=approved_in,
             )
             built.defined.append(name)

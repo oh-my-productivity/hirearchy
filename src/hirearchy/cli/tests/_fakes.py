@@ -106,7 +106,7 @@ class FakeServices(Recording, ServiceCommands, ServiceCatalog, ContractNormalize
         self.note("define_service", actor, owner, name, **kwargs)
         return f"defined service `{name}` for {owner}"
 
-    def retire_service(self, actor: str, owner: str, name: str, reason: str) -> str:
+    def retire_service(self, actor: str, owner: str, name: str, reason: str, approved_in: str = "") -> str:
         self.note("retire_service", actor, owner, name, reason)
         return f"retired service `{name}` of {owner}"
 

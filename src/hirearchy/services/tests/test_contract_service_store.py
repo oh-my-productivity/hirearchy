@@ -11,7 +11,7 @@ from typing import cast
 
 import pytest
 
-from hirearchy.kernel import OrgError
+from hirearchy.kernel import OrgError, split_frontmatter
 from hirearchy.services import PlaybookRace, ServiceStore
 from hirearchy.services.testing import IMPLEMENTATIONS, StoreHarness
 
@@ -261,3 +261,18 @@ def test_versions_of_another_kind_is_a_value_error(h: StoreHarness) -> None:
     h.store.write_contract("ceo", "brief", contract(1), "", None)
     with pytest.raises(ValueError):
         h.store.versions("ceo", "brief", "README")
+
+
+def test_retire_writes_the_record_when_given(h: StoreHarness) -> None:
+    h.store.write_contract("ceo", "brief", contract(), "", None)
+    h.store.write_contract("ceo", "other", contract(), "", None)
+    record = {"retired": "2026-01-01T00:00:00+00:00", "by": "root", "reason": "not needed", "approved_in": "change 0123456789ab"}
+    assert h.store.retire("ceo", "brief", "20260101T000000000001", record) == "ceo/services/.retired/brief-20260101T000000000001"
+    h.store.retire("ceo", "other", "20260101T000000000002")  # without a record, none is written
+    assert h.rels() == [
+        "ceo/services/.retired/brief-20260101T000000000001/RETIRED.md",
+        "ceo/services/.retired/brief-20260101T000000000001/SERVICE.md",
+        "ceo/services/.retired/other-20260101T000000000002/SERVICE.md",
+    ]
+    text = h.text("ceo/services/.retired/brief-20260101T000000000001/RETIRED.md")
+    assert text is not None and split_frontmatter(text)[0] == record

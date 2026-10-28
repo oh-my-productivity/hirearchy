@@ -119,7 +119,7 @@ class ContractDefinitions(Protocol):
         self, actor: str, owner: str, name: str, *, description: str | None, inputs: object, acceptance: object,
         deliverable: Mapping[str, object] | None, budget: int | None, playbook: str | None, locked: bool | None, notes: str | None,
         add_acceptance: object, remove_acceptance: object, answers: str | None, about: str | None, words: str | None,
-        sources: Sequence[Mapping[str, object]] | None, elicitation: str | None,
+        sources: Sequence[Mapping[str, object]] | None, elicitation: str | None, approved_in: str | None,
     ) -> str:
         """Define or amend (see ``ServiceCommands.define_service``)."""
         ...
@@ -136,7 +136,7 @@ class LinkNotes(Protocol):
 
 @runtime_checkable
 class ServiceRetirement(Protocol):
-    def retire_service(self, actor: str, owner: str, name: str, reason: str) -> str:
+    def retire_service(self, actor: str, owner: str, name: str, reason: str, approved_in: str = "") -> str:
         """Take a service out of use (see ``ServiceCommands.retire_service``)."""
         ...
 
@@ -206,7 +206,7 @@ class RetiredService:
     """A retired copy of a service that a root definition continues (design 5.10)."""
 
     path: str  # the copy, relative to the organization
-    files: tuple[tuple[str, str], ...]  # (name inside the service directory, text): SERVICE.md, PLAYBOOK.md, history/SERVICE.v<k>.md, history/PLAYBOOK.v<k>.md
+    files: tuple[tuple[str, str], ...]  # (name inside the service directory, text): SERVICE.md, PLAYBOOK.md, RETIRED.md, history/{SERVICE,PLAYBOOK,RETIRED}.v<k>.md
     recorded: int  # the requests of the service with a result of any status (done, blocked or failed)
 
 

@@ -92,7 +92,7 @@ class RecordedContinuations(ContinuedServices):
         )
 
     def _read(self, path: Path) -> tuple[tuple[str, str], ...]:
-        """The files of the four shapes the copy holds, the kept versions first and ``SERVICE.md`` last."""
-        names = [f"{HISTORY}/{entry}" for entry in sorted(self._files.listdir(path / HISTORY))] + ["PLAYBOOK.md", "SERVICE.md"]
+        """The files of the shapes the copy holds, the kept versions first and ``SERVICE.md`` last."""
+        names = [f"{HISTORY}/{entry}" for entry in sorted(self._files.listdir(path / HISTORY))] + ["PLAYBOOK.md", "RETIRED.md", "SERVICE.md"]
         found = [(rel, self._files.read_text(path / rel)) for rel in names if FILE_SHAPE.fullmatch(rel)]
         return tuple((rel, text) for rel, text in found if text is not None)

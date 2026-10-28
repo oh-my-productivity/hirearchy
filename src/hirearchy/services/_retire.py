@@ -9,6 +9,7 @@ from ._criteria import unanswered
 from ._protocols import OwnerAddresses, ServiceRetirement
 from .api import Rejection, ServiceCatalog, ServiceEvidence, ServiceStore
 
+ROOT_ONLY_APPROVED = "refused: approved_in records the user's approval of a change; only root passes it. Nothing was retired."
 RETIRE_UNRATED = (
     "refused: {n} delivered request(s) of `{name}` have no verdict yet: {tasks}. Record the user's verdict on each with feedback first "
     "(CLI: hirearchy feedback <task id> accept|reject --note ...); a service is retired only after its verdicts, so that its record stays "
@@ -44,8 +45,11 @@ class RuleServiceRetirement(ServiceRetirement):
         self._events = events
         self._evidence = evidence
 
-    def retire_service(self, actor: str, owner: str, name: str, reason: str) -> str:
+    def retire_service(self, actor: str, owner: str, name: str, reason: str, approved_in: str = "") -> str:
         actor = self._agents.require(actor)
+        approval = approved_in.strip()
+        if actor != ROOT and approval:
+            raise OrgError(ROOT_ONLY_APPROVED)
         owner = self._owners.resolve(actor, owner)
         if owner == ROOT or not self._agents.exists(owner) or parent(owner) != actor:
             raise OrgError(f"you can only retire services of your direct reports (root: top-level agents); {owner!r} is not one")
@@ -56,7 +60,9 @@ class RuleServiceRetirement(ServiceRetirement):
             raise OrgError("say why the service is retired (reason)")
         if actor == ROOT:  # an agent client retires its report's service as before
             self._check_record(owner, name)
-        dest = self._store.retire(owner, name, f"{self._clock.now():%Y%m%dT%H%M%S%f}")
+        now = self._clock.now()
+        record = {"retired": now.isoformat(timespec="seconds"), "by": actor, "reason": reason.strip(), **({"approved_in": approval} if approval else {})}
+        dest = self._store.retire(owner, name, f"{now:%Y%m%dT%H%M%S%f}", record)
         self._events.emit("service.retire", actor=actor, owner=owner, service=name, by=actor)
         self._delivery.notify(
             owner, f"service {name} retired",

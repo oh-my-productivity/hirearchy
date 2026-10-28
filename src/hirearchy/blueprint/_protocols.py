@@ -204,8 +204,9 @@ class TeamBuilding(Protocol):
 
 @runtime_checkable
 class ServiceDefining(Protocol):
-    def define(self, bp: Mapping[str, object], agents: Sequence[Agent], built: Built) -> None:
-        """Define the services of the blueprint for the top-level agent; ``built`` records each one the moment it is defined."""
+    def define(self, bp: Mapping[str, object], agents: Sequence[Agent], built: Built, approved_in: str | None = None) -> None:
+        """Define the services of the blueprint for the top-level agent; ``built`` records each one the moment it is defined. Each contract
+        records ``approved_in`` (``plan {plan_id}``) when given."""
         ...
 
 

@@ -110,3 +110,30 @@ def test_an_amendment_that_adds_nothing_has_no_such_line(w: ServicesWorld) -> No
     define(w)
     reply = amend(w, remove_acceptance=["At most 600 words"], words="Drop the limit.")
     assert " from your words " not in reply
+
+
+def test_a_first_definition_by_a_plan_writes_approved_in(w: ServicesWorld) -> None:
+    define(w, approved_in="plan 0123456789ab")
+    assert meta_of(w)["approved_in"] == "plan 0123456789ab"
+    define(w, name="other", approved_in="  change 0123456789ab ")
+    text = w.text("ceo/services/other/SERVICE.md")
+    assert text is not None and split_frontmatter(text)[0]["approved_in"] == "change 0123456789ab"
+
+
+def test_a_definition_without_an_approval_writes_no_approved_in(w: ServicesWorld) -> None:
+    define(w)
+    assert "approved_in" not in meta_of(w)
+
+
+def test_an_agents_approved_in_is_refused(w: ServicesWorld) -> None:
+    with pytest.raises(OrgError) as refused:
+        define(w, owner="ceo/eng", name="inner", actor="ceo", approved_in="plan 0123456789ab")
+    assert str(refused.value) == "refused: approved_in records the user's approval of a change; only root passes it. Nothing was written."
+    assert w.text("ceo/eng/services/inner/SERVICE.md") is None
+
+
+def test_an_amendment_with_approved_in_is_refused_and_keeps_the_mark_of_v1(w: ServicesWorld) -> None:
+    define(w, approved_in="plan 0123456789ab")
+    with pytest.raises(OrgError, match="approved_in"):
+        amend(w, add_acceptance=["Brief"], words="Add a brief.", approved_in="plan 0123456789ab")
+    assert meta_of(w)["version"] == 1

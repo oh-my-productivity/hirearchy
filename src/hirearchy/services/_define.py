@@ -39,6 +39,10 @@ AMENDMENT_SOURCES = (
     "refused: sources and elicitation record a first definition's criteria; an amendment records the user's words with words "
     "(CLI: --words). Nothing was written."
 )
+ROOT_ONLY_APPROVED = "refused: approved_in records the user's approval of a change; only root passes it. Nothing was written."
+AMENDMENT_APPROVED = (
+    "refused: approved_in records the approval a service was defined under; an amendment of a live service keeps it. Nothing was written."
+)
 SOURCED_REPLY = 'C{k} from your words "{words}"; words I added: {added}.'
 PAIR = (
     "refused: answers and about go together: answers=<the rejection's message id>, about=<the C or R id your question named> "
@@ -179,7 +183,7 @@ class RuleContractDefiner(ContractDefinitions):
         self, actor: str, owner: str, name: str, *, description: str | None, inputs: object, acceptance: object,
         deliverable: Mapping[str, object] | None, budget: int | None, playbook: str | None, locked: bool | None, notes: str | None,
         add_acceptance: object, remove_acceptance: object, answers: str | None, about: str | None, words: str | None,
-        sources: Sequence[Mapping[str, object]] | None, elicitation: str | None,
+        sources: Sequence[Mapping[str, object]] | None, elicitation: str | None, approved_in: str | None,
     ) -> str:
         actor = self._agents.require(actor)
         owner = self._owners.resolve(actor, owner)
@@ -195,6 +199,9 @@ class RuleContractDefiner(ContractDefinitions):
             raise OrgError(ROOT_ONLY)
         if actor != ROOT and (sources is not None or elicitation is not None):
             raise OrgError(ROOT_ONLY_SOURCES)
+        approval = (approved_in or "").strip()
+        if actor != ROOT and approval:
+            raise OrgError(ROOT_ONLY_APPROVED)
         answers_n, about_n, words_n = (answers or "").strip(), (about or "").strip().upper(), (words or "").strip()
         given = bool(answers_n or about_n or words_n)  # what root says about where an amendment comes from
         if not NAME_RE.fullmatch(name or ""):
@@ -214,6 +221,8 @@ class RuleContractDefiner(ContractDefinitions):
             raise OrgError(NOT_AN_AMENDMENT)
         if (sources is not None or elicitation is not None) and old is not None and prior is None:
             raise OrgError(AMENDMENT_SOURCES)
+        if approval and old is not None and prior is None:
+            raise OrgError(AMENDMENT_APPROVED)
         if old is not None and playbook is not None and prior is None:
             raise OrgError(
                 f"the playbook belongs to {owner}, which revises it with revise_playbook: do not pass `playbook` when "
@@ -278,6 +287,8 @@ class RuleContractDefiner(ContractDefinitions):
             "deliverable": new.deliverable, "budget": new.budget, "locked": new.locked, "version": new.version, "defined_by": actor,
             "defined": now, "created": now if old is None or old.created is None else old.created.isoformat(timespec="microseconds"),
         }
+        if approval:  # the approval a first definition (or a continuation's next version) rests on
+            meta["approved_in"] = approval
         if sources_n is not None:  # where each criterion of a first definition (or of a continuation's next version) comes from
             meta["sources"] = sources_n
         if elicitation_n is not None:

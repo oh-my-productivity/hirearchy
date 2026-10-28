@@ -14,7 +14,7 @@ from .api import Contract, Playbook
 
 
 VERSIONED_KINDS = ("SERVICE", "PLAYBOOK")  # the files that keep a history
-FILE_SHAPE = re.compile(r"(SERVICE|PLAYBOOK)\.md|history/(SERVICE|PLAYBOOK)\.v\d+\.md")  # the files of a service directory, as named inside it
+FILE_SHAPE = re.compile(r"(SERVICE|PLAYBOOK|RETIRED)\.md|history/(SERVICE|PLAYBOOK|RETIRED)\.v\d+\.md")  # the files of a service directory, as named inside it
 
 
 def as_int(value: object, default: int = 0) -> int:
@@ -25,6 +25,15 @@ def as_int(value: object, default: int = 0) -> int:
         return int(cast("SupportsInt | str", value))
     except (TypeError, ValueError):
         return default
+
+
+def restore_targets(files: Iterable[tuple[str, str]]) -> list[tuple[str, str]]:
+    """The files of a retired copy that a continuation puts back, as ``(name inside the live service directory, text)``, ``SERVICE.md`` last (until it
+    is there, no service exists). The copy's ``RETIRED.md`` is kept as ``history/RETIRED.v<n>.md``, ``n`` the contract version it retired."""
+    shapes = [(rel, text) for rel, text in files if FILE_SHAPE.fullmatch(rel)]
+    version = next((as_int(split_frontmatter(text)[0].get("version")) for rel, text in shapes if rel == "SERVICE.md"), 0)
+    named = [(f"history/RETIRED.v{version}.md" if rel == "RETIRED.md" else rel, text) for rel, text in shapes]
+    return sorted(named, key=lambda file: file[0] == "SERVICE.md")
 
 
 def playbook_version(text: str | None) -> int:

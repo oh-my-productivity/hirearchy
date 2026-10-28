@@ -45,9 +45,10 @@ class HiringBlueprintApplier(BlueprintApplier):
         top = agents[0]
         built = Built()
         msg = None
+        approved_in = f"plan {self._identity.plan_id(bp)}"  # the id propose_org returned for this blueprint
         try:
-            self._team.build(agents, bp, split, built, f"plan {self._identity.plan_id(bp)}")
-            self._services.define(bp, agents, built)
+            self._team.build(agents, bp, split, built, approved_in)
+            self._services.define(bp, agents, built, approved_in)
             msg = self._first_task.give(bp, top, total)
         except Exception:
             self._rollback.undo(built)
