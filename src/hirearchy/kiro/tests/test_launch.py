@@ -636,3 +636,80 @@ def test_the_quality_tool_changes_nothing_so_it_is_a_read_only_tool() -> None:
 
 def test_the_read_only_tools_are_the_sorted_hirearchy_tool_ids() -> None:
     assert _launch.READ_ONLY_TOOL_IDS == tuple(sorted(_launch.READ_ONLY_TOOL_IDS)) and all(i.startswith("hirearchy::") for i in _launch.READ_ONLY_TOOL_IDS)
+
+
+# ------------------------------------------------- the effort warning and the effort stop (batch 1.1)
+
+WARNING = "[warn] failed to set effort 'high': model 'claude-sonnet-5.5' offers no effort levels"
+QUOTED = "failed to set effort 'high': model 'claude-sonnet-5.5' offers no effort levels"  # 78 characters
+OTHER_WARNING = "[warn] failed to set effort 'high': the engine did not load its model list in time"
+OTHER_QUOTED = "failed to set effort 'high': the engine did not load its model list in time"  # 75 characters
+
+
+def mark_a(quoted: str, effects: str = "none") -> str:
+    """Text A of the design, written out (not built from ``_launch.EFFORT_MARK``) so that the test pins it."""
+    return f"# kiro: effort not set, run stopped (kiro-cli: {quoted}); tool effects: {effects}"
+
+
+def test_the_effort_warning_is_matched_by_its_prefix() -> None:
+    assert _launch.EFFORT_PREFIX == "failed to set effort"
+    assert _launch.EFFORT_MARK == "# kiro: effort not set, run stopped (kiro-cli: "
+
+
+@pytest.mark.parametrize(("line", "quoted"), [(WARNING, QUOTED), (OTHER_WARNING, OTHER_QUOTED)], ids=["offers-no-effort-levels", "model-list-not-loaded"])
+def test_effort_warning_gives_kiros_line_from_the_prefix_on(line: str, quoted: str) -> None:
+    assert _launch.effort_warning(line) == quoted
+    assert len(quoted) in (78, 75)
+
+
+def test_effort_warning_takes_any_reason_with_or_without_a_level_tag() -> None:
+    assert _launch.effort_warning("[warn] failed to set effort 'xhigh': something new") == "failed to set effort 'xhigh': something new"
+    assert _launch.effort_warning("failed to set effort 'high': x") == "failed to set effort 'high': x"
+    assert _launch.effort_warning("[WARN] failed to set effort 'high': x") == "failed to set effort 'high': x"
+
+
+def test_effort_warning_drops_carriage_returns_and_cuts_at_300() -> None:
+    assert _launch.effort_warning(WARNING + "\r") == QUOTED
+    assert len(_launch.effort_warning("failed to set effort " + "x" * 400)) == 300
+
+
+@pytest.mark.parametrize(
+    "line", ["note: failed to set effort 'high'", "[warn] failed to set efforts", "[verboselevel] failed to set effort 'high'", ""]
+)
+def test_effort_warning_is_empty_unless_the_line_starts_with_the_prefix(line: str) -> None:
+    assert _launch.effort_warning(line) == ""
+
+
+@pytest.mark.parametrize(("line", "quoted"), [(WARNING, QUOTED), (OTHER_WARNING, OTHER_QUOTED)], ids=["offers-no-effort-levels", "model-list-not-loaded"])
+def test_effort_stop_reads_the_launchers_mark(line: str, quoted: str) -> None:
+    tail = f"# kiro: run started (engine v3)\n{line}\n{mark_a(quoted)}\n\n# exit -9 after 3s\n"
+    assert _launch.effort_stop(tail) == _launch.EffortStop(quoted, 0)
+
+
+def test_effort_stop_reads_the_number_of_tool_effects() -> None:
+    tail = f"# kiro: run started (engine v3)\n{WARNING}\n{mark_a(QUOTED, '2')}\n\n# exit -9 after 3s\n"
+    assert _launch.effort_stop(tail) == _launch.EffortStop(QUOTED, 2)
+
+
+def test_effort_stop_is_none_unless_the_mark_is_the_last_kiro_line_with_a_warning_before_it() -> None:
+    mark = mark_a(QUOTED)
+    throttle = '[run error] prompt: {"retryErrorType":"THROTTLING"}\n' + _launch.THROTTLE_MARK + "none\n\n# exit 75 after 3s\n"
+    for tail in (
+        f"{WARNING}\n{mark}\n# kiro: launcher error: OSError: x\n\n# exit -9 after 3s\n",
+        f"# kiro: run started (engine v3)\n{mark}\n\n# exit -9 after 3s\n",
+        f"{mark}\n{WARNING}\n\n# exit -9 after 3s\n",
+        f"{WARNING}\n{mark_a(QUOTED, 'two')}\n\n# exit -9 after 3s\n",
+        f"{WARNING}\n# kiro: effort not set, run stopped (kiro-cli: {QUOTED}; tool effects: none\n\n# exit -9 after 3s\n",
+        "",
+        throttle,
+    ):
+        assert _launch.effort_stop(tail) is None, tail
+
+
+def test_the_kiro_api_exports_the_effort_names() -> None:
+    import hirearchy.kiro as kiro
+
+    assert kiro.EFFORT_PREFIX is _launch.EFFORT_PREFIX
+    assert kiro.EffortStop is _launch.EffortStop
+    assert kiro.effort_stop is _launch.effort_stop
+    assert kiro.effort_warning is _launch.effort_warning

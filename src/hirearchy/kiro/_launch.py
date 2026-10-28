@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import select
 import signal
 import subprocess
@@ -23,6 +24,12 @@ USAGE = "usage: _launch.py --start-deadline SECONDS -- KIRO_ARGV..."
 THROTTLE_EXIT = 75  # EX_TEMPFAIL of sysexits.h: the launcher's verdict "throttled by the model service before any tool effect" (kiro's own 75 becomes 1)
 THROTTLE_MARK = "# kiro: throttled by the model service (retryErrorType THROTTLING); tool effects: "  # followed by "none" or the number of effects
 THROTTLING = '"retryErrorType":"THROTTLING"'  # as it reads in a run error with its spaces removed
+EFFORT_PREFIX = "failed to set effort"  # the stable start of kiro-cli's warning that it did not apply --effort, whatever reason follows it
+# A stderr line that starts with the prefix, at once or after one level tag such as "[warn] ": group 1 is kiro's text from the prefix on.
+EFFORT_LINE = re.compile(r"(?:\[[A-Za-z]{1,10}\] )?(" + re.escape(EFFORT_PREFIX) + r"\b.*)")
+EFFORT_MARK = "# kiro: effort not set, run stopped (kiro-cli: "  # followed by the warning, "); tool effects: " and "none" or the number of effects
+EFFORT_EFFECTS = re.compile(r"\); tool effects: (none|[0-9]+)$")
+CUT_WARNING = 300  # longest warning kept in the mark
 READ_KINDS = ("read", "search", "think", "fetch")  # kinds of tool call that change nothing
 # The tools of hirearchy that change nothing, as kiro names them (sorted). Pinned equal to observability's READ_ONLY_TOOLS by
 # tests/architecture/test_read_only_tool_ids.py: the launcher is standard library only and cannot import it.
@@ -201,6 +208,38 @@ def throttled_without_effect(tail: str) -> bool:
     if not marks or before[marks[-1]] != THROTTLE_MARK + "none":
         return False
     return any(line.startswith("[run error] ") and THROTTLING in line.replace(" ", "") for line in before[: marks[-1]])
+
+
+def effort_warning(line: str) -> str:
+    """Kiro's warning that it did not set the effort, as the mark quotes it (from the prefix on, without trailing space and ``\\r``, cut at 300
+    characters), or ``""`` when ``line`` is not one."""
+    found = EFFORT_LINE.match(line.rstrip())
+    return found.group(1).replace("\r", "")[:CUT_WARNING] if found else ""
+
+
+@dataclass(frozen=True)
+class EffortStop:
+    warning: str  # kiro's warning from the prefix on, as the mark quotes it
+    effects: int  # tool effects before the stop; 0 = none
+
+
+def effort_stop(tail: str) -> EffortStop | None:
+    """The launcher's stop of a run whose kiro-cli did not set its effort, as the end of the run log records it (never raises): the mark
+    ``EFFORT_MARK ... ; tool effects: none|<n>`` is the last ``# kiro:`` line before the runtime's closing ``# exit`` line, and kiro's warning
+    stands on a line before it. An agent's text or shell can forge both lines, so the exit -9 the scheduler did not cause is the verdict and
+    this is its second check."""
+    lines = tail.splitlines()
+    closing = [i for i, line in enumerate(lines) if line.startswith("# exit ")]
+    before = lines[: closing[-1]] if closing else lines
+    marks = [i for i, line in enumerate(before) if line.startswith("# kiro:")]
+    if not marks or not before[marks[-1]].startswith(EFFORT_MARK):
+        return None
+    mark = before[marks[-1]]
+    ending = EFFORT_EFFECTS.search(mark)
+    if ending is None or not any(effort_warning(line) for line in before[: marks[-1]]):
+        return None
+    effects = ending.group(1)
+    return EffortStop(mark[len(EFFORT_MARK) : ending.start()], 0 if effects == "none" else int(effects))
 
 
 # ----------------------------------------------------------------------------------------------------------- the launcher
