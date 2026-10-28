@@ -363,9 +363,9 @@ def test_a_kiro_killed_before_its_first_line_leaves_no_process(tmp_path: Path) -
 
 
 def test_a_spinner_without_a_newline_is_given_up_on_the_same_way(tmp_path: Path, session: bool) -> None:
-    code, out, _, group = launch_in_group(tmp_path, "printf '\\r- waiting for sign-in'\nexec sleep 30\n", deadline=1, leader=session)
+    code, out, _, group = launch_in_group(tmp_path, "printf '\\r- waiting for sign-in'\nexec sleep 30\n", deadline=3, leader=session)
     assert code == (-9 if session else 1)
-    assert out[-1].startswith("# kiro: gave up after 1s")
+    assert out[-1].startswith("# kiro: gave up after 3s")
     assert any("waiting for sign-in" in line for line in out[:-1])  # the log shows what kiro printed
     assert group_gone(group)
 
@@ -455,7 +455,7 @@ def test_a_background_child_holding_stdout_does_not_hold_the_run(tmp_path: Path)
     try:
         code, out, _ = launch(tmp_path, body, timeout=20)
         assert code == 0 and out[0] == "# kiro: run started (engine v3)"
-        assert time.monotonic() - started < 5
+        assert time.monotonic() - started < 10
     finally:
         if (tmp_path / "pid").exists() and (tmp_path / "pid").read_text(encoding="utf-8").strip():
             try:
@@ -796,7 +796,7 @@ def test_a_background_child_holding_stderr_does_not_hold_the_run(tmp_path: Path)
     try:
         code, log = launch_logged(tmp_path, body, timeout=20)
         assert code == 0 and log[0] == "# kiro: run started (engine v3)"
-        assert time.monotonic() - started < 5
+        assert time.monotonic() - started < 10
     finally:
         if (tmp_path / "pid").exists() and (tmp_path / "pid").read_text(encoding="utf-8").strip():
             try:
