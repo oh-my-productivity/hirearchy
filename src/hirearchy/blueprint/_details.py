@@ -6,8 +6,10 @@ from collections.abc import Mapping, Sequence
 from pathlib import Path
 
 from ._protocols import AccessReport, BudgetPlanning, PlanBasis, PlanDetailing, PlanWords, PlaybookWriting
+from ._provenance import source_line
 from ._rules import is_code, review_required
 from ._view import (
+    criteria_entries,
     criteria_of,
     deliverable_of,
     is_plain,
@@ -17,6 +19,7 @@ from ._view import (
     s,
     services_of,
     svc_criteria,
+    svc_criteria_entries,
     svc_deliverable,
     task_of,
 )
@@ -124,7 +127,10 @@ class TextPlanDetails(PlanDetailing):
         if plain:
             L += ["", f"First task: to {s(task.get('to')) or (agents[0].addr if agents else '?')}: {s(task.get('title')) or '(missing)'}"]
             crit = criteria_of(bp)
-            L += [f"  {i}. {c}" for i, c in enumerate(crit, 1)] or ["  (no acceptance criteria)"]
+            for i, (c, entry) in enumerate(zip(crit, criteria_entries(bp)), 1):
+                L += [f"  {i}. {c}", f"     {source_line(entry)}"]
+            if not crit:
+                L.append("  (no acceptance criteria)")
         if services_of(bp):
             L += ["", f"Services ({len(services_of(bp))}), offered by {agents[0].addr if agents else '?'} and defined by root (the contract: only root can change it):"]
             for sv in services_of(bp):
@@ -135,7 +141,10 @@ class TextPlanDetails(PlanDetailing):
                       f"  budget: {svc_budgets.get(name, 0)} runs per request" + (", locked (the lead may not revise the playbook)" if sv.get("locked") is True else ""),
                       f"  deliverable: {s(sd.get('description')) or '(missing)'}" + (f" [{ssp}]" if ssp else "") + f"; delivered to: {self._words.delivery(sv, agents, bp)}",
                       "  acceptance (the contract, travels with every request):"]
-                L += [f"    {i}. {c}" for i, c in enumerate(svc_criteria(sv), 1)] or ["    (none)"]
+                for i, (c, entry) in enumerate(zip(svc_criteria(sv), svc_criteria_entries(sv)), 1):
+                    L += [f"    {i}. {c}", f"       {source_line(entry)}"]
+                if not svc_criteria(sv):
+                    L.append("    (none)")
                 pb = sv.get("playbook")
                 L.append("  playbook v1: " + (f"given in the blueprint ({len(pb.split())} words)" if isinstance(pb, str) and pb.strip() else "generated from the team (steps, budget plan):"))
                 if not (isinstance(pb, str) and pb.strip()) and agents:

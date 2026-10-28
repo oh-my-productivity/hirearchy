@@ -113,7 +113,7 @@ def test_a_first_request_is_made_as_root_and_reported(h: ApplierHarness) -> None
 
 def test_the_warnings_of_the_plan_come_back_in_the_summary(h: ApplierHarness) -> None:
     summary = h.applier.apply(bp_of("research/filled", h), allowed_roots=[base_dir(h.tmp)])
-    assert [w.code for w in summary.warnings] == ["path-delivery"] and summary.text().splitlines()[-1].startswith("warning: needs.deliverable.path")
+    assert [w.code for w in summary.warnings if not w.code.startswith("criterion-")] == ["path-delivery"] and summary.text().splitlines()[-1].startswith("warning: needs.deliverable.path")
 
 
 def test_a_blueprint_with_errors_is_refused_before_anything_is_written(h: ApplierHarness) -> None:

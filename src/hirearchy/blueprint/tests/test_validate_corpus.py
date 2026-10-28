@@ -23,7 +23,7 @@ NAMES = [name for name, _, _ in _corpus.MUTATIONS] + list(_corpus.ORG_SPECS)
 # Every code of an Issue that ``validate`` can emit (``schema``: a blueprint that is not a mapping, in the contract suite).
 ALL_CODES = {
     "agents", "authority", "budget", "budget-cap", "budget-low", "budget-tight", "children", "code-criteria", "code-needs", "code-tools",
-    "criteria", "deliverable", "deliverable-format", "depth", "edits-others", "effort-floor", "exists", "inputs", "inputs-overlap", "kind", "limit-criterion",
+    "criteria", "criterion-source", "criterion-words", "deliverable", "deliverable-format", "depth", "edits-others", "effort-floor", "exists", "inputs", "inputs-overlap", "kind", "limit-criterion",
     "manager-cheap-model", "mission", "model-floor", "model-policy", "model-review", "model-single", "name", "needs", "needs-approval", "needs-progress",
     "needs-scope", "path", "path-delivery", "path-parent", "path-root", "playbook", "read-nothing", "review", "scale", "service",
     "service-inputs", "service-name", "service-owner", "service-request", "shell-unconfined", "task", "template", "unknown-key",

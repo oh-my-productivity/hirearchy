@@ -64,11 +64,11 @@ def test_a_tier_missing_from_needs_models_uses_the_orgs_default_model(research, 
 def test_the_default_policy_is_single_model_and_raises_no_warning(research, tmp_path):
     found = bpm.validate(research, allowed_roots=[tmp_path])
     assert not bpm.errors(found)
-    assert codes(found) <= {"path-delivery"}  # only the delivery note of the example; nothing about models
+    assert codes(found) - {"criterion-source", "criterion-words"} <= {"path-delivery"}  # only the delivery note of the example; nothing about models
     unmapped = copy.deepcopy(research)
     unmapped["needs"].pop("models")
     unmapped["needs"].pop("model_policy")
-    assert not codes(bpm.validate(unmapped, allowed_roots=[tmp_path])) - {"path-delivery"}
+    assert not codes(bpm.validate(unmapped, allowed_roots=[tmp_path])) - {"path-delivery", "criterion-source", "criterion-words"}
     assert set(models_of(research, tmp_path).values()) == {DEFAULT_MODEL}
 
 

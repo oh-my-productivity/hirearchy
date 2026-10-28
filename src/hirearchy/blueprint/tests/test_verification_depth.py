@@ -86,7 +86,7 @@ def test_analysis_example_is_a_known_kind_and_proposes_cleanly_once_filled(cwd):
     bp = filled("analysis", cwd)
     issues = bpm.validate(bp, allowed_roots=[cwd.parent])
     assert not bpm.errors(issues), [i.render() for i in issues]
-    assert codes(issues) <= {"path-delivery", "path-parent", "workspace-new", "shell-unconfined"}
+    assert codes(issues) - {"criterion-source", "criterion-words"} <= {"path-delivery", "path-parent", "workspace-new", "shell-unconfined"}
     out = bpm.propose_text(bp, allowed_roots=[cwd.parent])
     assert bpm.PLAN_HEADING in out and "Errors (" not in out
 

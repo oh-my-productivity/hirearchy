@@ -14,6 +14,7 @@ so an ``Org`` whose runtime was opened with other ports (``FlakyHiring`` ...) ap
 
 from __future__ import annotations
 
+import re
 from collections.abc import Mapping, Sequence
 from pathlib import Path
 
@@ -38,6 +39,7 @@ from hirearchy.kernel import Environment
 from hirearchy.kiro import ConfinementPolicy
 from hirearchy.services import ContractNormalizer
 
+SOURCE_LINE = re.compile(r"^\s+(?:from your words |my default: |my wording)")  # the line under a criterion that says where it comes from (design 10.1)
 NO_ORG = Path("/nonexistent/hirearchy-no-org")  # a root nobody opens: the runtime of "no organization yet"
 Roots = Sequence[str | Path] | None
 
@@ -217,3 +219,8 @@ def server_of_the_environment():
     """The MCP server of the identity the environment names (``ORG_ROOT``, ``ORG_AGENT`` ...): what ``hirearchy mcp`` serves."""
     binding, me = wire_mcp_server.binding_resolver().resolve()
     return wire_mcp_server.server_factory(binding).build(me)
+
+
+def without_source_lines(text: str) -> list[str]:
+    """The lines of a plan without the source line under each criterion: the compactness of the block is counted on the rest."""
+    return [line for line in text.splitlines() if not SOURCE_LINE.match(line)]

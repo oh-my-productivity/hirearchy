@@ -18,9 +18,11 @@ from ._plan_texts import (
     SHOWN_WARNINGS,
 )
 from ._protocols import AccessWording, BudgetPlanning, OrgContext, PlanBasis, PlanWords, UserPlanning
+from ._provenance import source_line
 from ._rules import is_code, review_required
 from ._text import GOAL_CLIP, clip
 from ._view import (
+    criteria_entries,
     criteria_of,
     deliverable_of,
     has_plain_task,
@@ -32,6 +34,7 @@ from ._view import (
     s,
     services_of,
     svc_criteria,
+    svc_criteria_entries,
     task_of,
 )
 from .api import Agent, Issue
@@ -104,7 +107,8 @@ class TextUserPlan(UserPlanning):
         if plain:
             crit = criteria_of(bp)
             L.append("Done when ALL of these hold:" if crit else "Done when: (no success checks given)")
-            L += [f"  {i}. {' '.join(s(c).split())}" for i, c in enumerate(crit[:SHOWN_CRITERIA], 1)]  # the contract: in full
+            for i, (c, entry) in enumerate(zip(crit[:SHOWN_CRITERIA], criteria_entries(bp)), 1):  # the contract: in full
+                L += [f"  {i}. {' '.join(s(c).split())}", f"     {source_line(entry)}"]
             if len(crit) > SHOWN_CRITERIA:
                 L.append(f"  ... and {len(crit) - SHOWN_CRITERIA} more (see the details)")
         L += self._user_services(bp, agents)
@@ -217,7 +221,8 @@ class TextUserPlan(UserPlanning):
             out.append(f"  You provide: {self._words.input_words(sv)}")
             out.append(f"  Each request: up to {budgets[name]} runs")
             out.append("  Checks:" if crit else "  Checks: (none given)")
-            out += [f"    {i}. {' '.join(c.split())}" for i, c in enumerate(crit[:SHOWN_SERVICE_CRITERIA], 1)]
+            for i, (c, entry) in enumerate(zip(crit[:SHOWN_SERVICE_CRITERIA], svc_criteria_entries(sv)), 1):
+                out += [f"    {i}. {' '.join(c.split())}", f"       {source_line(entry)}"]
             if len(crit) > SHOWN_SERVICE_CRITERIA:
                 out.append(f"    ... and {len(crit) - SHOWN_SERVICE_CRITERIA} more (see the details)")
             out.append(f"  Delivered to: {self._words.delivery(sv, agents, bp)}")

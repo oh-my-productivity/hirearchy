@@ -28,14 +28,17 @@ Deliverable:
 
 First task: to lead: T
   1. a
+     my wording: your words for it were not recorded
 
 Checkpoints:
 - Approval: plan approval before anything is built or started (default)
 - Progress: one line on request (default)
 - Any spend beyond the budget needs your OK.
 
-Warnings (6):
+Warnings (8):
 - task.acceptance[1]: 'a' is not checkable; state the exact number, section, format or path that decides pass/fail
+- task.acceptance[1]: criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
+- needs.elicitation: this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.
 - needs.review: review not decided: set needs.review to true (independent check) or false; no independent verifier is planned
 - needs.budget_runs: no budget cap from the user; the estimate is 3 runs: ask what they are willing to spend
 - needs.scope: not elicited: what is in and out of scope

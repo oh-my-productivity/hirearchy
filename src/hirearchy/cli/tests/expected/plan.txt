@@ -30,15 +30,20 @@ Deliverable:
 
 First task: to lead: Write the note
   1. The note has a title.
+     my wording: your words for it were not recorded
   2. The note has a summary of two sentences.
+     my wording: your words for it were not recorded
 
 Checkpoints:
 - Approval: plan approval before anything is built or started (default)
 - Progress: one line on request (default)
 - Any spend beyond the budget needs your OK.
 
-Warnings (4):
+Warnings (7):
 - task.acceptance: the 300-word limit is not in any criterion; add an exact criterion such as 'at most 300 words (as counted by read)'
+- task.acceptance[1]: criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
+- task.acceptance[2]: criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
+- needs.elicitation: this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.
 - needs.review: review not decided: set needs.review to true (independent check) or false; no independent verifier is planned
 - needs.approval: not elicited: when the user wants to approve (plan, before start, final)
 - needs.progress: not elicited: how the user wants progress updates

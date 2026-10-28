@@ -11,7 +11,7 @@ from testkit.blueprint_world import ex
 from testkit.reach.hirearchy.core import ROOT, Org, OrgError
 from testkit.blueprint_world import server_of_the_environment
 
-from testkit.blueprint_world import bpm, services_mod
+from testkit.blueprint_world import bpm, services_mod, without_source_lines
 
 from hirearchy.blueprint._budgeting import BudgetPlanner
 from hirearchy.blueprint._example_texts import SERVICE_BUDGETS
@@ -40,7 +40,7 @@ def filled_service(kind: str, base: Path, **kw) -> dict:
     return bpm.load_text(fill(ex.example(kind, base, service=True), base, **kw))
 
 
-ALLOWED_WARNINGS = {"path-delivery", "path-parent", "workspace-new", "shell-unconfined"}
+ALLOWED_WARNINGS = {"path-delivery", "path-parent", "workspace-new", "shell-unconfined", "criterion-source", "criterion-words"}
 
 
 @pytest.mark.parametrize("kind", ex.KINDS)
@@ -260,10 +260,10 @@ def test_the_shipped_service_example_validates_plans_and_applies(tmp_path):
     bp = bpm.load_text(text)
     found = bpm.validate(bp, allowed_roots=[tmp_path])
     assert not bpm.errors(found), [i.render() for i in found]
-    assert codes(found) <= {"path-delivery", "path-parent"}, [i.render() for i in found]
+    assert codes(found) - {"criterion-source", "criterion-words"} <= {"path-delivery", "path-parent"}, [i.render() for i in found]
     assert bpm._is_request(bp) and bp["services"][0]["name"] == "weekly-brief" and not bpm._plain(bp)
     block = bpm.plan_for_user(bp, found, allowed_roots=[tmp_path])
-    assert len(block.splitlines()) <= 42 and "Services (kept ready" in block
+    assert len(without_source_lines(block)) <= 42 and "Services (kept ready" in block
     assert "First request, started on approval: weekly-brief (topic: solid-state batteries)." in block
     org = Org.init(tmp_path / "org", "x", {"poll_seconds": 0.05})
     s = bpm.apply(org, bp, allowed_roots=[tmp_path])

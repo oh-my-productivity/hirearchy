@@ -28,7 +28,7 @@ def codes(issues: list[Issue], level: str | None = None) -> set[str]:
 def test_the_shipped_example_has_no_error_and_one_warning(h: ValidatorHarness) -> None:
     issues = h.validator.validate(_corpus.research(h.tmp), allowed_roots=[h.tmp])
     assert not errors(issues)
-    assert codes(issues) == {"path-delivery"}
+    assert codes(issues) - {"criterion-source", "criterion-words"} == {"path-delivery"}
 
 
 def test_what_is_not_a_mapping_is_a_schema_error(h: ValidatorHarness) -> None:

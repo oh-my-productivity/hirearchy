@@ -9,6 +9,8 @@ import pytest
 from hirearchy.blueprint import Issue, PlanRenderer
 from hirearchy.blueprint.testing import IMPLEMENTATIONS, RendererHarness, StaticOrgContext
 
+from testkit.blueprint_world import without_source_lines
+
 from ._plans import KEYS, PROPOSED, base_dir, golden, load_text, scrub, template_at
 from ._support import implementations, make
 
@@ -108,5 +110,5 @@ def test_the_plan_is_made_of_the_blueprint_only(h: RendererHarness) -> None:
 
 def test_the_block_is_compact(h: RendererHarness) -> None:
     base = base_dir(h.tmp)
-    lines = h.renderer.plan_for_user(bp_of("research/filled", base), allowed_roots=[base]).splitlines()
+    lines = without_source_lines(h.renderer.plan_for_user(bp_of("research/filled", base), allowed_roots=[base]))
     assert len(lines) <= 42

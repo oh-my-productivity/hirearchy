@@ -58,7 +58,7 @@ def mutate(bp, fn):
 def test_example_is_valid_with_one_expected_warning(base, roots):
     issues = check(base, roots)
     assert not bpm.errors(issues)
-    assert codes(issues) == {"path-delivery"}
+    assert codes(issues) - {"criterion-source", "criterion-words"} == {"path-delivery"}
 
 
 # ----------------------------------------------------------------------------------------- the rules

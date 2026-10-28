@@ -68,3 +68,21 @@ def test_apply_without_allowed_roots_passes_none(tmp_path: Path) -> None:
     f, bp = Fixture(tmp_path), new_blueprints()
     go(ApplyCommand(f.session, lambda: bp, lambda: bp, f.out), "apply", "bp.yaml")
     assert bp.last("apply")[1] == {"allowed_roots": None}
+
+
+def test_plan_shows_the_my_wording_line_and_both_warnings(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    """Design 10.1 step 4: at the terminal a plan whose criteria are plain strings and record none of the user's words says so, and warns."""
+    import testkit
+    import testkit.reach.yaml as yaml
+    from testkit.cli_world import main
+
+    bp = yaml.safe_load((testkit.REPO / "examples" / "blueprint-research.yaml").read_text())
+    (tmp_path / "deliverables").mkdir()
+    bp["needs"]["deliverable"]["path"] = str(tmp_path / "deliverables" / "competitors.md")
+    (tmp_path / "bp.yaml").write_text(yaml.safe_dump(bp, sort_keys=False), encoding="utf-8")
+    main(["plan", str(tmp_path / "bp.yaml"), "--allow-root", str(tmp_path)])
+    out = capsys.readouterr().out
+    assert "  1. Covers exactly Obsidian, Logseq, Joplin, Trilium and AnyType, and no other app.\n     my wording: your words for it were not recorded\n" in out
+    assert "- task.acceptance[1]: criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true." in out
+    assert "- needs.elicitation: this plan records none of the user's words, so no criterion can show where it comes from." in out
+    assert "Reply 'approve' or tell me what to change." in out  # warnings, not errors: the human applies their own file

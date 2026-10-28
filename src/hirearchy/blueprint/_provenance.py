@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 
+from ..services import added_words
 from ._view import mapping_or_empty, needs_of, s, services_of
 from .api import Issue
 
@@ -29,6 +30,16 @@ BAD_FROM_TASKS = "criterion {i}: from_tasks is a list of 1 to " + str(FROM_TASKS
 BAD_ASKED = "criterion {i}: asked is the question the quote answered, at most " + str(ASKED_MAX) + " characters, and only with from."
 NOT_IN_WORDS = 'criterion {i} quotes words that are not in needs.elicitation: "{quote}". Quote the user\'s own words exactly, or mark it default: true.'
 NO_WORDS = "criterion {i} quotes the user, but needs.elicitation is missing: put their answers there, verbatim."
+NO_SOURCE = "criterion {i} does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true."
+NO_RECORD = (
+    "this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation "
+    "(for a plan with only defaults: their request in their words), and give each criterion from: or default: true."
+)
+FROM_LINE = 'from your words "{quote}"{asked}; words I added: {added}'
+ASKED_LINE = ' (my question: "{asked}")'
+DEFAULT_LINE = "my default: you did not say this"
+UNRECORDED_LINE = "my wording: your words for it were not recorded"
+SHOWN_ADDED = 8  # the words a source line lists before it says how many more
 BAD_ELICITATION = "needs.elicitation is the user's answers, verbatim: a text of 1 to " + str(ELICITATION_MAX) + " characters."
 
 
@@ -63,11 +74,30 @@ def _form_problem(c: Mapping[str, object], i: int, extension: bool) -> str | Non
     return None
 
 
+def source_line(entry: object) -> str:
+    """The line the gate shows under a criterion (design 10.1 step 4): the user's words it rests on and the words root added, root's default, or
+    that its source was not recorded. ``entry`` is the criterion as written (a string or a mapping)."""
+    if isinstance(entry, dict):
+        quote = entry.get("from")
+        if isinstance(quote, str) and quote.strip():
+            asked = entry.get("asked")
+            question = " ".join(asked.split()) if isinstance(asked, str) else ""
+            added = added_words(s(entry.get("text")), quote, question)
+            listed = ", ".join(added[:SHOWN_ADDED]) + (f", +{len(added) - SHOWN_ADDED} more" if len(added) > SHOWN_ADDED else "") if added else "none"
+            return FROM_LINE.format(quote=" ".join(quote.split()), asked=ASKED_LINE.format(asked=question) if question else "", added=listed)
+        if entry.get("default") is True:
+            return DEFAULT_LINE
+    return UNRECORDED_LINE
+
+
 def criterion_issues(bp: Mapping[str, object], *, extension: bool, require_sources: bool) -> list[Issue]:
     """The provenance issues of a blueprint's criteria (``task.acceptance`` and each service's ``acceptance``): ``criterion-form`` and
-    ``criterion-from`` (errors everywhere) and a bad ``needs.elicitation``. ``extension``: the blueprint extends the current organization
-    (``from_tasks`` is allowed). ``require_sources``: over MCP, where a criterion without a source is an error as well."""
+    ``criterion-from`` (errors everywhere), a bad ``needs.elicitation``, and the two a plan without sources earns: ``criterion-source`` (a
+    criterion that says nothing of where it comes from) and ``criterion-words`` (no recorded words at all). ``extension``: the blueprint extends
+    the current organization (``from_tasks`` is allowed). ``require_sources``: over MCP, where those two are errors; at the terminal, warnings."""
+    level = "error" if require_sources else "warning"
     issues: list[Issue] = []
+    sourced = False  # some criterion rests on the user's words or on root's default, or has no source: the plan needs the words
     elicitation = needs_of(bp).get("elicitation")
     words: str | None = ""
     if elicitation is not None:
@@ -86,13 +116,23 @@ def criterion_issues(bp: Mapping[str, object], *, extension: bool, require_sourc
     for where, criteria in lists:
         for i, c in enumerate(criteria, 1):
             if not isinstance(c, dict):
+                if s(c):
+                    sourced = True
+                    issues.append(Issue(level, f"{where}[{i}]", NO_SOURCE.format(i=i), "criterion-source"))
                 continue
             problem = _form_problem(c, i, extension)
             if problem is not None:
                 issues.append(Issue("error", f"{where}[{i}]", problem, "criterion-form"))
-            elif "from" in c and words is not None:
+                continue
+            if "from_tasks" not in c:
+                sourced = True
+            if "from" in c and words is not None:
                 if not words:
                     issues.append(Issue("error", f"{where}[{i}]", NO_WORDS.format(i=i), "criterion-from"))
                 elif _fold(c["from"]) not in words:
                     issues.append(Issue("error", f"{where}[{i}]", NOT_IN_WORDS.format(i=i, quote=c["from"].strip()), "criterion-from"))
+            elif not any(k in c for k in SOURCE_KEYS):
+                issues.append(Issue(level, f"{where}[{i}]", NO_SOURCE.format(i=i), "criterion-source"))
+    if sourced and words == "":
+        issues.append(Issue(level, "needs.elicitation", NO_RECORD, "criterion-words"))
     return issues

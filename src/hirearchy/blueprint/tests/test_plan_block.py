@@ -6,6 +6,7 @@ import re
 from testkit.blueprint_world import ex as blueprint_examples
 
 from testkit.blueprint_world import bpm as bp_mod
+from testkit.blueprint_world import without_source_lines
 
 
 # --------------------------------------------------------------------------------------------- the plan block
@@ -29,7 +30,7 @@ def test_failure_policy_line_under_the_budget(tmp_path, monkeypatch):
     assert reserve > 0
     assert policy == (f"If the check still fails after one rework, I'll come back to you with options before spending the "
                       f"reserve (about {reserve} runs); nothing beyond the {total} planned runs is spent without your OK.")
-    assert len(lines) <= 42
+    assert len(without_source_lines(block)) <= 42
 
 
 def test_failure_policy_without_a_reserve(tmp_path, monkeypatch):

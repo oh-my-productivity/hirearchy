@@ -74,6 +74,13 @@ def criteria_of(bp: Mapping[str, object]) -> list[str]:
     return [criterion_text(c) for c in acc] if isinstance(acc, list) else []
 
 
+def criteria_entries(bp: Mapping[str, object]) -> list[object]:
+    """The entries of ``task.acceptance`` as written, one for each text ``criteria_of`` returns (a string or a mapping with its source)."""
+    t = bp.get("task")
+    acc = t.get("acceptance") if isinstance(t, dict) else None
+    return list(acc) if isinstance(acc, list) else []
+
+
 def services_of(bp: Mapping[str, object]) -> list[JsonObject]:
     """The service items of the blueprint that are mappings (``validate`` reports the others)."""
     raw = bp.get("services")
@@ -107,6 +114,12 @@ def svc_deliverable(sv: Mapping[str, object]) -> JsonObject:
 def svc_criteria(sv: Mapping[str, object]) -> list[str]:
     acc = sv.get("acceptance")
     return [text for c in acc if (text := criterion_text(c))] if isinstance(acc, list) else []
+
+
+def svc_criteria_entries(sv: Mapping[str, object]) -> list[object]:
+    """The entries of a service's ``acceptance`` as written, one for each text ``svc_criteria`` returns (the ones with no text are left out)."""
+    acc = sv.get("acceptance")
+    return [c for c in acc if criterion_text(c)] if isinstance(acc, list) else []
 
 
 def cap_of(needs: Mapping[str, object]) -> int | None:

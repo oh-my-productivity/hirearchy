@@ -1,6 +1,14 @@
 ##### summary
 created 4 agents: lead, lead/researcher, lead/writer, lead/factcheck
 task 20260115T090100000000-root-0000 -> lead (budget 22)
+warning: task.acceptance[1]: criterion 1 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
+warning: task.acceptance[2]: criterion 2 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
+warning: task.acceptance[3]: criterion 3 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
+warning: task.acceptance[4]: criterion 4 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
+warning: task.acceptance[5]: criterion 5 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
+warning: task.acceptance[6]: criterion 6 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
+warning: task.acceptance[7]: criterion 7 does not say where it comes from: give from: <the user's exact words in needs.elicitation> or default: true.
+warning: needs.elicitation: this plan records none of the user's words, so no criterion can show where it comes from. Put their answers, verbatim, in needs.elicitation (for a plan with only defaults: their request in their words), and give each criterion from: or default: true.
 warning: needs.deliverable.path: no agent can write to <HOME>/deliverables/competitors.md (agents write only inside their own directory or workspace); the assistant must copy the final artifact there and verify it on completion (the plan lists this step)
 warning: needs.deliverable.path: <HOME>/deliverables does not exist; the copy step will create it
 

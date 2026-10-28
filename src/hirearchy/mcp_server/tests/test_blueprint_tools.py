@@ -10,10 +10,11 @@ import testkit.reach.yaml as yaml
 from testkit.reach.hirearchy.core import ROOT, Org
 from testkit.mcp_server_world import build_server, resolve_binding, skill_source
 from testkit.mcp_server_world import blueprint as bp_mod
+from testkit.blueprint_world import without_source_lines
 
 from hirearchy.mcp_server._instructions import ROOT_INSTRUCTIONS
 
-ALLOWED_WARNINGS = {"path-delivery", "path-parent", "workspace-new", "shell-unconfined"}  # shell-unconfined: the code example grants shell
+ALLOWED_WARNINGS = {"path-delivery", "path-parent", "workspace-new", "shell-unconfined", "criterion-source", "criterion-words"}  # shell-unconfined: the code example grants shell
 
 
 def call(server, tool, **args):
@@ -73,7 +74,7 @@ def test_propose_org_returns_the_block_then_details_then_plan_id(setup):
 def test_the_plan_block_is_compact_and_has_everything_the_user_approves(setup, env):
     server, _ = setup
     b = block(call(server, "propose_org", blueprint=example(server, "documents")))
-    assert len(b.splitlines()) <= 42
+    assert len(without_source_lines(b)) <= 42
     for needle in ("Goal:", "What I understood you need", "Team (4 agents)", "lead (Manager, model claude-sonnet-5.5)",
                    "Models: claude-sonnet-5.5 (high effort) for every agent", "reader", "can read files", "cannot change your files", "Budget: 19 runs planned",
                    "your cap is 25", "lead starts with 19", "Checking: reviewer", "Deliverable:", "Delivered to:",
@@ -96,7 +97,7 @@ def test_block_shows_a_code_workspace_and_write_access(setup, env):
     server, _ = setup
     b = block(call(server, "propose_org", blueprint=example(server, "code")))
     assert f"changes files only in {env / '<project-folder>'}" in b and "run commands" in b
-    assert "Tests / packaging / commits" in b and len(b.splitlines()) <= 42
+    assert "Tests / packaging / commits" in b and len(without_source_lines(b)) <= 42
     assert f"Delivered to: the workspace {env / '<project-folder>'}" in b
 
 

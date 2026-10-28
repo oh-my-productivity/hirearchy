@@ -11,7 +11,7 @@ import yaml
 from testkit.reach.hirearchy.app import wiring
 from testkit.reach.hirearchy.core import ROOT, Org, OrgError
 
-from testkit.blueprint_world import bpm, services_mod
+from testkit.blueprint_world import bpm, services_mod, without_source_lines
 from hirearchy.blueprint.testing import FlakyServiceCommands
 from hirearchy.services import ServiceCommands
 
@@ -114,7 +114,7 @@ def test_a_services_only_blueprint_needs_no_deliverable_task_or_acceptance(svc_b
     """D-E5-2: the services-only blueprint asks for 24 runs per request (the estimate 17 plus one client round of 7), so it gets no budget warning."""
     found = issues(mutate(svc_bp, lambda b: b["services"][0].update(budget=24)), roots)
     assert not bpm.errors(found), [i.render() for i in found]
-    assert codes(found, "warning") <= {"path-delivery", "path-parent"}
+    assert codes(found, "warning") - {"criterion-source", "criterion-words"} <= {"path-delivery", "path-parent"}
 
 
 def test_plain_task_blueprints_are_unchanged(svc_bp, roots, plain_bp):
@@ -394,7 +394,7 @@ def test_optional_inputs_may_stay_out_and_a_service_without_inputs_takes_none(sv
 def test_the_block_has_a_compact_services_part(svc_bp, roots):
     text = block(svc_bp, roots)
     assert text.startswith(bpm.PLAN_HEADING) and bpm.PLAN_END not in text
-    lines = text.splitlines()
+    lines = without_source_lines(text)  # the line under each check that says where it comes from is not part of this layout
     i = lines.index("Services (kept ready, requested whenever you want):")
     part = lines[i:i + 12]
     assert part[1] == "- weekly-brief: A one-page, sourced brief on the past week's news about a topic."
@@ -440,7 +440,7 @@ def test_up_to_ten_checks_are_shown(svc_bp, roots):
     bp = mutate(svc_bp, lambda b: b["services"][0].update(acceptance=ten))
     text = block(bp, roots)
     assert all(f"    {n}. {c}" in text for n, c in enumerate(ten, 1))
-    assert "more (see the details)" not in text
+    assert "    ... and" not in text  # (no check is left out of the list)
 
 
 def test_more_than_the_shown_criteria_are_counted_not_hidden_silently(svc_bp, roots):
