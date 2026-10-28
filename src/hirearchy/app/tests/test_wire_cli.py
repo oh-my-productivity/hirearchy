@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import io
 import json
+import os
 import subprocess
 import sys
 import textwrap
@@ -124,11 +125,14 @@ def test_a_new_organization_has_no_event_files(tmp_path: Path) -> None:
 def test_the_scheduler_runner_runs_the_loop_until_there_is_nothing_to_do(team: Org) -> None:
     out = MemoryOutput()
     runner = wire_cli.LoopSchedulerRunner(out, FakeClock())
-    runner.run(team.root, "kiro-cli", once=False, until_idle=False, until_done=True, max_runs=None)
-    assert out.stdout == "scheduler exiting: finished: no open tasks\n"
-    out.events.clear()
-    runner.run(team.root, "kiro-cli", once=True, until_idle=False, until_done=False, max_runs=None)
-    assert out.stdout == ""  # (one pass, nothing to run)
+    with wiring.overriding({RuntimeReadiness: FixedReadiness(None)}):
+        runner.run(team.root, "kiro-cli", once=False, until_idle=False, until_done=True, max_runs=None)
+        assert out.stdout == "scheduler exiting: finished: no open tasks\n"
+        out.events.clear()
+        runner.run(team.root, "kiro-cli", once=True, until_idle=False, until_done=False, max_runs=None)
+        assert out.stdout == ""  # (one pass, nothing to run)
+    stub_log = Path(os.environ["KIRO_STUB_LOG"])
+    assert not stub_log.exists() or "--version" not in stub_log.read_text(encoding="utf-8").splitlines()  # no readiness call
 
 
 def tree_of(root: Path) -> dict[str, bytes]:
