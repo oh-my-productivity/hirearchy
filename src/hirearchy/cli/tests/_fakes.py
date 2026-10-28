@@ -256,10 +256,11 @@ class FakeBlueprints(Recording, BlueprintLoader, BlueprintValidator, PlanRendere
     def __init__(self, issues: Sequence[Issue] = ()) -> None:
         super().__init__()
         self.issues = list(issues)
+        self.extension: JsonObject | None = None  # when set, what every file loads as (an extension blueprint)
 
     def load(self, source: object) -> JsonObject:
         self.note("load", source)
-        return {"mission": str(source)}
+        return dict(self.extension) if self.extension is not None else {"mission": str(source)}
 
     def validate(
         self, bp: Mapping[str, object], *, org_exists: bool = False, allowed_roots: Sequence[str | Path] | None = None, require_sources: bool = False,

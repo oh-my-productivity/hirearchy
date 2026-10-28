@@ -17,6 +17,7 @@ import pytest
 
 from hirearchy.app import Org, fields_cli, wire_cli, wire_dashboard, wiring
 from hirearchy.app.wire_locator import os_locator
+from hirearchy.blueprint import ExtensionApplying
 from hirearchy.cli import CliApp
 from hirearchy.cli._session import AnnouncingOrgSession
 from hirearchy.cli.testing import MemoryOutput
@@ -277,3 +278,20 @@ def test_the_request_command_prints_the_step_of_the_runtime(team: Org, capsys: p
         "(CLI: hirearchy send ceo \"<why>\" --budget 1)."
     ) in out
 
+
+
+def test_the_blueprint_commands_get_the_extension_applier(team: Org, tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    """``hirearchy apply`` of a file with ``extend:`` goes to the extension applier of the runtime (no plan_id: the user applies their own file), and
+    ``hirearchy plan`` of it without an organization has nothing to extend. [1.1] test_wire_cli.py re-read at the rebased base: its one change is the
+    readiness override of the scheduler runner test, which these commands do not touch."""
+    session = AnnouncingOrgSession(os_locator(), wire_cli.RuntimeOrgOpener(), MemoryOutput())
+    session.open(argparse.Namespace(root=str(team.root)))
+    commands = {c.__class__.__name__: c for c in wire_cli.commands_over(session, MemoryOutput(), wire_cli.StandardTerminal(), FakeClock())}
+    apply = commands["ApplyCommand"]
+    assert apply._extensions is not None and isinstance(apply._extensions(), ExtensionApplying)  # type: ignore[attr-defined]
+    validator, renderer = wire_cli.PlanTime().get()
+    bp = {"reason": "r", "extend": {"limits": [{"agent": "ceo", "max_children": 3}]}}
+    assert [i.code for i in validator.validate(bp, org_exists=False)] == ["extend-none"]
+    assert "there is no organization yet, so there is nothing to extend" in renderer.render_plan(bp, validator.validate(bp, org_exists=False))
+    applied = team.runtime.extension_applier.apply(bp, plan_id=None, allowed_roots=[tmp_path])
+    assert applied.startswith("applied the change ") and team.charter("ceo")[0]["max_children"] == 3

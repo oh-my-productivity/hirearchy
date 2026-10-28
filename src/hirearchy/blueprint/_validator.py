@@ -14,7 +14,7 @@ from typing import cast
 from ..kernel import JsonObject, inside
 from ..settings import config_default_model, config_effort, effort_floor_problem, model_floor_problem
 from ._budgeting import TIGHT
-from ._protocols import AccessReport, AgentResolution, BudgetPlanning, OrgContexts, PathChecking, ServiceRules, WorkspaceRoots
+from ._protocols import AccessReport, AgentResolution, BudgetPlanning, ExtensionResolution, OrgContexts, PathChecking, ServiceRules, WorkspaceRoots
 from ._provenance import criterion_issues
 from ._resolver import declared_inputs, review_roots
 from ._rules import (
@@ -46,13 +46,13 @@ from ._view import (
     svc_criteria,
     unknown,
 )
-from .api import BlueprintValidator, Issue
+from .api import BlueprintValidator, Issue, is_extension
 
 
 class RuleBlueprintValidator(BlueprintValidator):
     def __init__(
         self, resolver: AgentResolution, paths: PathChecking, budgets: BudgetPlanning, access: AccessReport, services: ServiceRules,
-        roots: WorkspaceRoots, orgs: OrgContexts,
+        roots: WorkspaceRoots, orgs: OrgContexts, extensions: ExtensionResolution | None = None,
     ) -> None:
         self._resolver = resolver
         self._paths = paths
@@ -61,6 +61,7 @@ class RuleBlueprintValidator(BlueprintValidator):
         self._services = services
         self._roots = roots
         self._orgs = orgs
+        self._extensions = extensions
 
     def validate(
         self, bp: Mapping[str, object], *, org_exists: bool = False, allowed_roots: Sequence[str | Path] | None = None, require_sources: bool = False,
@@ -68,6 +69,8 @@ class RuleBlueprintValidator(BlueprintValidator):
         issues: list[Issue] = []
         if not isinstance(bp, dict):
             return [Issue("error", "", "a blueprint is a mapping with mission, needs, agents and task", "schema")]
+        if self._extensions is not None and is_extension(bp):  # a change to the organization: its own rules (design 5.2)
+            return self._extensions.resolve(bp, allowed_roots=allowed_roots, require_sources=require_sources).issues
         org = self._orgs.context(org_exists)
         roots = self._roots.roots(allowed_roots)
         cfg = org.config()

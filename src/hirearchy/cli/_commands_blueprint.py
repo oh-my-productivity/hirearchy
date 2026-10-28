@@ -5,7 +5,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from ..blueprint import BlueprintApplier, BlueprintLoader, BlueprintValidator, PlanRenderer, errors
+from ..blueprint import BlueprintApplier, BlueprintLoader, BlueprintValidator, ExtensionApplying, PlanRenderer, errors, is_extension
 from ..kernel import Provider
 from ._ports import Arguments, Command, OrgSession, Output
 
@@ -39,11 +39,15 @@ class PlanCommand(Command):
 
 
 class ApplyCommand(Command):
-    def __init__(self, session: OrgSession, loader: Provider[BlueprintLoader], applier: Provider[BlueprintApplier], out: Output) -> None:
+    def __init__(
+        self, session: OrgSession, loader: Provider[BlueprintLoader], applier: Provider[BlueprintApplier], out: Output,
+        extensions: Provider[ExtensionApplying] | None = None,
+    ) -> None:
         self._session = session
         self._loader = loader
         self._applier = applier
         self._out = out
+        self._extensions = extensions
 
     def add_arguments(self, sub: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
         s = sub.add_parser("apply", help="create the agents of a blueprint and give its first task (as root)")
@@ -53,5 +57,9 @@ class ApplyCommand(Command):
 
     def run(self, args: Arguments) -> None:
         self._session.open(args, mutating=True)  # says which organization it is about to change, before anything is written
-        summary = self._applier().apply(self._loader().load(Path(args.blueprint)), allowed_roots=args.allow_root or None)
+        bp = self._loader().load(Path(args.blueprint))
+        if self._extensions is not None and is_extension(bp):  # a change to the organization: the user applies their own file, so there is no plan_id
+            self._out.say(self._extensions().apply(bp, plan_id=None, allowed_roots=args.allow_root or None))
+            return
+        summary = self._applier().apply(bp, allowed_roots=args.allow_root or None)
         self._out.say(summary.text())

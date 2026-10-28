@@ -13,15 +13,17 @@ from __future__ import annotations
 
 import json
 import sys
+from dataclasses import replace
 from collections.abc import Sequence
 from pathlib import Path
 from typing import NoReturn, TypeVar
 
 from ..agents import AgentDirectory
-from ..blueprint import BlueprintApplier, BlueprintLoader, BlueprintValidator, PlanRenderer, RoleLibrary
+from ..blueprint import BlueprintApplier, BlueprintLoader, BlueprintValidator, ExtensionApplying, PlanRenderer, RoleLibrary
 from ..blueprint._access import PolicyAccessReport
 from ..blueprint._assembly import plan_parts
 from ..blueprint._budgeting import BudgetPlanner
+from ..blueprint._extension import ExtensionResolver
 from ..blueprint._org import NoOrgContext, PresentOrAbsentOrg
 from ..blueprint._pathcheck import RootedPathChecker
 from ..blueprint._resolver import AgentResolver
@@ -282,10 +284,12 @@ class PlanTime:
         access = PolicyAccessReport(b.get(ConfinementPolicy))
         normalizer = b.get(ContractNormalizer)
         none = NoOrgContext()
+        reads = replace(wire_blueprint.reads_of(b), org=none)  # (an extension has nothing to extend: extend-none)
         validator = RuleBlueprintValidator(
             resolver, paths, budgets, access, ServiceBlueprintRules(normalizer, paths, budgets), roots, PresentOrAbsentOrg(none, none),
+            ExtensionResolver(reads),
         )
-        return validator, plan_parts(b.get(BlueprintLoader), validator, resolver, roots, budgets, access, normalizer, none).renderer
+        return validator, plan_parts(b.get(BlueprintLoader), validator, resolver, roots, budgets, access, normalizer, none, reads).renderer
 
 
 def validator_of(session: OrgSession, plan_time: PlanTime) -> Provider[BlueprintValidator]:
@@ -344,7 +348,7 @@ def commands_over(session: OrgSession, out: Output, terminal: Terminal, clock: C
         AcknowledgePlaybookCommand(session, commands, snapshots, text, out),
         RetireServiceCommand(session, commands, snapshots, out),
         PlanCommand(session, loader, validator_of(session, plan_time), renderer_of(session, plan_time), out),
-        ApplyCommand(session, loader, get(BlueprintApplier), out),
+        ApplyCommand(session, loader, get(BlueprintApplier), out, get(ExtensionApplying)),
         SendCommand(session, get(MessageSender), snapshots, text, out),
         StatusCommand(session, get(OrgTree), get(TaskQuery), get(SchedulerStatus), out),
         HealthCommand(session, get(HealthAnalyzer), get(HealthRenderer), out),

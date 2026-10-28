@@ -25,6 +25,7 @@ from ..blueprint._access import PolicyAccessReport
 from ..blueprint._assembly import PlanParts, applier_over, extension_applier_over, plan_parts
 from ..blueprint._budgeting import BudgetPlanner
 from ..blueprint._examples import TemplateBlueprintExamples
+from ..blueprint._extension import ExtensionResolver
 from ..blueprint._extension_org import Reads
 from ..blueprint._files import FsTextFiles
 from ..blueprint._loader import YamlBlueprintLoader
@@ -116,11 +117,11 @@ def _validator(b: Builder) -> BlueprintValidator:
     c = _checking(b)
     return RuleBlueprintValidator(
         c.resolver, c.paths, c.budgets, c.access, ServiceBlueprintRules(b.get(ContractNormalizer), c.paths, c.budgets), c.roots,
-        PresentOrAbsentOrg(c.org, NoOrgContext()),
+        PresentOrAbsentOrg(c.org, NoOrgContext()), ExtensionResolver(reads_of(b)),
     )
 
 
-def _reads(b: Builder) -> Reads:
+def reads_of(b: Builder) -> Reads:
     """What the rules of an extension read the organization through: the real ports of the runtime."""
     c = _checking(b)
     places, mail = OrgServicePlaces(b.get(OrgLayout)), b.get(MailboxReader)
@@ -134,7 +135,7 @@ def _reads(b: Builder) -> Reads:
 def _plan(b: Builder) -> PlanParts:
     c = _checking(b)
     return plan_parts(
-        b.get(BlueprintLoader), b.get(BlueprintValidator), c.resolver, c.roots, c.budgets, c.access, b.get(ContractNormalizer), c.org, _reads(b),
+        b.get(BlueprintLoader), b.get(BlueprintValidator), c.resolver, c.roots, c.budgets, c.access, b.get(ContractNormalizer), c.org, reads_of(b),
     )
 
 
@@ -147,6 +148,6 @@ def _applier(b: Builder) -> BlueprintApplier:
 
 def _extension_applier(b: Builder) -> ExtensionApplying:
     return extension_applier_over(
-        _plan(b), _reads(b), b.get(ContractNormalizer), b.get(Hiring), b.get(Retirement), b.get(AgentRegistry), b.get(ServiceCommands), b.get(OrgLimits),
+        _plan(b), reads_of(b), b.get(ContractNormalizer), b.get(Hiring), b.get(Retirement), b.get(AgentRegistry), b.get(ServiceCommands), b.get(OrgLimits),
         b.get(OwnerNotes), b.get(OrgSnapshotter), b.get(EventSink),
     )
