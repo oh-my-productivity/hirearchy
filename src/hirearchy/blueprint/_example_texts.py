@@ -114,7 +114,7 @@ task:
     - Covers <the topics the user listed, named exactly> and nothing else.
     - At most 1500 words as counted by read.
     - Every statement is traceable to a named input file, and gaps or conflicts between files are listed in a final section titled "Open questions".
-    - "The reviewer's report shows every criterion met (criteria met: n of m with n = m), including each statement checked against its named input file, and the writer applied every required change."
+    - "Every statement is checked against its named input file in the reviewer's report, and the writer applied every required change."
 """
 
 CODE = """\
@@ -271,7 +271,7 @@ SERVICE_BODIES = {
       - Covers <the topic of the request> and nothing else.
       - At most 1500 words as counted by read.
       - Every statement is traceable to a named input file, and gaps or conflicts between files are listed in a final section titled "Open questions".
-      - "The reviewer's report shows every criterion met (criteria met: n of m with n = m), and the writer applied every required change."
+      - "Every statement is checked against its named input file in the reviewer's report, and the writer applied every required change."
     deliverable:
       description: <What one request produces, e.g. one markdown section for the topic>
       format: markdown

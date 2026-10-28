@@ -24,7 +24,7 @@ Done when ALL of these hold:
   1. Covers <the topics the user listed, named exactly> and nothing else.
   2. At most 1500 words as counted by read.
   3. Every statement is traceable to a named input file, and gaps or conflicts between files are listed in a final section titled "Open questions".
-  4. The reviewer's report shows every criterion met (criteria met: n of m with n = m), including each statement checked against its named input file, and the writer applied every required change.
+  4. Every statement is checked against its named input file in the reviewer's report, and the writer applied every required change.
 Checkpoints: approval - Plan first; ask before any spend beyond the budget; progress - One line when I ask; any spend beyond the budget needs your OK.
 Warnings (3):
 - has built-in read but no workspace or inputs, so it can read nothing outside the organization; set needs.inputs or needs.workspace if it must read files
@@ -78,7 +78,7 @@ First task: to lead: <Short title of the document>
   1. Covers <the topics the user listed, named exactly> and nothing else.
   2. At most 1500 words as counted by read.
   3. Every statement is traceable to a named input file, and gaps or conflicts between files are listed in a final section titled "Open questions".
-  4. The reviewer's report shows every criterion met (criteria met: n of m with n = m), including each statement checked against its named input file, and the writer applied every required change.
+  4. Every statement is checked against its named input file in the reviewer's report, and the writer applied every required change.
 
 Checkpoints:
 - Approval: Plan first; ask before any spend beyond the budget.

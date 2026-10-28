@@ -179,7 +179,8 @@ def test_documents_example_with_its_placeholder_folder_is_a_draft_that_names_the
 
 
 def test_example_criteria_match_the_exhaustive_verifier_templates(root_server, cwd):
-    for kind, needle in (("research", "n of m factual claims verified' with n = m"), ("documents", "criteria met: n of m with n = m"),
+    for kind, needle in (("research", "n of m factual claims verified' with n = m"),
+                         ("documents", "Every statement is checked against its named input file in the reviewer's report"),
                          ("analysis", "Figures checked: n of m match' with n = m")):
         criteria = yaml.safe_load(fill_text(root_server, kind, cwd))["task"]["acceptance"]
         assert any(needle in c for c in criteria), kind

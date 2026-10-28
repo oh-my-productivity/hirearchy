@@ -26,7 +26,7 @@ Services (kept ready, requested whenever you want):
     1. Covers <the topic of the request> and nothing else.
     2. At most 1500 words as counted by read.
     3. Every statement is traceable to a named input file, and gaps or conflicts between files are listed in a final section titled "Open questions".
-    4. The reviewer's report shows every criterion met (criteria met: n of m with n = m), and the writer applied every required change.
+    4. Every statement is checked against its named input file in the reviewer's report, and the writer applied every required change.
   Delivered to: <CWD>/deliverables/<name> (I copy each result there after checking it)
 After each request the lead records lessons; before the next one it reviews them with your feedback and may improve how the team works (its playbook). It cannot change these checks: only you can, through me.
 Nothing runs until you ask for a request: approving only creates the team and the services.
@@ -90,7 +90,7 @@ Services (1), offered by lead and defined by root (the contract: only root can c
     1. Covers <the topic of the request> and nothing else.
     2. At most 1500 words as counted by read.
     3. Every statement is traceable to a named input file, and gaps or conflicts between files are listed in a final section titled "Open questions".
-    4. The reviewer's report shows every criterion met (criteria met: n of m with n = m), and the writer applied every required change.
+    4. Every statement is checked against its named input file in the reviewer's report, and the writer applied every required change.
   playbook v1: generated from the team (steps, budget plan):
     ## Steps
     1. Read the request in your prompt: its inputs, every acceptance criterion and the deliverable. The criteria come from the contract and can only be met, never changed; copy the relevant ones verbatim into every task you delegate.

@@ -107,6 +107,28 @@ def test_the_plain_templates_are_unchanged_by_the_service_option(tmp_path):
         assert svc != plain and svc.count("\nservices:") == 1
 
 
+def _criteria_of_every_example(base: Path):
+    for kind in ex.KINDS:
+        plain = bpm.load_text(fill(ex.example(kind, base), base))
+        yield kind, "task", plain["task"]["acceptance"]
+        service = bpm.load_text(fill(ex.example(kind, base, service=True), base))
+        yield kind, "service", service["services"][0]["acceptance"]
+
+
+def test_no_example_criterion_counts_the_criteria_it_belongs_to(tmp_path):
+    """F-P1-11: a criterion that reads 'criteria met: n of m with n = m' counts itself among the m, so no run can ever prove it."""
+    for kind, form, criteria in _criteria_of_every_example(tmp_path):
+        assert not any("criteria met" in c for c in criteria), (kind, form)
+
+
+def test_the_documents_criteria_keep_the_statement_check_and_the_applied_changes(tmp_path):
+    new = "Every statement is checked against its named input file in the reviewer's report, and the writer applied every required change."
+    seen = {form: criteria for kind, form, criteria in _criteria_of_every_example(tmp_path) if kind == "documents"}
+    assert set(seen) == {"task", "service"}
+    for form, criteria in seen.items():
+        assert new in criteria, form
+
+
 def test_example_rejects_an_unknown_kind_with_service_too(tmp_path):
     with pytest.raises(OrgError, match="unknown kind 'poetry'"):
         ex.example("poetry", tmp_path, service=True)
