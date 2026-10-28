@@ -10,6 +10,7 @@ from ..access import AccessScopes, AuthorityPolicy, children_limit
 from ..agents import AgentDirectory, AgentRegistry, CharterReader
 from ..kernel import ROOT, JsonObject, OrgError, OrgLayout, join_frontmatter, split_frontmatter
 from ..settings import OrgSettings, config_default_model, config_floor_problem, model_floor_problem
+from ._charter_added import CHARTER_ADDED, added_keys
 from ._charter_merge import CharterMerge
 from ._guard import WriteGuard
 from .api import OrgFileStore, OrgFileWriter
@@ -146,6 +147,8 @@ class GuardedOrgFileWriter(OrgFileWriter):
             self._check_charter_model(addr, p, content)
             if planned is not None and (key := _plan_key_changed(*planned)) is not None:
                 raise OrgError(CHARTER_PLAN.format(key=key, addr=addr))
+            if actor != ROOT and self._store.kind(p) == "file" and added_keys(self._store.read_text(p)) != added_keys(content):
+                raise OrgError(CHARTER_ADDED)  # (CHARTER-ADDED: the text that would be written, an append joined to the old text)
             self._registry.rewrite_charter(addr, content)
         else:
             self._check_org_md(p, content)

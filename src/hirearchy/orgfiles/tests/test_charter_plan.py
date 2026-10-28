@@ -1,9 +1,11 @@
-"""CHARTER-PLAN: an agent's charter rewrite keeps the plan's frontmatter (design 6.6, review 2's L20; owner question Q10).
+"""CHARTER-PLAN and CHARTER-ADDED: an agent's charter rewrite keeps the plan's frontmatter and the lines the user approved (design 6.6, review 2's L20;
+owner question Q10 for the first).
 
 For a writer that is not root, the merged frontmatter of a report's charter must equal the old one except ``role``, and ``max_children`` at or below its old
 value; any other key added, changed or emptied is refused, the bookkeeping keys (``kind``, ``approved_in``, ``onboard``, ``hired_by``, ``created``) included.
 The refusal runs after the authority, grant and model-floor checks, so those keep their texts, and before anything is written. An append never changes the
-frontmatter. Root is not held by it at the writer (root's MCP refusal is ``mcp_server``'s). Runs over both implementations."""
+frontmatter. Root is not held by it at the writer (root's MCP refusal is ``mcp_server``'s). CHARTER-ADDED: the lines under ``## Added by your changes`` of the
+text that would be written equal the current ones (a lead cannot take out, reword or add one). Runs over both implementations."""
 
 from __future__ import annotations
 
@@ -136,3 +138,72 @@ def test_root_is_not_held_by_it_at_the_writer(h: OrgFilesHarness) -> None:
     after = charter(h, "lead")
     assert after["tools"] == ["read"] and after["model"] == "claude-opus-5.5" and after["max_children"] == 9 and after["onboard"] == "yes"
     assert after["can_hire"] is False
+
+
+# ------------------------------------------------------------------------------ CHARTER-ADDED
+
+CHARTER_ADDED = (
+    'refused: the lines under "## Added by your changes" are the user\'s (approved in a plan); keep them exactly as they are, and put your own text under '
+    "another heading. Nothing was written."
+)
+LINES = "- Ada (Checker) was added to your team to check weekly-brief: it checks every claim. [change p1]\n- Your hiring limits were set by the user's change: up to 0 direct reports; may hire: no. [change p1]"
+
+
+def with_section(h: OrgFilesHarness, body: str) -> None:
+    """The report's charter holds ``body`` (the user's extension wrote the section; the file is put behind the writer)."""
+    h.put(h.root / "lead" / "rev" / "AGENT.md", join_frontmatter(charter(h), body))
+
+
+def section_body(before: str = "# Role\n\nReview.\n\n", after: str = "") -> str:
+    return f"{before}## Added by your changes\n{LINES}\n{after}"
+
+
+def test_deleting_a_line_under_added_by_your_changes_is_charter_added(h: OrgFilesHarness) -> None:
+    with_section(h, section_body())
+    before = raw(h)
+    only_one = "---\nrole: Reviewer\n---\n# Role\n\nReview.\n\n## Added by your changes\n" + LINES.splitlines()[0] + "\n"
+    assert refusal(lambda: h.writer.write("lead", f"{REPORT}/AGENT.md", only_one)) == CHARTER_ADDED
+    none = "---\nrole: Reviewer\n---\n# Role\n\nReview.\n"
+    assert refusal(lambda: h.writer.write("lead", f"{REPORT}/AGENT.md", none)) == CHARTER_ADDED
+    assert raw(h) == before
+
+
+def test_rewording_one_is_charter_added(h: OrgFilesHarness) -> None:
+    with_section(h, section_body())
+    before = raw(h)
+    reworded = "---\nrole: Reviewer\n---\n# Role\n\nReview.\n\n## Added by your changes\n" + LINES.replace("every claim", "every other claim") + "\n"
+    assert refusal(lambda: h.writer.write("lead", f"{REPORT}/AGENT.md", reworded)) == CHARTER_ADDED
+    assert raw(h) == before
+
+
+def test_an_append_under_that_heading_is_charter_added(h: OrgFilesHarness) -> None:
+    with_section(h, section_body())  # (the section is the last of the body, so an append lands under its heading)
+    before = raw(h)
+    chunk = "---\nrole: More\n---\n- A line of my own.\n"
+    assert refusal(lambda: h.writer.write("lead", f"{REPORT}/AGENT.md", chunk, append=True)) == CHARTER_ADDED
+    assert raw(h) == before
+
+
+def test_text_under_another_heading_passes(h: OrgFilesHarness) -> None:
+    with_section(h, section_body())
+    body = "# Role\n\nA sharper review.\n\n## My notes\nThings I learned.\n\n## Added by your changes\n" + LINES + "\n\n## After\nMore of my own.\n"
+    h.writer.write("lead", f"{REPORT}/AGENT.md", "---\nrole: Sharper\n---\n" + body)
+    assert "A sharper review." in raw(h) and "## My notes" in raw(h) and "## After" in raw(h)
+    h.writer.write("lead", f"{REPORT}/AGENT.md", "---\nrole: Sharper\n---\n" + body.replace("- Ada", "-   Ada"))  # spacing and bullets are not a reword
+    with_section(h, "# Role\n\nReview.\n\n## Added by your changes\n" + LINES + "\n\n## Mine\nx\n")
+    h.writer.write("lead", f"{REPORT}/AGENT.md", "---\nrole: More\n---\nOne more thing.\n", append=True)  # an append after another heading
+    assert raw(h).endswith("One more thing.\n")
+
+
+def test_a_charter_without_the_section_may_not_get_one(h: OrgFilesHarness) -> None:
+    before = raw(h)
+    text_with = "---\nrole: Reviewer\n---\n# Role\n\nReview.\n\n## Added by your changes\n- A line of my own.\n"
+    assert refusal(lambda: h.writer.write("lead", f"{REPORT}/AGENT.md", text_with)) == CHARTER_ADDED
+    assert raw(h) == before
+
+
+def test_root_is_not_held_by_charter_added_at_the_writer(h: OrgFilesHarness) -> None:
+    """GREEN when written: the writer admits root (the extension applier writes the section through the registry, not through this writer)."""
+    h.put(h.root / "lead" / "AGENT.md", join_frontmatter(charter(h, "lead"), section_body()))
+    h.writer.write("root", "lead/AGENT.md", "---\nrole: Lead\n---\nNo section any more.\n")
+    assert "Added by your changes" not in (written(h, "lead", "AGENT.md") or "")
