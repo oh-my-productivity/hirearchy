@@ -301,6 +301,41 @@ def session(request: pytest.FixtureRequest) -> bool:
     return bool(request.param)
 
 
+WRAPPER = "import subprocess, sys; sys.exit(subprocess.call(sys.argv[1:]))"  # leads the group, so the launcher does not
+
+
+def launch_in_group(
+    tmp_path: Path, body: str, deadline: float, leader: bool, timeout: float = 20
+) -> tuple[int, list[str], str, int]:
+    """(exit code, the launcher's stdout lines, its stderr text, the process group of the run): the launcher in a session of its own, as its
+    group's leader (as the scheduler starts it) or, with ``leader`` False, as the only child of a wrapper that leads the group."""
+    argv = [sys.executable, "-I", "-S", str(LAUNCHER), "--start-deadline", f"{deadline:g}", "--", str(fake(tmp_path, body))]
+    if not leader:
+        argv = [sys.executable, "-I", "-S", "-c", WRAPPER, *argv]
+    proc = subprocess.Popen(argv, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE, start_new_session=True)
+    try:
+        out, err = proc.communicate(timeout=timeout)
+    except subprocess.TimeoutExpired:
+        os.killpg(proc.pid, signal.SIGKILL)
+        proc.communicate()
+        raise
+    return proc.returncode, out.decode().splitlines(), err.decode(), proc.pid
+
+
+def group_gone(group: int, within: float = 20.0) -> bool:
+    """No process is left in ``group`` (polled every 50 ms, at most ``within`` seconds)."""
+    end = time.monotonic() + within
+    while time.monotonic() < end:
+        try:
+            os.killpg(group, 0)
+        except ProcessLookupError:
+            return True
+        except PermissionError:  # the id now names another user's group: ours has ended
+            return True
+        time.sleep(0.05)
+    return False
+
+
 def test_a_v3_start_gives_the_transcript_and_exit_0(tmp_path: Path, session: bool) -> None:
     code, out, _ = launch(tmp_path, START + hello("Hello") + FINISHED, session=session)
     assert code == 0
@@ -313,19 +348,26 @@ def test_exit_3_passes_through(tmp_path: Path, session: bool) -> None:
 
 
 def test_silence_gives_up_and_kills_the_run(tmp_path: Path, session: bool) -> None:
-    code, out, _ = launch(tmp_path, "echo $$ > pid\nexec sleep 30\n", deadline=1, session=session, timeout=20)
+    code, out, _, group = launch_in_group(tmp_path, "exec sleep 30\n", deadline=1, leader=session)
     assert code == (-9 if session else 1)
     assert len(out) == 1 and out[0].startswith("# kiro: gave up after 1s: kiro-cli did not start the run")
     assert "KIRO_API_KEY" in out[0] and "browser sign-in" in out[0]
-    assert gone(read_pid(tmp_path))
+    assert group_gone(group)
+
+
+def test_a_kiro_killed_before_its_first_line_leaves_no_process(tmp_path: Path) -> None:
+    code, out, _, group = launch_in_group(tmp_path, "sleep 15\necho $$ > pid\nexec sleep 30\n", deadline=1, leader=True)
+    assert code == -9
+    assert not (tmp_path / "pid").exists()  # the kill came before the shell got to its second line
+    assert group_gone(group)
 
 
 def test_a_spinner_without_a_newline_is_given_up_on_the_same_way(tmp_path: Path, session: bool) -> None:
-    code, out, _ = launch(tmp_path, "echo $$ > pid\nprintf '\\r- waiting for sign-in'\nexec sleep 30\n", deadline=1, session=session, timeout=20)
+    code, out, _, group = launch_in_group(tmp_path, "printf '\\r- waiting for sign-in'\nexec sleep 30\n", deadline=1, leader=session)
     assert code == (-9 if session else 1)
     assert out[-1].startswith("# kiro: gave up after 1s")
     assert any("waiting for sign-in" in line for line in out[:-1])  # the log shows what kiro printed
-    assert gone(read_pid(tmp_path))
+    assert group_gone(group)
 
 
 def test_the_text_copied_before_the_start_is_limited_to_4_kb(tmp_path: Path) -> None:
