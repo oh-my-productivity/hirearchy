@@ -1,6 +1,6 @@
 """The migration of a free-text playbook loses nothing and never needs a fallback on real playbooks (design 4.4, B5, plan PC-6).
 
-The corpus is every kept playbook of the studies (42 files) and every v1 the blueprint writes (the shipped service example and the four
+The corpus is every kept playbook of the studies (61 files) and every v1 the blueprint writes (the shipped service example and the four
 ``*-service`` templates). ``migrate_body`` must pass its loss check with the per-block split on each: a body that needs a fallback is a splitter bug."""
 
 from __future__ import annotations
@@ -37,7 +37,7 @@ def check_migrates_per_block(body: str, name: str) -> None:
 
 
 def test_every_kept_playbook_migrates_with_the_per_block_split_and_no_fallback() -> None:
-    assert len(KEPT) == 42, [str(p.relative_to(STUDIES)) for p in KEPT]  # B5: E, E2, E3, E4 s1/s1r/s2/s2r/s3, E5-E7 s1-s3, G0's six
+    assert len(KEPT) == 61, [str(p.relative_to(STUDIES)) for p in KEPT]  # B5: E, E2, E3, E4 s1/s1r/s2/s2r/s3, E5-E7 s1-s3, G0's six (42); P1's 19: F1-F3 one each, I1-I3 five each, scoring/F2/renamed-view one
     for path in KEPT:
         _, body = split_frontmatter(path.read_text(encoding="utf-8"))
         check_migrates_per_block(body.strip(), str(path.relative_to(STUDIES)))
