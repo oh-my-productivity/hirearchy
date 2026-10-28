@@ -57,8 +57,8 @@ def test_versions_are_consecutive_pairs_newest_first_with_the_keys_that_differ()
     history.commit({"other.md": b"x\n"}, at(3))  # a commit that touches no charter is no pair
     found = charters(history).versions(["lead"])
     assert found == CharterVersions(known=True, pairs=(
-        CharterPair(LEAD, third, at(2), keys=(KeyChange("model", None, "claude-opus-5.5"),)),
-        CharterPair(LEAD, second, at(1), keys=(KeyChange("tools", '["read"]', '["read", "write"]'),)),
+        CharterPair(LEAD, third, at(2), keys=(KeyChange("model", None, "claude-opus-5.5"),), older=at(1)),
+        CharterPair(LEAD, second, at(1), keys=(KeyChange("tools", '["read"]', '["read", "write"]'),), older=at(0)),
     ))
     assert [p.addr for p in found.pairs] == ["lead", "lead"] and all(not p.body_differs and p.kind == "edit" for p in found.pairs)
 
@@ -78,7 +78,7 @@ def test_the_added_section_before_and_after() -> None:
     second = history.commit({LEAD: with_added("- First line [change aaa]", "", "- Second line [change bbb]")}, at(1))
     (pair,) = charters(history).versions(["lead"]).pairs
     assert pair == CharterPair(
-        LEAD, second, at(1), added_before=("- First line [change aaa]",), added_after=("- First line [change aaa]", "- Second line [change bbb]"),
+        LEAD, second, at(1), added_before=("- First line [change aaa]",), added_after=("- First line [change aaa]", "- Second line [change bbb]"), older=at(0),
     )
 
 
@@ -122,7 +122,7 @@ def test_org_md_pairs_give_max_depth_before_and_after() -> None:
     history.commit({"ORG.md": org_md(max_depth=5, default_model="x")}, at(2))  # another key: no pair
     fourth = history.commit({"ORG.md": org_md(max_depth="6")}, at(3))
     found = charters(history).versions([])
-    assert found.pairs == (CharterPair("ORG.md", fourth, at(3), depth=("5", "6")), CharterPair("ORG.md", second, at(1), depth=("4", "5")))
+    assert found.pairs == (CharterPair("ORG.md", fourth, at(3), depth=("5", "6"), older=at(2)), CharterPair("ORG.md", second, at(1), depth=("4", "5"), older=at(0)))
     assert found.pairs[0].addr == ""
 
 

@@ -31,7 +31,7 @@ class CharterPair:
     ``created`` (the older one does not exist: the first version at an address that had an earlier, retired agent) or ``deleted`` (the newer one does not
     exist: the tree was retired). An edit has ``keys`` (the frontmatter keys that differ, by key), ``added_before`` and ``added_after`` (the lines of the
     added section, stripped, blank lines left out) and ``body_differs`` (the body outside the added section differs). An ``ORG.md`` pair is listed only when
-    its ``max_depth`` changed, and has ``depth`` (before, after) as text."""
+    its ``max_depth`` changed, and has ``depth`` (before, after) as text. ``when`` is the time of the newer commit, ``older`` that of the older one."""
 
     path: str
     commit: str
@@ -42,6 +42,7 @@ class CharterPair:
     added_after: tuple[str, ...] = ()
     body_differs: bool = False
     depth: tuple[str, str] | None = None
+    older: datetime | None = None  # the time of the older commit: the change happened between the two
 
     @property
     def addr(self) -> str:

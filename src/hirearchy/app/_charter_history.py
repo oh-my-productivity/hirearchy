@@ -75,10 +75,10 @@ class GitCharterHistory(CharterHistory):
             for newer, older in zip(listed, listed[1:]):
                 present = (self._history.blob(newer.commit, path) is not None, self._history.blob(older.commit, path) is not None)
                 if present == (True, False):
-                    pairs.append(CharterPair(path, newer.commit, newer.when, kind="created"))
+                    pairs.append(CharterPair(path, newer.commit, newer.when, kind="created", older=older.when))
                     continue
                 if present == (False, True):
-                    pairs.append(CharterPair(path, newer.commit, newer.when, kind="deleted"))
+                    pairs.append(CharterPair(path, newer.commit, newer.when, kind="deleted", older=older.when))
                     continue
                 if present == (False, False):
                     continue
@@ -94,7 +94,7 @@ class GitCharterHistory(CharterHistory):
                     break
                 after, before = versions[newer.commit], versions[older.commit]
                 if after is not None and before is not None:
-                    pair = _pair(path, newer, before, after)
+                    pair = _pair(path, newer, older, before, after)
                     if pair is not None:
                         pairs.append(pair)
             truncated = truncated or out_of_time
@@ -113,16 +113,16 @@ class GitCharterHistory(CharterHistory):
         return next((change.when for change in listed if change.commit == first), None)
 
 
-def _pair(path: str, newer: Change, before: Version, after: Version) -> CharterPair | None:
+def _pair(path: str, newer: Change, older: Change, before: Version, after: Version) -> CharterPair | None:
     """The pair of two consecutive versions; None for an ORG.md whose ``max_depth`` did not change."""
     if path == ORG:
         old, new = config_number(before.meta, "max_depth", int), config_number(after.meta, "max_depth", int)
-        return CharterPair(path, newer.commit, newer.when, depth=(str(old), str(new))) if old != new else None
+        return CharterPair(path, newer.commit, newer.when, depth=(str(old), str(new)), older=older.when) if old != new else None
     added_before, outside_before = _split(before.body)
     added_after, outside_after = _split(after.body)
     return CharterPair(
         path, newer.commit, newer.when, keys=_keys(before.meta, after.meta), added_before=added_before, added_after=added_after,
-        body_differs=outside_before != outside_after,
+        body_differs=outside_before != outside_after, older=older.when,
     )
 
 
