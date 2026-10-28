@@ -5,27 +5,14 @@ charters and ORG.md, reads each version once and compares consecutive versions o
 
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
-from dataclasses import dataclass
+from collections.abc import Sequence
 
-from ..kernel import Clock, split_frontmatter
+from ..kernel import Clock
 from ..reflection import BarChanges, CharterMark, ModelMark
 from ..reflection._ports import BarHistory
 from ..settings import config_default_model, config_effort
 from ..snapshots import Change, OrgHistory
-
-COMMITS = 40  # the newest commits that changed one of the files, read at most
-VERSION_LIMIT = 64 * 1024  # bytes of one version that are read; a larger one is not compared
-TIME_BOUND = 5.0  # seconds of git time one call may take
-ORG = "ORG.md"
-
-
-@dataclass(frozen=True)
-class _Version:
-    """One committed version of a file as far as it can be compared: its frontmatter and body."""
-
-    meta: Mapping[str, object]
-    body: str
+from ._git_versions import COMMITS, ORG, TIME_BOUND, Version, read_version
 
 
 class GitBarHistory(BarHistory):
@@ -49,7 +36,7 @@ class GitBarHistory(BarHistory):
         truncated = len({change.commit for change in found}) >= COMMITS  # the list was full: older changes may exist
         for path in paths:
             listed = [change for change in found if change.path == path]
-            versions: dict[str, _Version | None] = {}
+            versions: dict[str, Version | None] = {}
             out_of_time = False
             for newer, older in zip(listed, listed[1:]):
                 for change in (newer, older):
@@ -58,7 +45,7 @@ class GitBarHistory(BarHistory):
                     if self._clock.monotonic() - started >= TIME_BOUND:
                         out_of_time = True
                         break
-                    versions[change.commit] = self._read(change)
+                    versions[change.commit] = read_version(self._history, change)
                     skipped += versions[change.commit] is None
                 if out_of_time:
                     break
@@ -68,18 +55,8 @@ class GitBarHistory(BarHistory):
             truncated = truncated or out_of_time
         return BarChanges(known=True, marks=tuple(marks), truncated=truncated, skipped=skipped)
 
-    def _read(self, change: Change) -> _Version | None:
-        data = self._history.text(change.commit, change.path, VERSION_LIMIT)
-        if data is None:
-            return None
-        try:
-            meta, body = split_frontmatter(data.decode("utf-8"))
-        except Exception:  # noqa: BLE001 - not UTF-8, or YAML that does not parse (PyYAML is imported by kernel and blueprint only)
-            return None
-        return _Version(meta, body)
 
-
-def _compare(path: str, newer: Change, before: _Version, after: _Version) -> list[CharterMark | ModelMark]:
+def _compare(path: str, newer: Change, before: Version, after: Version) -> list[CharterMark | ModelMark]:
     """The marks of one pair of consecutive versions: ``newer`` is the commit that holds ``after``."""
     if path == ORG:
         pairs = [("default_model", config_default_model(before.meta), config_default_model(after.meta)), ("effort", config_effort(before.meta), config_effort(after.meta))]
@@ -94,7 +71,7 @@ def _compare(path: str, newer: Change, before: _Version, after: _Version) -> lis
     return marks
 
 
-def _model(version: _Version) -> str:
+def _model(version: Version) -> str:
     return str(version.meta.get("model") or "").strip()
 
 
