@@ -27,6 +27,7 @@ from ..templates import Notices
 from ._admission import BudgetGate
 from ._events import LifecycleEvents, SchedulerEvents, SessionAnnouncer
 from ._exit import GraceExitPolicy, GraceWait
+from ._effort import CreditingEffortStops
 from ._failures import CountingFailures, PausingEscalation
 from ._guard import LoggingPhaseGuard
 from ._loop import HeartbeatLoop, PollPacing
@@ -87,7 +88,10 @@ def assemble(ports: LifecyclePorts, run_clock: Clock, console: Console, guard: P
     starter = AgentRunLauncher(p.agents, p.settings, BudgetGate(p.mail, p.pauses, p.budgets, p.delivery, p.notices, console), single, count)
     reaper = PollingRunReaper(
         ExitWatcher(p.agents, p.settings, run_clock), tracker, guard, strays,
-        RunSettlement(p.agents, p.batches, failures, p.snapshots, run_events, console, p.layout, CreditingThrottles(p.log_reader, p.mail, p.delivery, console)),
+        RunSettlement(
+            p.agents, p.batches, failures, p.snapshots, run_events, console, p.layout, CreditingThrottles(p.log_reader, p.mail, p.delivery, console),
+            CreditingEffortStops(p.log_reader, p.mail, p.delivery, console),
+        ),
         run_clock,
         ShutdownTerminator(p.batches, run_events, tracker),
     )

@@ -19,7 +19,7 @@ from ..eligibility import RunnableQuery
 from ..eligibility.testing import MemoryFailureCounter, MemoryPauseStore, runnable_over
 from ..kernel import Message, OrgPaths
 from ..kernel.testing import FakeClock, ListEventSink, SequenceIdGenerator
-from ..kiro import RunCommand, RunCommandBuilder
+from ..kiro import EffortStop, RunCommand, RunCommandBuilder
 from ..mail import TaskQuery
 from ..mail.testing import MemoryMailbox, memory_mailbox
 from ..processes import OrphanJudge, ProcessHandle, ProcessSpawner
@@ -39,7 +39,7 @@ from ..templates.testing import RecordingNotices
 from ._assembly import LifecyclePorts, LoopPorts, assemble, assemble_loop
 from ._loop import HeartbeatLoop
 from ._ports import (
-    Claim, Console, ExitPolicy, InterruptedRuns, Lifecycle, OrphanSettler, Pacing, PhaseGuard, RunAdmission, RunEvents, RunFailures, RunInitiation,
+    Claim, Console, EffortStops, ExitPolicy, InterruptedRuns, Lifecycle, OrphanSettler, Pacing, PhaseGuard, RunAdmission, RunEvents, RunFailures, RunInitiation,
     RunNotes, RunPreparation, RunReaper, RunRecords, RunSettling, RunSpawning, RunStarter, RunTerminating, RunWatching, SchedulerSession,
     SessionEvents, StartAnnouncing, StartFailures, StrayWatch, ThrottleCredits, TickPhase, WaitGrace, WorkLeft,
 )
@@ -324,6 +324,24 @@ class ScriptedThrottles(ThrottleCredits):
     def credit(self, run: RunRecord) -> str:
         self.asked.append(run)
         return self.answer
+
+
+class ScriptedEffortStops(EffortStops):
+    """Recognises ``stop`` in every run (no stop by default), answers every credit with ``kind`` (``""``, ``"free"`` or ``"counted"``) and keeps the
+    runs it was asked about and the runs it credited."""
+
+    def __init__(self, stop: EffortStop | None = None, kind: str = "") -> None:
+        self.stop, self.kind = stop, kind
+        self.asked: list[RunRecord] = []
+        self.credited: list[RunRecord] = []
+
+    def stop_of(self, run: RunRecord) -> EffortStop | None:
+        self.asked.append(run)
+        return self.stop
+
+    def credit(self, run: RunRecord, stop: EffortStop) -> str:
+        self.credited.append(run)
+        return self.kind
 
 
 class RecordingTerminating(RunTerminating):

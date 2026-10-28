@@ -12,8 +12,10 @@ from ..mail import BatchStore
 from ..runs import log_exit, log_interrupted, log_retired, log_timeout
 from ..settings import OrgSettings
 from ..snapshots import OrgSnapshotter
+from ._effort import OUTCOMES, effort_text
 from ._ports import (
     Console,
+    EffortStops,
     PhaseGuard,
     RunEvents,
     RunFailures,
@@ -56,10 +58,10 @@ class ExitWatcher(RunWatching):
 class RunSettlement(RunSettling):
     def __init__(
         self, agents: AgentDirectory, batches: BatchStore, failures: RunFailures, snapshots: OrgSnapshotter, events: RunEvents, console: Console,
-        layout: OrgLayout, throttles: ThrottleCredits,
+        layout: OrgLayout, throttles: ThrottleCredits, efforts: EffortStops,
     ) -> None:
         self._agents, self._batches, self._failures, self._snapshots = agents, batches, failures, snapshots
-        self._events, self._console, self._layout, self._throttles = events, console, layout, throttles
+        self._events, self._console, self._layout, self._throttles, self._efforts = events, console, layout, throttles, efforts
 
     def settle(self, run: RunRecord, exit: Exit, elapsed: float) -> None:
         addr, code, ok = run.addr, exit.code, exit.code == 0
@@ -69,12 +71,20 @@ class RunSettlement(RunSettling):
             self._snapshots.commit(f"{addr}: run ended after retirement (exit {code})")
             return
         self._batches.end(addr, ok)
-        self._events.ended(run, code, exit.why)
-        if ok:
-            self._failures.cleared(addr)
-            self._console.say(f"{addr}: run finished in {elapsed:.0f}s")
+        stop = self._efforts.stop_of(run) if code == -signal.SIGKILL and not run.killed else None  # the launcher's group kill, not the scheduler's
+        if stop is None:
+            self._events.ended(run, code, exit.why)
+            if ok:
+                self._failures.cleared(addr)
+                self._console.say(f"{addr}: run finished in {elapsed:.0f}s")
+            else:
+                self._failed(run, exit)
         else:
-            self._failed(run, exit)
+            kind = self._efforts.credit(run, stop)  # the credit comes first, so that the event can state the outcome
+            self._events.ended(run, code, effort_text(stop, kind))
+            self._console.say(f"{addr}: run stopped because kiro-cli did not set its effort: {OUTCOMES[kind]}")
+            if kind != "free":
+                self._failures.failed(addr, run.log, run.traces)
         rel = run.log.relative_to(self._layout.root)
         self._snapshots.commit(f"{addr}: run {'ok' if ok else f'failed ({code})'}, {run.batch} message(s) [{rel}]")
 

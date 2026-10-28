@@ -6,18 +6,20 @@ import signal
 
 from hirearchy.kernel import is_run_credit
 from hirearchy.kernel.testing import FakeClock
+from hirearchy.kiro import EffortStop
 from hirearchy.processes.testing import FakeProcessTable
-from hirearchy.scheduler._ports import ThrottleCredits
+from hirearchy.scheduler._ports import EffortStops, ThrottleCredits
 from hirearchy.scheduler._reaper import ExitWatcher, PollingRunReaper, RunSettlement, ShutdownTerminator
 from hirearchy.scheduler._run import Exit, RunRecord
 from hirearchy.scheduler._throttle import CreditingThrottles
 from hirearchy.scheduler.testing import (
-    CatchingGuard, LifecycleWorld, MemoryRunRecords, NullSink, RecordingRunEvents, RecordingRunFailures, RecordingSettling,
+    CatchingGuard, LifecycleWorld, ScriptedEffortStops, MemoryRunRecords, NullSink, RecordingRunEvents, RecordingRunFailures, RecordingSettling,
     RecordingTerminating, ScriptedStrayWatch, ScriptedThrottles, ScriptedWatching, lifecycle_world,
 )
 from hirearchy.access.testing import StaticAccess
 
 from ._support import ROOT_DIR, a_run
+from .test_effort import QUOTED
 from .test_throttle import MARK, THROTTLE_ERROR
 
 
@@ -73,9 +75,13 @@ def test_a_run_of_a_retired_agent_is_killed_and_says_so() -> None:
     assert sink.text == "\n# killed: the agent was retired during its run\n" and access.agents.exists("ceo")
 
 
-def settlement(w: LifecycleWorld, throttles: ThrottleCredits | None = None) -> tuple[RunSettlement, RecordingRunFailures, RecordingRunEvents]:
+def settlement(
+    w: LifecycleWorld, throttles: ThrottleCredits | None = None, efforts: EffortStops | None = None
+) -> tuple[RunSettlement, RecordingRunFailures, RecordingRunEvents]:
     failures, events = RecordingRunFailures(), RecordingRunEvents()
-    return RunSettlement(w.access.agents, w.box, failures, w.snapshots, events, w.console, w.ports.layout, throttles or ScriptedThrottles()), failures, events
+    return RunSettlement(
+        w.access.agents, w.box, failures, w.snapshots, events, w.console, w.ports.layout, throttles or ScriptedThrottles(), efforts or ScriptedEffortStops()
+    ), failures, events
 
 
 def an_ended_run(w: LifecycleWorld) -> RunRecord:
@@ -177,6 +183,80 @@ def test_a_forged_mark_with_exit_1_or_a_kill_is_charged_and_counted() -> None:
         run.killed = killed
         settling.settle(run, exit, 3.0)
         assert failures.failed_runs == [("ceo", run.log, ())] and not [m for m in w.delivery.messages if is_run_credit(m)], (exit, killed)
+
+
+# ------------------------------------------------------------------------------------ a run the launcher stopped at kiro's effort warning
+
+EFFORT_LINE = "ceo: run stopped because kiro-cli did not set its effort: "
+STOP = EffortStop(QUOTED, 0)
+B1 = f"effort not set: run stopped, not charged, relaunched (kiro-cli: {QUOTED}; tool effects: none)"
+B2 = f"effort not set: run stopped, not charged, counted as a failure (kiro-cli: {QUOTED}; tool effects: none)"
+B3 = f"effort not set: run stopped, charged as a failed run (kiro-cli: {QUOTED}; tool effects: 2)"
+
+
+def test_settle_asks_for_an_effort_stop_only_on_minus_9_of_a_run_not_killed() -> None:
+    for exit, killed in ((Exit(-9), False), (Exit(-9, "timed out: killed after 5s"), True), (Exit(75), False), (Exit(1), False), (Exit(0), False)):
+        w = lifecycle_world()
+        efforts = ScriptedEffortStops()
+        settling, _, _ = settlement(w, efforts=efforts)
+        run = an_ended_run(w)
+        run.killed = killed
+        settling.settle(run, exit, 1.0)
+        assert [r.addr for r in efforts.asked] == (["ceo"] if (exit.code, killed) == (-9, False) else []), (exit, killed)
+
+
+def test_a_free_effort_credit_is_no_failure_and_says_relaunched() -> None:
+    w = lifecycle_world()
+    settling, failures, events = settlement(w, efforts=ScriptedEffortStops(STOP, "free"))
+    run = an_ended_run(w)
+    settling.settle(run, Exit(-9), 11.0)
+    assert events.calls == [("ended", "ceo", B1)] and failures.failed_runs == [] and failures.cleared_agents == []
+    assert w.console.lines == [EFFORT_LINE + "not charged, relaunched"] and w.box.messages("ceo", "inbox") != []  # the batch is back
+    assert w.snapshots.commits == ["ceo: run failed (-9), 1 message(s) [ceo/runs/20260101T000000000000.log]"]
+
+
+def test_a_counted_effort_credit_is_a_failure() -> None:
+    w = lifecycle_world()
+    settling, failures, events = settlement(w, efforts=ScriptedEffortStops(STOP, "counted"))
+    run = an_ended_run(w)
+    settling.settle(run, Exit(-9), 11.0)
+    assert events.calls == [("ended", "ceo", B2)] and failures.failed_runs == [("ceo", run.log, ())]
+    assert w.console.lines == [EFFORT_LINE + "not charged, counted as a failure"]
+
+
+def test_an_effort_stop_without_a_credit_is_charged_and_counted() -> None:
+    w = lifecycle_world()
+    settling, failures, events = settlement(w, efforts=ScriptedEffortStops(EffortStop(QUOTED, 2), ""))
+    run = an_ended_run(w)
+    settling.settle(run, Exit(-9), 11.0)
+    assert events.calls == [("ended", "ceo", B3)] and failures.failed_runs == [("ceo", run.log, ())]
+    assert w.console.lines == [EFFORT_LINE + "charged as a failed run"]
+
+
+def test_minus_9_without_an_effort_stop_is_the_failure_of_today() -> None:
+    w = lifecycle_world()
+    settling, failures, events = settlement(w, efforts=ScriptedEffortStops())
+    run = an_ended_run(w)
+    settling.settle(run, Exit(-9), 11.0)
+    assert events.calls == [("ended", "ceo", -9)] and failures.failed_runs == [("ceo", run.log, ())] and w.console.lines == []
+
+
+def test_exit_75_takes_the_throttle_path_with_an_effort_stop_scripted() -> None:
+    w = lifecycle_world()
+    efforts, throttles = ScriptedEffortStops(STOP, "free"), ScriptedThrottles("free")
+    settling, failures, _ = settlement(w, throttles, efforts)
+    settling.settle(an_ended_run(w), Exit(75), 1.0)
+    assert efforts.asked == [] and [r.addr for r in throttles.asked] == ["ceo"] and failures.failed_runs == []
+    assert w.console.lines == [THROTTLE_LINE + ", retried"]
+
+
+def test_a_run_of_a_retired_agent_is_not_asked_for_an_effort_stop() -> None:
+    w = lifecycle_world()
+    efforts = ScriptedEffortStops(STOP, "free")
+    settling, failures, events = settlement(w, efforts=efforts)
+    settling.settle(a_run(w.table, w.clock, "gone"), Exit(-9), 2.0)
+    assert efforts.asked == [] and events.calls == [("ended", "gone", "agent retired during its run")] and failures.failed_runs == []
+    assert w.console.lines == ["gone: was retired during its run (exit -9); nothing to settle"]
 
 
 def test_shutdown_interrupts_every_run_gives_the_batches_back_and_empties_the_table() -> None:

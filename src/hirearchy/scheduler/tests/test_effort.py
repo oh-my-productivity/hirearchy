@@ -6,6 +6,7 @@ from hirearchy.budget import effort_credit
 from hirearchy.kernel import Message, credited_stems, is_run_credit, run_credit_title
 from hirearchy.kiro import EffortStop
 from hirearchy.scheduler._effort import CreditingEffortStops, effort_text
+from hirearchy.scheduler._run import RunTable
 from hirearchy.scheduler.testing import LifecycleWorld, lifecycle_world
 
 from ._support import a_run
@@ -102,3 +103,20 @@ def test_effort_text_puts_the_outcome_before_kiros_quote() -> None:
     assert effort_text(stop, "counted") == f"effort not set: run stopped, not charged, counted as a failure (kiro-cli: {QUOTED}; tool effects: none)"
     assert effort_text(stop, "") == f"effort not set: run stopped, charged as a failed run (kiro-cli: {QUOTED}; tool effects: none)"
     assert effort_text(EffortStop(QUOTED, 2), "") == f"effort not set: run stopped, charged as a failed run (kiro-cli: {QUOTED}; tool effects: 2)"
+
+
+def test_the_assembled_lifecycle_credits_an_effort_stop() -> None:
+    w = lifecycle_world()
+    w.hire("ceo")
+    w.mail_to("ceo")
+    w.table.will_exit(-9, output=f"{WARNING}\n{MARK}\n")
+    runs: RunTable = {}
+    assert w.lifecycle.starter.launch(runs, set(), None) == 1
+    stem = runs["ceo"].log.stem
+    w.lifecycle.reaper.reap(runs)
+    (end,) = w.events_of("run.end")
+    assert end["error"] == f"effort not set: run stopped, not charged, relaunched (kiro-cli: {QUOTED}; tool effects: none)"
+    (note,) = credits(w)
+    assert note.to == "ceo" and note.body == effort_credit("ceo", stem).body
+    assert w.console.lines[-1] == "ceo: run stopped because kiro-cli did not set its effort: not charged, relaunched"
+    assert w.events_of("agent.failure") == [] and w.box.messages("ceo", "inbox") != []
