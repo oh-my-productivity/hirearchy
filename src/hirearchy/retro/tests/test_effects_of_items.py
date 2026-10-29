@@ -1,3 +1,4 @@
+# mypy: ignore-errors
 """What the files show of an item's effect (design 4.5, "effect of an item"), read over a real organization: a rejection answered, a criterion settled, runs taken back.
 
 ``FileBriefSources.read(since, after)`` gives ``Facts.effects`` for the changes made after ``after`` (the time of the last brief); ``taken_by`` says which recorded item each one is the effect of.
