@@ -8,14 +8,19 @@ port ``CharterHistory``) gets its fake here, added by the commit that implements
 from __future__ import annotations
 
 from collections.abc import Callable, Mapping, Sequence
+from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 
-from ..kernel import OrgError
-from ..kernel.testing import fs_ledger_store
+from ..kernel import Clock, OrgError
+from ..kernel.testing import FakeClock, ListEventSink, fs_ledger_store
+from ..settings.testing import MemoryOrgSettings
+from ._brief import FileRetroBriefs
+from ._facts import Facts
 from ._ledger import PATH, State, LedgerRetroRecords, with_record
-from ._ports import ORG, CHARTER, CharterHistory, CharterPair, CharterVersions
-from .api import BriefRecord, RetroRecords
+from ._ports import CHARTER, ORG, BriefSources, CharterHistory, CharterPair, CharterVersions, ServiceRetirements
+from ._views import ServiceRetired
+from .api import Brief, BriefRecord, RetroBriefs, RetroRecords
 
 
 class MemoryRetroRecords(RetroRecords):
@@ -81,6 +86,69 @@ class ScriptedCharterHistory(CharterHistory):
         return self._started if self._known else None
 
 
+class ScriptedServiceRetirements(ServiceRetirements):
+    """Answers the retired copies of services it was given."""
+
+    def __init__(self, retired: Sequence[ServiceRetired] = ()) -> None:
+        self._retired = tuple(retired)
+
+    def retired(self) -> tuple[ServiceRetired, ...]:
+        return self._retired
+
+
+class FixedSources(BriefSources):
+    """The facts a test put in, whatever the window: ``new`` verdicts since the last brief, the organization's ``started`` date. ``reads`` keeps the windows asked, as
+    ``(since, after)``."""
+
+    def __init__(self, facts: Facts | None = None, *, new: int = 0, started: datetime | None = None) -> None:
+        self.facts = facts or Facts()
+        self.new = new
+        self._started = started
+        self.reads: list[tuple[datetime | None, datetime | None]] = []
+
+    def started(self) -> datetime | None:
+        return self._started
+
+    def new_verdicts(self, after: datetime | None) -> int:
+        return self.new
+
+    def read(self, since: datetime | None, after: datetime | None) -> Facts:
+        self.reads.append((since, after))
+        return self.facts
+
+
+class FixedRetroBriefs(RetroBriefs):
+    """Answers the brief it was given; ``calls`` keeps the ``since`` of each call."""
+
+    def __init__(self, brief: Brief) -> None:
+        self._brief = brief
+        self.calls: list[datetime | None] = []
+
+    def brief(self, *, since: datetime | None = None) -> Brief:
+        self.calls.append(since)
+        return self._brief
+
+
+@dataclass
+class BriefsWorld:
+    """A brief over fixed facts: the sources, the ledger (in memory), the events it emitted and the clock, for a test to prepare and to look at."""
+
+    sources: FixedSources
+    records: MemoryRetroRecords
+    sink: ListEventSink
+    clock: FakeClock
+    briefs: RetroBriefs
+
+
+def briefs_over_fixed_facts(tmp_path: Path, facts: Facts | None = None, *, new: int = 0, started: datetime | None = None, org_md: str = "---\nmission: m\n---\nrules\n") -> BriefsWorld:
+    sources, records, sink, clock = FixedSources(facts, new=new, started=started), MemoryRetroRecords(), ListEventSink(), FakeClock()
+    return BriefsWorld(sources, records, sink, clock, FileRetroBriefs(sources, records, MemoryOrgSettings(org_md), sink, clock))
+
+
+def fixed_retro_briefs(tmp_path: Path) -> RetroBriefs:
+    return FixedRetroBriefs(Brief("B1", FakeClock().now(), None, "since the organization started"))
+
+
 def fs_retro_records(tmp_path: Path) -> RetroRecords:
     """The ledger over ``.runtime/retros.json`` of a directory."""
     return LedgerRetroRecords(fs_ledger_store(tmp_path).store)
@@ -90,6 +158,11 @@ def memory_retro_records(tmp_path: Path) -> RetroRecords:
     return MemoryRetroRecords()
 
 
+def file_retro_briefs(tmp_path: Path) -> RetroBriefs:
+    return briefs_over_fixed_facts(tmp_path).briefs
+
+
 IMPLEMENTATIONS: Mapping[type, Sequence[Callable[[Path], object]]] = {
     RetroRecords: [fs_retro_records, memory_retro_records],
+    RetroBriefs: [file_retro_briefs, fixed_retro_briefs],
 }

@@ -360,3 +360,4 @@ class EffectFacts:
     reclaimed: frozenset[str] = frozenset()
     clarified: frozenset[str] = frozenset()
     answered: frozenset[str] = frozenset()
+

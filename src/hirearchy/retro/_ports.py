@@ -9,7 +9,11 @@ from __future__ import annotations
 from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Protocol, runtime_checkable
+from typing import TYPE_CHECKING, Protocol, runtime_checkable
+
+if TYPE_CHECKING:
+    from ._facts import Facts
+    from ._views import ServiceRetired
 
 ORG = "ORG.md"
 CHARTER = "AGENT.md"
@@ -77,4 +81,35 @@ class CharterHistory(Protocol):
 
     def org_started(self) -> datetime | None:
         """The commit time of the oldest commit that added ``ORG.md``; None without a history or when it cannot be found. Never raises."""
+        ...
+
+
+@runtime_checkable
+class BriefSources(Protocol):
+    """Where a brief's facts come from: the one place that reads the files (the services, the cases, the agents, the event log, health) and hands the brief its narrow views."""
+
+    def started(self) -> datetime | None:
+        """The organization's start: the earliest of root's oldest box entry, the oldest agent's ``created`` and the commit time of the oldest commit that added ORG.md;
+        None when none of them gives a date. Never raises."""
+        ...
+
+    def new_verdicts(self, after: datetime | None) -> int:
+        """The verdict count of 4.6: the deliveries (service and one-off) whose first counted human-tier verdict was created after ``after`` (all of them when None). A link
+        note adds nothing to it. Never raises: a source that cannot be read counts 0."""
+        ...
+
+    def read(self, since: datetime | None, after: datetime | None) -> Facts:
+        """The facts over the window that starts at ``since`` (None: the whole record). ``after`` is the time of the last brief (None before the first): the verdicts and the
+        effects of its items are counted after it. A source that cannot be read becomes a line of ``Facts.unreadable``, not an exception; ``OrgError`` only when the agents
+        cannot be listed."""
+        ...
+
+
+@runtime_checkable
+class ServiceRetirements(Protocol):
+    """The retired copies of services (``<owner>/services/.retired/<name>-<stamp>/RETIRED.md``): no public port of ``services`` lists them, so ``retro`` defines the one it needs
+    and the composition root implements it (design 4.5, L22)."""
+
+    def retired(self) -> tuple[ServiceRetired, ...]:
+        """The record of every retired copy of a service: owner, name, when, by whom, why and the approval; a copy with no record is left out. Never raises."""
         ...

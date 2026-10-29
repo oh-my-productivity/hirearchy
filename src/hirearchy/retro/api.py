@@ -28,6 +28,7 @@ __all__ = [
     "RECORDS_KEPT",
     "RETRO_DEFAULTS",
     "RecordedItem",
+    "RetroBriefs",
     "RetroRecords",
     "RetroThresholds",
     "Section",
@@ -158,6 +159,15 @@ class Brief:
     notes: tuple[str, ...] = ()
     recorded: bool = False
     shown_again: str = ""
+
+
+@runtime_checkable
+class RetroBriefs(Protocol):
+    def brief(self, *, since: datetime | None = None) -> Brief:
+        """The brief for root, derived from the files. Without ``since`` it is recorded in the ledger as B<n> when a human verdict was created after the last brief's ``at``
+        (or there is none), and is the last brief shown again, recorded nowhere, otherwise (4.2); with ``since`` it is a look-back brief over that window, recorded
+        nowhere. ``OrgError`` for a ``since`` in the future and when the agents cannot be listed; every other unreadable source becomes a line of its section."""
+        ...
 
 
 @runtime_checkable

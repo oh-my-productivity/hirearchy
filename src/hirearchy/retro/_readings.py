@@ -13,6 +13,7 @@ from datetime import datetime
 from ..reflection import CostAlarm, RepeatAlarm
 from ..services import listed_added_words
 from . import _texts as texts
+from ._changes import Changes
 from ._effect import NOT_EVALUATED, Evaluated
 from ._shapes import RELATIONS, ShapeGroup
 from ._texts import (
@@ -263,3 +264,14 @@ def d7_held(rows: Sequence[Evaluated], unreadable: Unreadable) -> Section:
     lines = [f"- {e.text}: {e.outcome}" for e in rows]
     counts = (("changes", len(rows)), ("recurred", sum(e.outcome.startswith("recurred") for e in rows)), ("not_evaluated", sum(e.outcome == NOT_EVALUATED for e in rows)))
     return _section("d7", lines, lines, unreadable, counts)
+
+
+def d8_changes(found: Changes, since: datetime | None) -> Section:
+    """D8 Changes to your organization: every structural change after ``since`` with who made it (its label), then the count of the unprompted charter edits, which the
+    cap never hides; without a git history the charter and limit lines read ``unknown``."""
+    lines = [f"- {c.line}" for c in found.changes] + ([f"- {found.charter_line}"] if found.charter_line else []) or [NONE]
+    since_text = day(since) if since is not None else "the organization started"
+    count = (("changes", len(found.changes)), ("unprompted_charter_edits", found.unprompted if found.unprompted is not None else "unknown"))
+    block = _capped(lines, BLOCK_LINES, BLOCK_MORE) + (f"- Unprompted charter edits: {found.unprompted_text}",)
+    details = _capped(lines, DETAIL_LINES, DETAIL_MORE) + (f"- Unprompted charter edits since {since_text}: {found.unprompted_text}",)
+    return Section("d8", HEADINGS["d8"], block, details, count)
