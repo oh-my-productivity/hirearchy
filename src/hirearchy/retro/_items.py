@@ -13,7 +13,7 @@ from ..services import line_key
 from ._views import EffectFacts, Fate
 from .api import ITEM_KINDS, BriefRecord, Item, RecordedItem
 
-__all__ = ["EffectFacts", "Selection", "fates", "select", "taken_by", "to_record"]
+__all__ = ["EffectFacts", "Selection", "fates", "renamed", "select", "taken_by", "to_record"]
 
 LAPSES_MAX = 2  # a cause is asked again after it lapsed, but not a third time
 
@@ -66,7 +66,7 @@ def to_record(items: Sequence[Item], records: Sequence[BriefRecord], taken: froz
     return tuple(RecordedItem(i.n, i.kind, i.key, i.evidence, dict(i.effect), _lapses(i.key, records, taken)) for i in items)
 
 
-def _renamed(item: RecordedItem, facts: EffectFacts) -> str:
+def renamed(item: RecordedItem, facts: EffectFacts) -> str:
     """The service an extension defined for the owner of a ``service`` item under another name: its criteria key equals that of one of the item's tasks (``""`` for none)."""
     owner = str(item.effect.get("service", "")).split("/")[0]
     keys = {k for case in item.evidence if (k := facts.shapes.get(case))}
@@ -77,7 +77,7 @@ def _seen(item: RecordedItem, facts: EffectFacts) -> str:
     """What the files show of an item's effect (``""`` for none), by kind."""
     e = item.effect
     checks: dict[str, Callable[[], str]] = {
-        "service": lambda: f"{named} defined" if (named := e.get("service") if e.get("service") in facts.services else _renamed(item, facts)) else "",
+        "service": lambda: f"{named} defined" if (named := e.get("service") if e.get("service") in facts.services else renamed(item, facts)) else "",
         "checker-add": lambda: f"a checker joined {e.get('owner')}'s team" if e.get("owner") in facts.checkers else "",
         "checker-fix": lambda: f"the line is in {e.get('agent')}'s charter" if f"{e.get('agent')}|{line_key(e.get('line', ''))}" in facts.lines else "",
         "worker": lambda: f"a worker joined {e.get('lead')}'s team" if e.get("lead") in facts.workers else "",

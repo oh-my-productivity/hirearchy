@@ -166,6 +166,50 @@ def test_a_service_the_user_renamed_in_the_applied_extension_reads_taken_by_its_
     assert "- B1.1 service: taken (ops/chore-list defined)" in second and "B1.1 service: lapsed" not in second
 
 
+def a_judged_memo(org, topic, verdict, link=None):
+    """A new request of memos, delivered, and the user's verdict on it (a rejection is answered by the user's link to ``link``)."""
+    task = org.request(ROOT, "memos", {"topic": topic})
+    deliver(org, "ceo", task)
+    if verdict == "accept":
+        org.feedback(ROOT, task.id, "accept", source="human")
+        return task
+    no = org.feedback(ROOT, task.id, "reject", "Missing the sources again.", source="human")
+    org.feedback(ROOT, task.id, "reject", "Yes, it is about that.", source="human", criterion=[link], confirms=no.id)
+    return task
+
+
+def the_checker_taken(tmp_path):
+    org = make_the_org(tmp_path)
+    the_user_judged_three_chores_and_rejected_three_memos_on_one_criterion(org)
+    server = build_server(org, ROOT)
+    first = call(server, "retro")
+    time.sleep(1.1)
+    approve(server, item_blueprint(first, 2))  # item 2: the checker (the service item is left)
+    return org, server
+
+
+def test_a_taken_checker_is_weighed_by_the_cases_that_follow_it_until_it_holds(tmp_path):
+    """Review F1 of build 2a (design 4.4, rows 3-4): the next brief says whether a taken `checker-add` held: INCONCLUSIVE below the window, then `not recurred`."""
+    org, server = the_checker_taken(tmp_path)
+    a_judged_memo(org, "four", "accept")
+    second = call(server, "retro")
+    line = r"- agent ceo/c2-checker added \([\d-]+\), item B1\.2: "
+    assert re.search(line + r"INCONCLUSIVE \(1 of 3 exercised cases\)", second), second
+    a_judged_memo(org, "five", "accept")
+    a_judged_memo(org, "six", "accept")
+    third = call(server, "retro")
+    assert re.search(line + r"not recurred in 3 cases where it was exercised", third), third
+
+
+def test_a_taken_checker_whose_criterion_failed_again_reads_recurred_in_that_case(tmp_path):
+    org, server = the_checker_taken(tmp_path)
+    a_judged_memo(org, "four", "reject", link="C2")
+    second = call(server, "retro")
+    case = org.runtime.case_records.records("memos")[0].cases[-1].id
+    assert re.search(r"- agent ceo/c2-checker added \([\d-]+\), item B1\.2: recurred in case " + re.escape(case), second), second
+    assert "no target recorded" not in second.split("Did past changes hold")[1].split("Changes to your organization")[0]
+
+
 # ------------------------------------------------------------------------------------------------------------ item 2: root's refusals and the extension paths
 
 WHY = "the user said yes to this change"

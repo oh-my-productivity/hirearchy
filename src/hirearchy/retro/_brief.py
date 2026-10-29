@@ -21,6 +21,7 @@ from ._readings import (
     d14_held,
 )
 from ._shapes import groups
+from ._tracked import structural_tracked
 from ._signals import REF, answer_items, cause_items, checker_items, clarify_items, grown_estimate, idle_items, service_items
 from ._texts import day
 from ._views import EffectFacts, Fate, ServiceFailures, TakenFix
@@ -144,7 +145,7 @@ class FileRetroBriefs(RetroBriefs):
         self, facts: Facts, th: RetroThresholds, window: datetime | None, recs: tuple[BriefRecord, ...], last: BriefRecord | None, record: bool,
         held: tuple[Item, ...], d6_lines: tuple[str, ...], picked: Selection,
     ) -> tuple[Section, ...]:
-        evaluated = [evaluate(t, th.window) for t in facts.tracked]
+        evaluated = [evaluate(t, th.window) for t in (*facts.tracked, *structural_tracked(facts, recs))]
         carry_since = recs[-th.carry].since if th.carry and len(recs) >= th.carry else (self._clock.now() if th.carry == 0 else None)
         previous: tuple[Fate, ...] = fates(last, facts.effects, recorded=record)
         changes = changes_of(replace(facts.changes, briefs=recs), window)

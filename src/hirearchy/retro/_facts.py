@@ -12,7 +12,7 @@ from ..kernel import parse_time
 from ..reflection import gate_refusal_kind
 from ._changes import ChangeFacts
 from ._views import (
-    EffectFacts, HealthFlag, OneOffCase, Passed, PlaybookFacts, ProposalFacts, Refusal, Said, ServiceAlarms, ServiceFailures, Sourced, SpendFacts, Tracked, WriteFact,
+    EffectFacts, HealthFlag, OneOffCase, Occasion, Passed, PlaybookFacts, ProposalFacts, Refusal, Said, ServiceAlarms, ServiceFailures, Sourced, SpendFacts, Tracked, WriteFact,
 )
 
 
@@ -76,6 +76,7 @@ class Facts:
     spend: tuple[SpendFacts, ...] = ()
     changes: ChangeFacts = field(default_factory=ChangeFacts)
     tracked: tuple[Tracked, ...] = ()
+    judged: Mapping[str, tuple[Occasion, ...]] = field(default_factory=dict)  # a service -> the cases the user judged, with the time of the first verdict: where a change was exercised
     failures: tuple[ServiceFailures, ...] = ()
     effects: EffectFacts = field(default_factory=EffectFacts)
     unreadable: tuple[tuple[str, str], ...] = ()  # (service, why) of the records that could not be read

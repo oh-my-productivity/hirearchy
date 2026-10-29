@@ -131,7 +131,7 @@ class FileBriefSources(BriefSources):
             one_offs=one_offs, offers=self._offers(tops), estimates={a: self._estimate(a) for a in tops}, flags=self._flags(), last_checks=self._last_checks(agents),
             owners={a: tuple(names) for a in agents if (names := self._catalog.service_names(a))}, sourced=sourced, unknown_sources=unknown,
             proposals=proposals_of(events), oldest_event=oldest, playbooks=tuple(self._playbook(r) for r in service_records), spend=tuple(self._spend(r, since) for r in service_records),
-            changes=self._changes(agents, facts_events), tracked=self._tracked(service_records), failures=tuple(f for r in service_records if (f := self._failures(r, th.window_cases))),
+            changes=self._changes(agents, facts_events), tracked=self._tracked(service_records), judged={r.service: self._judged(r) for r in service_records}, failures=tuple(f for r in service_records if (f := self._failures(r, th.window_cases))),
             effects=self._effects(after, service_records, {c.id: k for c in one_offs if (k := criteria_key(c.criteria))}), unreadable=unreadable,
         )
 
@@ -351,6 +351,16 @@ class FileBriefSources(BriefSources):
                 if w.k:
                     found.append(Tracked(f"{r.service} {w.id} (v{w.text_version})", "playbook", w.watch_start, True, watch=WatchState(w.state, w.k, w.clean, w.related)))
         return tuple(found)
+
+    @staticmethod
+    def _judged(record: ServiceRecord) -> tuple[Occasion, ...]:
+        """The cases of a service the user judged, each with the time of its first counted human verdict, oldest first."""
+        first: dict[str, datetime | None] = {}
+        for d in record.deliveries:
+            if d.judged:
+                t = FileBriefSources._first_verdict(d)
+                first[d.case] = min((x for x in (first.get(d.case), t) if x is not None), default=None)
+        return tuple(sorted((Occasion(case, "", when) for case, when in first.items()), key=lambda o: (o.when is None, o.when or datetime.min.replace(tzinfo=timezone.utc), o.case)))
 
     def _agent_fact(self, addr: str) -> AgentFact | None:
         try:
