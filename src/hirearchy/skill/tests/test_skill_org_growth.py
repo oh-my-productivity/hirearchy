@@ -190,3 +190,46 @@ def test_lines_39_72_92_and_100_are_unchanged_byte_for_byte():
     lines = SKILL.read_text().splitlines()
     for number, text in UNCHANGED.items():
         assert lines[number - 1] == text, number
+
+
+# Org growth phase 2a (design 11.1): the three lines that change in place (SKILL.md stays at 125 lines)
+
+def test_a_change_to_the_org_is_an_extension_shown_and_approved():
+    """Line 18 (Q3): a change to the organization itself goes through ``propose_org(..., extend="current")``; the tools refuse any other way."""
+    lines = SKILL.read_text().splitlines()
+    assert len(lines) == 125
+    assert lines[17].endswith("is the approval), then `start()`. " + EXTENSION)  # (the sentence follows `then start().`, on the same physical line)
+    assert "propose_org(blueprint, extend=\"current\")" in lines[17]
+
+
+def test_a_retro_is_offered_then_called_after_the_users_yes():
+    """Line 113 (Q17): item 8 of section 5 says what the trigger line and the tool description say: offer, and call ``retro()`` only after the yes."""
+    lines = SKILL.read_text().splitlines()
+    assert len(lines) == 125 and lines[112] == RETRO_ITEM and lines[113] == "## Blueprint rules"
+    text = flat()
+    assert "offer it in one line once the delivery is settled, and call `retro()` only after their yes (or when they ask)" in text
+    assert "show its block from retro brief to retro brief end exactly as written" in text and "never add an item of your own" in text
+
+
+def test_the_users_answers_go_in_needs_elicitation_and_each_criterion_has_a_source():
+    """Line 119 (Q9): the answers are put verbatim in ``needs.elicitation`` and every criterion has ``from:`` (with ``asked:``) or ``default: true``."""
+    lines = SKILL.read_text().splitlines()
+    assert len(lines) == 125 and lines[118].endswith(PROVENANCE)
+    text = flat()
+    assert "put the user's answers, verbatim, in `needs.elicitation`" in text and "or `default: true` (yours)" in text
+    assert "refuses criteria without a source" in text
+
+
+EXTENSION = (
+    "A change to the org itself (an agent, a service, a charter line, a limit, a schedule, a retire) is `propose_org(blueprint, extend=\"current\")`: "
+    "show its plan and apply it only after their approval; the tools refuse any other way."
+)
+RETRO_ITEM = (
+    "8. A retro: when a reply says one is due, offer it in one line once the delivery is settled, and call `retro()` only after their yes (or when they ask). "
+    "Show its block from RETRO BRIEF to RETRO BRIEF END exactly as written; for each item they answer yes, make the call its Details give, one item at a time; "
+    "record nothing for a no, and never add an item of your own."
+)
+PROVENANCE = (
+    " Put the user's answers, verbatim, in `needs.elicitation`, and give each criterion `from:` (their exact words it rests on, with `asked:` your question) "
+    "or `default: true` (yours): the plan shows the words you added, and refuses criteria without a source."
+)

@@ -15,7 +15,7 @@ Call `whoami` (or `status`). If the hirearchy tools are not available or error o
 
 ## 0b. The org already exists: look for a service first
 Before building anything, call `services()`. If one fits, never build a new org or team: `request(service, inputs)` (tell the user
-the inputs and the per-request budget in one line; their asking for it within the approved per-request budget is the approval), then `start()`.
+the inputs and the per-request budget in one line; their asking for it within the approved per-request budget is the approval), then `start()`. A change to the org itself (an agent, a service, a charter line, a limit, a schedule, a retire) is `propose_org(blueprint, extend="current")`: show its plan and apply it only after their approval; the tools refuse any other way.
 
 ## 1. Elicit (one message, then wait)
 Once, or repeatedly? Recurring work ("every week", "whenever I...", "for each new ...") is a **service**, not a one-off: also ask which
@@ -110,13 +110,13 @@ Tell the user it is running and how many runs were planned (a ceiling: runs the 
 7. The scheduler exits on its own when nothing is left (`progress` shows "scheduler: stopped (finished: no open tasks)").
    Call `stop()` only if the user cancels, declines more budget, you hand over an unverified or partial result (say the task
    stays open/blocked, not done), or you started it with `until_done=False`.
-
+8. A retro: when a reply says one is due, offer it in one line once the delivery is settled, and call `retro()` only after their yes (or when they ask). Show its block from RETRO BRIEF to RETRO BRIEF END exactly as written; for each item they answer yes, make the call its Details give, one item at a time; record nothing for a no, and never add an item of your own.
 ## Blueprint rules
 Templates: manager, researcher, writer, reviewer, fact-checker, engineer, tester, code-reviewer, analyst, data-checker (or give `charter:` text).
 The validator enforces: exact acceptance criteria and a deliverable; web tools for web needs; write+shell only with a workspace;
 a reviewer separate from the author who never edits others' files; budget within the user's cap and above the estimate; the
 model floor (nothing below claude-sonnet-5.5). Criteria must be checkable ("at most 1500 words"), never "good quality". Example criteria: "Covers exactly the
-items the user listed", "The fact-checker's coverage report shows every factual claim verified (n of m, n = m)". The fact-checker and reviewer check everything, not a sample, so never ask for "at least N" checks.
+items the user listed", "The fact-checker's coverage report shows every factual claim verified (n of m, n = m)". The fact-checker and reviewer check everything, not a sample, so never ask for "at least N" checks. Put the user's answers, verbatim, in `needs.elicitation`, and give each criterion `from:` (their exact words it rests on, with `asked:` your question) or `default: true` (yours): the plan shows the words you added, and refuses criteria without a source.
 
 ## Files and access
 - `needs.inputs`: the user's folders; agents can read them and can never change them (kiro enforces it). `needs.workspace`: the one

@@ -72,3 +72,10 @@ def test_the_skill_ships_in_the_wheel_and_the_installed_copy_is_this_one(tmp_pat
     assert skill_source().read_text() == SKILL.read_text()
     install_skill(tmp_path / "skills")
     assert (tmp_path / "skills" / "hirearchy" / "SKILL.md").read_text() == SKILL.read_text()
+
+
+def test_root_instructions_name_retro_when_due(tmp_path):
+    """Design 11.2: one line of the root instructions gains ``; `retro` when due`` (18 characters): 2674 -> 2692 at the 60-character path, under the budget of 2700."""
+    instructions, length_at_reference_path = root_instructions(tmp_path / "o2")
+    assert "  `quality`: how the work went; `retro` when due.\n" in instructions
+    assert length_at_reference_path == 2692
