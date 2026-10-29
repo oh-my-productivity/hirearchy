@@ -186,9 +186,10 @@ def checker_runs(o: OwnerFacts) -> tuple[str, int, int]:
 
 
 def grown_estimate(o: OwnerFacts) -> int:
-    """The runs the team of ``o`` needs with one more checker: a pass and a rework of the checker and one more report for the owner to process. Every service of the owner
-    must be budgeted at least that (``extend-budget``)."""
-    return o.team_estimate + checker_runs(o)[1] + 2
+    """The runs the team of ``o`` needs with one more checker: a pass and a rework of the checker and one more report for the owner to process. An owner with no reports counts
+    as a worker now and as a manager of its one report then (2 + 1 + 2 in place of its worker runs). Every service of the owner must be budgeted at least that (``extend-budget``)."""
+    solo = (2 + 1 + 2) - o.own_runs if o.children == 0 else 0
+    return o.team_estimate + solo + checker_runs(o)[1] + (1 if o.children == 0 else 2)
 
 
 def _add(s: ServiceFailures, cls: frozenset[str], cases: tuple[FailedCase, ...], taken: TakenFix | None, thresholds: RetroThresholds) -> Item:

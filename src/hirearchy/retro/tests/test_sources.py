@@ -5,11 +5,15 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
 from testkit.reach.hirearchy.core import ROOT, Org
 
 from hirearchy.kernel.testing import ListEventSink
+from hirearchy.retro import RetroThresholds
 from hirearchy.retro._brief import FileRetroBriefs
+from hirearchy.retro._signals import checker_items
 from hirearchy.retro._sources import FileBriefSources, criteria_lines, goal_line
+from hirearchy.retro._views import FailedCase, ServiceFailures
 from hirearchy.retro.testing import MemoryRetroRecords, ScriptedCharterHistory, ScriptedServiceRetirements
 
 
@@ -73,3 +77,25 @@ def test_retro_writes_only_its_ledger_and_sends_nothing(tmp_path: Path) -> None:
     FileRetroBriefs(sources_of(org), MemoryRetroRecords(), org.runtime.settings, ListEventSink(), org.runtime.clock).brief()
     after = sorted(p.relative_to(org.root).as_posix() for p in org.root.rglob("*") if p.is_file() and ".git/" not in p.as_posix() and ".runtime/events" not in p.as_posix())
     assert after == before  # no message in any box, no file anywhere
+
+
+@pytest.mark.parametrize("role", ["Writer", "Lead"])
+def test_the_prefilled_checker_add_for_a_solo_owner_validates_on_the_team_the_checker_grows(tmp_path: Path, role: str) -> None:
+    """F5: an owner with no reports counts as a worker now and as a manager once the checker is its child (2 + 1 + 2), so the call's budgets are for that team."""
+    org = Org.init(tmp_path / "org", "documents", {"poll_seconds": 0.05})
+    ws, src = tmp_path / "ws", tmp_path / "src"
+    ws.mkdir()
+    src.mkdir()
+    org.hire(ROOT, "solo", role, "Does it.", tools=["read", "write"], workspace=str(ws), inputs=[str(src)])
+    org.define_service(ROOT, "solo", "memos", description="d", acceptance=["Every statement names its file"], deliverable={"description": "d", "path": str(ws)}, budget=4)
+    org.define_service(ROOT, "solo", "notes", description="d", acceptance=["Every note is dated"], deliverable={"description": "d", "path": str(ws)}, budget=4)
+    sources = sources_of(org)
+    record = next(r for r in org.runtime.case_records.records() if r.service == "memos")
+    facts = sources._owner_facts(record)
+    assert (facts.children, facts.team_estimate, facts.old_budget) == (0, 3, 4)
+    cases = tuple(FailedCase(f"M{n}", org.runtime.clock.now(), (frozenset({"C1"}),), "solo", False, True, 3) for n in (1, 2, 3))
+    (item,) = checker_items([ServiceFailures("memos", "solo", cases, 6, {"C1": "Every statement names its file"}, facts, ())], RetroThresholds())
+    bp = json.loads(item.blueprint.replace("B{n}.{k}", "B1.1"))
+    assert [b["budget"] for b in bp["extend"]["budgets"]] == [7, 7]  # 2 + 1 + 2 for the owner and 2 for the reviewer; the other service is lifted too
+    found = org.runtime.blueprint_validator.validate(org.runtime.blueprint_loader.load_text(json.dumps(bp)), org_exists=True)
+    assert list(found) == []  # no error and no warning

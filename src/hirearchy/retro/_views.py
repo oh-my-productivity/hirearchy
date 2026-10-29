@@ -332,6 +332,7 @@ class OwnerFacts:
     verifier_template: str = ""
     template_runs: tuple[tuple[str, int], ...] = ()
     others: tuple[tuple[str, int], ...] = ()  # the owner's other live services with their runs per request: the team with a checker must still fit each one's budget
+    own_runs: int = 0  # for an owner with no reports: what it counts as a worker now (its template's runs + 1); it counts as a manager once the checker is its child
 
 
 @dataclass(frozen=True)

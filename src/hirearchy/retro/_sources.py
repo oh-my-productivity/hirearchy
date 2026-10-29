@@ -256,6 +256,7 @@ class FileBriefSources(BriefSources):
         return OwnerFacts(
             owner, len(self._directory.children(owner)), max_children if isinstance(max_children, int) and not isinstance(max_children, bool) else 5, bool(meta.get("can_hire")),
             tuple(str(t) for t in tools) if isinstance(tools, list) else (), self._estimate(owner), record.budget, template, runs, others,
+            self._runs_of(owner) + 1 if not team else 0,
         )
 
     def _failures(self, record: ServiceRecord, window: int) -> ServiceFailures | None:
