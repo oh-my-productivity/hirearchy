@@ -6,7 +6,7 @@ and root's own tasks; it keeps no lesson, memory, note or report of a team. A re
 from __future__ import annotations
 
 import re
-from collections.abc import Iterable, Sequence
+from collections.abc import Iterable, Mapping, Sequence
 from datetime import datetime, timezone
 
 from ..agents import AgentDirectory, CharterReader, RetiredArchive
@@ -131,7 +131,7 @@ class FileBriefSources(BriefSources):
             owners={a: tuple(names) for a in agents if (names := self._catalog.service_names(a))}, sourced=sourced, unknown_sources=unknown,
             proposals=proposals_of(events), oldest_event=oldest, playbooks=tuple(self._playbook(r) for r in service_records), spend=tuple(self._spend(r, since) for r in service_records),
             changes=self._changes(agents, facts_events), tracked=self._tracked(service_records), failures=tuple(f for r in service_records if (f := self._failures(r, th.window_cases))),
-            effects=self._effects(after, service_records), unreadable=unreadable,
+            effects=self._effects(after, service_records, {c.id: k for c in one_offs if (k := criteria_key(c.criteria))}), unreadable=unreadable,
         )
 
     # ------------------------------------------------------------------------------------------------------------------------ D1 to D4
@@ -419,7 +419,7 @@ class FileBriefSources(BriefSources):
                 found.add(addr)
         return frozenset(found)
 
-    def _effects(self, after: datetime | None, records: Sequence[ServiceRecord] = ()) -> EffectFacts:
+    def _effects(self, after: datetime | None, records: Sequence[ServiceRecord] = (), shapes: Mapping[str, tuple[str, ...]] | None = None) -> EffectFacts:
         addrs = self._directory.agents()
         answered, clarified = self._answers(records, after)
         agents = [f for addr in addrs if (f := self._agent_fact(addr)) is not None]
@@ -431,14 +431,17 @@ class FileBriefSources(BriefSources):
             except (OSError, ValueError):
                 continue
         services: set[str] = set()
+        defined: list[tuple[str, str, tuple[str, ...]]] = []
         for owner in addrs:
             for name in self._catalog.service_names(owner):
                 versions = self._store.versions(owner, name, "SERVICE")
                 if versions and str(versions[0][1].get("approved_in") or "").startswith("change "):
                     services.add(f"{owner}/{name}")
+                    first = versions[0][1].get("acceptance")
+                    defined.append((owner, name, criteria_key([str(x) for x in first] if isinstance(first, list) else [])))
         checkers = frozenset(f.addr.rsplit("/", 1)[0] if "/" in f.addr else ROOT for f in made if f.verifier)
         return EffectFacts(
-            services=frozenset(services), checkers=checkers, lines=frozenset(lines), workers=frozenset(f.addr.rsplit("/", 1)[0] for f in made if "/" in f.addr),
+            services=frozenset(services), defined=tuple(defined), shapes=dict(shapes or {}), checkers=checkers, lines=frozenset(lines), workers=frozenset(f.addr.rsplit("/", 1)[0] for f in made if "/" in f.addr),
             retired=frozenset(t.addr for t in self._archive.trees()), reclaimed=self._reclaimed(addrs, after), clarified=clarified, answered=answered,
         )
 

@@ -145,6 +145,27 @@ def test_the_exit_study_on_one_lead_both_items_apply_as_the_brief_gives_them_in_
     assert "ceo/c2-checker" in org.runtime.agents.agents()
 
 
+def test_a_service_the_user_renamed_in_the_applied_extension_reads_taken_by_its_criteria(tmp_path):
+    """Review F3 of build 2a (design 4.5, "effect of an item"): the user renames the pre-filled service; it was still made by the brief's item, so the next brief shows the
+    item taken, not lapsed (P2-X1)."""
+    org = make_the_org(tmp_path)
+    the_user_judged_three_chores_and_rejected_three_memos_on_one_criterion(org)
+    server = build_server(org, ROOT)
+    first = call(server, "retro")
+    time.sleep(1.1)
+    service = item_blueprint(first, 1)
+    entry = service["extend"]["add_services"][0]
+    entry["name"] = "chore-list"
+    entry["deliverable"] = {"description": "one markdown list", "format": "markdown", "path": str(tmp_path / "out")}
+    (tmp_path / "out").mkdir()
+    assert "defined 1 service(s): chore-list of ops" in approve(server, service)
+    task = org.request(ROOT, "memos", {"topic": "four"})
+    deliver(org, "ceo", task)
+    org.feedback(ROOT, task.id, "accept", source="human")
+    second = call(server, "retro")
+    assert "- B1.1 service: taken (ops/chore-list defined)" in second and "B1.1 service: lapsed" not in second
+
+
 # ------------------------------------------------------------------------------------------------------------ item 2: root's refusals and the extension paths
 
 WHY = "the user said yes to this change"

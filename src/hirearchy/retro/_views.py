@@ -4,7 +4,7 @@ that hold human-tier verdicts, runtime facts (runs, times, the agents' tree) and
 from __future__ import annotations
 
 from collections.abc import Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 
 from ..reflection import CostAlarm, RepeatAlarm
@@ -355,6 +355,8 @@ class EffectFacts:
     (``service/C``) and the rejections answered."""
 
     services: frozenset[str] = frozenset()
+    defined: tuple[tuple[str, str, tuple[str, ...]], ...] = ()  # (owner, name, criteria key of v1) of every service an extension defined: a renamed one counts by its key
+    shapes: Mapping[str, tuple[str, ...]] = field(default_factory=dict)  # a one-off task's id -> the criteria key of its section: the shape a service item rests on
     checkers: frozenset[str] = frozenset()
     lines: frozenset[str] = frozenset()
     workers: frozenset[str] = frozenset()
