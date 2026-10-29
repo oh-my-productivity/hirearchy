@@ -31,7 +31,7 @@ from ._thresholds import retro_thresholds
 from ._watch_facts import retire_candidates, watch_retires
 from ._texts import day
 from ._views import (
-    Answering, AgentFact, EffectFacts, EventFacts, FailedCase, HealthFlag, OneOffCase, Occasion, OwnerFacts, Passed, PlaybookFacts, RetiredFact, Said, ServiceAlarms,
+    Answering, AgentFact, EffectFacts, EventFacts, FailedCase, HealthFlag, OneOffCase, Occasion, OwnerFacts, Passed, PlaybookFacts, RetiredFact, Rejection, Said, ServiceAlarms,
     ServiceFact, ServiceFailures, Sourced, SpendFacts, Tracked, WatchState,
 )
 
@@ -132,6 +132,7 @@ class FileBriefSources(BriefSources):
             owners={a: tuple(names) for a in agents if (names := self._catalog.service_names(a))}, sourced=sourced, unknown_sources=unknown,
             proposals=proposals_of(events), oldest_event=oldest, playbooks=tuple(self._playbook(r) for r in service_records), spend=tuple(self._spend(r, since) for r in service_records),
             changes=self._changes(agents, facts_events), tracked=self._tracked(service_records), judged={r.service: self._judged(r) for r in service_records}, failures=tuple(f for r in service_records if (f := self._failures(r, th.window_cases))),
+            rejected={r.service: self._rejections(r) for r in service_records},
             effects=self._effects(after, service_records, {c.id: k for c in one_offs if (k := criteria_key(c.criteria))}), unreadable=unreadable,
         )
 
@@ -284,6 +285,14 @@ class FileBriefSources(BriefSources):
             return None
         criteria = {c.id: c.text for c in self._catalog.criteria(record.owner, record.service)}
         return ServiceFailures(record.service, record.owner, tuple(failed), len(judged), criteria, self._owner_facts(record))
+
+    @staticmethod
+    def _rejections(record: ServiceRecord) -> tuple[Rejection, ...]:
+        """All the human rejections of a service whose link the user confirmed, with the lineage class of each criterion they name, taken at the verdict (no window)."""
+        return tuple(
+            Rejection(a.case, a.verdict.created, tuple(lineage_class(record.contracts, cid, a.verdict.created) for cid in a.about))
+            for a in record.assertions if a.link == "confirmed" and a.verdict.tier == "human" and a.verdict.created is not None
+        )
 
     # ------------------------------------------------------------------------------------------------------------------------ D9, D11, D12
 

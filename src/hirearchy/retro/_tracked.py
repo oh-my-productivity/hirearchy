@@ -52,10 +52,9 @@ def _weighed(change: Change, item: RecordedItem, facts: Facts) -> tuple[tuple[Oc
     if item.kind not in ("checker-add", "checker-fix") or len(parts) < 3:
         return (), ()
     service, criterion = parts[1], parts[-1]
-    failures = next((f for f in facts.failures if f.service == service), None)
     again = tuple(
-        Occasion(c.case, "", c.when) for c in failures.window if c.when is not None and when is not None and c.when > when and any(criterion in k for k in c.classes)
-    ) if failures else ()
+        Occasion(r.case, "", r.when) for r in facts.rejected.get(service, ()) if r.when is not None and when is not None and r.when > when and any(criterion in k for k in r.classes)
+    )
     return _after(facts.judged.get(service, ()), when), again
 
 

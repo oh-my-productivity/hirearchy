@@ -11,7 +11,7 @@ from hirearchy.retro._effect import NOT_EVALUATED, evaluate
 from hirearchy.retro._facts import Facts
 from hirearchy.retro._ports import CharterPair, CharterVersions, KeyChange
 from hirearchy.retro._tracked import structural_tracked
-from hirearchy.retro._views import AgentFact, EffectFacts, FailedCase, Occasion, OneOffCase, OwnerFacts, ServiceFact, ServiceFailures
+from hirearchy.retro._views import AgentFact, EffectFacts, Occasion, OneOffCase, Rejection, ServiceFact
 
 START = datetime(2026, 11, 2, 9, 0, tzinfo=timezone.utc)
 LIMITS = "- Your hiring limits were set by the user's change: up to 3 direct reports; may hire: yes. [change cafe00000001]"
@@ -34,12 +34,12 @@ def agent(addr: str, minutes: int, approved_in: str, verifier: bool = False, hir
     return AgentFact(addr, at(minutes), hired_by, approved_in, "verifier" if verifier else "author", False, verifier)
 
 
-def failing(case: str, minutes: int, *classes: str) -> FailedCase:
-    return FailedCase(case, at(minutes), tuple(frozenset({c}) for c in classes), "ceo/c4-checker", True, True, 3)
+def failing(case: str, minutes: int, *classes: str) -> Rejection:
+    return Rejection(case, at(minutes), tuple(frozenset({c}) for c in classes))
 
 
-def memos(*window: FailedCase) -> tuple[ServiceFailures, ...]:
-    return (ServiceFailures("memos", "ceo", tuple(window), len(window), {"C4": "Every claim names its source"}, OwnerFacts("ceo", 2, 3, True, ("read",), 12, 15)),)
+def memos(*rejections: Rejection) -> dict[str, tuple[Rejection, ...]]:
+    return {"memos": rejections}
 
 
 def weigh(facts: Facts, briefs: tuple[BriefRecord, ...] = ()) -> list[tuple[str, str, str]]:
@@ -60,10 +60,17 @@ def test_a_checker_the_user_took_is_inconclusive_below_the_window_then_not_recur
 
 def test_a_later_rejection_on_the_criterion_s_class_is_a_recurrence_and_an_earlier_one_is_not() -> None:
     changes = ChangeFacts(agents=(agent("ceo/c4-checker", 10, "change cafe00000001", True),))
-    again = Facts(changes=changes, judged=judged(11), failures=memos(failing("M1", 2, "C4"), failing("M5", 11, "C4")))
+    again = Facts(changes=changes, judged=judged(11), rejected=memos(failing("M1", 2, "C4"), failing("M5", 11, "C4")))
     assert weigh(again, held(checker_add()))[0][2] == "recurred in case M5"
-    other = Facts(changes=changes, judged=judged(11), failures=memos(failing("M1", 2, "C4"), failing("M6", 12, "C9")))
+    other = Facts(changes=changes, judged=judged(11), rejected=memos(failing("M1", 2, "C4"), failing("M6", 12, "C9")))
     assert weigh(other, held(checker_add()))[0][2] == "INCONCLUSIVE (1 of 3 exercised cases)"
+
+
+def test_a_recurrence_is_remembered_after_ten_accepted_cases_follow_it() -> None:
+    changes = ChangeFacts(agents=(agent("ceo/c4-checker", 10, "change cafe00000001", True),))
+    accepted = {"memos": tuple(Occasion(f"M{n}", "", at(12 + n)) for n in range(5, 16))}  # eleven judged cases after the change, ten of them after the rejection
+    facts = Facts(changes=changes, judged=accepted, rejected=memos(failing("M4", 11, "C4")))
+    assert weigh(facts, held(checker_add()))[0][2] == "recurred in case M4"  # the 7.2 window of ten cases no longer holds M4; D7 has no window
 
 
 def test_the_limit_and_the_line_of_one_extension_belong_to_its_item() -> None:
@@ -81,7 +88,7 @@ def test_a_checker_fix_line_is_weighed_by_the_class_it_names() -> None:
     line = CharterPair("ceo/checker/AGENT.md", "c2", at(10), added_after=(f"- {LINE} [change cafe00000002]",), older=at(1))
     changes = ChangeFacts(versions=CharterVersions(True, (line,)))
     assert weigh(Facts(changes=changes, judged=judged(11, 12, 13)), held(fix))[0][1:] == ("charter", "not recurred in 3 cases where it was exercised")
-    assert weigh(Facts(changes=changes, failures=memos(failing("M9", 11, "C4"))), held(fix))[0][2] == "recurred in case M9"
+    assert weigh(Facts(changes=changes, rejected=memos(failing("M9", 11, "C4"))), held(fix))[0][2] == "recurred in case M9"
 
 
 def test_a_service_is_weighed_by_its_requests_and_a_later_task_of_the_same_shape() -> None:

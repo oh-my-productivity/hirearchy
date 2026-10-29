@@ -377,3 +377,14 @@ def test_the_widened_criterion_shows_its_added_words_and_is_asked_once_after_thr
     org.feedback(ROOT, task.id, "accept", source="human")
     second = call(server, "retro")
     assert second.startswith("RETRO BRIEF B2") and not [i for i in org.runtime.retro_records.last().items if i.kind == "clarify"]  # asked once
+
+
+def test_a_recurrence_of_a_taken_checker_is_still_read_after_ten_accepted_cases(tmp_path):
+    """Review F6 of build 2a (design 4.4, row 4 has no window): a rejection on the criterion, then ten accepted cases; D7 still reads `recurred in case`."""
+    org, server = the_checker_taken(tmp_path)
+    a_judged_memo(org, "four", "reject", link="C2")
+    case = org.runtime.case_records.records("memos")[0].cases[-1].id
+    for n in range(10):
+        a_judged_memo(org, f"later {n}", "accept")
+    brief = call(server, "retro")
+    assert re.search(r"- agent ceo/c2-checker added \([\d-]+\), item B1\.2: recurred in case " + re.escape(case), brief), brief

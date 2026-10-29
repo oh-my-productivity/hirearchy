@@ -291,6 +291,16 @@ class Tracked:
 
 
 @dataclass(frozen=True)
+class Rejection:
+    """A human rejection of a service that the user linked to criteria (4.4, row 4): its ``case``, when it was given and the lineage class of each criterion it names, taken at
+    the verdict. D7 reads a checker's recurrences from all of them, with no window."""
+
+    case: str
+    when: datetime | None
+    classes: tuple[frozenset[str], ...]
+
+
+@dataclass(frozen=True)
 class FailedCase:
     """A judged case of a service that the user rejected (7.2): ``classes`` has the lineage class of each criterion a human rejection of it names (a pending rejection and
     a link to no criterion name none), ``signer`` signed its delivery off (``verifier``: it is a check), ``escape`` is true when that delivery was rejected, and
