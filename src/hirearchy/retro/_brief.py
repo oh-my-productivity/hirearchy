@@ -148,7 +148,7 @@ class FileRetroBriefs(RetroBriefs):
         evaluated = [evaluate(t, th.window) for t in (*facts.tracked, *structural_tracked(facts, recs))]
         carry_since = recs[-th.carry].since if th.carry and len(recs) >= th.carry else (self._clock.now() if th.carry == 0 else None)
         previous: tuple[Fate, ...] = fates(last, facts.effects, recorded=record)
-        changes = changes_of(replace(facts.changes, briefs=recs), window)
+        changes = changes_of(replace(facts.changes, briefs=recs, effects=facts.effects), window)
         bad = facts.unreadable
         return (
             d1_said(facts.said, facts.accepts, bad), d2_passed(facts.passed, bad), d3_unlinked(facts.said, bad), d4_alarms(facts.alarms, facts.passed, bad),

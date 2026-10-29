@@ -60,7 +60,7 @@ def _weighed(change: Change, item: RecordedItem, facts: Facts) -> tuple[tuple[Oc
 
 def structural_tracked(facts: Facts, briefs: tuple[BriefRecord, ...]) -> tuple[Tracked, ...]:
     """The charter edits and the structural changes D7 weighs, oldest first. The limit and the lines one extension made belong to the item its agent or service has."""
-    changes = [c for c in changes_of(replace(facts.changes, briefs=briefs), None).changes if c.when is not None and not c.label.startswith(_NOT_LISTED)]
+    changes = [c for c in changes_of(replace(facts.changes, briefs=briefs, effects=facts.effects), None).changes if c.when is not None and not c.label.startswith(_NOT_LISTED)]
     items = [_item_of(c, briefs, facts) for c in changes]
     by_plan = {c.plan_id: found for c, found in zip(changes, items) if c.plan_id and found is not None}
     out: list[Tracked] = []

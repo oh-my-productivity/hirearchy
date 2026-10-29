@@ -164,6 +164,7 @@ def test_a_service_the_user_renamed_in_the_applied_extension_reads_taken_by_its_
     org.feedback(ROOT, task.id, "accept", source="human")
     second = call(server, "retro")
     assert "- B1.1 service: taken (ops/chore-list defined)" in second and "B1.1 service: lapsed" not in second
+    assert re.search(r"service ops/chore-list added \([\d-]+\).*, item B1\.1", second), second  # D8 names the item of a renamed service too
 
 
 def a_judged_memo(org, topic, verdict, link=None):

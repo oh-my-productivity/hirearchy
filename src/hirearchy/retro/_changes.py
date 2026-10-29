@@ -16,9 +16,10 @@ from datetime import datetime, timedelta, timezone
 
 from ..kernel import parent as parent_of
 from ..services import line_key
+from ._items import renamed
 from ._ports import CharterPair, CharterVersions, KeyChange
 from ._texts import day as _date
-from ._views import AgentFact, EventFacts, RetiredFact, ServiceFact, ServiceRetired
+from ._views import AgentFact, EffectFacts, EventFacts, RetiredFact, ServiceFact, ServiceRetired
 from .api import BriefRecord
 
 PLAN_LABEL = "from the plan you approved ({date})"
@@ -67,7 +68,8 @@ class Change:
 @dataclass(frozen=True)
 class ChangeFacts:
     """Everything the changes are read from: the agents, the retired trees, the services and their retired copies, the committed charters (``versions``), the
-    subjects of the commits that changed ORG.md, the ``write`` events, the briefs held (so that a change that is the effect of an item names it)."""
+    subjects of the commits that changed ORG.md, the ``write`` events, the briefs held (so that a change that is the effect of an item names it) and the ``effects`` (so that
+    a service the user renamed still names its item)."""
 
     agents: tuple[AgentFact, ...] = ()
     retired: tuple[RetiredFact, ...] = ()
@@ -77,6 +79,7 @@ class ChangeFacts:
     subjects: Mapping[str, str] = field(default_factory=dict)
     events: EventFacts = field(default_factory=EventFacts)
     briefs: tuple[BriefRecord, ...] = ()
+    effects: EffectFacts = field(default_factory=EffectFacts)
 
 
 @dataclass(frozen=True)
@@ -164,9 +167,20 @@ def _retired(fact: RetiredFact, briefs: tuple[BriefRecord, ...]) -> Change:
     return Change(fact.retired, "agent-retired", fact.addr, f"agent {fact.addr} retired ({_date(fact.retired)})", label, fact.by, plan_id)
 
 
-def _service(fact: ServiceFact, briefs: tuple[BriefRecord, ...]) -> Change:
+def _renamed_item(briefs: tuple[BriefRecord, ...], effects: EffectFacts, when: datetime | None, name: str) -> str:
+    """``B<n>.<k>`` of the ``service`` item whose service the user defined under ``name`` instead (the criteria key of its tasks); ``""`` when there is none."""
+    for record in briefs:
+        if when is not None and record.at < when:
+            for item in record.items:
+                if item.kind == "service" and renamed(item, effects) == name:
+                    return f"{record.id}.{item.n}"
+    return ""
+
+
+def _service(fact: ServiceFact, facts: ChangeFacts) -> Change:
     name = f"{fact.owner}/{fact.name}"
-    label, plan_id = _creation(fact.approved_in, fact.defined_by, False, fact.created, _item(briefs, fact.created, "service", service=name))
+    item = _item(facts.briefs, fact.created, "service", service=name) or _renamed_item(facts.briefs, facts.effects, fact.created, name)
+    label, plan_id = _creation(fact.approved_in, fact.defined_by, False, fact.created, item)
     return Change(fact.created, "service-defined", name, f"service {name} added ({_date(fact.created)})", label, fact.defined_by, plan_id)
 
 
@@ -264,7 +278,7 @@ def changes_of(facts: ChangeFacts, since: datetime | None) -> Changes:
     no date is left out when ``since`` is given."""
     found = [
         *(_agent(a, facts.briefs) for a in facts.agents), *(_retired(r, facts.briefs) for r in facts.retired),
-        *(_service(s, facts.briefs) for s in facts.services), *(_service_retired(s) for s in facts.retired_services),
+        *(_service(s, facts) for s in facts.services), *(_service_retired(s) for s in facts.retired_services),
     ]
     for pair in facts.versions.pairs:
         if pair.kind != "edit" or pair.path.startswith(".retired/"):

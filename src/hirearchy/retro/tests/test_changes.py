@@ -10,7 +10,7 @@ from datetime import datetime, timedelta, timezone
 from hirearchy.retro import BriefRecord, RecordedItem
 from hirearchy.retro._changes import Change, ChangeFacts, changes_of
 from hirearchy.retro._ports import CharterPair, CharterVersions, KeyChange
-from hirearchy.retro._views import AgentFact, EventFacts, RetiredFact, ServiceFact, ServiceRetired, WriteFact
+from hirearchy.retro._views import AgentFact, EffectFacts, EventFacts, RetiredFact, ServiceFact, ServiceRetired, WriteFact
 
 START = datetime(2026, 11, 2, 9, 0, tzinfo=timezone.utc)
 SINCE = START - timedelta(days=1)
@@ -115,6 +115,16 @@ def test_a_service_reads_like_an_agent() -> None:
     assert only(ChangeFacts(services=(ServiceFact("ceo", "x", at(1), "root", ""),))).label.startswith("by root, outside a plan")
     gone = ServiceRetired("ceo", "list", at(4), "root", "revert", "change fedcba654321")
     assert only(ChangeFacts(retired_services=(gone,))).line == "service ceo/list retired (2026-11-02): from your change fedcba654321"
+
+
+def test_a_service_the_user_renamed_names_the_item_that_offered_it_by_its_criteria() -> None:
+    item = RecordedItem(1, "service", "service|ceo|M1", ("M1", "M2", "M3"), {"service": "ceo/list"})
+    held = BriefRecord("B2", at(0), None, "cli", (item,))
+    effects = EffectFacts(shapes={c: ("everyactionhasanowner",) for c in ("M1", "M2", "M3")}, defined=(("ceo", "chores", ("everyactionhasanowner",)),))
+    renamed = ServiceFact("ceo", "chores", at(2), "root", "change fedcba654321")
+    assert only(ChangeFacts(services=(renamed,), briefs=(held,), effects=effects)).label == "from your change fedcba654321, item B2.1"
+    other = EffectFacts(shapes=effects.shapes, defined=(("ceo", "chores", ("somethingelse",)),))
+    assert only(ChangeFacts(services=(renamed,), briefs=(held,), effects=other)).label == "from your change fedcba654321"  # another criteria key: not the item's service
 
 
 def test_changes_before_since_are_left_out_and_the_rest_are_in_time_order() -> None:
