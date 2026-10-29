@@ -11,7 +11,7 @@ import time
 
 import pytest
 from testkit.e2e_world import build_server
-from testkit.services_world import call
+from testkit.services_world import call, fails
 
 from hirearchy.core import ROOT, Org
 from hirearchy.retro import brief_json
@@ -122,3 +122,172 @@ def test_the_exit_criterion_service_and_checker_through_the_brief_with_no_unprom
     assert "outside a plan" not in second and "outside the tools" not in second and "Unprompted charter edits: 0" in second
     counts = brief_json(org.runtime.retro_briefs.brief())["sections"]["d8"]["counts"]
     assert counts["unprompted_charter_edits"] == 0 and counts["changes"] >= 3
+
+
+# ------------------------------------------------------------------------------------------------------------ item 2: root's refusals and the extension paths
+
+WHY = "the user said yes to this change"
+
+
+def change(server, extend, **needs):
+    """One extension, proposed and then applied after the user's approval (what the assistant does); returns the reply of apply_org."""
+    blueprint = {"reason": WHY, "extend": extend}
+    if needs:
+        blueprint["needs"] = needs
+    proposal = call(server, "propose_org", blueprint=json.dumps(blueprint), extend="current")
+    assert "PLAN FOR YOU (a change to your organization)" in proposal and "Cannot apply yet" not in proposal, proposal
+    return call(server, "apply_org", blueprint=json.dumps(blueprint), extend="current", approved=True, plan_id=plan_id_in(proposal))
+
+
+def test_root_structural_calls_are_refused_and_each_extension_path_applies(tmp_path):
+    """Design 15.3 item 2: over root's MCP a hire, a retire, a first definition of a service, a write of a charter and a write of ORG.md's max_depth are refused, each
+    naming the extension; and each kind of extension (an agent, a service, a charter line and its removal, limits, a budget, a service retired, an agent retired)
+    is proposed and applied the way the refusals say."""
+    org = make_the_org(tmp_path)
+    server = build_server(org, ROOT)
+    before = {path.name: path.read_bytes() for path in (org.root / "ceo" / "AGENT.md", org.root / "ORG.md")}
+
+    for tool, arguments, refused in (
+        ("hire", dict(name="newbie", role="Helper", charter="Helps."), "refused: a new agent changes the organization, so the user approves it in a plan"),
+        ("retire", dict(name="ceo/writer", reason="done"), "refused: retiring ceo/writer changes the organization, so the user approves it in a plan"),
+        ("define_service", dict(owner="ceo", name="fresh", description="d", acceptance=["a"], budget=3), "refused: ceo offers no service `fresh`, and a new service changes the organization"),
+        ("write", dict(path="ceo/AGENT.md", content="---\nrole: Chief\n---\nNew body.\n"), "refused: a charter changes through a plan the user approves"),
+        ("write", dict(path="ORG.md", content=before["ORG.md"].decode().replace("max_depth: 4", "max_depth: 6")), "refused: max_depth bounds the organization's structure"),
+    ):
+        text = fails(server, tool, **arguments)
+        assert refused in text and 'extend="current"' in text, (tool, text)
+    assert {path.name: path.read_bytes() for path in (org.root / "ceo" / "AGENT.md", org.root / "ORG.md")} == before
+    assert org.runtime.agents.agents() == ["ceo", "ceo/writer", "ops"] and org.runtime.service_catalog.service_names("ceo") == ["memos"]
+
+    added = change(server, {"add_agents": [{"parent": "ceo", "name": "editor", "template": "writer", "tools": ["read", "write"]}], "limits": [{"agent": "ceo", "max_children": 2}]})
+    assert "added 1 agent(s): ceo/editor" in added and org.charter("ceo/editor")[0]["approved_in"].startswith("change ") and org.charter("ceo")[0]["max_children"] == 2
+
+    service = change(
+        server,
+        {"add_services": [{
+            "owner": "ops", "name": "notes", "description": "Notes of a meeting.", "inputs": [{"name": "meeting", "description": "which meeting", "required": True}],
+            "acceptance": [{"text": "Every decision is listed", "from": "list every decision", "asked": "What must the notes hold?"}],
+            "deliverable": {"description": "one markdown file", "format": "markdown"}, "budget": 6,
+        }]},
+        elicitation="list every decision",
+    )
+    assert "defined 1 service(s): notes of ops" in service and org.runtime.service_catalog.service_names("ops") == ["notes"]
+
+    line = "Check the sources of every memo."
+    assert "charter lines: 1 added, 0 taken out" in change(server, {"add_charter_lines": [{"agent": "ceo", "line": line}]})
+    assert line in org.charter("ceo")[1]
+    assert "charter lines: 0 added, 1 taken out" in change(server, {"remove_charter_lines": [{"agent": "ceo", "line": line}]})
+    assert line not in org.charter("ceo")[1]
+
+    assert "changed limits: ceo" in change(server, {"limits": [{"agent": "ceo", "max_children": 3}]})
+    assert org.charter("ceo")[0]["max_children"] == 3
+    assert "budget of memos of ceo: 12 -> 15 runs per request" in change(server, {"budgets": [{"owner": "ceo", "service": "memos", "budget": 15}]})
+    assert "max_depth" in change(server, {"limits": [{"org": "max_depth", "value": 5}]}) and "max_depth: 5" in (org.root / "ORG.md").read_text()
+
+    assert "retired: service notes of ops" in change(server, {"retire_services": [{"owner": "ops", "service": "notes", "reason": "no longer asked for"}]})
+    assert org.runtime.service_catalog.service_names("ops") == []
+    assert "retired: ceo/editor" in change(server, {"retire": [{"agent": "ceo/editor", "reason": "not needed"}]})
+    assert org.runtime.agents.agents() == ["ceo", "ceo/writer", "ops"]
+
+
+def test_charter_plan_charter_added_and_verifier_kept_through_mcp(tmp_path):
+    """Design 15.3 item 2 (the agent refusals of 6.6): the lead of a team cannot, over MCP, rewrite a report's plan keys (CHARTER-PLAN), drop or reword a line the user
+    approved under "## Added by your changes" (CHARTER-ADDED) or retire the report that checks its team (VERIFIER-KEPT); a rewrite of the report's body passes."""
+    org = make_the_org(tmp_path)
+    root_server = build_server(org, ROOT)
+    line = "Name the source of every claim."
+    change(root_server, {
+        "add_agents": [{"parent": "ceo", "name": "checker", "template": "reviewer", "tools": ["read"]}], "limits": [{"agent": "ceo", "max_children": 3}],
+        "add_charter_lines": [{"agent": "ceo/writer", "line": line}],
+    })
+    assert org.charter("ceo/checker")[0]["kind"] == "verifier"
+    lead = build_server(org, "ceo")  # (the lead holds the built-in `write`, so the organization's tool is called `org_write`)
+
+    path = org.root / "ceo" / "checker" / "AGENT.md"
+    text = path.read_text()
+    refusal = fails(lead, "org_write", path="ceo/checker/AGENT.md", content=text.replace("kind: verifier", "kind: worker", 1))
+    assert "refused: kind of ceo/checker is the plan's, which the user approved; a change goes through the user (propose_org(..., extend=\"current\")" in refusal
+    assert path.read_text() == text
+
+    writer = org.root / "ceo" / "writer" / "AGENT.md"
+    held = writer.read_text()
+    assert f"## Added by your changes" in held and line in held
+    without = "\n".join(entry for entry in held.splitlines() if line not in entry) + "\n"
+    added_refusal = fails(lead, "org_write", path="ceo/writer/AGENT.md", content=without)
+    assert 'refused: the lines under "## Added by your changes" are the user\'s (approved in a plan); keep them exactly as they are' in added_refusal
+    assert writer.read_text() == held
+    assert call(lead, "org_write", path="ceo/writer/AGENT.md", content=held + "\n## Notes\nI draft in short paragraphs.\n").startswith("wrote ceo/writer/AGENT.md (organization file)")
+    assert line in writer.read_text() and "I draft in short paragraphs." in writer.read_text()
+
+    kept = fails(lead, "retire", name="checker", reason="restructure")
+    assert kept.endswith("refused: ceo/checker checks your team's work (Independent Reviewer); removing a check is the user's decision (the retro brief shows them the team). Nothing was retired.")
+    assert org.runtime.agents.exists("ceo/checker")
+    assert call(lead, "retire", name="writer", reason="restructure").startswith("retired ceo/writer")  # a report that is no check is the lead's to retire
+
+
+# ------------------------------------------------------------------------------------------------------------ item 3: F-P1-3, a criterion and the words it rests on
+
+USER_WORDS = "Use the words from the notes."  # P1's I1, turn 2: the user's own words
+ASKED = "Owners: initials or full names?"
+WIDENED = "decisions and actions use the notes' own words"  # the criterion the assistant wrote from them: it adds words of its own
+
+
+def notes_service(acceptance):
+    return {"owner": "ops", "name": "notes", "description": "Notes of a meeting.", "inputs": [{"name": "meeting", "description": "which meeting", "required": True}],
+            "acceptance": acceptance, "deliverable": {"description": "one markdown file", "format": "markdown"}, "budget": 6}
+
+
+def proposal_of(server, extend, **needs):
+    blueprint = {"reason": WHY, "extend": extend}
+    if needs:
+        blueprint["needs"] = needs
+    return call(server, "propose_org", blueprint=json.dumps(blueprint), extend="current")
+
+
+def test_the_widened_criterion_shows_its_added_words_and_is_asked_once_after_three_accepts(tmp_path, capsys):
+    """Design 15.3 item 3 (F-P1-3): P1's I1 turn-2 words are the plan's `needs.elicitation`, and the widened criterion cites them: PLAN FOR YOU shows `words I added: decisions,
+    and, actions, own`. A quote that is not in the words is refused; so are string criteria, and a plan without `needs.elicitation`, over MCP; at the terminal the same
+    plan shows `my wording: your words for it were not recorded`. After 3 accepts the next brief carries the `clarify` item once."""
+    org = make_the_org(tmp_path)
+    server = build_server(org, ROOT)
+    cited = [{"text": WIDENED, "from": USER_WORDS, "asked": ASKED}]
+
+    plan = proposal_of(server, {"add_services": [notes_service(cited)]}, elicitation=f"{USER_WORDS} Initials are fine.")
+    assert "Cannot apply yet" not in plan and "words I added: decisions, and, actions, own" in plan
+    assert f'from your words "{USER_WORDS}" (my question: "{ASKED}")' in plan and "my wording" not in plan
+
+    elsewhere = [{"text": WIDENED, "from": "Always use their full names.", "asked": ASKED}]  # a quote that is not in the user's words
+    refused = proposal_of(server, {"add_services": [notes_service(elsewhere)]}, elicitation=USER_WORDS)
+    assert "Cannot apply yet" in refused and 'quotes words that are not in needs.elicitation: "Always use their full names."' in refused
+    strings = proposal_of(server, {"add_services": [notes_service([WIDENED])]}, elicitation=USER_WORDS)
+    assert "Cannot apply yet" in strings and "criterion 1 does not say where it comes from" in strings
+    unrecorded = proposal_of(server, {"add_services": [notes_service(cited)]})
+    assert "Cannot apply yet" in unrecorded and "this plan records none of the user's words" in unrecorded
+    assert org.runtime.service_catalog.service_names("ops") == []  # none of the refusals wrote anything
+
+    from testkit.services_world import main  # at the terminal the user's own seat shows a string criterion with the line that says its source was not recorded
+    plan_file = tmp_path / "terminal.yaml"
+    plan_file.write_text(json.dumps({"reason": WHY, "extend": {"add_services": [notes_service([WIDENED])]}}))
+    capsys.readouterr()
+    main(["--root", str(org.root), "plan", str(plan_file)])
+    assert "my wording: your words for it were not recorded" in capsys.readouterr().out
+
+    applied = call(server, "apply_org", blueprint=json.dumps({"reason": WHY, "needs": {"elicitation": f"{USER_WORDS} Initials are fine."}, "extend": {"add_services": [notes_service(cited)]}}),
+                   extend="current", approved=True, plan_id=plan_id_in(plan))
+    assert "defined 1 service(s): notes of ops" in applied
+
+    for meeting in ("monday", "tuesday", "wednesday"):  # three accepts the user gave to deliveries under the widened criterion
+        task = org.request(ROOT, "notes", {"meeting": meeting})
+        deliver(org, "ops", task)
+        org.feedback(ROOT, task.id, "accept", source="human")
+    first = call(server, "retro")
+    clarify = [i for i in org.runtime.retro_records.last().items if i.kind == "clarify"]
+    assert len(clarify) == 1 and clarify[0].key.startswith("clarify|notes|")
+    assert "decisions, and, actions, own" in first and USER_WORDS in first
+
+    time.sleep(1.1)
+    task = org.request(ROOT, "notes", {"meeting": "thursday"})
+    deliver(org, "ops", task)
+    org.feedback(ROOT, task.id, "accept", source="human")
+    second = call(server, "retro")
+    assert second.startswith("RETRO BRIEF B2") and not [i for i in org.runtime.retro_records.last().items if i.kind == "clarify"]  # asked once
