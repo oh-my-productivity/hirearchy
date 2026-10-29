@@ -13,7 +13,7 @@ from ..agents import AgentDirectory, CharterReader, RetiredArchive
 from ..blueprint import RoleLibrary, is_verifier
 from ..eventlog import EventReader
 from ..health import HealthAnalyzer
-from ..kernel import ROOT, Clock, JsonObject, OrgError, fmt_duration, msg_time, parse_time, stamp_of
+from ..kernel import ROOT, Clock, JsonObject, OrgError, fmt_duration, msg_time, parent, parse_time, stamp_of, verdict_tier
 from ..mail import MailboxReader
 from ..reflection import (
     Case, CaseRecords, ContractMark, Delivery, ServiceRecord, cost_alarm, judged_cases, lineage_class, quality_thresholds, repeat_alarm, user_approved, user_cost,
@@ -131,7 +131,7 @@ class FileBriefSources(BriefSources):
             owners={a: tuple(names) for a in agents if (names := self._catalog.service_names(a))}, sourced=sourced, unknown_sources=unknown,
             proposals=proposals_of(events), oldest_event=oldest, playbooks=tuple(self._playbook(r) for r in service_records), spend=tuple(self._spend(r, since) for r in service_records),
             changes=self._changes(agents, facts_events), tracked=self._tracked(service_records), failures=tuple(f for r in service_records if (f := self._failures(r, th.window_cases))),
-            effects=self._effects(after), unreadable=unreadable,
+            effects=self._effects(after, service_records), unreadable=unreadable,
         )
 
     # ------------------------------------------------------------------------------------------------------------------------ D1 to D4
@@ -382,8 +382,46 @@ class FileBriefSources(BriefSources):
         end = next((n for n in range(start + 1, len(lines)) if _HEADING.match(lines[n])), len(lines))
         return [x.strip() for x in lines[start + 1 : end] if x.strip()]
 
-    def _effects(self, after: datetime | None) -> EffectFacts:
+    @staticmethod
+    def _later(when: datetime | None, after: datetime | None) -> bool:
+        return when is not None and (after is None or when > after)
+
+    def _answers(self, records: Sequence[ServiceRecord], after: datetime | None) -> tuple[frozenset[str], frozenset[str]]:
+        """The rejections answered after ``after`` (an answering version or a human link of the user), and the criteria settled after it as ``service/C`` (a version that
+        removes or replaces one, or a human link that names it). A rejection counts as answered only when no rejection with the same number, of another service, still waits."""
+        answered: set[str] = set()
+        waiting: set[str] = set()
+        clarified: set[str] = set()
+        for r in records:
+            for a in r.assertions:
+                mark = next((m for m in r.timeline if isinstance(m, ContractMark) and m.basis == "answers" and m.answers == a.verdict.message.id), None)
+                links = [msg_time(n) for n in a.verdict.link_notes if verdict_tier(n) == "human"]
+                if not links and mark is None:
+                    waiting.add(a.id)
+                elif any(self._later(t, after) for t in (*links, mark.when if mark is not None else None)):
+                    answered.add(a.id)
+                if any(self._later(t, after) for t in links):
+                    clarified |= {f"{r.service}/{c}" for c in a.verdict.confirmed}
+            for m in r.timeline:
+                if isinstance(m, ContractMark) and m.basis != "first" and self._later(m.when, after):
+                    clarified |= {f"{r.service}/{c}" for c in m.removes}
+        return frozenset(answered - waiting), frozenset(clarified)
+
+    def _reclaimed(self, addrs: Sequence[str], after: datetime | None) -> frozenset[str]:
+        """The agents that gave runs back to their parent after ``after``: a note from the agent to its parent that carries budget (a reclaim writes one on its behalf)."""
+        found: set[str] = set()
+        for addr in addrs:
+            try:
+                sent = self._mail.sent(addr)
+            except (OrgError, OSError):
+                continue
+            if any(m.type == "note" and m.budget > 0 and m.to == parent(addr) and self._later(msg_time(m), after) for m in sent):
+                found.add(addr)
+        return frozenset(found)
+
+    def _effects(self, after: datetime | None, records: Sequence[ServiceRecord] = ()) -> EffectFacts:
         addrs = self._directory.agents()
+        answered, clarified = self._answers(records, after)
         agents = [f for addr in addrs if (f := self._agent_fact(addr)) is not None]
         made = [f for f in agents if f.approved_in.startswith("change ") and (after is None or (f.created is not None and f.created > after))]
         lines: set[str] = set()
@@ -401,7 +439,7 @@ class FileBriefSources(BriefSources):
         checkers = frozenset(f.addr.rsplit("/", 1)[0] if "/" in f.addr else ROOT for f in made if f.verifier)
         return EffectFacts(
             services=frozenset(services), checkers=checkers, lines=frozenset(lines), workers=frozenset(f.addr.rsplit("/", 1)[0] for f in made if "/" in f.addr),
-            retired=frozenset(t.addr for t in self._archive.trees()),
+            retired=frozenset(t.addr for t in self._archive.trees()), reclaimed=self._reclaimed(addrs, after), clarified=clarified, answered=answered,
         )
 
 
