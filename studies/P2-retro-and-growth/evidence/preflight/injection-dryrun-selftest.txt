@@ -1,0 +1,23 @@
+=== preflight-R --dry-run
+title md5 849fe21b104be883af9b3c06367d4445 ok; note len 866 md5 4cdbcb9b682f2f25dcb31c83d3743fec ok
+rc=0
+=== preflight-R --selftest
+[10/29/26 10:15:47] INFO     Processing request of type            server.py:733
+                             ListToolsRequest                                   
+tools: acknowledge_playbook, apply_org, blueprint_example, create_org, define_service, delegate, feedback, health, hire, inbox, observe, progress, propose_org, quality, read, reclaim, report, request, retire, retro, send, services, start, status, stop, whoami, write
+rc=0
+=== preflight-C --dry-run
+title md5 849fe21b104be883af9b3c06367d4445 ok; note len 866 md5 4cdbcb9b682f2f25dcb31c83d3743fec ok
+rc=0
+=== preflight-C --selftest
+[10/29/26 10:15:48] INFO     Processing request of type            server.py:733
+                             ListToolsRequest                                   
+tools: acknowledge_playbook, apply_org, blueprint_example, create_org, define_service, delegate, feedback, health, hire, inbox, observe, progress, propose_org, quality, read, reclaim, report, request, retire, send, services, start, status, stop, whoami, write
+rc=0
+=== test_poll_loop
+PASS test_settled_on_the_first_poll
+PASS test_the_pause_resets_after_a_reply_that_waited
+PASS test_the_poll_cap_bounds_the_calls
+PASS test_the_poll_check_window
+7 passed, 0 failed
+rc=0

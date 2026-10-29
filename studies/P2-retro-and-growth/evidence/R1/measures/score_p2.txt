@@ -1,0 +1,11 @@
+memo 2026-10-12: trap per delivered version []
+memo 2026-10-19: trap per delivered version []
+memo 2026-10-26: trap per delivered version []
+memo 2026-11-02: trap per delivered version []
+delivered versions (P2's form): 0 wrong dates outside the trap rows, 0 extra rows (0 copied versions); PASS
+final 2026-10-05: trap None decisions {'k': 2, 'n': 2} actions {'k': 5, 'n': 5} wrong 0 extra 0
+final 2026-10-12: trap passes decisions {'k': 3, 'n': 3} actions {'k': 5, 'n': 5} wrong 0 extra 0
+final 2026-10-19: trap passes decisions {'k': 3, 'n': 3} actions {'k': 5, 'n': 5} wrong 0 extra 0
+final 2026-10-26: trap passes decisions {'k': 3, 'n': 3} actions {'k': 5, 'n': 5} wrong 0 extra 0
+final 2026-11-02: trap passes decisions {'k': 3, 'n': 3} actions {'k': 5, 'n': 5} wrong 0 extra 0
+final 2026-11-09: trap None decisions {'k': 3, 'n': 3} actions {'k': 5, 'n': 5} wrong 0 extra 0

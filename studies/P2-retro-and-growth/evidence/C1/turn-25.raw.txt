@@ -1,0 +1,14 @@
+Checked against the notes. Copying.The action list for 9 November is at `/private/tmp/hirearchy-p2/C1-1793280632/deliverables/action-list-2026-11-09.md`. I checked it against the notes before copying, and the two files are identical.
+
+- **Only the 9 Nov meeting:** met.
+- **Title with the date, then one Owner | Action | Due table, nothing else:** met.
+- **Every action item listed:** met, 5 of 5. The customer confirming the review for Wednesday is left out, because nobody has to do anything there.
+- **Owner, action and an ISO due date (or "none") on every row:** met. Marta is 2026-11-11, Dev 2026-11-20, Priya 2026-11-16 and Sam 2026-11-13. Lee is "none" because the notes give no date. Jo is marked "(not in attendee list)".
+- **At most 250 words:** met, 102 by `wc`.
+- **Nothing beyond the notes:** met.
+
+The team used 3 of the 8 runs I allowed, and 5 came back.
+
+The stray rework hasn't come back since I looked at the log. It is still logged as mine, not yours.
+
+Keep it, or what should change?

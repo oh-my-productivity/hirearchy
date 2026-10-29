@@ -1,0 +1,15 @@
+# Reflect before you start: weekly-meeting-memo
+Your playbook is how your team delivers this service; you own it and change it one item at a time. Evidence since v2:
+Cases with new evidence (most recent first):
+- case 20261029T123006918979-root-a9da "Memo for the 12 October 2026 meeting": done, playbook v2, 5 of 12 runs; client feedback: accept "That one is right, all the items are there - keep it."; owner's view: near miss: first draft put a title line before 'Summary:' (C9 'starts…
+- case 20261029T121630346755-root-d28e "Memo for the 5 October 2026 meeting": done, playbook v1, 7 of 24 runs, 2 rework(s), 1 relayed; client feedback: reject R1 "No, not right yet. Sam's CI item says 'before Friday', so that has a date, 2026…" -> reject (relayed) "Made no change to the memo. Its rework note did not carry the user's correction…" -> accept "This version is right now, thanks."; owner's view (written after the reject: check it against her words): near miss: the earlier rework 5ea7 changed nothing because the instruc…; earlier: "Near miss: Due for Marta ('book room for Oct 14') and Sam ('before Friday') could be read as dates; writer set none and listed both under Unclear. P…"
+By playbook version:
+- v1: 1 request(s): 1 done, 0 failed, 0 open; 1 reworked; avg 7 runs; feedback 1 accept (1 after a reject), 0 reject
+- v2: 2 request(s): 1 done, 0 failed, 1 open; 0 reworked; avg 5 runs; feedback 1 accept, 0 reject
+Before working on the new request:
+1. Look for what repeats, and for anything the client rejected (the regression list). A rejection or a failure is enough to look into on its own; a single slow case is not.
+2. When a lesson of yours conflicts with the client's own feedback (not a relayed verdict), the client is right: apply the feedback in this request.
+3. If a change to how the team works would prevent it, change one item with `revise_playbook` (its description gives the ops). A rule, or a step that changes a check, an output or how a criterion is handled, needs evidence in `evidence`: the same criterion or assertion failed in 2 different cases the client rejected, or the item is the own words of a criterion the client confirmed (now C9 (an item may be the own words of it)). Lessons and relayed verdicts are not evidence. An admitted item is watched: a related client rejection warns it, a second retires it. Retiring or weakening an item that covers a criterion needs your parent's acknowledgement. If a change is refused, nothing is written: send your parent its question once and go on.
+4. The playbook may raise the bar, never lower it: the acceptance criteria come from the contract and travel with every request. Your parent asks the client whether a rejection is a lasting requirement: send nothing about it yourself beyond a refused change's question (step 3).
+5. If nothing needs to change, change nothing. Then handle the request following the playbook.
+

@@ -1,0 +1,56 @@
+turn-01 2026-10-29T12:13:39Z: no org yet, services not run
+turn-02 2026-10-29T12:15:55Z: no org yet, services not run
+turn-03 start 2026-10-29T12:18:54.443920+00:00 end 2026-10-29T12:18:54.732401+00:00 exit 0 bytes 1659 product /Volumes/workspace/hirearchy
+  new cli-*.jsonl: 2026-10-29/cli-43752-1793276334690.jsonl  command: services 
+turn-04 start 2026-10-29T12:21:25.682359+00:00 end 2026-10-29T12:21:26.024742+00:00 exit 0 bytes 1957 product /Volumes/workspace/hirearchy
+  new cli-*.jsonl: 2026-10-29/cli-44558-1793276485986.jsonl  command: services 
+turn-05 start 2026-10-29T12:24:40.880662+00:00 end 2026-10-29T12:24:41.216153+00:00 exit 0 bytes 2207 product /Volumes/workspace/hirearchy
+  new cli-*.jsonl: 2026-10-29/cli-45534-1793276681183.jsonl  command: services 
+turn-06 start 2026-10-29T12:25:59.734145+00:00 end 2026-10-29T12:26:00.026701+00:00 exit 0 bytes 2226 product /Volumes/workspace/hirearchy
+  new cli-*.jsonl: 2026-10-29/cli-46153-1793276759993.jsonl  command: services 
+turn-07 start 2026-10-29T12:29:24.865308+00:00 end 2026-10-29T12:29:25.219828+00:00 exit 0 bytes 2226 product /Volumes/workspace/hirearchy
+  new cli-*.jsonl: 2026-10-29/cli-47443-1793276965186.jsonl  command: services 
+turn-08 start 2026-10-29T12:33:50.599092+00:00 end 2026-10-29T12:33:50.993695+00:00 exit 0 bytes 2400 product /Volumes/workspace/hirearchy
+  new cli-*.jsonl: 2026-10-29/cli-48778-1793277230958.jsonl  command: services 
+turn-09 start 2026-10-29T12:39:51.487103+00:00 end 2026-10-29T12:39:51.888019+00:00 exit 0 bytes 2356 product /Volumes/workspace/hirearchy
+  new cli-*.jsonl: 2026-10-29/cli-50413-1793277591850.jsonl  command: services 
+turn-10 start 2026-10-29T12:45:35.120404+00:00 end 2026-10-29T12:45:35.629716+00:00 exit 0 bytes 2356 product /Volumes/workspace/hirearchy
+  new cli-*.jsonl: 2026-10-29/cli-51793-1793277935587.jsonl  command: services 
+turn-11 start 2026-10-29T12:49:25.445731+00:00 end 2026-10-29T12:49:25.919519+00:00 exit 0 bytes 2402 product /Volumes/workspace/hirearchy
+  new cli-*.jsonl: 2026-10-29/cli-53563-1793278165880.jsonl  command: services 
+turn-12 start 2026-10-29T12:52:36.173256+00:00 end 2026-10-29T12:52:36.695408+00:00 exit 0 bytes 2402 product /Volumes/workspace/hirearchy
+  new cli-*.jsonl: 2026-10-29/cli-54897-1793278356658.jsonl  command: services 
+turn-13 start 2026-10-29T12:53:53.525695+00:00 end 2026-10-29T12:53:54.051527+00:00 exit 0 bytes 2622 product /Volumes/workspace/hirearchy
+  new cli-*.jsonl: 2026-10-29/cli-55959-1793278434014.jsonl  command: services 
+turn-14 start 2026-10-29T12:56:59.506850+00:00 end 2026-10-29T12:57:00.115629+00:00 exit 0 bytes 2744 product /Volumes/workspace/hirearchy
+  new cli-*.jsonl: 2026-10-29/cli-57416-1793278620078.jsonl  command: services 
+turn-15 start 2026-10-29T13:00:08.468459+00:00 end 2026-10-29T13:00:09.313576+00:00 exit 0 bytes 2744 product /Volumes/workspace/hirearchy
+  new cli-*.jsonl: 2026-10-29/cli-58959-1793278809270.jsonl  command: services 
+turn-16 start 2026-10-29T13:03:35.990288+00:00 end 2026-10-29T13:03:36.941575+00:00 exit 0 bytes 2832 product /Volumes/workspace/hirearchy
+  new cli-*.jsonl: 2026-10-29/cli-60687-1793279016899.jsonl  command: services 
+turn-17 start 2026-10-29T13:07:09.410449+00:00 end 2026-10-29T13:07:10.368440+00:00 exit 0 bytes 2754 product /Volumes/workspace/hirearchy
+  new cli-*.jsonl: 2026-10-29/cli-62395-1793279230333.jsonl  command: services 
+turn-18 start 2026-10-29T13:10:21.857413+00:00 end 2026-10-29T13:10:22.982239+00:00 exit 0 bytes 2755 product /Volumes/workspace/hirearchy
+  new cli-*.jsonl: 2026-10-29/cli-64208-1793279422936.jsonl  command: services 
+turn-19 start 2026-10-29T13:12:00.405162+00:00 end 2026-10-29T13:12:01.389495+00:00 exit 0 bytes 2938 product /Volumes/workspace/hirearchy
+  new cli-*.jsonl: 2026-10-29/cli-65414-1793279521354.jsonl  command: services 
+turn-20 start 2026-10-29T13:14:44.762779+00:00 end 2026-10-29T13:14:45.809960+00:00 exit 0 bytes 2887 product /Volumes/workspace/hirearchy
+  new cli-*.jsonl: 2026-10-29/cli-67086-1793279685772.jsonl  command: services 
+turn-21 start 2026-10-29T13:16:10.338210+00:00 end 2026-10-29T13:16:11.374784+00:00 exit 0 bytes 2756 product /Volumes/workspace/hirearchy
+  new cli-*.jsonl: 2026-10-29/cli-68361-1793279771335.jsonl  command: services 
+turn-22 start 2026-10-29T13:18:12.969403+00:00 end 2026-10-29T13:18:14.083006+00:00 exit 0 bytes 2756 product /Volumes/workspace/hirearchy
+  new cli-*.jsonl: 2026-10-29/cli-69529-1793279894043.jsonl  command: services 
+turn-23 start 2026-10-29T13:19:29.708292+00:00 end 2026-10-29T13:19:30.816622+00:00 exit 0 bytes 4348 product /Volumes/workspace/hirearchy
+  new cli-*.jsonl: 2026-10-29/cli-70673-1793279970781.jsonl  command: services 
+turn-24 start 2026-10-29T13:20:40.397524+00:00 end 2026-10-29T13:20:41.452645+00:00 exit 0 bytes 4348 product /Volumes/workspace/hirearchy
+  new cli-*.jsonl: 2026-10-29/cli-71921-1793280041413.jsonl  command: services 
+turn-25 start 2026-10-29T13:23:53.601985+00:00 end 2026-10-29T13:23:54.700662+00:00 exit 0 bytes 4408 product /Volumes/workspace/hirearchy
+  new cli-*.jsonl: 2026-10-29/cli-73719-1793280234667.jsonl  command: services 
+turn-26 start 2026-10-29T13:25:02.044965+00:00 end 2026-10-29T13:25:03.162117+00:00 exit 0 bytes 4424 product /Volumes/workspace/hirearchy
+  new cli-*.jsonl: 2026-10-29/cli-74953-1793280303128.jsonl  command: services 
+turn-27 start 2026-10-29T13:26:09.790918+00:00 end 2026-10-29T13:26:10.907822+00:00 exit 0 bytes 4424 product /Volumes/workspace/hirearchy
+  new cli-*.jsonl: 2026-10-29/cli-76150-1793280370868.jsonl  command: services 
+turn-28 start 2026-10-29T13:26:58.148468+00:00 end 2026-10-29T13:26:59.281263+00:00 exit 0 bytes 4424 product /Volumes/workspace/hirearchy
+  new cli-*.jsonl: 2026-10-29/cli-77266-1793280419247.jsonl  command: services 
+end start 2026-10-29T13:27:22.403361+00:00 end 2026-10-29T13:27:23.554271+00:00 exit 0 bytes 4424 product /Volumes/workspace/hirearchy
+  new cli-*.jsonl: 2026-10-29/cli-77895-1793280443512.jsonl  command: services 

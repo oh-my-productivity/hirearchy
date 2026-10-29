@@ -1,0 +1,6 @@
+# score_stream.sh selfcheck-R started 2026-10-29T12:09:14Z
+exit 0: python3 -B /Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/harness/extract_p2.py /private/tmp/hirearchy-p2/selfcheck-R-1793275673/am-ev --checks -> score-extract_p2-checks.txt
+exit 0: zsh /Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/harness/watch_views.sh /private/tmp/hirearchy-p2/selfcheck-R-1793275673/am-ev -> score-watch_views.txt
+exit 0: python3 -B /Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/harness/score_p2.py /private/tmp/hirearchy-p2/selfcheck-R-1793275673/am-ev --out /private/tmp/hirearchy-p2/selfcheck-R-1793275673/am-ev/measures --am-time 2026-10-29T12:08:52.833016+00:00 -> measures/score_p2-output.txt
+exit 0: python3 -B /Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/harness/gate_p1.py /private/tmp/hirearchy-p2/selfcheck-R-1793275673/am-ev -> score-gate_p1.txt
+# score_stream.sh selfcheck-R ended 2026-10-29T12:09:16Z; failed: 0

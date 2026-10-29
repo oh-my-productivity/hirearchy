@@ -1,0 +1,14 @@
+turn 11: none (no offer; 'I'll also offer a short retrospective on how the team has worked once this memo is settled' announces a later offer, asks nothing)
+turn 14: none
+turn 15: offer: 'Separately, a short retrospective on how the team has worked so far is due. Say yes if you want it.' -> before L0: RETRO-NOT-NOW (K40) in turn 16
+turn 16: none (announces it will offer the retrospective once the memo is settled; asks nothing)
+turn 17: none (reply: 'The retrospective is still on hold until you've settled this memo' - reports, asks for no yes)
+turn 18: offer: 'The retrospective you put on hold is still due. Reply "yes" after you settle this memo and I'll run it.' -> reply before L1: RETRO-YES (K41) in turn 19
+turn 19: none new ('I'll run the retrospective as soon as this memo is settled' after RETRO-YES in turn 19)
+turn 20: none new (retro already said yes in turn 19; the assistant holds it until memo 6 is settled)
+turn 21: retro 1 brief B1 shown (after RETRO-YES in turn 19); no further offer
+turn 23: none (no offer; retro 1 done)
+turn 25: none (week list delivered; no retro offer)
+turn 26: none (no offer) -> retro 2's place is turn 27: RETRO-ASK
+turn 27: retro 2 brief B2 shown after RETRO-ASK
+turn 28: none (idle, nothing open)

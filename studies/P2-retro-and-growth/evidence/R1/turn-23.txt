@@ -1,0 +1,14 @@
+######## TURN 23  start 13:18:27  end 13:19:06  elapsed 39s  (local, 2026-10-29; UTC wall-clock start 2026-10-29T13:18:27Z end 2026-10-29T13:19:06Z; exit code 0)
+######## LENA (prompt sent verbatim):
+approve
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-23.stderr.txt):
+The `ops-action-list` service is now set up, and nothing is running. You now have two standing services:
+
+- **weekly-meeting-memo:** the weekly memo, up to 12 runs per request.
+- **ops-action-list:** the one-page ops action list, up to 8 runs per request. It saves to `deliverables/` as `<meeting date>-ops-actions.md`.
+
+To use either, give me the notes file name, for example "memo for 2026-11-16.md" or "ops action list for 2026-11-16.md". I'll tell you the inputs and the run budget, run it, check the result against the notes, and copy it to `deliverables/`.
+
+The new service has not been run yet. The three action lists already in `deliverables/` were made as one-off tasks before it existed.
+
+Retro items 2 and 3 lapse with no change, as you asked.

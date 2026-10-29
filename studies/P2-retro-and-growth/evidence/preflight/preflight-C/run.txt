@@ -1,0 +1,19 @@
+org: /private/tmp/hirearchy-p2/preflight-C-1793268897/org
+initialized organization at /private/tmp/hirearchy-p2/preflight-C-1793268897/org
+edit /private/tmp/hirearchy-p2/preflight-C-1793268897/org/ORG.md to set the mission and limits
+init exit 0
+org: /private/tmp/hirearchy-p2/preflight-C-1793268897/org
+hired lead
+hire exit 0
+org: /private/tmp/hirearchy-p2/preflight-C-1793268897/org
+task 20261029T101457986640-root-96c6 -> lead (budget 2)
+task exit 0
+org: /private/tmp/hirearchy-p2/preflight-C-1793268897/org
+lead: started run (1 message(s))
+lead: run stopped because kiro-cli did not set its effort: not charged, relaunched
+lead: started run (2 message(s))
+lead: run finished in 28s
+scheduler exiting: finished: no open tasks
+run exit 0
+# cmd: /Volumes/workspace/hirearchy/.worktrees/p2-arm-c/.venv/bin/python -I -S /Volumes/workspace/hirearchy/.worktrees/p2-arm-c/src/hirearchy/kiro/_launch.py --start-deadline 60 -- kiro-cli chat --no-interactive --agent hirearchy-preflight-c-1793268897-o-b45b48 --model claude-sonnet-5.5 --effort high --v3 --require-mcp-startup --output-format stream-json <prompt on stdin>
+# cmd: /Volumes/workspace/hirearchy/.worktrees/p2-arm-c/.venv/bin/python -I -S /Volumes/workspace/hirearchy/.worktrees/p2-arm-c/src/hirearchy/kiro/_launch.py --start-deadline 60 -- kiro-cli chat --no-interactive --agent hirearchy-preflight-c-1793268897-o-b45b48 --model claude-sonnet-5.5 --effort high --v3 --require-mcp-startup --output-format stream-json <prompt on stdin>

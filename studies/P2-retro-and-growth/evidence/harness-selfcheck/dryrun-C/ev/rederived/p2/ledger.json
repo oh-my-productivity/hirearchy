@@ -1,0 +1,11 @@
+{
+ "asked": 0,
+ "records": [],
+ "rules": {
+  "cap": [],
+  "lapsed_counts": [],
+  "order": [],
+  "pairs": [],
+  "suppression": []
+ }
+}

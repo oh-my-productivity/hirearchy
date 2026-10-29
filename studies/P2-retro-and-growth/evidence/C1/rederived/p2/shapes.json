@@ -1,0 +1,208 @@
+{
+ "cases": [
+  {
+   "assignee": "lead",
+   "criteria": [
+    "1. Uses only the meeting in 2026-10-05.md.",
+    "2. Has a short title with the meeting date, then one markdown table with the columns Owner | Action | Due, and nothing else (no summary, no decisions section).",
+    "3. The table has one row for every action item in the notes, including informal ones written in prose (n of m with n = m in the lead's check against the notes), worded as in the notes.",
+    "4. Every row has an owner, an action and a due date; Due is an ISO date (YYYY-MM-DD), or none when the notes give no date. Sam's flaky CI is 2026-10-09 and Marta's on-call training room is 2026-10-14.",
+    "5. At most 250 words as counted by read.",
+    "6. Nothing appears that is not in the notes file."
+   ],
+   "head": "20261029T135020907593-root-5d5e",
+   "judged": true,
+   "judged_at": "2026-10-29T13:52:44.717650+00:00",
+   "key": [
+    "atmost#wordsascountedbyread",
+    "everyrowhasanowneranactionandaduedatedueisanisodateyyyymmddornonewhenthenotesgivenodatesamsflakyciis#andmartasoncalltrainingroomis#",
+    "hasashorttitlewiththemeetingdatethenonemarkdowntablewiththecolumnsowneractiondueandnothingelsenosummarynodecisionssection",
+    "nothingappearsthatisnotinthenotesfile",
+    "thetablehasonerowforeveryactioniteminthenotesincludinginformaloneswritteninprosenofmwithnmintheleadscheckagainstthenoteswordedasinthenotes",
+    "usesonlythemeetingin#md"
+   ],
+   "skeleton": [
+    "one",
+    "-",
+    "page",
+    "action",
+    "list",
+    "for",
+    "the",
+    "ops",
+    "team",
+    "from",
+    "the",
+    "october",
+    "notes"
+   ],
+   "tasks": [
+    "20261029T135020907593-root-5d5e"
+   ],
+   "title": "One-page action list for the ops team from the 5 October 2026 notes",
+   "tokens": "{'in', 'date', 'yyyy', 'action', 'only', 'nothing', 'for', 'table', 'one', 'markdown', 'on', 'the', '-', 'read', 'row', 'no', 'iso', 'lead', '=', 'an', 'when', 'dd', 'else', 'none', 'and', 'call', 'at', 'flaky', 'check', 'by', 'marta', 'n', 'that', 'most', 'mm', 'a', 'appears', 'summary', 'or', 'then', 'meeting', 'with', 'of', 'short', 'not', 'prose', 'file', 'training', 'worded', 'ones', 'section', 'has', 'written', 'columns', 'against', 'words', 'room', '|', 'as', 'title', 'uses', 'informal', 'counted', 'decisions', 'due', 'sam', 'is', 'every', 'give', 's', 'ci', 'including', 'item', 'owner', 'm', 'md', 'notes'}"
+  },
+  {
+   "assignee": "lead",
+   "criteria": [
+    "1. Uses only the meeting in 2026-10-12.md.",
+    "2. Has a short title with the meeting date, then one markdown table with the columns Owner | Action | Due, and nothing else (no summary, no decisions section).",
+    "3. The table has one row for every action item in the notes, including informal ones written in prose (n of m with n = m in the lead's check against the notes), worded as in the notes.",
+    "4. Every row has an owner, an action and a due date; Due is an ISO date (YYYY-MM-DD), or none when the notes give no date. Sam's staging test data is 2026-10-21.",
+    "5. At most 250 words as counted by read.",
+    "6. Nothing appears that is not in the notes file."
+   ],
+   "head": "20261029T135548333153-root-f836",
+   "judged": true,
+   "judged_at": "2026-10-29T13:58:31.087397+00:00",
+   "key": [
+    "atmost#wordsascountedbyread",
+    "everyrowhasanowneranactionandaduedatedueisanisodateyyyymmddornonewhenthenotesgivenodatesamsstagingtestdatais#",
+    "hasashorttitlewiththemeetingdatethenonemarkdowntablewiththecolumnsowneractiondueandnothingelsenosummarynodecisionssection",
+    "nothingappearsthatisnotinthenotesfile",
+    "thetablehasonerowforeveryactioniteminthenotesincludinginformaloneswritteninprosenofmwithnmintheleadscheckagainstthenoteswordedasinthenotes",
+    "usesonlythemeetingin#md"
+   ],
+   "skeleton": [
+    "one",
+    "-",
+    "page",
+    "action",
+    "list",
+    "for",
+    "the",
+    "ops",
+    "team",
+    "from",
+    "the",
+    "october",
+    "notes"
+   ],
+   "tasks": [
+    "20261029T135548333153-root-f836"
+   ],
+   "title": "One-page action list for the ops team from the 12 October 2026 notes",
+   "tokens": "{'or', 'then', '|', '=', 'as', 'an', 'when', 'test', 'dd', 'in', 'else', 'meeting', 'with', 'date', 'of', 'title', 'short', 'yyyy', 'not', 'action', 'prose', 'uses', 'informal', 'm', 'none', 'counted', 'file', 'and', 'only', 'nothing', 'decisions', 'for', 'table', 'due', 'sam', 'is', 'worded', 'at', 'ones', 'data', 'one', 'every', 'give', 'markdown', 'staging', 'section', 'has', 'the', 'written', 's', 'check', '-', 'read', 'columns', 'by', 'against', 'including', 'n', 'row', 'no', 'item', 'owner', 'iso', 'words', 'that', 'lead', 'most', 'mm', 'a', 'appears', 'summary', 'md', 'notes'}"
+  },
+  {
+   "assignee": "lead",
+   "criteria": [
+    "1. Uses only the meeting in 2026-10-19.md.",
+    "2. Has a short title with the meeting date, then one markdown table with the columns Owner | Action | Due, and nothing else (no summary, no decisions section).",
+    "3. The table has one row for every action item in the notes, including informal ones written in prose (n of m with n = m in the lead's check against the notes), worded as in the notes. It has no row for a line where nobody has to do anything (Marta keeping the agenda as sent).",
+    "4. Every row has an owner, an action and a due date; Due is an ISO date (YYYY-MM-DD), or none when the notes give no date. Lee's sign-off on the SSO renewal is 2026-10-30; Sam's pairing with Jo is none. A name not in the attendee list (Jo) is marked '(not in attendee list)'.",
+    "5. At most 250 words as counted by read.",
+    "6. Nothing appears that is not in the notes file."
+   ],
+   "head": "20261029T140824580301-root-605b",
+   "judged": true,
+   "judged_at": "2026-10-29T14:11:02.592491+00:00",
+   "key": [
+    "atmost#wordsascountedbyread",
+    "everyrowhasanowneranactionandaduedatedueisanisodateyyyymmddornonewhenthenotesgivenodateleessignoffonthessorenewalis#samspairingwithjoisnoneanamenotintheattendeelistjoismarkednotinattendeelist",
+    "hasashorttitlewiththemeetingdatethenonemarkdowntablewiththecolumnsowneractiondueandnothingelsenosummarynodecisionssection",
+    "nothingappearsthatisnotinthenotesfile",
+    "thetablehasonerowforeveryactioniteminthenotesincludinginformaloneswritteninprosenofmwithnmintheleadscheckagainstthenoteswordedasinthenotesithasnorowforalinewherenobodyhastodoanythingmartakeepingtheagendaassent",
+    "usesonlythemeetingin#md"
+   ],
+   "skeleton": [
+    "one",
+    "-",
+    "page",
+    "action",
+    "list",
+    "for",
+    "the",
+    "ops",
+    "team",
+    "from",
+    "the",
+    "october",
+    "notes"
+   ],
+   "tasks": [
+    "20261029T140824580301-root-605b"
+   ],
+   "title": "One-page action list for the ops team from the 19 October 2026 notes",
+   "tokens": "{'to', 'in', 'renewal', 'date', 'yyyy', 'action', 'anything', 'only', 'nothing', 'for', 'table', 'off', 'nobody', 'one', 'markdown', 'on', 'the', '-', 'read', 'row', 'no', 'iso', 'lead', '=', 'an', 'when', 'list', 'dd', 'else', 'sent', 'jo', 'none', 'and', 'at', 'it', 'check', 'by', 'where', 'n', 'marta', 'sso', 'agenda', 'that', 'most', 'mm', 'a', 'appears', 'summary', 'or', 'then', 'sign', 'meeting', 'with', 'of', 'short', 'not', 'prose', 'file', 'do', 'attendee', 'worded', 'ones', 'lee', 'section', 'has', 'written', 'columns', 'against', 'words', 'name', 'marked', '|', 'as', 'pairing', 'line', 'title', 'uses', 'informal', 'keeping', 'counted', 'decisions', 'due', 'sam', 'is', 'every', 'give', 's', 'including', 'item', 'owner', 'm', 'md', 'notes'}"
+  },
+  {
+   "assignee": "lead",
+   "criteria": [
+    "1. Uses only the meeting in 2026-11-09.md.",
+    "2. Has a short title with the meeting date, then one markdown table with the columns Owner | Action | Due, and nothing else (no summary, no decisions section).",
+    "3. The table has one row for every action item in the notes, including informal ones written in prose (n of m with n = m in the lead's check against the notes), worded as in the notes. It has no row for a line where nobody has to do anything.",
+    "4. Every row has an owner, an action and a due date; Due is an ISO date (YYYY-MM-DD), or none when the notes give no date. Sam's on-call rotation item is 2026-11-13; Lee's SSO audit log check is none. A name not in the attendee list (Jo) is marked '(not in attendee list)'.",
+    "5. At most 250 words as counted by read.",
+    "6. Nothing appears that is not in the notes file."
+   ],
+   "head": "20261029T143558022215-root-44d7",
+   "judged": true,
+   "judged_at": "2026-10-29T14:39:09.047714+00:00",
+   "key": [
+    "atmost#wordsascountedbyread",
+    "everyrowhasanowneranactionandaduedatedueisanisodateyyyymmddornonewhenthenotesgivenodatesamsoncallrotationitemis#leesssoauditlogcheckisnoneanamenotintheattendeelistjoismarkednotinattendeelist",
+    "hasashorttitlewiththemeetingdatethenonemarkdowntablewiththecolumnsowneractiondueandnothingelsenosummarynodecisionssection",
+    "nothingappearsthatisnotinthenotesfile",
+    "thetablehasonerowforeveryactioniteminthenotesincludinginformaloneswritteninprosenofmwithnmintheleadscheckagainstthenoteswordedasinthenotesithasnorowforalinewherenobodyhastodoanything",
+    "usesonlythemeetingin#md"
+   ],
+   "skeleton": [
+    "one",
+    "-",
+    "page",
+    "action",
+    "list",
+    "for",
+    "the",
+    "ops",
+    "team",
+    "from",
+    "the",
+    "november",
+    "notes"
+   ],
+   "tasks": [
+    "20261029T143558022215-root-44d7"
+   ],
+   "title": "One-page action list for the ops team from the 9 November 2026 notes",
+   "tokens": "{'to', 'in', 'date', 'yyyy', 'action', 'log', 'anything', 'only', 'nothing', 'for', 'table', 'nobody', 'one', 'rotation', 'markdown', 'on', 'the', '-', 'read', 'row', 'no', 'iso', 'lead', 'audit', '=', 'an', 'when', 'list', 'dd', 'else', 'jo', 'none', 'and', 'call', 'at', 'it', 'check', 'by', 'where', 'n', 'sso', 'that', 'most', 'mm', 'a', 'appears', 'summary', 'or', 'then', 'meeting', 'with', 'of', 'short', 'not', 'prose', 'file', 'do', 'attendee', 'worded', 'ones', 'lee', 'section', 'has', 'written', 'columns', 'against', 'words', 'name', 'marked', '|', 'as', 'line', 'title', 'uses', 'informal', 'counted', 'decisions', 'due', 'sam', 'is', 'every', 'give', 's', 'including', 'item', 'owner', 'm', 'md', 'notes'}"
+  }
+ ],
+ "groups": [
+  {
+   "assignee": "lead",
+   "criteria_key": [
+    "atmost#wordsascountedbyread",
+    "everyrowhasanowneranactionandaduedatedueisanisodateyyyymmddornonewhenthenotesgivenodatesamsoncallrotationitemis#leesssoauditlogcheckisnoneanamenotintheattendeelistjoismarkednotinattendeelist",
+    "hasashorttitlewiththemeetingdatethenonemarkdowntablewiththecolumnsowneractiondueandnothingelsenosummarynodecisionssection",
+    "nothingappearsthatisnotinthenotesfile",
+    "thetablehasonerowforeveryactioniteminthenotesincludinginformaloneswritteninprosenofmwithnmintheleadscheckagainstthenoteswordedasinthenotesithasnorowforalinewherenobodyhastodoanything",
+    "usesonlythemeetingin#md"
+   ],
+   "heads": [
+    "20261029T135020907593-root-5d5e",
+    "20261029T135548333153-root-f836",
+    "20261029T140824580301-root-605b",
+    "20261029T143558022215-root-44d7"
+   ],
+   "judged": [
+    "20261029T135020907593-root-5d5e",
+    "20261029T135548333153-root-f836",
+    "20261029T140824580301-root-605b",
+    "20261029T143558022215-root-44d7"
+   ],
+   "reached_at": "2026-10-29T14:11:02.592491+00:00",
+   "relations": [
+    "overlap",
+    "title"
+   ],
+   "titles": [
+    "One-page action list for the ops team from the 5 October 2026 notes",
+    "One-page action list for the ops team from the 12 October 2026 notes",
+    "One-page action list for the ops team from the 19 October 2026 notes",
+    "One-page action list for the ops team from the 9 November 2026 notes"
+   ]
+  }
+ ]
+}

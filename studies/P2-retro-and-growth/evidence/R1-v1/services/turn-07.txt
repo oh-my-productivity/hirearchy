@@ -1,0 +1,17 @@
+Services you can request (from your direct reports):
+- weekly-meeting-memo (offered by lead; contract v2, playbook v2): One markdown memo with the decisions and the action-item table from one weekly meeting-notes file.
+  inputs: notes_file* (File name of the meeting notes in the notes folder, e.g. 2026-10-05.md)   (* required)
+  each request: 12 runs; acceptance criteria (lead/services/weekly-meeting-memo/SERVICE.md):
+    C1: The memo covers only the decisions and the action items of the requested notes file, with a Decisions section and an Actions section.
+    C2: The memo is at most 400 words as counted by read.
+    C3: Every decision in the notes file is listed in the Decisions section, and nothing is listed there that the notes do not state as decided or agreed.
+    C4: Every commitment in the notes file is a row in the Actions table, including informal ones in prose (for example 'Sam said he'd look into ...'), and no row is an invented commitment.
+    C5: The Actions section is a table with exactly the columns Owner | Action | Due.
+    C6: The Owner cell uses the words the notes use for that person or group.
+    C7: The Due cell is an ISO date (YYYY-MM-DD). A vague deadline (for example 'before Friday') is turned into a date, using the meeting date in the notes, only when the notes make that date clear; otherwise the cell is 'none'.
+    C8: The lead's check report matches every decision and every action row of the memo against the notes file (n of m, n = m), and every commitment in the notes file has a row.
+    C9: Every memo starts with a one-line 'Summary:' of the meeting, then the Decisions, then the Actions; the Summary line is the one thing allowed besides decisions and actions.
+  record: 1 request(s): 1 done, 0 failed, 0 open; 1 reworked; avg 12 runs; feedback 1 accept (1 after a reject), 0 reject
+  regression list (the client's rejections):
+    R1 (case 20261029T104227032002-root-b870, about C9): "No, not right yet. Always start the memo with a one-line 'Summary:' of the meeting, then the decisions, then the action items." (items citing it: P8)
+  playbook v2 (2026-10-29): "C9 was added by an amendment the client confirmed (R1); this step is its own words."; 8 items (0 rules); watched: P8 new (0 of 3 clean cases, k 3)

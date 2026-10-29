@@ -1,0 +1,21 @@
+######## TURN 1  start 10:31:25  end 10:31:50  elapsed 25s  (local, 2026-10-29; UTC wall-clock start 2026-10-29T10:31:25Z end 2026-10-29T10:31:50Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Please load your hirearchy skill first, then run the hirearchy whoami tool and show me its reply.
+
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-01.stderr.txt):
+I loaded the hirearchy skill and ran `whoami`. Both ran in the same step, so `whoami` didn't strictly come after the skill load. This is the reply:
+
+```
+- Address: `root`; parent: `-`; role: human (root of the organization)
+- Direct reports:
+  - lead [Memo lead] idle, budget 0, open tasks 0, delegated 0, unread 0
+- Open tasks assigned to you: none
+- Work you delegated that is still outstanding: none
+
+## Charter
+(root has no charter)
+
+scheduler: stopped
+```
+
+The org already exists, with one direct report (`lead`, a memo lead). That agent is idle and has a budget of 0 runs. No tasks are open, and the scheduler is stopped.

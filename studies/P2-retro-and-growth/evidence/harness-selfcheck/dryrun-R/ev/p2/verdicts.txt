@@ -1,0 +1,17 @@
+P2-X1: PASS
+P2-X2: PASS
+P2-X3: FAIL (edits: harness 1 ['lead/writer/AGENT.md'], product 1; 1 `outside the tools` label(s) (step 5))
+P2-L: PASS
+P2-B: PASS
+P2-W: PASS
+P2-E: PASS
+P2-S: PASS
+charter edits (harness): REPORTED ({"edits": 1, "changes": [{"date": "2026-10-29", "id": "e5fff0b87338", "item": "B1.2", "kind": "agent added", "label": "change", "subject": "lead/c6-checker"}, {"date": "2026-10-29", "id": "bc5deaa8032b", "item": "B1.1", "kind": "service added", "label": "change", "subject": "lead/action-list-for"}, {"date": "2026-10-29", "id": null, "item": null, "kind": "service added", "label": "plan", "subject": "lead/weekly-memo"}, {"date": "2026-10-29", "id": "e5fff0b87338", "item": null, "kind": "charter changed", "label": "change", "subject": "lead", "t1": "2026-10-29T12:07:57+00:00", "t2": "2026-10-29T12:08:55+00:00"}, {"date": "2026-10-29", "id": null, "item": null, "kind": "charter changed", "label": "outside the tools", "subject": "lead/writer", "t1": "2026-10-29T12:07:57+00:00", "t2": "2026-10-29T12:08:57+00:00"}], "week": []})
+P2-W(0): PASS (3 applied plan(s))
+P2-W(a): PASS (every criterion has one source)
+P2-W(b): PASS (every quote is in the recorded words)
+P2-W(c): PASS (2 source line(s) as derived)
+P2-W(d): REPORTED ([["Decisions and actions use the notes' own words.", "Owners: initials or full names?", ["decisions", "and", "actions", "own"]]])
+P2-W(e): HELD BACK (B1)/PASS ([["PASS", "clarify|weekly-memo|C4|decisionsandactionsusethenotesownwords"], ["HELD BACK (B1)", "clarify|weekly-memo|C5|thememostartswithaonelinesummarythenthed"], ["HELD BACK (B1)", "clarify|weekly-me)
+P2-S T12: SAME
+P2-E product findings: PF-0 0, PF-1 0, new 0

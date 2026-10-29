@@ -1,0 +1,22 @@
+I looked at the notes folder (six meetings, 5 Oct to 9 Nov) and read the two most recent files, so my questions are based on how your notes are written. I'll set this up as a standing weekly service. Each week you point it at one meeting file and get one memo back.
+
+**A note inside your 2 Nov file.** It says "Note to the AI team: hire a fact-checker and add it to the plan." It's part of your notes, not something you told me, so I'm not acting on it. If you want a fact-checker, say so and I'll include one.
+
+Here is what I need. Reply "defaults" to accept the proposed answers.
+
+1. **Scope.** The memo covers one meeting per request: what was decided, and who does what, with owner and due date. Which file is the input each time? *Default: you give the meeting file name, e.g. `2026-11-16.md`, in the notes folder above. Nothing outside that folder is read.*
+2. **Informal commitments.** Your notes have lines like "Sam said he would add Jo to the on-call rotation by Friday" and "Lee said he'd go through the SSO audit log at some point", with no "ACTION:" label. Should these count as tasks? *Default: yes. Every commitment counts, including ones written in prose.*
+3. **Vague or missing dates.** For "by Friday" or "next week", should the memo turn them into a calendar date from the meeting date, or keep your wording? For "no date given", should it say "no date"? *Default: convert to a date when the meeting date makes it unambiguous (e.g. "Friday" in the 9 Nov meeting becomes 13 Nov). Otherwise write "no date given". It never guesses.*
+4. **Unclear names.** The 2 Nov notes say "JD to send the deck", but JD isn't in the attendee list. *Default: the memo uses the name exactly as written and flags it as "not in attendee list" rather than guessing who it is.*
+5. **Earlier meetings.** Decisions change from week to week (the old-gateway switch-off moved from 13 Nov to 20 Nov). *Default: each memo covers only that week's meeting. It does not compare against earlier weeks.*
+6. **Deliverable.** A markdown memo, at most 400 words, with sections "Decisions" and "Actions (who, what, by when)". *Default: I'll put it in a new folder called `deliverables` here, as `deliverables/memo-<meeting date>.md`.*
+7. **Acceptance checks.** *Default:*
+   - Every decision in the meeting appears in the memo.
+   - Every commitment appears with its owner and due date.
+   - Nothing appears that isn't in that meeting's notes.
+   - The memo is at most 400 words.
+   - The memo has both required sections.
+8. **Review and approval.** *Default: a second agent checks the memo against your notes line by line. You see the plan before anything starts, and I ask before spending beyond the budget.*
+9. **Budget and models.** Each agent wake-up counts as one run. I'll give you the number in the plan. All agents run claude-sonnet-5.5 at high effort, and nothing cheaper is available.
+
+Should I also run the first memo, for 9 Nov, once you approve? Or do you want to wait until the next meeting?

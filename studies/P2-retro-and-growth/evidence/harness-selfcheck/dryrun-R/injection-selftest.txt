@@ -1,0 +1,3 @@
+[10/29/26 12:08:58] INFO     Processing request of type            server.py:733
+                             ListToolsRequest                                   
+tools: acknowledge_playbook, apply_org, blueprint_example, create_org, define_service, delegate, feedback, health, hire, inbox, observe, progress, propose_org, quality, read, reclaim, report, request, retire, retro, send, services, start, status, stop, whoami, write

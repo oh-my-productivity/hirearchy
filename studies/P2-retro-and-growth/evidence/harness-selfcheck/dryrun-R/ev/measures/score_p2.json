@@ -1,0 +1,30 @@
+{
+ "view": {
+  "memos": {},
+  "not_determined": {},
+  "others": []
+ },
+ "versions": [],
+ "finals": [],
+ "lists": [],
+ "p2_delivered_versions": {
+  "ok": false,
+  "versions": 0,
+  "bad": [],
+  "exempt_rejected": [],
+  "not_determined": [],
+  "verdict": "PASS",
+  "end": {
+   "known": true,
+   "cut": false,
+   "turn": 9,
+   "reason": "retro-2-done"
+  }
+ },
+ "traps": {
+  "2026-10-12": [],
+  "2026-10-19": [],
+  "2026-10-26": [],
+  "2026-11-02": []
+ }
+}

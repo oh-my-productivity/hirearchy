@@ -1,0 +1,95 @@
+# propose_org call 3 at 2026-10-29T13:50:04.389Z; result at 2026-10-29T13:50:04.389Z
+
+Target organization: /private/tmp/hirearchy-p2/C1-1793280632/org (exists, 2 agent(s) besides root; apply_org adds to it)
+
+DRAFT - NOT READY (it has errors: fix the blueprint and propose again; do not show this to the user)
+Goal: Every week, turn the notes of one platform-team meeting into a short memo that says what was decided and who does what by when. One extra one-off job: a one-page action list for the ops team from the 5 October 2026 notes.
+What I understood you need:
+- Scope: A one-off, one-page action list for the ops team from the notes of the 5 October 2026 platform team weekly (2026-10-05.md): every action item in those notes, each with its owner and due date. Nothing else from the meeting.
+- Your files (read-only): /tmp/hirearchy-p2/C1-1793280632/notes
+- Quality bar: Every statement comes from 2026-10-05.md, in the notes' own words; where the file is silent (for example no date), Due is none.
+- Sources: Only the files in needs.inputs; no web.
+- Workspace: none (nothing writes files or runs commands)
+- Models: claude-sonnet-5.5 (high effort) for every agent
+Team (2 agents):
+- lead (Manager, model claude-sonnet-5.5): directs the team; does not produce the work itself; can read files only in /private/tmp/hirearchy-p2/C1-1793280632/notes and the organization's own files; cannot change your files
+  - writer (Writer, model claude-sonnet-5.5): can read files only in /private/tmp/hirearchy-p2/C1-1793280632/notes and the organization's own files; cannot change your files
+Budget: 8 runs planned (one run = one working session of one agent), your cap is 8; the minimum for one review and rework is 8. Unspent runs come back to you.
+  lead starts with 8, hands down writer 3 and keeps 5 for planning, checking and rework.
+If the check still fails after one rework, I'll come back to you with options; the plan has no reserve beyond that rework, and nothing beyond the 8 planned runs is spent without your OK.
+Checking: no independent reviewer (you did not ask for one). I still re-check the final result against every success check below.
+Deliverable: (missing)
+  Delivered to: inside the organization folder (no location given)
+Done when ALL of these hold:
+  1. Uses only the meeting in 2026-10-05.md.
+  2. Has a short title with the meeting date, then one markdown table with the columns Owner | Action | Due, and nothing else (no summary, no decisions section).
+  3. The table has one row for every action item in the notes, including informal ones written in prose (n of m with n = m in the lead's check against the notes), worded as in the notes.
+  4. Every row has an owner, an action and a due date; Due is an ISO date (YYYY-MM-DD), or none when the notes give no date. Sam's flaky CI is 2026-10-09 and Marta's on-call training room is 2026-10-14.
+  5. At most 250 words as counted by read.
+  6. Nothing appears that is not in the notes file.
+Checkpoints: approval - Plan first; ask before any spend beyond the budget; progress - One line when I ask; any spend beyond the budget needs your OK.
+Warnings (1):
+- 8 runs leaves almost no slack over the estimate of 8; expect a stall on the first surprise
+Errors (2):
+- agents[lead]: lead already exists in this organization; pick another name or retire it first
+- needs.deliverable: state the deliverable: description, format, length and where it should end up (needs.deliverable.description)
+Cannot apply yet.
+
+--- machine marker: the user block ends above; do not show this line or anything below it ---
+
+Details (the full plan, for you; the user need not read it):
+# Plan for approval
+
+Goal: Every week, turn the notes of one platform-team meeting into a short memo that says what was decided and who does what by when. One extra one-off job: a one-page action list for the ops team from the 5 October 2026 notes.
+
+Needs as understood:
+- Scope: A one-off, one-page action list for the ops team from the notes of the 5 October 2026 platform team weekly (2026-10-05.md): every action item in those notes, each with its owner and due date. Nothing else from the meeting.
+- Deliverable: (not specified)
+- Quality bar: Every statement comes from 2026-10-05.md, in the notes' own words; where the file is silent (for example no date), Due is none.
+- Sources / tools: Only the files in needs.inputs; no web.
+- Workspace: none (no agent writes files or runs commands)
+- Model policy: one model for all
+- Review: not required
+
+Organization (2 agents):
+- lead [manager] Manager: model=claude-sonnet-5.5, tools=read
+  Access: kiro read only in /private/tmp/hirearchy-p2/C1-1793280632/notes and in the organization's own files (read-only)
+  - writer [writer] Writer: model=claude-sonnet-5.5, tools=read
+    Access: kiro read only in /private/tmp/hirearchy-p2/C1-1793280632/notes and in the organization's own files (read-only)
+
+Budget: 8 runs planned (your cap: 8), estimate 8 for one pass + one review/rework cycle:
+  This is a ceiling: runs the team does not spend come back automatically, agent by agent, with their final reports, until what is left returns to you.
+  lead: starts with 8, hands down writer 3 (each includes its rework/re-check run), keeps 5 (own 5)
+  lead/writer: 3 runs (2 work + 1 rework)
+
+Review / verification:
+- no independent reviewer (review not requested)
+- the assistant re-checks the final deliverable against every acceptance criterion before telling you it is done
+
+Deliverable:
+- (missing)
+- Final location: inside the organization (no path given)
+
+First task: to lead: One-page action list for the ops team from the 5 October 2026 notes
+  1. Uses only the meeting in 2026-10-05.md.
+  2. Has a short title with the meeting date, then one markdown table with the columns Owner | Action | Due, and nothing else (no summary, no decisions section).
+  3. The table has one row for every action item in the notes, including informal ones written in prose (n of m with n = m in the lead's check against the notes), worded as in the notes.
+  4. Every row has an owner, an action and a due date; Due is an ISO date (YYYY-MM-DD), or none when the notes give no date. Sam's flaky CI is 2026-10-09 and Marta's on-call training room is 2026-10-14.
+  5. At most 250 words as counted by read.
+  6. Nothing appears that is not in the notes file.
+
+Checkpoints:
+- Approval: Plan first; ask before any spend beyond the budget.
+- Progress: One line when I ask.
+- Any spend beyond the budget needs your OK.
+
+Warnings (1):
+- task.budget: 8 runs leaves almost no slack over the estimate of 8; expect a stall on the first surprise
+
+Errors (2) - must be fixed before this can be applied:
+- agents[lead]: lead already exists in this organization; pick another name or retire it first
+- needs.deliverable: state the deliverable: description, format, length and where it should end up (needs.deliverable.description)
+
+Cannot apply yet: tell me what to change.
+
+plan_id: none (the blueprint has errors). Fix them and call propose_org again; do not ask the user to approve this.

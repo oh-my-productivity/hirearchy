@@ -1,0 +1,42 @@
+MISMATCH  (A) turn.sh: a first snapshot at 2020-01-01T00:00:00.000000+00:00, before the turn's end + boundary: STOP
+      got: after_turn sequential: checked (no snapshot taken: no org yet)
+MISMATCH  (A) turn.sh: an unparseable snapshot time: STOP (fail closed)
+      got: after_turn sequential: checked (no snapshot taken: no org yet)
+MISMATCH  (A) turn.sh: a first snapshot at 2099-01-01T00:00:00.000000+00:00, after the boundary: checked, with the comparison
+      got: after_turn sequential: checked (no snapshot taken: no org yet)
+MISMATCH  (A) R1 v1's turn-3 record form (+00:00, 1.17 s after the boundary): checked, with the comparison
+      got: (no output; exit 2; /Library/Frameworks/Python.framework/Versions/3.11/Resources/Python.app/Contents/MacOS/Python: can't open file '/Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/harness/turn_seqcheck.)
+MISMATCH  (A) a +00:00 snapshot 0.1 s before the boundary: STOP
+      got: (no output; exit 2; /Library/Frameworks/Python.framework/Versions/3.11/Resources/Python.app/Contents/MacOS/Python: can't open file '/Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/harness/turn_seqcheck.)
+MISMATCH  (A) a Z time still parses: checked
+      got: (no output; exit 2; /Library/Frameworks/Python.framework/Versions/3.11/Resources/Python.app/Contents/MacOS/Python: can't open file '/Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/harness/turn_seqcheck.)
+MISMATCH  (A) the snapshot's own `no org yet` record: checked (no snapshot taken: no org yet)
+      got: (no output; exit 2; /Library/Frameworks/Python.framework/Versions/3.11/Resources/Python.app/Contents/MacOS/Python: can't open file '/Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/harness/turn_seqcheck.)
+MISMATCH  (A) no record of this turn's snapshot at all: STOP (fail closed)
+      got: (no output; exit 2; /Library/Frameworks/Python.framework/Versions/3.11/Resources/Python.app/Contents/MacOS/Python: can't open file '/Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/harness/turn_seqcheck.)
+MISMATCH  (A) no quality/calls.txt: STOP (fail closed)
+      got: (no output; exit 2; /Library/Frameworks/Python.framework/Versions/3.11/Resources/Python.app/Contents/MacOS/Python: can't open file '/Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/harness/turn_seqcheck.)
+MISMATCH  (A) an unparseable turn end in turn-times.txt: STOP (fail closed)
+      got: (no output; exit 2; /Library/Frameworks/Python.framework/Versions/3.11/Resources/Python.app/Contents/MacOS/Python: can't open file '/Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/harness/turn_seqcheck.)
+ok  (B) finish_stream.sh names its extract command (EM_ARGV)
+MISMATCH  (B) an effort-stopped run's session with no messages.jsonl: the finish's extract exits 0 and writes cost.txt
+      got: exit 1; FileNotFoundError: [Errno 2] No such file or directory: '/tmp/hirearchy-p2/selfcheck-amend1/B/stop/org-kiro-sessions/h0/sess_boss-scribe/messages.jsonl'
+MISMATCH  (B) cost.txt counts the stop: 1 (boss-scribe's run -> sess_boss-scribe)
+      got: (no count line)
+MISMATCH  (B) cost_total.py's figure from that cost.txt: 3.50 (assistant 1.00 + org runs 2.50; the stop 0 credits, no estimate)
+      got: None
+ok  (B) the stopped run stays matched to its session (credits 0.000000), so no run counts as unmatched
+MISMATCH  (B) the same folder with no effort mark in its run log: fail closed (exit != 0, no cost.txt; the extract's file kept as cost.txt.unverified with a FAIL-CLOSED line naming the session)
+      got: exit 1; act_mechanical.py", line 358, in run_extract
+    for line in open(s["dir"] / "messages.jsonl"):
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/tmp/hirearchy-p2/selfcheck-amend1/B/nomark/org-kiro-sessions/h0/sess_boss-scribe/messages.jsonl'
+ok  (B) P1's extract_mechanical.py is byte-identical to its pin (73b27e25bd18ea9ec17ad5e64c7f6d1c)
+MISMATCH  (C) injection.sh writes S/injection/window.txt from the log, with no facilitator step: `2026-10-29T10:48:27 2026-10-29T10:50:27` (E7's form)
+      got: exit 0; window.txt None; nd-growth/evidence/harness/inject_root_rework.py --org /tmp/hirearchy-p2/selfcheck-amend1/C/c1/S/org --revises 20261029T104533934917-root-f18f --out /tmp/hirearchy-p2/selfcheck-amend1/C/c1/S/injection
+MISMATCH  (C) a log with no window end: no window.txt, and a NOTE line
+      got:  --directory /Volumes/workspace/hirearchy run python /Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/harness/inject_root_rework.py --org /tmp/hirearchy-p2/selfcheck-amend1/C/c2/S/org --revises 20261029T104533934917-root-f18f --out /tmp/hirearchy-p2/selfcheck-amend1/C/c2/S/injection
+ok  (C) `injection.sh --stop` writes no window.txt
+MISMATCH  (C) an existing different window.txt is kept, with a STOP line
+      got:  --directory /Volumes/workspace/hirearchy run python /Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/harness/inject_root_rework.py --org /tmp/hirearchy-p2/selfcheck-amend1/C/c4/S/org --revises 20261029T104533934917-root-f18f --out /tmp/hirearchy-p2/selfcheck-amend1/C/c4/S/injection
+amend1_cases: 4 of 21 ok

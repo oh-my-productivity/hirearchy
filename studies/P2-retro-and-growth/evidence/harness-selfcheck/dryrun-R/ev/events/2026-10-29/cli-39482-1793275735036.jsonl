@@ -1,0 +1,3 @@
+{"v":1,"ts":"2026-10-29T12:08:55.036534+00:00","seq":1,"proc":"cli","pid":39482,"kind":"service.define","actor":"root","run":null,"trace":null,"owner":"lead","service":"action-list-for","version":1,"by":"root","amendment":false}
+{"v":1,"ts":"2026-10-29T12:08:55.037201+00:00","seq":2,"proc":"cli","pid":39482,"kind":"service.revise","actor":"root","run":null,"trace":null,"owner":"lead","service":"action-list-for","version":1,"by":"root","admitted":"client"}
+{"v":1,"ts":"2026-10-29T12:08:55.117154+00:00","seq":3,"proc":"cli","pid":39482,"kind":"cli.command","actor":"root","run":null,"trace":null,"command":"apply","ok":true,"ms":87.76,"error":null,"error_type":null}

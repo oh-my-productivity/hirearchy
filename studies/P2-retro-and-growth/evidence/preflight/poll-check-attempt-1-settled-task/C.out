@@ -1,0 +1,5 @@
+[10/29/26 10:16:04] INFO     Processing request of type            server.py:733
+                             CallToolRequest                                    
+                    INFO     Processing request of type            server.py:733
+                             ListToolsRequest                                   
+{"polls": 1, "quick_replies": 0, "paused_seconds": 0.0, "end": "settled: the task's line shows done, failed or blocked, and the scheduler has stopped"}

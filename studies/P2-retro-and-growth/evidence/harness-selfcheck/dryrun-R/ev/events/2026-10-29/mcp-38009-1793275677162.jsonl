@@ -1,0 +1,1 @@
+{"v":1,"ts":"2026-10-29T12:07:57.162551+00:00","seq":1,"proc":"mcp","pid":38009,"kind":"tool.call","actor":"root","run":null,"trace":null,"tool":"whoami","ok":true,"ms":1.47,"error":null,"error_type":null,"args":{}}

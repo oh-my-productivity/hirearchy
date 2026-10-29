@@ -1,0 +1,9 @@
+ok  four alike sessions: PASS
+ok  no sessions: STOP (fail closed)
+ok  a session_start difference: STOP
+ok  a failed empty-argument call: STOP
+ok  a skill proof not PROVED: STOP
+ok  a tool loaded with two hashes within one arm: STOP
+ok  the positive control fails (retro in arm C's catalog): STOP
+ok  a tool the catalogs agree on, loaded differently in the two arms: STOP
+probe_compare selfcheck: 8 of 8 ok

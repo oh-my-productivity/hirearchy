@@ -1,0 +1,44 @@
+[
+ {
+  "case": "20261029T130759453335-root-5699",
+  "change": "weekly-meeting-memo contract v2 adds C9",
+  "in_window": true,
+  "key": [
+   "contract",
+   "weekly-meeting-memo",
+   2
+  ],
+  "n": null,
+  "outcome": "recurred",
+  "rid": "R3",
+  "time": "2026-10-29T12:22:20.419551+00:00"
+ },
+ {
+  "case": null,
+  "change": "weekly-meeting-memo contract v3 adds C10",
+  "in_window": true,
+  "key": [
+   "contract",
+   "weekly-meeting-memo",
+   3
+  ],
+  "n": 5,
+  "outcome": "not recurred",
+  "rid": null,
+  "time": "2026-10-29T12:54:29.640460+00:00"
+ },
+ {
+  "case": null,
+  "change": "weekly-meeting-memo contract v4 adds C11",
+  "in_window": true,
+  "key": [
+   "contract",
+   "weekly-meeting-memo",
+   4
+  ],
+  "n": 1,
+  "outcome": "INCONCLUSIVE",
+  "rid": null,
+  "time": "2026-10-29T13:12:32.972313+00:00"
+ }
+]

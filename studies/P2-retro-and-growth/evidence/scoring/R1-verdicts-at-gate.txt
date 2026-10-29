@@ -1,0 +1,17 @@
+P2-X1: FAIL (B2 shows B1.1 lapsed (step 8))
+P2-X2: NOT REACHED (X2 not reached, not failed: the team passed the trap in memos ['2026-10-12', '2026-10-19', '2026-10-26', '2026-11-02'])
+P2-X3: PASS
+P2-L: PASS
+P2-B: PASS
+P2-W: PASS
+P2-E: MISMATCH (5 finding(s): PF-0 0, PF-1 0, new 5)
+P2-S: PASS
+charter edits (harness): REPORTED ({"edits": 0, "changes": [{"date": "2026-10-29", "id": "fa962d655366", "item": null, "kind": "service added", "label": "change", "subject": "lead/ops-action-list"}], "week": [{"from": "2026-10-29T13:19:52+00:00", "one_off": [], "service": ["ops-action-list: 20261029T132116440288-root-b3ec"], "tasks": ["20261029T132116440288-root-b3ec"], "to_turn": 26, "turn": 24}]})
+P2-W(0): PASS (2 applied plan(s))
+P2-W(a): PASS (every criterion has one source)
+P2-W(b): PASS (every quote is in the recorded words)
+P2-W(c): PASS (10 source line(s) as derived)
+P2-W(d): REPORTED ([])
+P2-W(e): HELD BACK (B1)/PASS ([["PASS", "clarify|weekly-meeting-memo|C1|thememoismarkdownandhasatmost400wordsasc"], ["HELD BACK (B1)", "clarify|weekly-meeting-memo|C2|thememohasadecisionssectionlistingeveryd"], ["HELD BACK (B1)", )
+P2-S T12: SAME
+P2-E product findings: PF-0 0, PF-1 0, new 5

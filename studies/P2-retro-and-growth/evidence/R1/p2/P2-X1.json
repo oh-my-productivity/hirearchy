@@ -1,0 +1,19 @@
+{
+ "files": [
+  "p2/oneoffs.json",
+  "msgs/sent/",
+  "org-files/retros.json",
+  "p2/lena.json",
+  "p2/applies.json",
+  "services-all/",
+  "p2/retro-replies/",
+  "end.txt"
+ ],
+ "reason": "B2 shows B1.1 lapsed (step 8)",
+ "steps": [
+  "1-2: repeats ['20261029T122710588867-root-c1b8', '20261029T123457206032-root-cabf', '20261029T125747104778-root-4a85'], third judged at 2026-10-29T13:01:01.594702+00:00",
+  "3-4: B1.1 service|lead|20261029T122710588867-root-c1b8",
+  "6-7: applied fa962d655366; lead--ops-action-list v1 approved_in change fa962d655366"
+ ],
+ "verdict": "FAIL"
+}

@@ -1,0 +1,9 @@
+ok  R text, arm R: expected PROVED, got PROVED
+ok  R text, arm C: expected NOT PROVED, got NOT PROVED
+ok  C text, arm C: expected PROVED, got PROVED
+ok  C text, arm R: expected NOT PROVED, got NOT PROVED
+ok  both texts, arm R: expected NOT PROVED, got NOT PROVED
+ok  no disclosure, arm C: expected NOT PROVED, got NOT PROVED
+ok  P1 I2's kept session, arm C: expected PROVED, got PROVED
+ok  P1 I2's kept session, arm R: expected NOT PROVED, got NOT PROVED
+skill_proof selfcheck: 8 of 8 ok

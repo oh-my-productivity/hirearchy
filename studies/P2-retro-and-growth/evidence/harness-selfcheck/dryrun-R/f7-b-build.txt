@@ -1,0 +1,10 @@
+[10/29/26 12:08:10] INFO     Processing request of type            server.py:733
+                             CallToolRequest                                    
+                    INFO     Processing request of type            server.py:733
+                             ListToolsRequest                                   
+[10/29/26 12:08:11] INFO     Processing request of type            server.py:733
+                             CallToolRequest                                    
+                    INFO     Processing request of type            server.py:733
+                             ListToolsRequest                                   
+{"memo5": "20261029T120809630428-root-2924"}
+{"form": "b", "memo5": "20261029T120809630428-root-2924", "rejection": "20261029T120810517789-root-41fa"}

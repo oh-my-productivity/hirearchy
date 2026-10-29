@@ -1,0 +1,7 @@
+######## TURN 28  start 13:26:22  end 13:26:35  elapsed 13s  (local, 2026-10-29; UTC wall-clock start 2026-10-29T13:26:22Z end 2026-10-29T13:26:35Z; exit code 0)
+######## LENA (prompt sent verbatim):
+1: Not now. 2: Not now. 3: Not now.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-28.stderr.txt):
+All three questions are recorded as "not now". Nothing changes, and the questions lapse at the next brief.
+
+The team is idle and nothing is open. When you want the next memo or action list, give me the notes file name.

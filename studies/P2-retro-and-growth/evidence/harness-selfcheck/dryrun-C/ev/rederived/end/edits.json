@@ -1,0 +1,29 @@
+{
+ "applied": [],
+ "commits": 2,
+ "count": 1,
+ "d8_unprompted": [
+  {
+   "date": "2026-10-29",
+   "id": null,
+   "item": null,
+   "kind": "charter changed",
+   "label": "outside the tools",
+   "subject": "lead/writer",
+   "t1": "2026-10-29T12:09:20+00:00",
+   "t2": "2026-10-29T12:09:23+00:00"
+  }
+ ],
+ "edits": [
+  {
+   "changed": [
+    "+A line the human typed by hand."
+   ],
+   "commit": "e22531759fd037dd5ab5c00d3757b6e30f4621ba",
+   "path": "lead/writer/AGENT.md",
+   "subject": "hand edit (study self-check)",
+   "t": "2026-10-29T12:09:23+00:00"
+  }
+ ],
+ "t0": null
+}

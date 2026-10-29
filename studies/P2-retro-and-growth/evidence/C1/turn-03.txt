@@ -1,0 +1,28 @@
+######## TURN 3  start 13:34:50  end 13:37:27  elapsed 157s  (local, 2026-10-29; UTC wall-clock start 2026-10-29T13:34:50Z end 2026-10-29T13:37:27Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Great, approve. I'll wait.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-03.stderr.txt):
+The team is built and running. I planned 12 runs for this memo. I'll wait for it now.The memo is done. The team used 3 of the 12 runs, so 9 came back. I haven't copied it to `deliverables` yet because two Due dates need your call. The memo currently shows both as "none".
+
+- **Sam, flaky CI.** The notes say "before Friday". The meeting was Monday 5 October, so that could mean 2026-10-08 (strictly before Friday) or 2026-10-09 (by Friday). Should I use one of those dates, or keep "none"?
+- **Marta, on-call training room.** The notes say "book the on-call training room for Oct 14". The 14th looks like the training date, not a deadline for booking. Should Due be 2026-10-14, or "none"?
+
+Here is the draft:
+
+```
+## Decisions
+- Push the gateway migration to the week of 26 October.
+- Adopt Renovate with a weekly Monday batch of dependency PRs, starting with the three core repos.
+
+## Actions
+| Owner  | Action                                                              | Due        |
+| Priya  | Draft the RFC for the new per-key rate limiter                      | 2026-10-09 |
+| Dev    | Enable Renovate on the three core repos                             | 2026-10-08 |
+| Sam    | Look into the flaky CI before Friday                                | none       |
+| Marta  | Book the on-call training room for Oct 14                           | none       |
+| Lee    | Ping the vendor about the SSO certificate this week and report back | none       |
+```
+
+I checked it against `2026-10-05.md`. It has 2 of 2 decisions and 5 of 5 commitments, all names are on the attendee list, and it is 97 words, under the 400 limit. Lee's "this week" has no hard date in the notes, so it stays "none".
+
+Tell me your answers and I'll send the memo back for the change, then copy it to `deliverables`. Changing the dates would cost about 3 more runs, which stays inside the 12.

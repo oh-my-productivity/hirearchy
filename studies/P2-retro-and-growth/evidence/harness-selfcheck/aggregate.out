@@ -1,0 +1,11 @@
+ok  three PASS and every gate-able measure PASS (G1(b) VACUOUS): expected PASS, got PASS
+ok  one FAIL: expected FAIL, got FAIL
+ok  X2 not reached: expected NOT DETERMINED, got NOT DETERMINED
+ok  two valid streams only: expected NOT DETERMINED, got NOT DETERMINED
+ok  F1: a gate-able FAIL in an arm-C stream fails the exit: expected FAIL, got FAIL
+ok  F1: a judged key missing leaves the exit NOT DETERMINED: expected NOT DETERMINED, got NOT DETERMINED
+ok  F1: VACUOUS is not PASS outside G1(b): expected NOT DETERMINED, got NOT DETERMINED
+ok  F1: a stream without gate_p1.json: expected NOT DETERMINED, got NOT DETERMINED
+ok  12.6 (4): PF-0, PF-1 and new findings counted per stream (arm C n/a): expected yes, got yes
+ok  a bad before_failure key is refused: expected error, got error
+aggregate selfcheck: 10 of 10 ok

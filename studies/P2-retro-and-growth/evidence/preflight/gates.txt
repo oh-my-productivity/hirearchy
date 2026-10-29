@@ -1,0 +1,18 @@
+== md5 gate
+md5 gate: standing-rules-streams.md5 missing (not frozen)
+md5 -q harness/MD5SUMS: a1ff86dd09d4ec766d8f2fb3701a3045
+== freeze (protocol 2.2) at 2026-10-29T10:13:49Z
+REPO_R HEAD: 3d6b28aa17a70a3f95854c73c2f479b6361a71de (required 3d6b28aa17a70a3f95854c73c2f479b6361a71de)
+REPO_R diff --stat 3d6b28aa17a70a3f95854c73c2f479b6361a71de HEAD -- src skills pyproject.toml uv.lock: []
+REPO_C HEAD: aac6af1b47b721515106f03f1dd6eb6758da6e55 (required aac6af1b47b721515106f03f1dd6eb6758da6e55)
+REPO_C status --porcelain: []
+freeze_ok: YES
+SKILL R: 443e1bc4911aa4d6aaa6457e78f673c1
+SKILL C: b10238639f48ab351fa44a06aed03ffb
+global: 443e1bc4911aa4d6aaa6457e78f673c1
+git status main: 
+ M docs/design/org-growth-phase-2.md
+?? docs/research/
+?? studies/P2-retro-and-growth/
+KIRO_HOME: unset
+ORG_AGENT: unset

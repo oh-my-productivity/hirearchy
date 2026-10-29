@@ -1,0 +1,18 @@
+######## TURN 4  start 13:38:20  end 13:40:41  elapsed 141s  (local, 2026-10-29; UTC wall-clock start 2026-10-29T13:38:20Z end 2026-10-29T13:40:41Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Sam's should be 2026-10-09. Marta's should be 2026-10-14. I'll wait.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-04.stderr.txt):
+Verified. Copying to deliverables.The memo is at `/private/tmp/hirearchy-p2/C1-1793280632/deliverables/memo-2026-10-05.md`. I copied it from the team's output and the two files are identical.
+
+1. Covers only the 5 Oct meeting: met.
+2. At most 400 words: met (127 by `wc`, which also counts the table's pipe characters).
+3. "Decisions" section: met. It has 2 of 2 decisions.
+4. "Actions" table (Owner | Action | Due): met. It has 5 of 5 commitments, including the informal ones, in the notes' wording.
+5. ISO dates, "none" if no date: met. Sam is 2026-10-09 and Marta is 2026-10-14, as you said. Lee's "this week" has no hard date, so it is "none".
+6. Names not on the attendee list: met. All five names are on it, so nothing was marked.
+7. Nothing beyond the notes: met.
+8. The lead's check shows n = m: met (2 of 2 decisions, 5 of 5 commitments).
+
+The case used 6 runs against the 12 planned per memo. The team stays set up. For next week, ask me for the memo for a given file, for example `2026-11-16.md`.
+
+Keep it, or what should change?

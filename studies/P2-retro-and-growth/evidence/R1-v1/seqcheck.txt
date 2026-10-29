@@ -1,0 +1,5 @@
+seqcheck turn 3: turn end 10:44:32 + 20 s = 10:44:52 <= first snapshot 10:44:53.169316: checked
+seqcheck turn 4: turn end 10:47:28 + 20 s = 10:47:48 <= first snapshot 10:47:49.660254: checked
+seqcheck turn 5: turn end 10:51:37 + 20 s = 10:51:57 <= first snapshot 10:51:58.117027: checked
+seqcheck turn 6: turn end 10:55:40 + 20 s = 10:56:00 <= first snapshot 10:56:01.622816: checked
+seqcheck turn 7: turn end 10:57:32 + 20 s = 10:57:52 <= first snapshot 10:57:53.462098: checked

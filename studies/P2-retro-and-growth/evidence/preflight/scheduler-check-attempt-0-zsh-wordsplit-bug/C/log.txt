@@ -1,0 +1,22 @@
+start call 2026-10-29T10:21:23Z
+preflight/scheduler-check/scheduler-check.sh:12: no such file or directory: env -u KIRO_HOME uv --directory /Volumes/workspace/hirearchy/.worktrees/p2-arm-c run python /Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/harness/mcp_call.py --repo /Volumes/workspace/hirearchy/.worktrees/p2-arm-c --org /tmp/hirearchy-p2/preflight-sched-C-1793269282/org
+start exit 127 at 2026-10-29T10:21:23Z (client exited)
+scheduler pid 
++5s: 2026-10-29T10:21:28Z ps: option requires an argument -- p
+usage: ps [-AaCcEefhjlMmrSTvwXx] [-O fmt | -o fmt] [-G gid[,gid...]]
+          [-g grp[,grp...]] [-u [uid,uid...]]
+          [-p pid[,pid...]] [-t tty[,tty...]] [-U user[,user...]]
+       ps [-L]
++25s: 2026-10-29T10:21:48Z ps: option requires an argument -- p
+usage: ps [-AaCcEefhjlMmrSTvwXx] [-O fmt | -o fmt] [-G gid[,gid...]]
+          [-g grp[,grp...]] [-u [uid,uid...]]
+          [-p pid[,pid...]] [-t tty[,tty...]] [-U user[,user...]]
+       ps [-L]
+preflight/scheduler-check/scheduler-check.sh:20: no such file or directory: env -u KIRO_HOME uv --directory /Volumes/workspace/hirearchy/.worktrees/p2-arm-c run python /Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/harness/mcp_call.py --repo /Volumes/workspace/hirearchy/.worktrees/p2-arm-c --org /tmp/hirearchy-p2/preflight-sched-C-1793269282/org
+stop exit 127 at 2026-10-29T10:23:48Z
+process after stop: ps: option requires an argument -- p
+usage: ps [-AaCcEefhjlMmrSTvwXx] [-O fmt | -o fmt] [-G gid[,gid...]]
+          [-g grp[,grp...]] [-u [uid,uid...]]
+          [-p pid[,pid...]] [-t tty[,tty...]] [-U user[,user...]]
+       ps [-L]
+RESULT: preflight-C-sched org: INCOMPLETE (nothing to check yet; not a pass) (2026-10-29T10:23:51Z)

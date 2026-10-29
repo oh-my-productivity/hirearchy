@@ -1,0 +1,15 @@
+ok  nothing holds: stage 2 on the manager's yes; the written CONDITION is the computed L0 (the answer line, F27): expected (False, []), got (False, [])
+ok  item 1: a stream over 250.00: expected True, got True
+ok  item 1: exactly 250.00 does not exceed: expected False, got False
+ok  item 2: checker_due without a checker-add item: expected True, got True
+ok  item 2: service_due without a service item: expected True, got True
+ok  item 2: no class due, no checker-add item: nothing holds: expected False, got False
+ok  item 3: a FAIL-CLOSED verdict: expected True, got True
+ok  item 3: a NOT DETERMINED that is no fail-closed rule, and a P2-E mismatch, are information only: expected (False, True), got (False, True)
+ok  item 3: an unread credits.txt fails closed: expected True, got True
+ok  item 4: an invalid stream: expected True, got True
+ok  F36: item 3: a gate_p1.json measure that fails closed stops: expected (True, True), got (True, True)
+ok  F36: item 3: a judged key's NOT DETERMINED (no prefix) is information, not a stop: expected (False, True), got (False, True)
+ok  F36: item 3: an unread gate_p1.json fails closed: expected True, got True
+ok  a written CONDITION that differs from the computed one is reported (H7): expected True, got True
+stage_gate selfcheck: 14 of 14 ok

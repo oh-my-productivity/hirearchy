@@ -1,0 +1,2 @@
+MISMATCH look-back D8 [PF-0] charter changed lead/writer: product ('charter changed', 'lead/writer', 'by parent, or outside the tools', 'lead', None) | harness ('charter changed', 'lead/writer', 'outside the tools', None, None)
+PF-0 1 PF-1 0 new 0

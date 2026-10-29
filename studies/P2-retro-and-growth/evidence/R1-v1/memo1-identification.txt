@@ -1,0 +1,4 @@
+Memo 1's first delivered version (D8, 6.1): turn 4's reply copied memo-2026-10-05.md into deliverables/ and presented it as the memo (turn 3's reply showed a draft and said it was not delivered).
+It is the result of root's rework task 20261029T104533934917-root-f18f (revises 20261029T104227032002-root-b870), result message read/20261029T104710281447-lead-420f.md (status done), artifact lead/writer/work/memo-2026-10-05.md.
+--revises argument: 20261029T104533934917-root-f18f
+No scheduler running before the injection (no .runtime/scheduler.pid; no process naming the sandbox).

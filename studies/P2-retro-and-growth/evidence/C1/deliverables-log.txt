@@ -1,0 +1,180 @@
+# deliverables log (protocol 7.2, D6); facts only
+
+[2026-10-29T13:40:35.248Z] call #29 turn 4 execute_bash
+COMMAND: mkdir -p /private/tmp/hirearchy-p2/C1-1793280632/deliverables && cp /private/tmp/hirearchy-p2/C1-1793280632/org/lead/writer/work/memo-2026-10-05.md /private/tmp/hirearchy-p2/C1-1793280632/deliverables/memo-2026-10-05.md && cmp /private/tmp/hirearchy-p2/C1-1793280632/org/lead/writer/work/memo-2026-10-05.md /private/tmp/hirearchy-p2/C1-1793280632/deliverables/memo-2026-10-05.md && wc -w /private/tmp/hirearchy-p2/C1-1793280632/deliverables/memo-2026-10-05.md
+source file(s): ['lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: cea96d6 2026-10-29T13:40:00Z', 'lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: cea96d6 2026-10-29T13:40:00Z']
+result: Output:
+     127 /private/tmp/hirearchy-p2/C1-1793280632/deliverables/memo-2026-10-05.md
+
+
+Exit Code: 0
+
+[2026-10-29T13:47:08.832Z] call #48 turn 6 execute_bash
+COMMAND: cd /private/tmp/hirearchy-p2/C1-1793280632 && cp org/lead/writer/work/memo-2026-10-05.md deliverables/memo-2026-10-05.md && cmp org/lead/writer/work/memo-2026-10-05.md deliverables/memo-2026-10-05.md && echo IDENTICAL && wc -w deliverables/memo-2026-10-05.md && head -1 deliverables/memo-2026-10-05.md | cut -c1-60
+source file(s): ['lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: 3f0dc1c 2026-10-29T13:46:40Z', 'lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: 3f0dc1c 2026-10-29T13:46:40Z']
+result: Output:
+IDENTICAL
+     146 deliverables/memo-2026-10-05.md
+Summary: Platform team weekly, Monday 5 October 2026 (Presen
+
+
+Exit Code: 0
+
+[2026-10-29T13:51:35.166Z] call #60 turn 8 execute_bash
+COMMAND: cd /private/tmp/hirearchy-p2/C1-1793280632 && cp org/lead/writer/work/action-list-2026-10-05.md deliverables/action-list-2026-10-05.md && cmp org/lead/writer/work/action-list-2026-10-05.md deliverables/action-list-2026-10-05.md && echo IDENTICAL && wc -w deliverables/action-list-2026-10-05.md && ls deliverables
+source file(s): ['lead/writer/work/action-list-2026-10-05.md -> org-git commit at that time: b729de7 2026-10-29T13:51:13Z', 'lead/writer/work/action-list-2026-10-05.md -> org-git commit at that time: b729de7 2026-10-29T13:51:13Z']
+result: Output:
+IDENTICAL
+      91 deliverables/action-list-2026-10-05.md
+action-list-2026-10-05.md
+memo-2026-10-05.md
+
+
+Exit Code: 0
+
+[2026-10-29T13:54:28.502Z] call #68 turn 9 execute_bash
+COMMAND: cd /private/tmp/hirearchy-p2/C1-1793280632 && cp org/lead/writer/work/memo-2026-10-12.md deliverables/memo-2026-10-12.md && cmp org/lead/writer/work/memo-2026-10-12.md deliverables/memo-2026-10-12.md && echo IDENTICAL && wc -w deliverables/memo-2026-10-12.md && head -1 deliverables/memo-2026-10-12.md | cut -c1-40
+source file(s): ['lead/writer/work/memo-2026-10-12.md -> org-git commit at that time: 7f3ca0a 2026-10-29T13:53:55Z', 'lead/writer/work/memo-2026-10-12.md -> org-git commit at that time: 7f3ca0a 2026-10-29T13:53:55Z']
+result: Output:
+IDENTICAL
+     192 deliverables/memo-2026-10-12.md
+Summary: Platform team weekly, Monday 12
+
+
+Exit Code: 0
+
+[2026-10-29T13:57:21.962Z] call #78 turn 10 execute_bash
+COMMAND: cd /private/tmp/hirearchy-p2/C1-1793280632 && cp org/lead/writer/work/action-list-2026-10-12.md deliverables/action-list-2026-10-12.md && cmp org/lead/writer/work/action-list-2026-10-12.md deliverables/action-list-2026-10-12.md && echo IDENTICAL && wc -w deliverables/action-list-2026-10-12.md
+source file(s): ['lead/writer/work/action-list-2026-10-12.md -> org-git commit at that time: f1354d6 2026-10-29T13:56:53Z', 'lead/writer/work/action-list-2026-10-12.md -> org-git commit at that time: f1354d6 2026-10-29T13:56:53Z']
+result: Output:
+IDENTICAL
+     104 deliverables/action-list-2026-10-12.md
+
+
+Exit Code: 0
+
+[2026-10-29T14:02:58.516Z] call #96 turn 12 execute_bash
+COMMAND: cd /private/tmp/hirearchy-p2/C1-1793280632 && cp org/lead/writer/work/memo-2026-10-19.md deliverables/memo-2026-10-19.md && cmp org/lead/writer/work/memo-2026-10-19.md deliverables/memo-2026-10-19.md && echo IDENTICAL && wc -w deliverables/memo-2026-10-19.md && ls deliverables
+source file(s): ['lead/writer/work/memo-2026-10-19.md -> org-git commit at that time: 288c6a0 2026-10-29T14:02:24Z', 'lead/writer/work/memo-2026-10-19.md -> org-git commit at that time: 288c6a0 2026-10-29T14:02:24Z']
+result: Output:
+IDENTICAL
+     203 deliverables/memo-2026-10-19.md
+action-list-2026-10-05.md
+action-list-2026-10-12.md
+memo-2026-10-05.md
+memo-2026-10-12.md
+memo-2026-10-19.md
+
+
+Exit Code: 0
+
+[2026-10-29T14:07:14.897Z] call #107 turn 14 execute_bash
+COMMAND: cd /private/tmp/hirearchy-p2/C1-1793280632 && cp org/lead/writer/work/memo-2026-10-19.md deliverables/memo-2026-10-19.md && cmp org/lead/writer/work/memo-2026-10-19.md deliverables/memo-2026-10-19.md && echo IDENTICAL && wc -w deliverables/memo-2026-10-19.md
+source file(s): ['lead/writer/work/memo-2026-10-19.md -> org-git commit at that time: 98fa57f 2026-10-29T14:06:32Z', 'lead/writer/work/memo-2026-10-19.md -> org-git commit at that time: 98fa57f 2026-10-29T14:06:32Z']
+result: Output:
+IDENTICAL
+     192 deliverables/memo-2026-10-19.md
+
+
+Exit Code: 0
+
+[2026-10-29T14:10:01.084Z] call #116 turn 15 execute_bash
+COMMAND: cd /private/tmp/hirearchy-p2/C1-1793280632 && cp org/lead/writer/work/action-list-2026-10-19.md deliverables/action-list-2026-10-19.md && cmp org/lead/writer/work/action-list-2026-10-19.md deliverables/action-list-2026-10-19.md && echo IDENTICAL && wc -w deliverables/action-list-2026-10-19.md
+source file(s): ['lead/writer/work/action-list-2026-10-19.md -> org-git commit at that time: 6f44d31 2026-10-29T14:09:27Z', 'lead/writer/work/action-list-2026-10-19.md -> org-git commit at that time: 6f44d31 2026-10-29T14:09:27Z']
+result: Output:
+IDENTICAL
+     104 deliverables/action-list-2026-10-19.md
+
+
+Exit Code: 0
+
+[2026-10-29T14:12:35.646Z] call #125 turn 16 execute_bash
+COMMAND: cd /private/tmp/hirearchy-p2/C1-1793280632 && cp org/lead/writer/work/memo-2026-10-26.md deliverables/memo-2026-10-26.md && cmp org/lead/writer/work/memo-2026-10-26.md deliverables/memo-2026-10-26.md && echo IDENTICAL && wc -w deliverables/memo-2026-10-26.md
+source file(s): ['lead/writer/work/memo-2026-10-26.md -> org-git commit at that time: 6f8e33d 2026-10-29T14:11:59Z', 'lead/writer/work/memo-2026-10-26.md -> org-git commit at that time: 6f8e33d 2026-10-29T14:11:59Z']
+result: Output:
+IDENTICAL
+     210 deliverables/memo-2026-10-26.md
+
+
+Exit Code: 0
+
+[2026-10-29T14:16:45.231Z] call #137 turn 18 execute_bash
+COMMAND: cd /private/tmp/hirearchy-p2/C1-1793280632 && cp org/lead/writer/work/memo-2026-11-02.md deliverables/memo-2026-11-02.md && cmp org/lead/writer/work/memo-2026-11-02.md deliverables/memo-2026-11-02.md && echo IDENTICAL && wc -w deliverables/memo-2026-11-02.md && head -1 deliverables/memo-2026-11-02.md | cut -c1-30
+source file(s): ['lead/writer/work/memo-2026-11-02.md -> org-git commit at that time: e171d69 2026-10-29T14:15:07Z', 'lead/writer/work/memo-2026-11-02.md -> org-git commit at that time: e171d69 2026-10-29T14:15:07Z']
+result: Output:
+IDENTICAL
+     176 deliverables/memo-2026-11-02.md
+Summary: Platform team weekly,
+
+
+Exit Code: 0
+
+[2026-10-29T14:21:39.585Z] call #153 turn 20 execute_bash
+COMMAND: cd /private/tmp/hirearchy-p2/C1-1793280632 && cp org/lead/writer/work/memo-2026-11-09.md deliverables/memo-2026-11-09.md && cmp org/lead/writer/work/memo-2026-11-09.md deliverables/memo-2026-11-09.md && echo IDENTICAL && wc -w deliverables/memo-2026-11-09.md && ls deliverables
+source file(s): ['lead/writer/work/memo-2026-11-09.md -> org-git commit at that time: c9b7ee5 2026-10-29T14:20:00Z', 'lead/writer/work/memo-2026-11-09.md -> org-git commit at that time: c9b7ee5 2026-10-29T14:20:00Z']
+result: Output:
+IDENTICAL
+     172 deliverables/memo-2026-11-09.md
+action-list-2026-10-05.md
+action-list-2026-10-12.md
+action-list-2026-10-19.md
+memo-2026-10-05.md
+memo-2026-10-12.md
+memo-2026-10-19.md
+memo-2026-10-26.md
+memo-2026-11-02.md
+memo-2026-11-09.md
+
+
+Exit Code: 0
+
+[2026-10-29T14:25:31.544Z] call #166 turn 22 execute_bash
+COMMAND: cd /private/tmp/hirearchy-p2/C1-1793280632 && cp org/lead/writer/work/memo-2026-11-09.md deliverables/memo-2026-11-09.md && cmp org/lead/writer/work/memo-2026-11-09.md deliverables/memo-2026-11-09.md && echo IDENTICAL && wc -w deliverables/memo-2026-11-09.md && grep -n '^Summary\|^## ' deliverables/memo-2026-11-09.md | cut -c1-30
+source file(s): ['lead/writer/work/memo-2026-11-09.md -> org-git commit at that time: c09e50e 2026-10-29T14:24:52Z', 'lead/writer/work/memo-2026-11-09.md -> org-git commit at that time: c09e50e 2026-10-29T14:24:52Z']
+result: Output:
+IDENTICAL
+     172 deliverables/memo-2026-11-09.md
+1:Summary: Platform team weekl
+3:## Actions
+12:## Decisions
+
+
+Exit Code: 0
+
+[2026-10-29T14:37:41.970Z] call #189 turn 25 execute_bash
+COMMAND: cd /private/tmp/hirearchy-p2/C1-1793280632 && cp org/lead/writer/work/action-list-2026-11-09.md deliverables/action-list-2026-11-09.md && cmp org/lead/writer/work/action-list-2026-11-09.md deliverables/action-list-2026-11-09.md && echo IDENTICAL && wc -w deliverables/action-list-2026-11-09.md
+source file(s): ['lead/writer/work/action-list-2026-11-09.md -> org-git commit at that time: b261d79 2026-10-29T14:37:05Z', 'lead/writer/work/action-list-2026-11-09.md -> org-git commit at that time: b261d79 2026-10-29T14:37:05Z']
+result: Output:
+IDENTICAL
+     102 deliverables/action-list-2026-11-09.md
+
+
+Exit Code: 0
+
+any other write into the deliverable folder (not by the assistant): none can be seen from the assistant session; the folder holds:
+  action-list-2026-10-05.md size 446 mtime 13:51:35 local md5 a8565278195f6f355a2f3380d04445cf
+  action-list-2026-10-12.md size 529 mtime 13:57:21 local md5 00c88346278d73a1e3b851c49d8ae7b5
+  action-list-2026-10-19.md size 524 mtime 14:10:01 local md5 f13e987d0b0f9f027ef78feda918b80a
+  action-list-2026-11-09.md size 492 mtime 14:37:41 local md5 b88f43144043707caf8b6a70384a6eea
+  memo-2026-10-05.md size 768 mtime 13:47:08 local md5 ff62bea31a26b0f3c8ca5b884a130f11
+  memo-2026-10-12.md size 1016 mtime 13:54:28 local md5 ee36a01feadf53de194c2c4b21fc596e
+  memo-2026-10-19.md size 1016 mtime 14:07:14 local md5 632228cd1d6f3b141fe965c8caafb449
+  memo-2026-10-26.md size 1104 mtime 14:12:35 local md5 4f4a26e18e131ffb86587ff3dbed0f6b
+  memo-2026-11-02.md size 939 mtime 14:16:45 local md5 2a4ad5052707485699548c72c46619c7
+  memo-2026-11-09.md size 910 mtime 14:25:31 local md5 eba739fa86c2caa605bfaee2c3cd3af1
+
+final ls -la:
+total 80
+drwxr-xr-x@ 12 aminalizadeh  wheel   384 Oct 29 14:37 .
+drwxr-xr-x@  7 aminalizadeh  wheel   224 Oct 29 13:41 ..
+-rw-r--r--@  1 aminalizadeh  wheel   446 Oct 29 13:51 action-list-2026-10-05.md
+-rw-r--r--@  1 aminalizadeh  wheel   529 Oct 29 13:57 action-list-2026-10-12.md
+-rw-r--r--@  1 aminalizadeh  wheel   524 Oct 29 14:10 action-list-2026-10-19.md
+-rw-r--r--@  1 aminalizadeh  wheel   492 Oct 29 14:37 action-list-2026-11-09.md
+-rw-r--r--@  1 aminalizadeh  wheel   768 Oct 29 13:47 memo-2026-10-05.md
+-rw-r--r--@  1 aminalizadeh  wheel  1016 Oct 29 13:54 memo-2026-10-12.md
+-rw-r--r--@  1 aminalizadeh  wheel  1016 Oct 29 14:07 memo-2026-10-19.md
+-rw-r--r--@  1 aminalizadeh  wheel  1104 Oct 29 14:12 memo-2026-10-26.md
+-rw-r--r--@  1 aminalizadeh  wheel   939 Oct 29 14:16 memo-2026-11-02.md
+-rw-r--r--@  1 aminalizadeh  wheel   910 Oct 29 14:25 memo-2026-11-09.md
+

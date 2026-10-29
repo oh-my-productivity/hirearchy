@@ -1,0 +1,1 @@
+env -u KIRO_HOME kiro-cli chat --v3 --no-interactive --trust-all-tools --resume --effort high --agent hirearchy-study-p2-C1-assistant Lee\''s should be 2026-10-30. Sam'\''s none is right. I'\''ll wait.'

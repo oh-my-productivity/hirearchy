@@ -1,0 +1,20 @@
+Services you can request (from your direct reports):
+- weekly-meeting-memo (offered by lead; contract v4, playbook v4): One short markdown memo from one meeting's notes with the decisions and a table of action items.
+  inputs: notes_file* (File name of the meeting notes inside the notes folder, for example 2026-10-05.md)   (* required)
+  each request: 12 runs; acceptance criteria (lead/services/weekly-meeting-memo/SERVICE.md):
+    C1: Covers only the meeting in the file named in the request and nothing else.
+    C2: At most 400 words as counted by read.
+    C3: The memo has a section titled "Decisions" that lists every decision in the notes, worded as in the notes.
+    C4: The memo has a section titled "Actions" with a markdown table with the columns Owner | Action | Due, with one row for every commitment in the notes, including informal ones written in prose ("X said he would ..."), worded as in the notes.
+    C5: Due is an ISO date (YYYY-MM-DD). A relative deadline such as "before Friday" becomes a date only when the notes and the meeting date make it clear; otherwise, and when the notes give no date, Due is "none".
+    C6: A name that is not in the attendee list is used as written in the notes and marked "(not in attendee list)".
+    C7: Nothing appears in the memo that is not in the notes file.
+    C8: The lead's check against the notes shows every decision and every commitment covered (n of m with n = m).
+    C10: The Actions table leaves out any line where nobody has to do anything, such as a statement that something stays as it is.
+    C11: The memo starts with a one-line "Summary:" of the meeting, followed by the "Actions" section, then the "Decisions" section, in that order.
+  record: 6 request(s): 6 done, 0 failed, 0 open; 3 reworked; avg 6 runs; feedback 5 accept (2 after a reject), 1 reject
+  regression list (the client's rejections):
+    R1 (case 20261029T133518543841-root-4955, about C9 (removed)): "No, not right yet. Always start the memo with a one-line 'Summary:' of the meeting, then the decisions, then the action items."
+    R2 (case 20261029T135831104369-root-5e7a, about C10): "Almost, but not right yet: 'Marta keeps the agenda as sent' isn't an action item, nobody has to do anything there. Take that row out. The rest is fine." (items citing it: P9)
+    R3 (case 20261029T141835117946-root-723b, about C11): "No: I've changed my mind - always put the action items before the decisions now, right after the one-line Summary." (items citing it: P8)
+  playbook v4 (2026-10-29): "C11 (client-confirmed) replaces C9 after rejection R3; item is the own words of C11."; 9 items (0 rules); watched: P8 new (0 of 3 clean cases, k 3)

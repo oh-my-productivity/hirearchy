@@ -1,0 +1,18 @@
+injection 2026-10-29T12:08:58Z: arm R script inject_root_rework.py md5 1c4e7824e448a3a34e24a7b759a59fcd product /Volumes/workspace/hirearchy args --revises 20261029T120757800056-root-9524 --dry-run
+title md5 849fe21b104be883af9b3c06367d4445 ok; note len 866 md5 4cdbcb9b682f2f25dcb31c83d3743fec ok
+{
+  "service": "weekly-memo",
+  "inputs": {
+    "notes_file": "2026-10-05.md"
+  },
+  "title": "Rework memo 2026-10-05: unclear due dates",
+  "note": "<866 chars>",
+  "budget": 6,
+  "revises": "20261029T120757800056-root-9524",
+  "source": "relayed"
+}
+task file: /tmp/hirearchy-p2/selfcheck-R-1793275673/org/sent/20261029T120757800056-root-9524.md
+injection 2026-10-29T12:08:58Z: arm R script inject_root_rework.py md5 1c4e7824e448a3a34e24a7b759a59fcd product /Volumes/workspace/hirearchy args  --selftest
+[10/29/26 12:08:58] INFO     Processing request of type            server.py:733
+                             ListToolsRequest                                   
+tools: acknowledge_playbook, apply_org, blueprint_example, create_org, define_service, delegate, feedback, health, hire, inbox, observe, progress, propose_org, quality, read, reclaim, report, request, retire, retro, send, services, start, status, stop, whoami, write

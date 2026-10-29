@@ -1,0 +1,8 @@
+playbook_attempts R1: 4 attempts: 1 refused (0 P1-REFUSED, 1 other), 0 errors, 3 admitted; 0 in the injection window (2026-10-29T12:19:13Z to 2026-10-29T12:20:07Z)
+
+  2026-10-29T12:22:57.761434Z lead lead@20261029T122231909894: admitted, v2 admitted: c
+  2026-10-29T12:55:26.845509Z lead lead@20261029T125438338670: refused (other refusal)
+      refused: op="add" takes kind ("step" with text, or "rule" with then), and optionally when (a rule) and after (an item id); after=P8 is not a live rule. Nothing was written.
+  2026-10-29T12:55:29.590073Z lead lead@20261029T125438338670: admitted, v3 admitted: c
+  2026-10-29T13:12:59.091578Z lead lead@20261029T131242831707: admitted, v4 admitted: c
+owner attempted revise_playbook: yes

@@ -1,0 +1,26 @@
+[
+ {
+  "date": "2026-10-29",
+  "id": null,
+  "item": null,
+  "kind": "agent added",
+  "label": "plan",
+  "subject": "lead"
+ },
+ {
+  "date": "2026-10-29",
+  "id": null,
+  "item": null,
+  "kind": "agent added",
+  "label": "plan",
+  "subject": "lead/writer"
+ },
+ {
+  "date": "2026-10-29",
+  "id": null,
+  "item": null,
+  "kind": "service added",
+  "label": "plan",
+  "subject": "lead/weekly-memo"
+ }
+]

@@ -1,0 +1,106 @@
+{
+ "cases": [
+  {
+   "assignee": "lead",
+   "criteria": [
+    "Each action with its owner and due date; at most one page."
+   ],
+   "head": "20261029T120921119467-root-56da",
+   "judged": true,
+   "judged_at": "2026-10-29T12:09:21.125600+00:00",
+   "key": [
+    "eachactionwithitsownerandduedateatmostonepage"
+   ],
+   "skeleton": [
+    "action",
+    "list",
+    "for",
+    "the",
+    "ops",
+    "team"
+   ],
+   "tasks": [
+    "20261029T120921119467-root-56da"
+   ],
+   "title": "Action list for the ops team (2026-10-05)",
+   "tokens": "{'one', 'its', 'page', 'action', 'at', 'with', 'and', 'date', 'owner', 'due', 'most', 'each'}"
+  },
+  {
+   "assignee": "lead",
+   "criteria": [
+    "Each action with its owner and due date; at most one page."
+   ],
+   "head": "20261029T120921188435-root-d596",
+   "judged": true,
+   "judged_at": "2026-10-29T12:09:21.196223+00:00",
+   "key": [
+    "eachactionwithitsownerandduedateatmostonepage"
+   ],
+   "skeleton": [
+    "action",
+    "list",
+    "for",
+    "the",
+    "ops",
+    "team"
+   ],
+   "tasks": [
+    "20261029T120921188435-root-d596"
+   ],
+   "title": "Action list for the ops team (2026-10-12)",
+   "tokens": "{'one', 'its', 'page', 'action', 'at', 'with', 'and', 'date', 'owner', 'due', 'most', 'each'}"
+  },
+  {
+   "assignee": "lead",
+   "criteria": [
+    "Each action with its owner and due date; at most one page."
+   ],
+   "head": "20261029T120921483324-root-87e8",
+   "judged": true,
+   "judged_at": "2026-10-29T12:09:21.493068+00:00",
+   "key": [
+    "eachactionwithitsownerandduedateatmostonepage"
+   ],
+   "skeleton": [
+    "action",
+    "list",
+    "for",
+    "the",
+    "ops",
+    "team"
+   ],
+   "tasks": [
+    "20261029T120921483324-root-87e8"
+   ],
+   "title": "Action list for the ops team (2026-10-19)",
+   "tokens": "{'one', 'its', 'page', 'action', 'at', 'with', 'and', 'date', 'owner', 'due', 'most', 'each'}"
+  }
+ ],
+ "groups": [
+  {
+   "assignee": "lead",
+   "criteria_key": [
+    "eachactionwithitsownerandduedateatmostonepage"
+   ],
+   "heads": [
+    "20261029T120921119467-root-56da",
+    "20261029T120921188435-root-d596",
+    "20261029T120921483324-root-87e8"
+   ],
+   "judged": [
+    "20261029T120921119467-root-56da",
+    "20261029T120921188435-root-d596",
+    "20261029T120921483324-root-87e8"
+   ],
+   "reached_at": "2026-10-29T12:09:21.493068+00:00",
+   "relations": [
+    "title"
+   ],
+   "titles": [
+    "Action list for the ops team (2026-10-05)",
+    "Action list for the ops team (2026-10-12)",
+    "Action list for the ops team (2026-10-19)"
+   ]
+  }
+ ]
+}

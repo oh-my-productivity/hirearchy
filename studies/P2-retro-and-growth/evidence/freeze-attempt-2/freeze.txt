@@ -1,0 +1,17 @@
+# P2 freeze (attempt 2; attempt 1's files are in freeze-attempt-1/ with NOTE.md)
+freeze time (UTC): 2026-10-29T10:10:16Z
+basis: /Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/manager-decision-prereg-loop.md (sections 'The loop is CLOSED by decision after iteration 3', 'Go-ahead to freeze' and 'Freeze attempt 1 failed on a timing fixture: ruling (b)'), prereg-closing-pass.md and its self-check 19 of 19 (2026-10-29T09:51:20Z). prereg-review.json stays CHANGES_REQUESTED (review 3's record, unedited); the freeze rests on the manager's closure decision, not on an APPROVED verdict.
+changes since attempt 1 (ruling (b), harness/CHANGES.md 'Freeze fix'): harness/dryrun.sh, harness/dryrun_build.py, harness/selfcheck_cases.py, harness/CHANGES.md, new harness/pf0_timing.py, protocol.md 13.3.
+arm R product sha (git -C /Volumes/workspace/hirearchy rev-parse HEAD): 3d6b28aa17a70a3f95854c73c2f479b6361a71de
+arm C product sha (git -C /Volumes/workspace/hirearchy/.worktrees/p2-arm-c rev-parse HEAD): aac6af1b47b721515106f03f1dd6eb6758da6e55
+check 1: git diff --stat 3d6b28aa HEAD -- src skills pyproject.toml uv.lock: EMPTY
+check 2: arm-C worktree HEAD aac6af1b (expected aac6af1b), tree CLEAN
+global skill md5 before the self-check: 443e1bc4911aa4d6aaa6457e78f673c1 (expected 443e1bc4911aa4d6aaa6457e78f673c1)
+check 3: md5s written: protocol.md5 (protocol.md, standing-rules-streams.md) and harness/MD5SUMS (76 files; excludes MD5SUMS itself and __pycache__)
+--- protocol.md5
+31bc856cad06efbdefc04d582142eac2  protocol.md
+909fbb79c838b69a2d620089545c3ae6  standing-rules-streams.md
+md5 of harness/MD5SUMS: a1ff86dd09d4ec766d8f2fb3701a3045
+--- self-check on the frozen files (run after the md5s were written; harness/MD5SUMS and protocol.md5 re-verified afterwards: no file changed)
+result: SELFCHECK: 19 of 19 parts passed (harness-selfcheck/selfcheck-summary.txt); the PF-0 timing: pf0 timing verdict: PASS: 1 'same second' build(s) read PF-0 1; 1 'earlier second' build(s) read no difference
+global skill md5 after: 443e1bc4911aa4d6aaa6457e78f673c1

@@ -1,0 +1,24 @@
+######## TURN 23  start 14:31:54  end 14:32:41  elapsed 47s  (local, 2026-10-29; UTC wall-clock start 2026-10-29T14:31:54Z end 2026-10-29T14:32:41Z; exit code 0)
+######## LENA (prompt sent verbatim):
+This version is right now, thanks. I don't know anything about that rework - I didn't ask for it. Shall we look at how it's going?
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-23.stderr.txt):
+Everything you've asked for is done and judged, and nothing is open. I've now recorded your accept on the last rework, so every delivery has your verdict.
+
+**Delivered, in `deliverables`**
+- **Memos:** all six meetings, 5 Oct to 9 Nov.
+- **Ops action lists:** 5, 12 and 19 Oct.
+
+You accepted the first delivery of 3 memos and all 3 action lists. Your changes on the other 3 memos were 3 rejections, each adding a new rule that the memo rules hadn't had before. The checks hit n = m every time. They missed nothing in the notes.
+
+**Contract.** It's now at version 4 with 10 criteria:
+- C1 to C8 are the originals.
+- C10 leaves out lines where nobody has to do anything.
+- C11 puts the Summary first, then Actions, then Decisions. It replaced C9, which had the old Decisions-first order.
+
+The older memos in `deliverables` still use the order that was current when you accepted them.
+
+**Cost.** The planned budget was 12 runs per memo. The 12 Oct, 26 Oct and 2 Nov memos used 3 each. The 19 Oct memo used 9 and the 9 Nov memo used 6, because of reworks. The 5 Oct memo used 12, 9 for your requests and 3 for the stray rework. Each action list used 3 of its 8. In total that is 45 charged runs, 3 of them mine. No case went over its budget. Four runs failed on a model-service throttle and weren't charged.
+
+**The rework you didn't ask for.** The event log shows it as a request sent through the same channel I use, with the source marked "relayed". It arrived at 13:41:37, the same instant as a status poll, and it carried its own note. I made no request at that time, and I can't tell who or what sent it. It undid your confirmed dates for Sam and Marta, and I fixed that before delivering anything. I rejected it myself, not on your behalf. Its 3 runs are charged to me, not to you. If it happens again, tell me and I'll check the log straight away.
+
+**Next weeks.** Ask for any meeting file by name and I'll request the memo. The Summary-then-Actions-then-Decisions layout and the date rules are built into the service now.

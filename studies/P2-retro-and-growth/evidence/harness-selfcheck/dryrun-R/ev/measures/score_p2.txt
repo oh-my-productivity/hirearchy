@@ -1,0 +1,5 @@
+memo 2026-10-12: trap per delivered version []
+memo 2026-10-19: trap per delivered version []
+memo 2026-10-26: trap per delivered version []
+memo 2026-11-02: trap per delivered version []
+delivered versions (P2's form): 0 wrong dates outside the trap rows, 0 extra rows (0 copied versions); PASS

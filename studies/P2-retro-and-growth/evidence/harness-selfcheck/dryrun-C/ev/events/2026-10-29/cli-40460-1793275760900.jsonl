@@ -1,0 +1,5 @@
+{"v":1,"ts":"2026-10-29T12:09:20.900379+00:00","seq":1,"proc":"cli","pid":40460,"kind":"agent.hire","actor":"root","run":null,"trace":null,"agent":"lead","by":"root","role":"Manager","model":"claude-sonnet-5.5","tools":[]}
+{"v":1,"ts":"2026-10-29T12:09:20.901663+00:00","seq":2,"proc":"cli","pid":40460,"kind":"agent.hire","actor":"lead","run":null,"trace":null,"agent":"lead/writer","by":"lead","role":"Writer","model":"claude-sonnet-5.5","tools":[]}
+{"v":1,"ts":"2026-10-29T12:09:20.902598+00:00","seq":3,"proc":"cli","pid":40460,"kind":"service.define","actor":"root","run":null,"trace":null,"owner":"lead","service":"weekly-memo","version":1,"by":"root","amendment":false}
+{"v":1,"ts":"2026-10-29T12:09:20.903170+00:00","seq":4,"proc":"cli","pid":40460,"kind":"service.revise","actor":"root","run":null,"trace":null,"owner":"lead","service":"weekly-memo","version":1,"by":"root","admitted":"client"}
+{"v":1,"ts":"2026-10-29T12:09:20.946383+00:00","seq":5,"proc":"cli","pid":40460,"kind":"cli.command","actor":"root","run":null,"trace":null,"command":"apply","ok":true,"ms":50.56,"error":null,"error_type":null}

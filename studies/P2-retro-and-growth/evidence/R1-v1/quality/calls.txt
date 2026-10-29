@@ -1,0 +1,14 @@
+turn-01 2026-10-29T10:39:30Z: no org yet, quality not run
+turn-02 2026-10-29T10:41:41Z: no org yet, quality not run
+turn-03 start 2026-10-29T10:44:53.169316+00:00 end 2026-10-29T10:44:53.484650+00:00 exit 0 bytes 8096 json ok product /Volumes/workspace/hirearchy
+  new cli-*.jsonl: 2026-10-29/cli-3538-1793270693449.jsonl  command: quality 
+turn-04 start 2026-10-29T10:47:49.660254+00:00 end 2026-10-29T10:47:49.966643+00:00 exit 0 bytes 8527 json ok product /Volumes/workspace/hirearchy
+  new cli-*.jsonl: 2026-10-29/cli-4689-1793270869932.jsonl  command: quality 
+turn-05 start 2026-10-29T10:51:58.117027+00:00 end 2026-10-29T10:51:58.546573+00:00 exit 0 bytes 9599 json ok product /Volumes/workspace/hirearchy
+  new cli-*.jsonl: 2026-10-29/cli-5936-1793271118512.jsonl  command: quality 
+turn-06 start 2026-10-29T10:56:01.622816+00:00 end 2026-10-29T10:56:01.985366+00:00 exit 0 bytes 12025 json ok product /Volumes/workspace/hirearchy
+  new cli-*.jsonl: 2026-10-29/cli-7091-1793271361951.jsonl  command: quality 
+turn-07 start 2026-10-29T10:57:53.462098+00:00 end 2026-10-29T10:57:53.776974+00:00 exit 0 bytes 11972 json ok product /Volumes/workspace/hirearchy
+  new cli-*.jsonl: 2026-10-29/cli-7856-1793271473739.jsonl  command: quality 
+end start 2026-10-29T11:03:18.939286+00:00 end 2026-10-29T11:03:19.230171+00:00 exit 0 bytes 11972 json ok product /Volumes/workspace/hirearchy
+  new cli-*.jsonl: 2026-10-29/cli-8803-1793271799195.jsonl  command: quality 

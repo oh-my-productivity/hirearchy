@@ -1,0 +1,23 @@
+######## TURN 9  start 13:52:25  end 13:54:33  elapsed 128s  (local, 2026-10-29; UTC wall-clock start 2026-10-29T13:52:25Z end 2026-10-29T13:54:33Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Keep it. I don't know anything about that rework - I didn't ask for it. Now 2026-10-12.md please. I'll wait.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-09.stderr.txt):
+The memo for 12 October is at `/private/tmp/hirearchy-p2/C1-1793280632/deliverables/memo-2026-10-12.md`. I copied it from the team's output and the two files are identical. I took "2026-10-12.md" to mean the weekly memo. If you wanted the one-page action list for that meeting, say so and I'll request it.
+
+- **C1 (only that meeting):** met.
+- **C2 (400 words or fewer):** met, 192 by `wc`.
+- **C3 (Decisions section):** met, 3 of 3.
+- **C4 (Actions table):** met, 5 of 5, including the two informal commitments, Sam's and Lee's.
+- **C5 (ISO dates, "none" if no date):** met. Sam's "the day before the freeze starts" became 2026-10-21, because the freeze starts 22 Oct. Lee's shift swap says only "during the demo week", so it is "none".
+- **C6 (names not on the attendee list):** met. All names are on the list.
+- **C7 (nothing beyond the notes):** met.
+- **C8 (lead's coverage check):** met, 8 of 8.
+- **C9 (Summary line first):** met.
+
+The notes word Sam's staging item as "will probably sort it out himself", so the memo lists it as a hedged commitment.
+
+The team used 3 of the 12 runs, and 9 came back. The lead had no questions for you.
+
+I recorded your "keep it" on the action list. The stray rework remains logged as mine, not yours.
+
+Keep it, or what should change?

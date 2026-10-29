@@ -1,0 +1,214 @@
+{
+ "checker": [
+  {
+   "candidates": [
+    {
+     "class": [
+      "C1"
+     ],
+     "estimate": null,
+     "evidence": [
+      "20261029T120921070812-root-dd62"
+     ],
+     "fires": false,
+     "key": "checker-add|weekly-memo|C1",
+     "kind": "checker-add",
+     "reached_at": null,
+     "rung": 4,
+     "signers": {
+      "20261029T120921070812-root-dd62": "lead/writer"
+     },
+     "via": "class",
+     "weight": 1
+    },
+    {
+     "class": [
+      "C5"
+     ],
+     "estimate": null,
+     "evidence": [
+      "20261029T120921070812-root-dd62"
+     ],
+     "fires": false,
+     "key": "checker-add|weekly-memo|C5",
+     "kind": "checker-add",
+     "reached_at": null,
+     "rung": 4,
+     "signers": {
+      "20261029T120921070812-root-dd62": "lead/writer"
+     },
+     "via": "class",
+     "weight": 1
+    },
+    {
+     "class": [
+      "C6"
+     ],
+     "estimate": {
+      "c": 2,
+      "f": 3,
+      "k": 3,
+      "n": 4,
+      "net": -2.0,
+      "p": 0.75,
+      "r": 3.0,
+      "rendered": "net -2.0 = 0.8 \u00d7 3 \u2212 2 \u2212 0.8 \u00d7 3, from 3 of 4 cases"
+     },
+     "evidence": [
+      "20261029T120921129687-root-e6b6",
+      "20261029T120921202160-root-cf1c",
+      "20261029T120921501452-root-a43f"
+     ],
+     "fires": true,
+     "key": "checker-add|weekly-memo|C6",
+     "kind": "checker-add",
+     "reached_at": "2026-10-29T12:09:21.765732+00:00",
+     "rung": 4,
+     "signers": {
+      "20261029T120921129687-root-e6b6": "lead/writer",
+      "20261029T120921202160-root-cf1c": "lead/writer",
+      "20261029T120921501452-root-a43f": "lead/writer"
+     },
+     "via": "class",
+     "weight": 3
+    }
+   ],
+   "owner": "lead",
+   "service": "weekly-memo",
+   "window": [
+    "20261029T120921070812-root-dd62",
+    "20261029T120921129687-root-e6b6",
+    "20261029T120921202160-root-cf1c",
+    "20261029T120921501452-root-a43f"
+   ]
+  }
+ ],
+ "checker_due": true,
+ "clarify": [
+  {
+   "accepted": 4,
+   "added": [
+    "the",
+    "memo",
+    "starts",
+    "with",
+    "a",
+    "one",
+    "-",
+    "line",
+    "summary",
+    "then",
+    "decisions",
+    "action",
+    "items"
+   ],
+   "criterion": "C5",
+   "evidence": [
+    "weekly-memo/C5"
+   ],
+   "exercised": 7,
+   "fires": true,
+   "fires_rule": true,
+   "key": "clarify|weekly-memo|C5|thememostartswithaonelinesummarythenthed",
+   "kind": "clarify",
+   "reached_at": "2026-10-29T12:09:21.482535+00:00",
+   "rung": 1,
+   "source": "amendment",
+   "weight": 0
+  },
+  {
+   "accepted": 3,
+   "added": [
+    "a",
+    "deadline",
+    "the",
+    "notes",
+    "give",
+    "in",
+    "words",
+    "is",
+    "turned",
+    "into",
+    "its",
+    "iso",
+    "date",
+    "counted",
+    "from",
+    "meeting",
+    "s",
+    "day"
+   ],
+   "criterion": "C6",
+   "evidence": [
+    "weekly-memo/C6"
+   ],
+   "exercised": 5,
+   "fires": true,
+   "fires_rule": true,
+   "key": "clarify|weekly-memo|C6|adeadlinethenotesgiveinwordsisturnedinto",
+   "kind": "clarify",
+   "reached_at": "2026-10-29T12:09:21.820577+00:00",
+   "rung": 1,
+   "source": "amendment",
+   "weight": 0
+  }
+ ],
+ "service": [
+  {
+   "assignee_top_level": true,
+   "covered_by": [],
+   "d5": null,
+   "evidence": [
+    "20261029T120921119467-root-56da",
+    "20261029T120921188435-root-d596",
+    "20261029T120921483324-root-87e8"
+   ],
+   "fires": true,
+   "group": {
+    "assignee": "lead",
+    "criteria_key": [
+     "eachactionwithitsownerandduedateatmostonepage"
+    ],
+    "heads": [
+     "20261029T120921119467-root-56da",
+     "20261029T120921188435-root-d596",
+     "20261029T120921483324-root-87e8"
+    ],
+    "judged": [
+     "20261029T120921119467-root-56da",
+     "20261029T120921188435-root-d596",
+     "20261029T120921483324-root-87e8"
+    ],
+    "reached_at": "2026-10-29T12:09:21.493068+00:00",
+    "relations": [
+     "title"
+    ],
+    "titles": [
+     "Action list for the ops team (2026-10-05)",
+     "Action list for the ops team (2026-10-12)",
+     "Action list for the ops team (2026-10-19)"
+    ]
+   },
+   "key": "service|lead|20261029T120921119467-root-56da",
+   "kind": "service",
+   "reached_at": "2026-10-29T12:09:21.493068+00:00",
+   "rung": 2,
+   "weight": 3
+  }
+ ],
+ "service_due": true,
+ "thresholds": {
+  "accepted_cases": 3,
+  "added_words": 3,
+  "after_verdicts": 3,
+  "carry": 3,
+  "criterion_cases": 3,
+  "escapes": 2,
+  "items": 3,
+  "saturation": 0.45,
+  "shape_cases": 3,
+  "shape_overlap": 0.6,
+  "window": 3,
+  "window_cases": 10
+ }
+}

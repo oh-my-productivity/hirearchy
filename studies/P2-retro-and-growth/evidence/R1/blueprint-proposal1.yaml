@@ -1,0 +1,67 @@
+mission: >
+  Every week, after the team meeting, write a short memo from the user's meeting notes: what the team decided and who does what. Written for the user (the meeting owner) to send to the team.
+needs:
+  kind: writing
+  scope: "One memo per request, from one meeting notes file: the decisions made and the action items (who does what, by when). Nothing else: no attendee list, no next-meeting date."
+  elicitation: |
+    First answer: "Thanks! Yes, if someone said they'd do something, it counts. Yes, turn vague deadlines into a date when the notes make it clear. The file name each time is fine. Format: a markdown memo, at most 400 words, with the action items as a table with columns Owner | Action | Due (ISO dates, 'none' if there's no date). The rest of your defaults are fine, the deliverables folder too. Please keep it cheap, but I need it right - about 12 runs per memo. No separate reviewer: the lead checks. No, keep it as it is. For the Owner column: Use the words from the notes. No, the first memo should be this week's: 2026-10-05.md, not 2026-11-09.md."
+    Original request: "After each of our weekly team meetings I want a short memo from my notes: what we decided and who does what. My notes are in /tmp/hirearchy-p2/R1-1793275867/notes (one file per meeting)."
+  inputs:
+    - /tmp/hirearchy-p2/R1-1793275867/notes
+  quality_bar: Every statement comes from the notes file; where the notes are unclear, the memo says so instead of guessing.
+  sources: Only the files in the notes folder; no web.
+  budget_runs: 12
+  models: {cheap: claude-sonnet-5.5, strong: claude-sonnet-5.5}
+  model_policy: one model for all
+  review: false
+  approval: Plan first; ask before any spend beyond the budget.
+  progress: One line when I ask.
+agents:
+  - name: lead
+    template: manager
+    model: strong
+    children:
+      - {name: writer, template: writer}
+services:
+  - name: weekly-meeting-memo
+    owner: lead
+    description: One markdown memo with the decisions and the action items table for one meeting notes file.
+    inputs:
+      - name: notes_file
+        description: File name of the meeting notes in the notes folder, for example 2026-10-05.md
+        required: true
+    acceptance:
+      - text: The memo is markdown and has at most 400 words as counted by read.
+        from: "a markdown memo, at most 400 words"
+        asked: "Format and length?"
+      - text: The memo has a Decisions section listing every decision made in the named notes file, and nothing from other files.
+        from: "what we decided"
+        asked: "Memo contents?"
+      - text: The action items are a markdown table with exactly the columns Owner | Action | Due.
+        from: "the action items as a table with columns Owner | Action | Due"
+        asked: "Format and length?"
+      - text: Every commitment in the notes is a row of the table, both those labelled ACTION and those stated in prose, such as someone saying they would do something.
+        from: "if someone said they'd do something, it counts"
+        asked: "Do informal or unlabelled commitments count?"
+      - text: "Each Due value is an ISO date (YYYY-MM-DD). A relative deadline such as 'by Friday' is turned into a date only when the notes make the date clear; if the notes give no date, Due is 'none'."
+        from: "turn vague deadlines into a date when the notes make it clear"
+        asked: "How to treat relative or vague dates?"
+      - text: Each Owner value uses the name exactly as written in the notes.
+        from: "For the Owner column: Use the words from the notes."
+        asked: "How should the Owner column read?"
+      - text: Every statement in the memo is traceable to the notes file, and anything unclear (no owner, an unconfirmed decision) is listed under a final heading 'Unclear' instead of being guessed.
+        default: true
+      - text: The lead's check report states that every decision and every table row was compared with the notes file, with the count verified (n of m, n = m).
+        from: "No separate reviewer: the lead checks."
+        asked: "Review by another agent?"
+    deliverable:
+      description: One memo per request, named <meeting-date>-memo.md after the notes file (for example 2026-10-05-memo.md).
+      format: markdown
+      max_words: 400
+      path: /private/tmp/hirearchy-p2/R1-1793275867/deliverables
+    budget: 12
+task:
+  service: weekly-meeting-memo
+  inputs:
+    notes_file: 2026-10-05.md
+  title: Memo for the 5 October 2026 meeting

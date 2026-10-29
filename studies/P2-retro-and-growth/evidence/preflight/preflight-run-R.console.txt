@@ -1,0 +1,3 @@
+RESULT: preflight-R org: OK (2026-10-29T10:14:52Z)
+preflight run arm R: 1 '# cmd:' line(s) with --effort high (see /Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/preflight/preflight-R/run.txt)
+zsh harness/preflight_run.sh R  2.80s user 0.70s system 14% cpu 23.351 total

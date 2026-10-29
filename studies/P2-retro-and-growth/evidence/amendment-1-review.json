@@ -1,0 +1,14 @@
+{"verdict": "CHANGES_REQUESTED", "findings": [
+ {"id": "A1", "severity": "MEDIUM", "summary": "Precedence 1 ('never K62-K66, however worded') contradicts K65's either/or clause; an either/or with a structural option is not answered as asked. Compose EXT-NO + the row's open line."},
+ {"id": "A2", "severity": "MEDIUM", "summary": "Service rows K42/K43/K43a/K57/K58/K60 are missing from the precedence; K66 (any action list: folder, budget, how checked) collides with K43/K43a while a list service is defined, and with K58 under D2."},
+ {"id": "A3", "severity": "MEDIUM", "summary": "Likely follow-ups to EXT-NO are excluded on purpose and stop: 'write it myself' (K65's generic yes/no form 'No, someone already on the team.' needs no new words) and 'send it as a request of the memo service' (needs a manager-ruled line); 'lead or writer?' gets a non-answer."},
+ {"id": "A4", "severity": "MEDIUM", "summary": "No notes file says 'ops'; 'Which team is ops?' maps to K63 only through the names clause and is not answered as asked; 'Is ops the Platform team?' stops. Extend K63's class and its yes/no form."},
+ {"id": "A5", "severity": "MEDIUM", "summary": "In arm C, K51's 'repeated action list' is not mechanical inside the ACT-REQ windows to which the precedence now routes service proposals (K51 yes vs K48 no); define 'repeated' and name the consequence for arm C's one-off count."},
+ {"id": "A6", "severity": "LOW", "summary": "R1 v1 showed the assistant sees the harness CLI calls; a follow-up 'did you run those commands?' has no row. The manager accepts the risk or rules a line."},
+ {"id": "A7", "severity": "LOW", "summary": "The amendment's item numbering does not match the decision (mapping = item 2, harness = item 4, no item 7); fixes (B) and (C) go beyond decision item 4 and need recorded ratification; AM:245 omits SR-A's new rules A, E, F, G."},
+ {"id": "A8", "severity": "LOW", "summary": "The re-freeze list omits decision item 5's preflight-copy check of standing-rules-streams.md5, and the R1 -> R1-v1 move, without which setup_stream.sh refuses label R1."},
+ {"id": "A9", "severity": "LOW", "summary": "Numbered answers apply only in lines holding K48; say whether any multi-question numbered reply gets them."},
+ {"id": "A10", "severity": "LOW", "summary": "Inconsistent record forms: bare K62/K63/K64/K66 for open lines vs 'K65 (open form)'."},
+ {"id": "A11", "severity": "LOW", "summary": "K66's 'rules' part ratifies any rule default, even one against the key (e.g. 'only ACTION: lines'); limit it to the memo's rules and send contrary rule defaults to K54's content rows or K1."},
+ {"id": "A12", "severity": "LOW", "summary": "Reported only: long K62/K63 answers copied into the first one-off's criteria can split the T12/X1 shape group (digits are stripped, so the date itself is harmless); note it for step 12."}
+]}

@@ -1,0 +1,65 @@
+######## hirearchy --root /tmp/hirearchy-p2/R1-1793275867/org services (/Volumes/workspace/hirearchy)
+Services you can request (from your direct reports):
+- ops-action-list (offered by lead; contract v1, playbook v1): One one-page action list (table of owner, action, due date) for the ops team from one meeting notes file.
+  inputs: notes_file* (File name of the meeting notes in the notes folder, for example 2026-10-05.md)   (* required)
+  each request: 8 runs; acceptance criteria (lead/services/ops-action-list/SERVICE.md):
+    C1: The deliverable is markdown, has at most 350 words as counted by read (this is the one-page limit), and a title line naming the meeting date.
+    C2: It contains one markdown table with exactly the columns Owner | Action | Due, and no other sections (no decisions, no summary).
+    C3: Every action item in the named notes file is a row, including those stated in prose, and no row is added that is not an action item in the notes; a statement that something stays as it is, where nobody has to do anything, gets no row.
+    C4: Each Due value is an ISO date (YYYY-MM-DD) or 'none'. A relative deadline such as 'by Friday' is turned into a date only when the notes make the date clear; if the notes give no date, Due is 'none'.
+    C5: Each Owner value uses the name exactly as written in the notes.
+    C6: Rows are ordered by Due ascending with 'none' last, ties in the order of the notes.
+    C7: Every statement is traceable to the named notes file; nothing is invented.
+    C8: The lead's report states that every table row was compared with the notes file, with the count verified (n of m, n = m).
+  record: 1 request(s): 1 done, 0 failed, 0 open; 0 reworked; avg 3 runs; feedback 1 accept, 0 reject
+  playbook v1 (2026-10-29): "initial playbook"; 7 items (0 rules), none watched
+- weekly-meeting-memo (offered by lead; contract v4, playbook v4): One markdown memo with the decisions and the action items table for one meeting notes file.
+  inputs: notes_file* (File name of the meeting notes in the notes folder, for example 2026-10-05.md)   (* required)
+  each request: 12 runs; acceptance criteria (lead/services/weekly-meeting-memo/SERVICE.md):
+    C1: The memo is markdown and has at most 400 words as counted by read.
+    C2: The memo has a Decisions section listing every decision made in the named notes file, and nothing from other files.
+    C3: The action items are a markdown table with exactly the columns Owner | Action | Due.
+    C4: Every commitment in the notes is a row of the table, both those labelled ACTION and those stated in prose, such as someone saying they would do something.
+    C5: Each Due value is an ISO date (YYYY-MM-DD). A relative deadline such as 'by Friday' is turned into a date only when the notes make the date clear; if the notes give no date, Due is 'none'.
+    C6: Each Owner value uses the name exactly as written in the notes.
+    C7: Every statement in the memo is traceable to the notes file, and anything unclear (no owner, an unconfirmed decision) is listed under a final heading 'Unclear' instead of being guessed.
+    C8: The lead's check report states that every decision and every table row was compared with the notes file, with the count verified (n of m, n = m).
+    C10: A statement that something stays as it is, where nobody has to do anything, is not an action item and gets no row in the table.
+    C11: The memo starts with a one-line 'Summary:' of the meeting, followed by the action items table, then the Decisions section.
+  record: 6 request(s): 6 done, 0 failed, 0 open; 3 reworked; avg 5.7 runs; feedback 6 accept (3 after a reject), 0 reject
+  regression list (the client's rejections):
+    R1 (case 20261029T121630346755-root-d28e, about C9 (removed)): "No, not right yet. Sam's CI item says 'before Friday', so that has a date, 2026-10-09, not 'none'. And Marta's room is for the training on the 14th, so I want…"
+    R2 (case 20261029T124626096325-root-750e, about C10): "Almost, but not right yet: 'Marta keeps the agenda as sent' isn't an action item, nobody has to do anything there. Take that row out. The rest is fine." (rules citing it: P9)
+    R3 (case 20261029T130759453335-root-5699, about C11): "No: I've changed my mind - always put the action items before the decisions now, right after the one-line Summary." (items citing it: P8)
+  playbook v4 (2026-10-29): "Own words of C11, confirmed by client (R3); replaces the C9 order in P8."; 9 items (1 rule); watched: P8 new (0 of 3 clean cases, k 3)
+
+######## hirearchy --root /tmp/hirearchy-p2/R1-1793275867/org progress (/Volumes/workspace/hirearchy)
+"Memo for the 5 October 2026 meeting" [service weekly-meeting-memo v1]: done. runs 3 of 12 (9 returned). last activity 2m ago. artifacts: lead/writer/work/2026-10-05-memo.md. case total: 7 runs used: 6 by the user's requests, 1 by your relayed rework 20261029T121913557638-root-5ea7; 24 handed down (contract: 12 per request). The runs of your relayed rework are your own spend, not the user's: report them to the user as yours, and never ask the user to fund them. (task 20261029T121630346755-root-d28e)
+"Rework memo 2026-10-05: unclear due dates" [service weekly-meeting-memo v1]: done. runs 1 of 6 (5 returned). last activity 2m ago. artifacts: lead/writer/work/2026-10-05-memo.md. case total: 7 runs used: 6 by the user's requests, 1 by your relayed rework 20261029T121913557638-root-5ea7; 24 handed down (contract: 12 per request). The runs of your relayed rework are your own spend, not the user's: report them to the user as yours, and never ask the user to fund them. (task 20261029T121913557638-root-5ea7)
+"Rework memo 2026-10-05: user's corrections" [service weekly-meeting-memo v1]: done. runs 3 of 6 (3 returned). last activity 2m ago. artifacts: lead/writer/work/2026-10-05-memo.md. case total: 7 runs used: 6 by the user's requests, 1 by your relayed rework 20261029T121913557638-root-5ea7; 24 handed down (contract: 12 per request). The runs of your relayed rework are your own spend, not the user's: report them to the user as yours, and never ask the user to fund them. (task 20261029T122228932381-root-6eed)
+"One-page ops action list for the 2026-10-05 meeting": done. runs 3 of 8 (5 returned). last activity 2m ago. artifacts: lead/writer/work/2026-10-05-ops-actions.md. (task 20261029T122710588867-root-c1b8)
+"Memo for the 12 October 2026 meeting" [service weekly-meeting-memo v2]: done. runs 5 of 12 (7 returned). last activity 2m ago. artifacts: lead/writer/work/2026-10-12-memo.md, lead/work/2026-10-12-check.md. (task 20261029T123006918979-root-a9da)
+"One-page ops action list for the 2026-10-12 meeting": done. runs 6 of 8. 0 returned (kept by lead). last activity 2m ago. artifacts: lead/writer/work/2026-10-12-ops-actions.md. (task 20261029T123457206032-root-cabf)
+"Memo for the 19 October 2026 meeting" [service weekly-meeting-memo v2]: done. runs 4 of 12 (10 returned). last activity 2m ago. artifacts: lead/writer/work/2026-10-19-memo.md. case total: 10 runs used of 22 handed down (contract: 12 per request). (task 20261029T124626096325-root-750e)
+"Memo 2026-10-19: user's answers on two dates" [service weekly-meeting-memo v2]: done. runs 3 of 6 (3 returned). last activity 2m ago. artifacts: lead/writer/work/2026-10-19-memo.md. case total: 10 runs used of 22 handed down (contract: 12 per request). (task 20261029T125003917827-root-5858)
+"Memo 2026-10-19: remove the Marta agenda row" [service weekly-meeting-memo v2]: done. runs 3 of 4 (1 returned). last activity 2m ago. artifacts: lead/writer/work/2026-10-19-memo.md. case total: 10 runs used of 22 handed down (contract: 12 per request). (task 20261029T125435379557-root-7468)
+"One-page ops action list for the 2026-10-19 meeting": done. runs 3 of 8 (5 returned). last activity 2m ago. no artifacts. (task 20261029T125747104778-root-4a85)
+"Memo for the 26 October 2026 meeting" [service weekly-meeting-memo v3]: done. runs 3 of 12 (9 returned). last activity 2m ago. artifacts: lead/writer/work/2026-10-26-memo.md. (task 20261029T130102202128-root-c11b)
+"Memo for the 2 November 2026 meeting" [service weekly-meeting-memo v3]: done. runs 3 of 12 (9 returned). last activity 2m ago. artifacts: lead/writer/work/2026-11-02-memo.md. (task 20261029T130435793673-root-f5c0)
+"Memo for the 9 November 2026 meeting" [service weekly-meeting-memo v3]: done. runs 3 of 12 (9 returned). last activity 2m ago. artifacts: lead/writer/work/2026-11-09-memo.md. case total: 6 runs used of 16 handed down (contract: 12 per request). (task 20261029T130759453335-root-5699)
+"Memo 2026-11-09: action items before decisions" [service weekly-meeting-memo v3]: done. runs 3 of 4 (1 returned). last activity 2m ago. artifacts: lead/writer/work/2026-11-09-memo.md. case total: 6 runs used of 16 handed down (contract: 12 per request). (task 20261029T131242430542-root-0f42)
+"Ops action list for the 9 November 2026 meeting" [service ops-action-list v1]: done. runs 3 of 8 (5 returned). last activity 2m ago. artifacts: lead/writer/work/2026-11-09-ops-actions.md. (task 20261029T132116440288-root-b3ec)
+scheduler: stopped (finished: no open tasks)
+
+######## hirearchy --root /tmp/hirearchy-p2/R1-1793275867/org status (/Volumes/workspace/hirearchy)
+root (human): unread 8, delegated 0
+  lead [Manager] idle  budget=0 open=0 delegated=0 unread=0 services: ops-action-list, weekly-meeting-memo
+    writer [Writer] idle  budget=0 open=0 delegated=0 unread=0
+
+scheduler: stopped (finished: no open tasks)
+
+######## hirearchy --root /tmp/hirearchy-p2/R1-1793275867/org health (/Volumes/workspace/hirearchy)
+2 agents, 0 flagged
+lead idle, budget 0/164, runs 42, open 0, done 15 failed 0 blocked 0 rework 0 (+5 by the client), escapes 0 of 13 judged (+3 not its: 3 contract-gap), re-checks after a FAIL 0 (author rework runs 0), runs/task 2.0, empty 1 (+11 failed), last activity 3m ago | branch: runs 59, open 0, done 30, failed 0, blocked 0, rework 1, worst none
+  writer idle, budget 0/42, runs 17, open 0, done 15 failed 0 blocked 0 rework 1 (+3 by the client), escapes 0 of 12 judged (+3 not its: 3 contract-gap), re-checks after a FAIL 0 (author rework runs 0), runs/task 0.9, empty 0 (+3 failed), last activity 4m ago
+

@@ -1,0 +1,26 @@
+{
+  "verdict": "CHANGES_REQUESTED",
+  "findings": [
+    {"id": "F38", "severity": "MEDIUM", "check": 1,
+     "file": "harness/score_p2.py:125-146; protocol.md:972-980, 1336 (against 765 and 1006, the cut rule)",
+     "title": "Iteration 3's new final-memo check (F26) ignores the cut rule. In a cut stream (a cap, a ruling end, the credits stop, a stop) the memo in progress keeps its rejected or unjudged last version as its final file. delivered_check counts its wrong Dues with the trap row included (not L-ASIS), so a TRAP-rejected final always fails, and an unjudged version keeps the rule. gate_p1 then reads FAIL and the exit reads FAIL where 12/12.5 give NOT DETERMINED.",
+     "resolve": "A final memo keeps the rule only when the memo's last judging line is ACCEPT or L-ASIS. When it is a rejection or none: NOT DETERMINED (cut) in a cut stream (end_of), FAIL-CLOSED NOT DETERMINED with no end.txt, FAIL in a retro-2-done stream. Apply the same rule to never-judged versions. Carry it into gate_p1's 'delivered versions (P2's form)'. Write it into 12.3 and 16 item 10. Add score_p2 selfcheck cases (a cut stream with a TRAP-N-rejected final; a cut stream with an unjudged final with a slip; a retro-2-done stream with an accepted final with an extra row: FAIL). Re-run the self-check."},
+    {"id": "F39", "severity": "LOW", "check": 3,
+     "file": "protocol.md:504, 1451; standing-rules-streams.md:32",
+     "title": "K33's new open form 'In the brief's order, one at a time.' assumes a brief; in arm C an either/or order question after K51 and K52 has no row and would end the C stream by ruling",
+     "resolve": "Add an arm-C open form to K33: 'In the order you proposed, one at a time.' (recorded 'K33 (arm C open form)', rule ANSWER), in 16 item 37 and standing rule 6. Text-only."},
+    {"id": "F40", "severity": "LOW", "check": 3,
+     "file": "protocol.md:511-513, 391, 552",
+     "title": "F28's rows mark K40 and K41a as arm R but leave K41's arm unstated. An arm-C offer of a review before L3 (D-RETRO-OFFER includes 'a review') has no row before L0, and in L1 or L2 K41's RETRO-YES conflicts with 4.6's 'L3 carries RETRO-ASK, always'",
+     "resolve": "Write arm C's rule in K40/K41/K41a, 4.6 and 16 item 11. Recommended: an arm-C offer gets the same rows as arm R's, and a RETRO-YES in L1 or L2 is then the arm-C turn; or else every arm-C offer before L3 gets RETRO-NOT-NOW. Record the offer in retro-offers.txt. Text-only."},
+    {"id": "F41", "severity": "LOW", "check": 6,
+     "file": "harness/probe.sh:43-49; harness/setup_stream.sh:62",
+     "title": "zsh resumes a script after a trapped INT or TERM (spot-checked). An interrupted probe run deletes its profile and restores the skill (F34), then runs turn 2 without a profile and goes on to the later sessions, moving the skill aside again. An interrupted arm-C setup completes with the skill restored, so turn 1 stops as H2.",
+     "resolve": "trap 'cleanup; exit 130' INT TERM plus trap 'cleanup' EXIT in probe.sh; trap 'cleanup; exit 4' INT TERM in setup_stream.sh; one selfcheck.sh case with a stub that has the same trap lines and receives TERM."},
+    {"id": "F42", "severity": "LOW", "check": 7,
+     "file": "harness/score_stream.sh; harness/dryrun.sh:274-290; harness/selfcheck.sh",
+     "title": "The gate's new input driver score_stream.sh (F36) never ran in the self-check (dryrun.sh calls the four commands directly; D=$EV/$LABEL rules out a selfcheck label). A bug would show only at step 6, failing closed.",
+     "resolve": "Let score_stream.sh take a selfcheck-* label's folder from P2_EVDIR (as copy_org_evidence.sh does); run it in dryrun.sh in both arms in place of the four direct calls; check score-steps.txt for four exit-0 lines and the --am-time handling."}
+  ],
+  "reviewDoc": "/Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/prereg-review.md"
+}

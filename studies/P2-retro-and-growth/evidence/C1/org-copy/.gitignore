@@ -1,0 +1,8 @@
+.tmp-*
+runs/
+.kiro/
+.runtime/scheduler.pid
+.runtime/events/
+.runtime/running.json
+.runtime/scheduler.log
+.runtime/scheduler.exit

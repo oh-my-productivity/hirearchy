@@ -1,0 +1,28 @@
+ok  a clean stream: every measure PASS or G1(b) VACUOUS: expected ['PASS', 'VACUOUS'], got ['PASS', 'VACUOUS']
+ok  G1(b): the runtime retire in the call of the second related answer: expected PASS, got PASS
+ok  G1(b): a runtime retire minutes after that call: expected FAIL, got FAIL
+ok  G1(b): retire due and no runtime retire: expected FAIL, got FAIL
+ok  G1(b): a runtime retire of an item never due: expected FAIL, got FAIL
+ok  G1(c): rule (b) with one R id: expected FAIL, got FAIL
+ok  G1(c): rule (b) with two human-tier R ids: expected PASS, got PASS
+ok  G1(c): an R id that is no human-tier rejection of the service: expected FAIL, got FAIL
+ok  G1(c): rule (c) with a C id a human link names: expected PASS, got PASS
+ok  G1(f): a pinned-key mismatch: expected FAIL, got FAIL
+ok  G1(f): `since` equal at whole seconds (P1's ruling 1): expected PASS, got PASS
+ok  G1(a): an item kept with a related rejection: expected FAIL, got FAIL
+ok  G1(d) and deliveries by copy: judged.json missing: expected ('NOT', 'NOT'), got ('NOT', 'NOT')
+ok  G1(d): a hit that states the lesson: expected FAIL, got FAIL
+ok  G2(b) and (c): an answer after the service's next request: expected ('FAIL', 'FAIL'), got ('FAIL', 'FAIL')
+ok  G2(b): a human accept of the case before the answer, outside 13.2's exception: expected FAIL, got FAIL
+ok  G2(a): a rejection rule without its own note: expected FAIL, got FAIL
+ok  relayed reworks: the injection's own task is excepted: expected PASS, got PASS
+ok  relayed reworks: one more relayed rework by the assistant: expected FAIL, got FAIL
+ok  relayed reworks: no injection record, one relayed rework: expected FAIL, got FAIL
+ok  hand edits 1 of 3; empty calls 2; a presented version with a wrong date; a delivery by presentation: expected ('FAIL', 'FAIL', 'FAIL', 'FAIL'), got ('FAIL', 'FAIL', 'FAIL', 'FAIL')
+ok  F26: a version presented in turn 1 with a wrong date that Lena rejected in turn 2 (VR-REJECT@2026-10-12) is exempt: expected PASS, got PASS
+ok  C1: a cut stream whose memo-4 final was rejected: score_p2's NOT DETERMINED (cut) is carried, with no FAIL-CLOSED prefix: expected ('NOT DETERMINED', True, False), got ('NOT DETERMINED', True, False)
+ok  C1: the same with no end.txt: NOT DETERMINED (FAIL-CLOSED: ...): expected ('NOT DETERMINED', False, True), got ('NOT DETERMINED', False, True)
+ok  C1: a version presented in the cut turn with a slip and never judged: NOT DETERMINED (cut), not FAIL: expected ('NOT DETERMINED', True, False), got ('NOT DETERMINED', True, False)
+ok  delivered versions: no version scored fails closed: expected NOT, got NOT
+ok  hand edits: no copy at all fails closed: expected NOT, got NOT
+gate_p1 selfcheck: 27 of 27 ok

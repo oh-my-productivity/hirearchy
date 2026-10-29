@@ -1,0 +1,38 @@
+ok  9 of 10 lines read, 1 unread
+ok  trap memos 3 (10-12, 10-19, 11-02)
+ok  passed the trap in 10-26 only: X2 reachable
+ok  F27: the third TRAP rule is memo 5's (turn 17): L0 is the line answering its question (turn 18, K29, `answers TRAP-N@2026-11-02`), not the TRAP line
+ok  F27: L0 = the K30c line answering the third trap rejection (turn 10)
+ok  F27: an answer to another rejection (its facts name TRAP-N@2026-10-19) is not L0; the K30 answer after it is
+ok  F27: no question for the third rejection before its next delivery: L0 = the line judging that delivery (turn 10)
+ok  F27: the answer given as a brief's `answer` item (K47a) is L0
+ok  F27: the third TRAP line with nothing after it: the condition has not held
+ok  F28: RETRO-NOT-NOW at L0 and between retro 1 and retro 2's place (K41a); retro 2 at the line after the week list's LIST-KEEP
+ok  F28: RETRO-YES between the retros is misplaced; the week list's LIST-KEEP with RETRO-YES is retro 2's place
+ok  F28: RETRO-NOT-NOW in L1 (after the condition held, before retro 1) is misplaced
+ok  memo 5's verdict makes the condition
+ok  two memos passed (judged, no TRAP rule): X2 not reached
+ok  F2: memos the stream never reached are not passed (one TRAP memo, nothing after): X2 reachable
+ok  F2: a VR-REJECT with no TRAP rule counts as passed
+ok  the list bounds are LIST-KEEP, ACT-REQ, NEXT and WEEK-LIST lines
+ok  the new rule ids are known
+ok  F26: Lena's verdict on a delivered version: memo 1 in turn 0 rejected (H6); memo 2 in turn 3 rejected, in turn 5 accepted; memo 3 as-is; memo 4 never judged
+ok  an unknown rule is listed
+ok  C3: an arm-C offer before L1 gets RETRO-YES at L1 (the arm-C turn) and no RETRO-ASK at L3; a RETRO-ASK there is misplaced
+ok  C3: no offer: RETRO-ASK at L3 (turn 13), and a RETRO-ASK at L1 is misplaced
+ok  C3: an arm-C offer before L0 gets RETRO-NOT-NOW (K40), and retro 1 then falls back to RETRO-ASK at L3
+ok  C2: the row record `K33 (arm C open form)` reads as one row, K33, with rule ANSWER known
+ok  amendment 1: the row record `K62` reads as one row, K62, rule ANSWER known
+ok  amendment 1: the row record `K62 (yes/no form)` reads as one row, K62, rule ANSWER known
+ok  amendment 1: the row record `K63` reads as one row, K63, rule ANSWER known
+ok  amendment 1: the row record `K63 (yes/no form)` reads as one row, K63, rule ANSWER known
+ok  amendment 1: the row record `K64` reads as one row, K64, rule ANSWER known
+ok  amendment 1: the row record `K64 (yes/no form)` reads as one row, K64, rule ANSWER known
+ok  amendment 1: the row record `K65 (open form)` reads as one row, K65, rule ANSWER known
+ok  amendment 1: the row record `K65 (yes/no form)` reads as one row, K65, rule ANSWER known
+ok  amendment 1: the row record `K66` reads as one row, K66, rule ANSWER known
+ok  amendment 1: the row record `K66 (yes/no form)` reads as one row, K66, rule ANSWER known
+ok  amendment 1: the composed line (EXT-NO + ANSWER, K48 then K62-K66) is read, EXT-NO counted once, and it bounds no one-off window (ACT-REQ at 7 runs to the LIST-KEEP at 10)
+MISMATCH  amendment 1 item 3: ext_no_not_first (KeyError: 'ext_no_not_first')
+ok  amendment 1: K62-K66 are no trap-answer rows (L0 is not moved by an action-list answer after the third TRAP line)
+lena_lines selfcheck: 36 of 37 ok

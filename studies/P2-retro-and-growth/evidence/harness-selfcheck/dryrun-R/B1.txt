@@ -1,0 +1,192 @@
+RETRO BRIEF B1 (since the organization started, 2026-10-29: 11 verdicts of yours on 7 cases)
+What you said:
+- weekly-memo R1: "No, not right yet. Always start the memo with a one-line 'Summary:' of the meeting, then the decisions, then the action…" (C5 added (v2))
+- weekly-memo R2: "Not right yet: Sam's due should be 2026-10-21. Always turn a deadline the notes give in words into its date, counted fr…" (C6 added (v3))
+- weekly-memo R3: "Not right yet: Lee's due should be 2026-10-30." (same as R2)
+- weekly-memo R4: "Not right yet: Sam's due should be 2026-10-30." (same as R2)
+- and 7 accepts
+What got past a check:
+- weekly-memo: lead/writer delivered 20261029T120757800056-root-9524 (no check of the team signed it); you rejected it (R1, C5)
+- weekly-memo: lead/writer delivered 20261029T120757860113-root-c9cb (no check of the team signed it); you rejected it (R2, C6)
+- weekly-memo: lead/writer delivered 20261029T120757930373-root-b504 (no check of the team signed it); you rejected it (R3, C6)
+- weekly-memo: lead/writer delivered 20261029T120758262825-root-f703 (no check of the team signed it); you rejected it (R4, C6)
+Did past changes hold:
+- weekly-memo contract v2 adds C5: not recurred in 7 cases where it was exercised
+- weekly-memo contract v3 adds C6: recurred in case 20261029T120757930373-root-b504 (R3)
+Changes to your organization:
+- agent lead added (2026-10-29): from the plan you approved (2026-10-29)
+- agent lead/writer added (2026-10-29): from the plan you approved (2026-10-29)
+- service lead/weekly-memo added (2026-10-29): from the plan you approved (2026-10-29)
+- Unprompted charter edits: 0
+Questions (one short answer each; any you leave lapse with no change at the next brief):
+1. Make the repeated task "action list for the ops team" a standing service of lead? You asked for it 3 times (2026-10-29). It costs nothing to set up; each request uses up to 11 runs, and is sent only when you ask.
+2. Add a checker to weekly-memo for C6 ("A deadline the notes give in words is turned into its ISO date, counted from th…")? You rejected 3 deliveries on it (2026-10-29). It costs about 2 more runs per request; about 2.0 more runs per request than the rework it saves.
+3. C4 of weekly-memo reads "Decisions and actions use the notes' ow…". It rests on your words "Use the words from the notes.", your answer to "Owners: initials or full names?"; the words decisions, and, actions, own are mine. Does it say what you meant?
+RETRO BRIEF END
+Details (for you; the user need not read them):
+D1 What you said:
+- weekly-memo R1 (case 20261029T120757800056-root-9524, 2026-10-29): "No, not right yet. Always start the memo with a one-line 'Summary:' of the meeting, then the decisions, then the action items." (C5 added (v2))
+- weekly-memo R2 (case 20261029T120757860113-root-c9cb, 2026-10-29): "Not right yet: Sam's due should be 2026-10-21. Always turn a deadline the notes give in words into its date, counted from the meeting's day." (C6 added (v3))
+- weekly-memo R3 (case 20261029T120757930373-root-b504, 2026-10-29): "Not right yet: Lee's due should be 2026-10-30." (same as R2)
+- weekly-memo R4 (case 20261029T120758262825-root-f703, 2026-10-29): "Not right yet: Sam's due should be 2026-10-30." (same as R2)
+- and 7 accepts
+D2 What got past a check:
+- weekly-memo: lead/writer delivered 20261029T120757800056-root-9524 (no check of the team signed it); you rejected it (R1, C5); cause contract-gap
+- weekly-memo: lead/writer delivered 20261029T120757860113-root-c9cb (no check of the team signed it); you rejected it (R2, C6); cause contract-gap
+- weekly-memo: lead/writer delivered 20261029T120757930373-root-b504 (no check of the team signed it); you rejected it (R3, C6); cause reviewer-miss
+- weekly-memo: lead/writer delivered 20261029T120758262825-root-f703 (no check of the team signed it); you rejected it (R4, C6); cause reviewer-miss
+D3 Rejections with no criterion yet:
+- none
+D4 Alarms and causes to settle:
+- weekly-memo: repeat alarm fires: R2 in 3 of 3 judged cases; C6 in 3 of 3 judged cases
+D5 Work you ask for again and again:
+- lead: "Action list for the ops team (2026-10-05)" and 2 more (20261029T120757850378-root-ed57, 20261029T120757916711-root-8082, 20261029T120758245555-root-635c), joined by their titles: 3 of 3 with your verdict
+D6 Idle or stranded agents:
+- none
+D7 Did past changes hold:
+- weekly-memo contract v2 adds C5: not recurred in 7 cases where it was exercised
+- weekly-memo contract v3 adds C6: recurred in case 20261029T120757930373-root-b504 (R3)
+D8 Changes to your organization:
+- agent lead added (2026-10-29): from the plan you approved (2026-10-29)
+- agent lead/writer added (2026-10-29): from the plan you approved (2026-10-29)
+- service lead/weekly-memo added (2026-10-29): from the plan you approved (2026-10-29)
+- Unprompted charter edits since 2026-10-29: 0
+D9 Criteria and your words:
+- weekly-memo C1 "One memo per notes file, at most 400 words.": my default: you did not say this; exercised in 8 judged cases, 4 accepted
+- weekly-memo C2 "The memo lists every decision and every commitment in the notes, informal ones…": my default: you did not say this; exercised in 8 judged cases, 4 accepted
+- weekly-memo C3 "The action items are a table Owner | Action | Due, with ISO dates and 'none' if…": from your words "with the action items as a table with columns Owner | Action | Due (ISO dates, 'none' if there's no date)"; words I added: are, and; exercised in 8 judged cases, 4 accepted
+- weekly-memo C4 "Decisions and actions use the notes' own words.": from your words "Use the words from the notes." (my question: "Owners: initials or full names?"); words I added: decisions, and, actions, own; exercised in 8 judged cases, 4 accepted
+- weekly-memo C5 "The memo starts with a one-line 'Summary:', then the decisions, then the action…": from your words "Yes, add it." (your answer about C1); words I added: the, memo, starts, with, a, one, -, line, +5 more; exercised in 7 judged cases, 4 accepted
+- weekly-memo C6 "A deadline the notes give in words is turned into its ISO date, counted from th…": from your words "Yes, add it." (your answer about C3); words I added: a, deadline, the, notes, give, in, words, is, +10 more; exercised in 5 judged cases, 3 accepted
+D10 Your team's own proposals:
+- Refusals since 2026-10-29: 0
+- events before 2026-10-29 have expired (events_keep_days)
+D11 Playbooks:
+- weekly-memo: 212 of 1000 words; items: 7 kept
+D12 Spend:
+- approved = root's hand-downs (the user's own approvals are not recorded; F-P1-10)
+- weekly-memo: 4 cases, 27 runs used against 12 approved per request; 0 cases above it
+D13 The last brief:
+- no earlier brief
+D14 Held back:
+- clarify clarify|weekly-memo|C5|thememostartswithaonelinesummarythenthed (weight 0)
+- clarify clarify|weekly-memo|C6|adeadlinethenotesgiveinwordsisturnedinto (weight 0)
+Items:
+1. service (rung 2 of 7, adjust the standard: a one-off task has no contract to clarify (rung 1); a standing service gives these tasks one contract and lets the client's verdicts improve it)
+   Evidence: 20261029T120757850378-root-ed57, 20261029T120757916711-root-8082, 20261029T120758245555-root-635c
+   Cost: up to 11 runs per request
+   Objection test (refuse it if it spends beyond the plan or lowers a criterion): spends within the plan: no run until you ask; lowers no criterion: the service's checks are the ones your tasks had
+   On yes: propose_org(blueprint=<the blueprint of this item>, extend="current")
+   {
+     "reason": "B1.1: 3 one-off tasks of one shape",
+     "extend": {
+       "add_services": [
+         {
+           "owner": "lead",
+           "name": "action-list-for",
+           "description": "Make a one-page action list from the notes of 2026-10-05 for the ops team.",
+           "inputs": [
+             {
+               "name": "request",
+               "description": "what this request is about",
+               "required": true
+             }
+           ],
+           "acceptance": [
+             {
+               "text": "Each action with its owner and due date; at most one page.",
+               "from_tasks": [
+                 "20261029T120757850378-root-ed57",
+                 "20261029T120757916711-root-8082",
+                 "20261029T120758245555-root-635c"
+               ]
+             }
+           ],
+           "deliverable": {
+             "description": "<ASK THE USER: what one request produces>",
+             "path": "<ASK THE USER: where it goes>"
+           },
+           "budget": 11
+         }
+       ]
+     }
+   }
+   Revert: propose_org(blueprint=<the revert blueprint of this item>, extend="current"): it retires the service and keeps its record (defining it again continues it)
+   {
+     "reason": "revert of B1.1",
+     "extend": {
+       "retire_services": [
+         {
+           "owner": "lead",
+           "service": "action-list-for",
+           "reason": "revert of B1.1"
+         }
+       ]
+     }
+   }
+2. checker-add (rung 4 of 7, add a checker or integrator: no check of the team signed these deliveries, so there is no check to instruct (rung 2); more workers do not catch a defect (rung 3))
+   Evidence: 20261029T120757860113-root-c9cb, 20261029T120757930373-root-b504, 20261029T120758262825-root-f703
+   Cost: about 2 runs per request
+   Objection test (refuse it if it spends beyond the plan or lowers a criterion): spends about 2 runs per request beyond the plan: the change's PLAN FOR YOU shows the new budget, and you approve it there; lowers no criterion
+   On yes: propose_org(blueprint=<the blueprint of this item>, extend="current")
+   {
+     "reason": "B1.2: 3 cases failed C6",
+     "extend": {
+       "add_agents": [
+         {
+           "parent": "lead",
+           "name": "c6-checker",
+           "template": "reviewer",
+           "charter_extra": "Check C6 of weekly-memo on every request: A deadline the notes give in words is turned into its ISO date, counted from the meeting's day.. Report criteria met n of m like every check."
+         }
+       ],
+       "limits": [
+         {
+           "agent": "lead",
+           "max_children": 2
+         }
+       ],
+       "budgets": [
+         {
+           "owner": "lead",
+           "service": "weekly-memo",
+           "budget": 14
+         }
+       ]
+     }
+   }
+   Revert: propose_org(blueprint=<the revert blueprint of this item>, extend="current"): it retires the checker and puts the limits and the budget back
+   {
+     "reason": "revert of B1.2",
+     "extend": {
+       "retire": [
+         {
+           "agent": "lead/c6-checker",
+           "reason": "revert of B1.2"
+         }
+       ],
+       "budgets": [
+         {
+           "owner": "lead",
+           "service": "weekly-memo",
+           "budget": 12
+         }
+       ],
+       "limits": [
+         {
+           "agent": "lead",
+           "max_children": 1
+         }
+       ]
+     }
+   }
+   Note: net -2.0 = 0.8 × 3 − 2 − 0.8 × 3, from 3 of 4 cases
+   Note: lead holds no read, so the checker can check only what the team's reports quote to it
+3. clarify (rung 1 of 7, clarify: no rejection names it, so nothing else will ever show it again)
+   Evidence: weekly-memo/C4
+   Cost: no run
+   Objection test (refuse it if it spends beyond the plan or lowers a criterion): spends nothing; lowers no criterion (a no leads to your own wording, recorded with your words)
+   On yes: nothing to record: keep it
+   Revert: the same call back
+   Note: On no: ask what they meant, then define_service(owner, name, remove_acceptance=["C4"], add_acceptance=[<their wording>], words=<their answer, verbatim>)
+Next: show the block from "RETRO BRIEF" to "RETRO BRIEF END" to the user exactly as written. Ask nothing else about it. For each item they answer yes, make its call (an extension: propose_org(..., extend="current"), show its PLAN FOR YOU, apply only after their approval; one item at a time). Record nothing for a no. Never add an item of your own.

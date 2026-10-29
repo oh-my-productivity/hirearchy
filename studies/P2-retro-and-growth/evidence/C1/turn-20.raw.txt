@@ -1,0 +1,18 @@
+The memo for 9 November is at `/private/tmp/hirearchy-p2/C1-1793280632/deliverables/memo-2026-11-09.md`. Sam's date stays 2026-11-13, so the team's version needed no change. I copied it as is and the two files are identical.
+
+- **C1 (only that meeting):** met.
+- **C2 (400 words or fewer):** met, 172 by `wc`.
+- **C3 (Decisions section):** met, 3 of 3.
+- **C4 (Actions table):** met, 5 of 5.
+- **C5 (ISO dates, "none" if no date):** met. Marta is 2026-11-11, Dev 2026-11-20, Priya 2026-11-16 and Sam 2026-11-13. Lee is "none" because the notes give no date.
+- **C6 (names not on the attendee list):** met. Jo is marked in both places.
+- **C7 (nothing beyond the notes):** met.
+- **C8 (lead's coverage check):** met, 8 of 8.
+- **C9 (Summary line first):** met.
+- **C10 (no "nobody has to act" lines):** met.
+
+The memo used 3 of the 12 planned runs, and 9 came back.
+
+That's all six meetings in `notes` done. The `deliverables` folder has memos for 5, 12, 19 and 26 October and 2 and 9 November, plus ops action lists for 5, 12 and 19 October. The stray rework from earlier is still unexplained. It stays logged as mine, not yours.
+
+Keep it, or what should change? I haven't recorded a verdict on this memo yet.

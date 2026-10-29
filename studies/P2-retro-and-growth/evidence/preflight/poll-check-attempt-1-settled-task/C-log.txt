@@ -1,0 +1,9 @@
+## POLL CHECK (protocol 4.14; progress(task_id) only), script md5 51384711db3354da7157e386662eff6e, org /private/tmp/hirearchy-p2/preflight-C-1793268897/org, task 20261029T101457986640-root-96c6, max 120s, 2026-10-29T10:16:04Z (local 10:16:04 WET)
+--- progress at 2026-10-29T10:16:04Z (local 10:16:04 WET) -> reply at 2026-10-29T10:16:04Z (local 10:16:04 WET)
+args: {"task_id": "20261029T101457986640-root-96c6", "wait_seconds": 119}
+reply:
+Nothing to wait for: no listed task is being worked on right now.
+"Say hello": done. runs 1 of 2 (1 returned). last activity 25s ago. no artifacts. (task 20261029T101457986640-root-96c6)
+scheduler: stopped (finished: no open tasks)
+poll 1: reply after 0.0s; settled
+polling ended (settled: the task's line shows done, failed or blocked, and the scheduler has stopped): progress(task_id) polls 1, quick replies 0, paused 0.0s in all

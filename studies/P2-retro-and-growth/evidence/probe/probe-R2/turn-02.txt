@@ -1,0 +1,18 @@
+######## TURN 2  start 10:30:42  end 10:31:04  elapsed 22s  (local, 2026-10-29; UTC wall-clock start 2026-10-29T10:30:42Z end 2026-10-29T10:31:04Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Now run the hirearchy services tool and show me its reply.
+
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-02.stderr.txt):
+The `services` call returned this:
+
+```
+Services you can request (from your direct reports):
+- probe-memo (offered by lead; contract v1, playbook v0): One short memo from one notes file
+  inputs: notes_file* (the notes file)   (* required)
+  each request: 12 runs; acceptance criteria (lead/services/probe-memo/SERVICE.md):
+    C1: At most 400 words.
+  record: no requests yet
+  playbook: none yet
+```
+
+I called it before loading its schema, so the first attempt ran without the load step. The result is still the real reply.

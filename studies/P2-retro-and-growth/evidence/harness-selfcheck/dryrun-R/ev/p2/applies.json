@@ -1,0 +1,156 @@
+[
+ {
+  "t": "2026-10-29T12:07:57+00:00",
+  "ok": true,
+  "change": null,
+  "plan_id": "terminal",
+  "approved": true,
+  "blueprint": {
+   "mission": "Every week, turn the user's meeting notes into a short memo of decisions and action items.",
+   "needs": {
+    "kind": "writing",
+    "inputs": [
+     "/private/tmp/hirearchy-p2/selfcheck-R-1793275673/notes"
+    ],
+    "budget_runs": 12,
+    "review": false,
+    "elicitation": "Thanks! The file name each time is fine. Format: a markdown memo, at most 400 words, with the action items as a table with columns Owner | Action | Due (ISO dates, 'none' if there's no date). The rest of your defaults are fine, the deliverables folder too. Please keep it cheap, but I need it right - about 12 runs per memo. No separate reviewer: the lead checks. Use the words from the notes."
+   },
+   "agents": [
+    {
+     "name": "lead",
+     "template": "manager",
+     "children": [
+      {
+       "name": "writer",
+       "template": "writer"
+      }
+     ]
+    }
+   ],
+   "services": [
+    {
+     "name": "weekly-memo",
+     "owner": "lead",
+     "description": "One memo of decisions and action items from one meeting's notes file.",
+     "inputs": [
+      {
+       "name": "notes_file",
+       "description": "the notes file name, e.g. 2026-10-05.md",
+       "required": true
+      }
+     ],
+     "acceptance": [
+      {
+       "text": "One memo per notes file, at most 400 words.",
+       "default": true
+      },
+      {
+       "text": "The memo lists every decision and every commitment in the notes, informal ones included.",
+       "default": true
+      },
+      {
+       "text": "The action items are a table Owner | Action | Due, with ISO dates and 'none' if there's no date.",
+       "from": "with the action items as a table with columns Owner | Action | Due (ISO dates, 'none' if there's no date)"
+      },
+      {
+       "text": "Decisions and actions use the notes' own words.",
+       "from": "Use the words from the notes.",
+       "asked": "Owners: initials or full names?"
+      }
+     ],
+     "deliverable": {
+      "description": "one markdown memo",
+      "format": "markdown",
+      "path": "/private/tmp/hirearchy-p2/selfcheck-R-1793275673/deliverables"
+     },
+     "budget": 12
+    }
+   ]
+  },
+  "extend": false,
+  "proposal": "# Plan for approval\n\nGoal: Every week, turn the user's meeting notes into a short memo of decisions and action items.\n\nNeeds as understood:\n- Scope: (not specified)\n- Deliverable: per service (see Services below)\n- Quality bar: (not specified)\n- Sources / tools: (not specified)\n- Workspace: none (no agent writes files or runs commands)\n- Model policy: (not specified)\n- Review: not required\n\nOrganization (2 agents):\n- lead [manager] Manager: model=claude-sonnet-5.5, tools=none\n  Access: read-only inputs (hirearchy read): /private/tmp/hirearchy-p2/selfcheck-R-1793275673/notes\n  - writer [writer] Writer: model=claude-sonnet-5.5, tools=none\n    Access: read-only inputs (hirearchy read): /private/tmp/hirearchy-p2/selfcheck-R-1793275673/notes\n\nBudget per request (your cap: 12), estimate 8 for one pass + one review/rework cycle, 11 with one round of your questions or a rejection:\n  A ceiling: runs the team does not spend come back automatically with the final report of each request.\n  service weekly-memo: 12 runs per request\n    lead: starts with 12, hands down writer 3 (each includes its rework/re-check run), keeps 9 (own 5 + slack 4)\n    lead/writer: 3 runs (2 work + 1 rework)\n\nReview / verification:\n- no independent reviewer (review not requested)\n- the assistant re-checks the final deliverable against every acceptance criterion before telling you it is done\n\nDeliverable:\n- per service (see Services below)\n\nServices (1), offered by lead and defined by root (the contract: only root can change it):\n- weekly-memo: One memo of decisions and action items from one meeting's notes file.\n  inputs: notes_file (required)\n  budget: 12 runs per request\n  deliverable: one markdown memo [markdown]; delivered to: /private/tmp/hirearchy-p2/selfcheck-R-1793275673/deliverables (I copy each result there after checking it)\n  acceptance (the contract, travels with every request):\n    1. One memo per notes file, at most 400 words.\n       my default: you did not say this\n    2. The memo lists every decision and every commitment in the notes, informal ones included.\n       my default: you did not say this\n    3. The action items are a table Owner | Action | Due, with ISO dates and 'none' if there's no date.\n       from your words \"with the action items as a table with columns Owner | Action | Due (ISO dates, 'none' if there's no date)\"; words I added: are, and\n    4. Decisions and actions use the notes' own words.\n       from your words \"Use the words from the notes.\" (my question: \"Owners: initials or full names?\"); words I added: decisions, and, actions, own\n  playbook v1: generated from the team (steps, budget plan):\n    ## Steps\n    1. Read the request in your prompt: its inputs, every acceptance criterion and the deliverable. The criteria come from the contract and can only be met, never changed; copy the relevant ones verbatim into every task you delegate.\n    2. Delegate to `writer` (Writer) with `budget=3`: its part of the request, with the criteria it must meet.\n    3. Read the final artifact yourself and check it against EVERY criterion of the request, quoting counts from your own `read` output.\n    4. Report: `done` only if every criterion is met (else `blocked` with the deviation and a recommended decision). Name the deliverable's path (the assistant copies it to /private/tmp/hirearchy-p2/selfcheck-R-1793275673/deliverables) and pass `lessons` as an after-action review: Expected / Happened / Caught at / Cause / Prevent (the system cause, not a person), or Near miss when nothing went wrong.\n    \n    ## Budget plan\n    Request budget: 12 runs (the contract's). Hand down no more than this up front, each with `budget=` set explicitly:\n    - writer: 3 runs (2 work + 1 rework or re-check)\n    - you (lead): keep 9 runs: your own 5 (plan, process each result, final check, report, one rework cycle) and 4 of slack.\n    Unspent runs return to your parent with your final report.\nAfter each request the lead records lessons; before the next one it reviews them with your feedback and may improve how the team works (its playbook). It cannot change these checks: only you can, through me.\nNo first task: nothing runs until you ask for a request (request(service, inputs), then start()).\n\nCheckpoints:\n- Approval: plan approval before anything is built or started (default)\n- Progress: one line on request (default)\n- Any spend beyond the budget needs your OK.\n\nWarnings (4):\n- services[weekly-memo].deliverable.path: no agent can write to /private/tmp/hirearchy-p2/selfcheck-R-1793275673/deliverables (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)\n- needs.scope: not elicited: what is in and out of scope\n- needs.approval: not elicited: when the user wants to approve (plan, before start, final)\n- needs.progress: not elicited: how the user wants progress updates\n\nReply 'approve' or tell me what to change.\n",
+  "result": "created 2 agents: lead, lead/writer\ndefined 1 service(s) of lead: weekly-memo (contract and playbook v1)\nno task was given: the services are ready and nothing runs yet. To use one: request(service, inputs) (or `hirearchy request SERVICE --input key=value`), then start()\nwarning: services[weekly-memo].deliverable.path: no agent can write to /private/tmp/hirearchy-p2/selfcheck-R-1793275673/deliverables (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)\nwarning: needs.scope: not elicited: what is in and out of scope\nwarning: needs.approval: not elicited: when the user wants to approve (plan, before start, final)\nwarning: needs.progress: not elicited: how the user wants progress updates\norg: /private/tmp/hirearchy-p2/selfcheck-R-1793275673/org\n"
+ },
+ {
+  "t": "2026-10-29T12:08:55.117440+00:00",
+  "ok": true,
+  "change": "bc5deaa8032b",
+  "plan_id": "bc5deaa8032b",
+  "approved": true,
+  "blueprint": {
+   "reason": "B1.1: 3 one-off tasks of one shape",
+   "extend": {
+    "add_services": [
+     {
+      "owner": "lead",
+      "name": "action-list-for",
+      "description": "Make a one-page action list from the notes of 2026-10-05 for the ops team.",
+      "inputs": [
+       {
+        "name": "request",
+        "description": "what this request is about",
+        "required": true
+       }
+      ],
+      "acceptance": [
+       {
+        "text": "Each action with its owner and due date; at most one page.",
+        "from_tasks": [
+         "20261029T120757850378-root-ed57",
+         "20261029T120757916711-root-8082",
+         "20261029T120758245555-root-635c"
+        ]
+       }
+      ],
+      "deliverable": {
+       "description": "One action list per request",
+       "format": "markdown",
+       "path": "/tmp/hirearchy-p2/selfcheck-R-1793275673/deliverables"
+      },
+      "budget": 11
+     }
+    ]
+   }
+  },
+  "extend": true,
+  "proposal": "PLAN FOR YOU (a change to your organization)\nWhy: B1.1: 3 one-off tasks of one shape\nYour organization now: 2 agents, 1 service(s): weekly-memo.\nAdds:\n- service action-list-for of lead: Make a one-page action list from the notes of 2026-10-05 for the ops team.\n  You provide: request (required). Each request: up to 11 runs, sent only when you ask.\n  Checks:\n    1. Each action with its owner and due date; at most one page.\n       my wording, from the one-off tasks I sent for you (2026-10-29); you accepted those deliveries\n  Delivered to: /tmp/hirearchy-p2/selfcheck-R-1793275673/deliverables (I copy each result there after checking it)\nBudget: action-list-for of lead: up to 11 runs per request; nothing else changes what a request costs.\nUnchanged: 2 agents and 1 service(s), their charters, contracts and playbooks.\nNothing changes until you approve. Reply 'approve', or tell me what to change.\n\nExtension: B1.1: 3 one-off tasks of one shape\nPlan id: bc5deaa8032b\nAdded service action-list-for of lead: 11 runs per request; criteria 1\nFingerprint of the organization it touches: {\"agents\":{\"lead\":{\"body\":\"cc604a3eec0fabe9bbb3800924b0e5d363a416af56536fb181d81241d48bf388\",\"can_hire\":true,\"inputs\":[\"/private/tmp/hirearchy-p2/selfcheck-R-1793275673/notes\"],\"kind\":\"manager\",\"max_children\":1,\"model\":\"claude-sonnet-5.5\",\"reports\":[\"lead/writer\"],\"tools\":[],\"workspace\":null}},\"free\":{},\"max_depth\":4,\"services\":{\"lead/action-list-for\":null}}\nwarning: extend.add_services[0].deliverable.path: no agent can write to /private/tmp/hirearchy-p2/selfcheck-R-1793275673/deliverables (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)\n",
+  "result": "org: /private/tmp/hirearchy-p2/selfcheck-R-1793275673/org\napplied the change bc5deaa8032b to /private/tmp/hirearchy-p2/selfcheck-R-1793275673/org\ndefined 1 service(s): action-list-for of lead (contract and playbook)\nwarning: extend.add_services[0].deliverable.path: no agent can write to /private/tmp/hirearchy-p2/selfcheck-R-1793275673/deliverables (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)\nNothing runs yet: the services are ready. When the user asks for one, call request(service, inputs) (see services()), then start() if the scheduler is not running.\n"
+ },
+ {
+  "t": "2026-10-29T12:08:55.609261+00:00",
+  "ok": true,
+  "change": "e5fff0b87338",
+  "plan_id": "e5fff0b87338",
+  "approved": true,
+  "blueprint": {
+   "reason": "B1.2: 3 cases failed C6",
+   "extend": {
+    "add_agents": [
+     {
+      "parent": "lead",
+      "name": "c6-checker",
+      "template": "reviewer",
+      "charter_extra": "Check C6 of weekly-memo on every request: A deadline the notes give in words is turned into its ISO date, counted from the meeting's day.. Report criteria met n of m like every check."
+     }
+    ],
+    "limits": [
+     {
+      "agent": "lead",
+      "max_children": 2
+     }
+    ],
+    "budgets": [
+     {
+      "owner": "lead",
+      "service": "weekly-memo",
+      "budget": 14
+     }
+    ]
+   }
+  },
+  "extend": true,
+  "proposal": "PLAN FOR YOU (a change to your organization)\nWhy: B1.2: 3 cases failed C6\nYour organization now: 2 agents, 2 service(s): action-list-for, weekly-memo.\nAdds:\n- lead/c6-checker (Independent Reviewer, model claude-sonnet-5.5, reports to lead): can read /private/tmp/hirearchy-p2/selfcheck-R-1793275673/notes through the organization's read tool; cannot change your files\nChanges:\n- lead: may have up to 2 direct reports (was 1)\n- the charter of lead gets the line: \"lead/c6-checker (Independent Reviewer) was added to your team to check action-list-for, weekly-memo: Check C6 of weekly-memo on every request: A deadline the notes give in words is turned into its ISO date, counted from the meeting's day..\"\n- lead is told that lead/c6-checker joined its team (one run of lead when it next runs)\n- weekly-memo of lead: up to 14 runs per request (was 12)\nBudget: weekly-memo of lead: up to 14 runs per request (was 12); nothing else changes what a request costs.\nUnchanged: 1 agents and 1 service(s), their charters, contracts and playbooks.\nNothing changes until you approve. Reply 'approve', or tell me what to change.\n\nExtension: B1.2: 3 cases failed C6\nPlan id: e5fff0b87338\nAdded agent lead/c6-checker: role Independent Reviewer; kind verifier; model claude-sonnet-5.5; tools none; workspace none; inputs /private/tmp/hirearchy-p2/selfcheck-R-1793275673/notes; can_hire False; max_children 0\nCharter of lead/c6-checker:\n## Purpose\nGive an independent verdict on whether the deliverable meets every acceptance criterion and the quality bar. You did not write it.\n\n## Responsibilities\n- `read` the deliverable (read-only) by its path, from the workspace or inputs you were given; start the review with the files you opened (path and word count as `read` shows it) and any you could not open. If you cannot open the deliverable, report `blocked`; never review text pasted into a task as if it were the file. Take the acceptance criteria one by one, splitting criteria that bundle several requirements (numbers, format, sections, path, citations) into their parts. Do not skip a criterion.\n- Enumerate independently before you compare. When the deliverable is derived from a source (notes, data, documents, a spec), first build your OWN list of the items the criteria are about, from the source itself: every decision and every commitment, including informal or unlabelled ones buried in prose (\"X said she'd ...\", \"we agreed Y would ...\"). Write that list into your review before you compare, then compare the deliverable against it item by item. A criterion like \"one row for every action item\" is checked against your list, never against the author's selection. If you are unsure whether an item counts, list it as `ambiguous` and report it; never exclude it silently. An item that fits a criterion's words but not its evident purpose (nothing for anyone to do, a restatement, a status) is `ambiguous`: list it, never decide it. If you cannot open the source, the criterion is `not verifiable`.\n- Check against the artifact itself, not against the author's report or summary. Counts come from `read` (word count), not from an estimate; quote the text that proves each part.\n- Write a review in your own `work/`: one line per criterion with `met`, `not met` or `not verifiable` and the evidence (quote, count, path). A criterion you cannot verify is not met. A deviation is not met, even if the author disclosed it.\n- Add a REQUIRED CHANGES list with the exact text to change, ordered by severity.\n- Report to your manager with the path of the review, \"criteria met: n of m\" and the overall verdict (pass only if n = m).\n- A figure or fact in the deliverable is checked together with its label or subject against the file or output that has it, not by finding the number somewhere.\n- If the work contains factual claims you were not asked to check, say so in the review; a reviewer's pass is not a fact-check.\n\n## You never edit the deliverable\nYou write only in your own directory. Do not modify, overwrite or \"apply fixes to\" the author's file. Fixes reach the author through your manager's rework task.\n\n## Decision rights\nThe verdict per criterion and which changes are required versus optional.\n\n## Escalation\nA criterion that is ambiguous or contradicts another: report `blocked` and say which.\n\n## Quality bar\nSpecific and checkable: quote the text, give the count, name the criterion. No general praise.\n\n## Budget discipline\nOne focused run. Re-review only if your manager sends the revised file back; then re-check every criterion that was not met plus anything that changed.\n\n## Assignment (from the user's change e5fff0b87338)\nReports to: lead\nRead-only inputs: /private/tmp/hirearchy-p2/selfcheck-R-1793275673/notes. Read them (kiro `read`, or hirearchy `read` by absolute path); never create, edit or delete anything there.\n\n## Additional instructions\nCheck C6 of weekly-memo on every request: A deadline the notes give in words is turned into its ISO date, counted from the meeting's day.. Report criteria met n of m like every check.\nLimit lead: max_children 1 -> 2\nFingerprint of the organization it touches: {\"agents\":{\"lead\":{\"body\":\"cc604a3eec0fabe9bbb3800924b0e5d363a416af56536fb181d81241d48bf388\",\"can_hire\":true,\"inputs\":[\"/private/tmp/hirearchy-p2/selfcheck-R-1793275673/notes\"],\"kind\":\"manager\",\"max_children\":1,\"model\":\"claude-sonnet-5.5\",\"reports\":[\"lead/writer\"],\"tools\":[],\"workspace\":null}},\"free\":{\"lead/c6-checker\":true},\"max_depth\":4,\"services\":{\"lead/action-list-for\":{\"budget\":11,\"playbook\":1,\"version\":1},\"lead/weekly-memo\":{\"budget\":12,\"playbook\":1,\"version\":3}}}\n",
+  "result": "org: /private/tmp/hirearchy-p2/selfcheck-R-1793275673/org\napplied the change e5fff0b87338 to /private/tmp/hirearchy-p2/selfcheck-R-1793275673/org\nadded 1 agent(s): lead/c6-checker\nchanged limits: lead\ncharter lines: 1 added, 0 taken out\nbudget of weekly-memo of lead: 12 -> 14 runs per request\nNothing runs because of it.\n"
+ }
+]

@@ -1,0 +1,4 @@
+{
+ "reason": "{\"edits\": 0, \"changes\": [{\"date\": \"2026-10-29\", \"id\": \"fa962d655366\", \"item\": null, \"kind\": \"service added\", \"label\": \"change\", \"subject\": \"lead/ops-action-list\"}], \"week\": [{\"from\": \"2026-10-29T13:19:52+00:00\", \"one_off\": [], \"service\": [\"ops-action-list: 20261029T132116440288-root-b3ec\"], \"tasks\": [\"20261029T132116440288-root-b3ec\"], \"to_turn\": 26, \"turn\": 24}]}",
+ "verdict": "REPORTED"
+}

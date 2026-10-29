@@ -1,0 +1,24 @@
+{
+ "arm": "C",
+ "session": "/Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/probe/probe-C1/session-messages.jsonl",
+ "disclosed": 1,
+ "rows": [
+  {
+   "n": 1,
+   "md5": "fa4d4edb999f7c985e8d28db686ce334",
+   "arm_body": true,
+   "other_body": false,
+   "distinct_R_lines": [
+    false,
+    false
+   ],
+   "ok": true
+  }
+ ],
+ "verdict": "PROVED",
+ "reasons": [],
+ "body_md5": {
+  "R": "aac2542d1fee2221a650c3beb7de986d",
+  "C": "f6cc64cd11d3ba8b4390a216dd654bd6"
+ }
+}

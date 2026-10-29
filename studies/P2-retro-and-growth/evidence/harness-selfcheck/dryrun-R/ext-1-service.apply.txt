@@ -1,0 +1,5 @@
+org: /private/tmp/hirearchy-p2/selfcheck-R-1793275673/org
+applied the change bc5deaa8032b to /private/tmp/hirearchy-p2/selfcheck-R-1793275673/org
+defined 1 service(s): action-list-for of lead (contract and playbook)
+warning: extend.add_services[0].deliverable.path: no agent can write to /private/tmp/hirearchy-p2/selfcheck-R-1793275673/deliverables (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)
+Nothing runs yet: the services are ready. When the user asks for one, call request(service, inputs) (see services()), then start() if the scheduler is not running.

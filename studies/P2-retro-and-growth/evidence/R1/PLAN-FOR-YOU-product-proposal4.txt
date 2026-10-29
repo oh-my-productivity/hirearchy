@@ -1,0 +1,48 @@
+# propose_org call 4 at 2026-10-29T13:17:40.147Z; result at 2026-10-29T13:17:40.147Z
+
+Target organization: /private/tmp/hirearchy-p2/R1-1793275867/org (exists, 2 agent(s) besides root; this plan changes it)
+
+Show the block below to the user exactly as written, from its first line up to (not including) the marker line; one plain-words intro line before it is fine.
+
+PLAN FOR YOU (a change to your organization)
+Why: Retro item 1, the user said yes to making the one-page ops action list a standing service
+Your organization now: 2 agents, 1 service(s): weekly-meeting-memo.
+Adds:
+- service ops-action-list of lead: One one-page action list (table of owner, action, due date) for the ops team from one meeting notes file.
+  You provide: notes_file (required). Each request: up to 8 runs, sent only when you ask.
+  Checks:
+    1. The deliverable is markdown, has at most 350 words as counted by read (this is the one-page limit), and a title line naming the meeting date.
+       from your words "at most one page" (my question: "How should one page be measured?"); words I added: the, deliverable, is, markdown, has, 350, words, as, +13 more
+    2. It contains one markdown table with exactly the columns Owner | Action | Due, and no other sections (no decisions, no summary).
+       my wording, from the one-off tasks I sent for you (2026-10-29); you accepted those deliveries
+    3. Every action item in the named notes file is a row, including those stated in prose, and no row is added that is not an action item in the notes; a statement that something stays as it is, where nobody has to do anything, gets no row.
+       from your words "Every action item in those notes." (my question: "Which actions should the list include?"); words I added: named, file, is, a, row, including, stated, prose, +18 more
+    4. Each Due value is an ISO date (YYYY-MM-DD) or 'none'. A relative deadline such as 'by Friday' is turned into a date only when the notes make the date clear; if the notes give no date, Due is 'none'.
+       from your words "turn vague deadlines into a date when the notes make it clear" (my question: "How to treat relative or vague dates?"); words I added: each, due, value, is, an, iso, yyyy, -, +13 more
+    5. Each Owner value uses the name exactly as written in the notes.
+       my wording, from the one-off tasks I sent for you (2026-10-29); you accepted those deliveries
+    6. Rows are ordered by Due ascending with 'none' last, ties in the order of the notes.
+       my wording, from the one-off tasks I sent for you (2026-10-29); you accepted those deliveries
+    7. Every statement is traceable to the named notes file; nothing is invented.
+       my default: you did not say this
+    8. The lead's report states that every table row was compared with the notes file, with the count verified (n of m, n = m).
+       my wording, from the one-off tasks I sent for you (2026-10-29); you accepted those deliveries
+  Delivered to: /private/tmp/hirearchy-p2/R1-1793275867/deliverables (I copy each result there after checking it)
+Budget: ops-action-list of lead: up to 8 runs per request; nothing else changes what a request costs.
+Unchanged: 2 agents and 1 service(s), their charters, contracts and playbooks.
+Warnings (1):
+- 8 runs per request covers one pass and one internal rework (the estimate is 8), not a round of your questions or a rejection, which takes about 3 more (1, plus 2 for each agent below lead): 11 per request covers one such round
+Nothing changes until you approve. Reply 'approve', or tell me what to change.
+
+--- machine marker: the user block ends above; do not show this line or anything below it ---
+
+Details (the full plan, for you; the user need not read it):
+Extension: Retro item 1, the user said yes to making the one-page ops action list a standing service
+Plan id: fa962d655366
+Added service ops-action-list of lead: 8 runs per request; criteria 8
+Fingerprint of the organization it touches: {"agents":{"lead":{"body":"bc1b24838c727a24b46c08440fb4c847163eef1f400ce4a234a11f414a9594dd","can_hire":true,"inputs":["/private/tmp/hirearchy-p2/R1-1793275867/notes"],"kind":"manager","max_children":1,"model":"claude-sonnet-5.5","reports":["lead/writer"],"tools":[],"workspace":null}},"free":{},"max_depth":4,"services":{"lead/ops-action-list":null}}
+warning: extend.add_services[0].deliverable.path: no agent can write to /private/tmp/hirearchy-p2/R1-1793275867/deliverables (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)
+warning: extend.add_services[0].budget: 8 runs per request covers one pass and one internal rework (the estimate is 8), not a round of your questions or a rejection, which takes about 3 more (1, plus 2 for each agent below lead): 11 per request covers one such round
+
+plan_id: fa962d655366
+Next: show the PLAN FOR YOU block above to the user exactly as written (a plain-words intro line before it is fine) and wait for their explicit approval. Then apply_org(blueprint=<this exact YAML>, approved=True, plan_id="fa962d655366"). If you change the blueprint, or anything it names changes in the organization, call propose_org(blueprint, extend="current") again: the plan_id changes.

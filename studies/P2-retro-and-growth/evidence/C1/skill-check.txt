@@ -1,0 +1,20 @@
+# C1 skill check (protocol 1, 8 H2) mode end at 2026-10-29T14:41:25Z
+arm: C (product /Volumes/workspace/hirearchy/.worktrees/p2-arm-c)
+repo skill:     b10238639f48ab351fa44a06aed03ffb (/Volumes/workspace/hirearchy/.worktrees/p2-arm-c/skills/hirearchy/SKILL.md)
+workspace copy: b10238639f48ab351fa44a06aed03ffb (/tmp/hirearchy-p2/C1-1793280632/.kiro/skills/hirearchy/SKILL.md)
+global (md5 only): absent
+required: b10238639f48ab351fa44a06aed03ffb; global rule: aside (absent)
+
+first disclose_context call for the skill: CALL #1, turn 1, 2026-10-29T13:31:26.119Z, status completed (not an error),
+  disclosed uri: file:///private/tmp/hirearchy-p2/C1-1793280632/.kiro/skills/hirearchy/SKILL.md
+  md5 of the SKILL.md at that path: b10238639f48ab351fa44a06aed03ffb (valid: = b10238639f48ab351fa44a06aed03ffb)
+
+skill-activation stratum (4.4.1): first propose_org call = CALL #10, turn 2, 2026-10-29T13:33:57.637Z; first feedback call = CALL #34, turn 5, 2026-10-29T13:44:07.041Z.
+  disclose_context (turn 1, 13:31:26Z) is earlier than both -> stratum A (activated before the first propose_org and before the first feedback).
+stratum: A
+
+occurrences of 'Note: the installed skill at' in the whole transcript: 0 (assistant-session-messages.jsonl); 0 (assistant-tool-calls.txt)
+disclose_context calls in the session: 1 (1 for the hirearchy skill)
+skill proof (arm C): PROVED (1 disclosed text(s))
+
+verdict: OK

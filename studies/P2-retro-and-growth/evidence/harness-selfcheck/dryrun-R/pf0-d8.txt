@@ -1,0 +1,5 @@
+- agent lead added (2026-10-29): from the plan you approved (2026-10-29)
+- agent lead/writer added (2026-10-29): from the plan you approved (2026-10-29)
+- service lead/weekly-memo added (2026-10-29): from the plan you approved (2026-10-29)
+- charter of lead/writer changed: body (2026-10-29): by lead, or outside the tools (the event log does not reach back)
+- Unprompted charter edits since 2026-09-30: 1

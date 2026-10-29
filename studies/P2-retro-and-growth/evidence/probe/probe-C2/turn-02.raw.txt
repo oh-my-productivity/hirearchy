@@ -1,0 +1,20 @@
+The `services` tool returned this:
+
+```
+Services you can request (from your direct reports):
+- probe-memo (offered by lead; contract v1, playbook v0): One short memo from one notes file
+  inputs: notes_file* (the notes file)   (* required)
+  each request: 12 runs; acceptance criteria (lead/services/probe-memo/SERVICE.md):
+    C1: At most 400 words.
+  record: no requests yet
+  playbook: none yet
+```
+
+The org offers one service, `probe-memo`, run by `lead`. It writes one short memo from a notes file.
+
+- **Input:** `notes_file` is required.
+- **Budget:** 12 runs per request.
+- **Acceptance criterion:** C1 says the memo must be at most 400 words.
+- **History:** no requests have been made yet, and there's no playbook.
+
+To use it, I'd need the path to your notes file.

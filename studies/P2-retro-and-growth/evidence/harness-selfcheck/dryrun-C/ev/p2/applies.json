@@ -1,0 +1,61 @@
+[
+ {
+  "t": "2026-10-29T12:09:20+00:00",
+  "ok": true,
+  "change": null,
+  "plan_id": "terminal",
+  "approved": true,
+  "blueprint": {
+   "mission": "Every week, turn the user's meeting notes into a short memo of decisions and action items.",
+   "needs": {
+    "kind": "writing",
+    "inputs": [
+     "/private/tmp/hirearchy-p2/selfcheck-C-1793275756/notes"
+    ],
+    "budget_runs": 12,
+    "review": false
+   },
+   "agents": [
+    {
+     "name": "lead",
+     "template": "manager",
+     "children": [
+      {
+       "name": "writer",
+       "template": "writer"
+      }
+     ]
+    }
+   ],
+   "services": [
+    {
+     "name": "weekly-memo",
+     "owner": "lead",
+     "description": "One memo of decisions and action items from one meeting's notes file.",
+     "inputs": [
+      {
+       "name": "notes_file",
+       "description": "the notes file name, e.g. 2026-10-05.md",
+       "required": true
+      }
+     ],
+     "acceptance": [
+      "One memo per notes file, at most 400 words.",
+      "The memo lists every decision and every commitment in the notes, informal ones included.",
+      "The action items are a table Owner | Action | Due, with ISO dates and 'none' if there's no date.",
+      "Decisions and actions use the notes' own words."
+     ],
+     "deliverable": {
+      "description": "one markdown memo",
+      "format": "markdown",
+      "path": "/private/tmp/hirearchy-p2/selfcheck-C-1793275756/deliverables"
+     },
+     "budget": 12
+    }
+   ]
+  },
+  "extend": false,
+  "proposal": "# Plan for approval\n\nGoal: Every week, turn the user's meeting notes into a short memo of decisions and action items.\n\nNeeds as understood:\n- Scope: (not specified)\n- Deliverable: per service (see Services below)\n- Quality bar: (not specified)\n- Sources / tools: (not specified)\n- Workspace: none (no agent writes files or runs commands)\n- Model policy: (not specified)\n- Review: not required\n\nOrganization (2 agents):\n- lead [manager] Manager: model=claude-sonnet-5.5, tools=none\n  Access: read-only inputs (hirearchy read): /private/tmp/hirearchy-p2/selfcheck-C-1793275756/notes\n  - writer [writer] Writer: model=claude-sonnet-5.5, tools=none\n    Access: read-only inputs (hirearchy read): /private/tmp/hirearchy-p2/selfcheck-C-1793275756/notes\n\nBudget per request (your cap: 12), estimate 8 for one pass + one review/rework cycle, 11 with one round of your questions or a rejection:\n  A ceiling: runs the team does not spend come back automatically with the final report of each request.\n  service weekly-memo: 12 runs per request\n    lead: starts with 12, hands down writer 3 (each includes its rework/re-check run), keeps 9 (own 5 + slack 4)\n    lead/writer: 3 runs (2 work + 1 rework)\n\nReview / verification:\n- no independent reviewer (review not requested)\n- the assistant re-checks the final deliverable against every acceptance criterion before telling you it is done\n\nDeliverable:\n- per service (see Services below)\n\nServices (1), offered by lead and defined by root (the contract: only root can change it):\n- weekly-memo: One memo of decisions and action items from one meeting's notes file.\n  inputs: notes_file (required)\n  budget: 12 runs per request\n  deliverable: one markdown memo [markdown]; delivered to: /private/tmp/hirearchy-p2/selfcheck-C-1793275756/deliverables (I copy each result there after checking it)\n  acceptance (the contract, travels with every request):\n    1. One memo per notes file, at most 400 words.\n    2. The memo lists every decision and every commitment in the notes, informal ones included.\n    3. The action items are a table Owner | Action | Due, with ISO dates and 'none' if there's no date.\n    4. Decisions and actions use the notes' own words.\n  playbook v1: generated from the team (steps, budget plan):\n    ## Steps\n    1. Read the request in your prompt: its inputs, every acceptance criterion and the deliverable. The criteria come from the contract and can only be met, never changed; copy the relevant ones verbatim into every task you delegate.\n    2. Delegate to `writer` (Writer) with `budget=3`: its part of the request, with the criteria it must meet.\n    3. Read the final artifact yourself and check it against EVERY criterion of the request, quoting counts from your own `read` output.\n    4. Report: `done` only if every criterion is met (else `blocked` with the deviation and a recommended decision). Name the deliverable's path (the assistant copies it to /private/tmp/hirearchy-p2/selfcheck-C-1793275756/deliverables) and pass `lessons` as an after-action review: Expected / Happened / Caught at / Cause / Prevent (the system cause, not a person), or Near miss when nothing went wrong.\n    \n    ## Budget plan\n    Request budget: 12 runs (the contract's). Hand down no more than this up front, each with `budget=` set explicitly:\n    - writer: 3 runs (2 work + 1 rework or re-check)\n    - you (lead): keep 9 runs: your own 5 (plan, process each result, final check, report, one rework cycle) and 4 of slack.\n    Unspent runs return to your parent with your final report.\nAfter each request the lead records lessons; before the next one it reviews them with your feedback and may improve how the team works (its playbook). It cannot change these checks: only you can, through me.\nNo first task: nothing runs until you ask for a request (request(service, inputs), then start()).\n\nCheckpoints:\n- Approval: plan approval before anything is built or started (default)\n- Progress: one line on request (default)\n- Any spend beyond the budget needs your OK.\n\nWarnings (4):\n- services[weekly-memo].deliverable.path: no agent can write to /private/tmp/hirearchy-p2/selfcheck-C-1793275756/deliverables (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)\n- needs.scope: not elicited: what is in and out of scope\n- needs.approval: not elicited: when the user wants to approve (plan, before start, final)\n- needs.progress: not elicited: how the user wants progress updates\n\nReply 'approve' or tell me what to change.\n",
+  "result": "created 2 agents: lead, lead/writer\ndefined 1 service(s) of lead: weekly-memo (contract and playbook v1)\nno task was given: the services are ready and nothing runs yet. To use one: request(service, inputs) (or `hirearchy request SERVICE --input key=value`), then start()\nwarning: services[weekly-memo].deliverable.path: no agent can write to /private/tmp/hirearchy-p2/selfcheck-C-1793275756/deliverables (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)\nwarning: needs.scope: not elicited: what is in and out of scope\nwarning: needs.approval: not elicited: when the user wants to approve (plan, before start, final)\nwarning: needs.progress: not elicited: how the user wants progress updates\norg: /private/tmp/hirearchy-p2/selfcheck-C-1793275756/org\n"
+ }
+]

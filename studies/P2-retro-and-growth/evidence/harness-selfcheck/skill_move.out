@@ -1,0 +1,3 @@
+skill aside: /tmp/hirearchy-p2/selfcheck-home/.kiro/skills/hirearchy -> /tmp/hirearchy-p2/skill-aside/selfcheck-C1-1793275654/hirearchy (md5 443e1bc4911aa4d6aaa6457e78f673c1 before and after; recorded in /tmp/hirearchy-p2/selfcheck-skill-moves.txt)
+skill restore: /tmp/hirearchy-p2/skill-aside/selfcheck-C1-1793275654/hirearchy -> /tmp/hirearchy-p2/selfcheck-home/.kiro/skills/hirearchy (md5 443e1bc4911aa4d6aaa6457e78f673c1; recorded)
+skill_move cases: 18 of 18 ok

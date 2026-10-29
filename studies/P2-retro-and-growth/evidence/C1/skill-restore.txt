@@ -1,0 +1,3 @@
+restored 2026-10-29T14:27:30Z: /Volumes/workspace/hirearchy/studies/P2-retro-and-growth/skill-aside/C1-1793280632/hirearchy -> /Users/aminalizadeh/.kiro/skills/hirearchy md5 443e1bc4911aa4d6aaa6457e78f673c1 ok
+restored 2026-10-29T14:41:27Z: /Volumes/workspace/hirearchy/studies/P2-retro-and-growth/skill-aside/C1-1793284289/hirearchy -> /Users/aminalizadeh/.kiro/skills/hirearchy md5 443e1bc4911aa4d6aaa6457e78f673c1 ok
+skill restore: /Volumes/workspace/hirearchy/studies/P2-retro-and-growth/skill-aside/C1-1793284289/hirearchy -> /Users/aminalizadeh/.kiro/skills/hirearchy (md5 443e1bc4911aa4d6aaa6457e78f673c1; recorded)

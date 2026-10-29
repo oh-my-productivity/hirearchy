@@ -1,0 +1,177 @@
+# revise_playbook attempts (protocol 7.2; amendment 1 A3.3 10.1(c)); facts only
+
+tool.call events with tool == revise_playbook: 5
+- 2026-10-29T13:45:53.281605+00:00 actor=lead run=lead@20261029T134535648827 trace=20261029T133518543841-root-4955 ok=True error_type=None
+  error (verbatim): None
+  args: {"service": "weekly-meeting-memo", "reason_chars": 74, "op_chars": 3, "evidence_n": 1, "evidence_chars": 2, "kind": "step", "text_chars": 138, "after_chars": 2}
+- 2026-10-29T14:05:42.466332+00:00 actor=lead run=lead@20261029T140520362606 trace=20261029T135831104369-root-5e7a ok=False error_type=OrgError
+  error (verbatim): refused: C10 is confirmed by the client, so an item citing it may be only its own words: this item is not. Write it as a step with text "The Actions table leaves out any line where nobody has to do anything, such as a statement that something stays as it is." (or a rule with then "The Actions table leaves out any line where nobody has to do anything, such as a statement that something stays as it is." and no when) to add C10. A different way of doing it needs a second case the client rejected o…
+  args: {"service": "weekly-meeting-memo", "reason_chars": 112, "op_chars": 3, "evidence_n": 2, "evidence_chars": 5, "kind": "step", "text_chars": 135, "after_chars": 2}
+- 2026-10-29T14:05:45.317693+00:00 actor=lead run=lead@20261029T140520362606 trace=20261029T135831104369-root-5e7a ok=True error_type=None
+  error (verbatim): None
+  args: {"service": "weekly-meeting-memo", "reason_chars": 51, "op_chars": 3, "evidence_n": 1, "evidence_chars": 3, "kind": "step", "text_chars": 121, "after_chars": 2}
+- 2026-10-29T14:24:10.411233+00:00 actor=lead run=lead@20261029T142345748642 trace=20261029T141835117946-root-723b ok=False error_type=OrgError
+  error (verbatim): refused: C11 is confirmed by the client, so an item citing it may be only its own words: this item is not. Write it as a step with text "The memo starts with a one-line "Summary:" of the meeting, followed by the "Actions" section, then the "Decisions" section, in that order." (or a rule with then "The memo starts with a one-line "Summary:" of the meeting, followed by the "Actions" section, then the "Decisions" section, in that order." and no when) to add C11. A different way of doing it needs a…
+  args: {"service": "weekly-meeting-memo", "reason_chars": 101, "op_chars": 4, "evidence_n": 2, "evidence_chars": 5, "item_chars": 2, "text_chars": 152}
+- 2026-10-29T14:24:15.373787+00:00 actor=lead run=lead@20261029T142345748642 trace=20261029T141835117946-root-723b ok=True error_type=None
+  error (verbatim): None
+  args: {"service": "weekly-meeting-memo", "reason_chars": 84, "op_chars": 4, "evidence_n": 1, "evidence_chars": 3, "item_chars": 2, "text_chars": 138}
+
+run-log patterns per run (after '# ---- output ----'): P1 revise_playbook call lines | P2 end lines | P3 all hirearchy call lines | tool.call events whose run is this run
+  lead@20261029T133521066009                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/writer@20261029T133549207363            P1=0 P2=0 P3=0 events(all)=0 events(revise_playbook)=0
+  lead/writer@20261029T133601374577            P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261029T133637571485                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead@20261029T133844124757                   P1=0 P2=0 P3=6 events(all)=6 events(revise_playbook)=0
+  lead/writer@20261029T133924325621            P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261029T133956535515                   P1=0 P2=0 P3=3 events(all)=3 events(revise_playbook)=0
+  lead@20261029T134137783757                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/writer@20261029T134207960019            P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261029T134230144973                   P1=0 P2=0 P3=3 events(all)=3 events(revise_playbook)=0
+  lead@20261029T134535648827                   P1=1 P2=1 P3=5 events(all)=5 events(revise_playbook)=1
+      [tool] @hirearchy/revise_playbook {"tool_id":"hirearchy::revise_playbook","arguments":{"service":"weekly-meeting-memo","op":"add","kind":"step","text":"The memo starts with a one-line \"Summary:\" of the meeting, followed by the \"Dec
+      [tool ok] @hirearchy/revise_playbook {"tool_id":"hirearchy::revise_playbook","arguments":{"service":"weekly-meeting-memo","op":"add","kind":"step","text":"The memo starts with a one-line \"Summary:\" of the meeting, followed by the \"Dec
+  lead/writer@20261029T134607849718            P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261029T134634062669                   P1=0 P2=0 P3=3 events(all)=3 events(revise_playbook)=0
+  lead@20261029T135021176403                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/writer@20261029T135043308940            P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261029T135109521561                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead@20261029T135252664569                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/writer@20261029T135318794263            P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261029T135348976104                   P1=0 P2=0 P3=3 events(all)=3 events(revise_playbook)=0
+  lead@20261029T135553356941                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/writer@20261029T135617469338            P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261029T135649656149                   P1=0 P2=0 P3=3 events(all)=3 events(revise_playbook)=0
+  lead@20261029T135833481356                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/writer@20261029T135859657986            P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261029T135927891942                   P1=0 P2=0 P3=3 events(all)=3 events(revise_playbook)=0
+  lead@20261029T140118166730                   P1=0 P2=0 P3=5 events(all)=5 events(revise_playbook)=0
+  lead/writer@20261029T140154501474            P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261029T140220796085                   P1=0 P2=0 P3=3 events(all)=3 events(revise_playbook)=0
+  lead@20261029T140520362606                   P1=2 P2=2 P3=5 events(all)=5 events(revise_playbook)=2
+      [tool] @hirearchy/revise_playbook {"tool_id":"hirearchy::revise_playbook","arguments":{"service":"weekly-meeting-memo","op":"add","kind":"step","text":"The Actions table leaves out any line where nobody has to do anything, such as a s
+      [tool failed] @hirearchy/revise_playbook {"tool_id":"hirearchy::revise_playbook","arguments":{"service":"weekly-meeting-memo","op":"add","kind":"step","text":"The Actions table leaves out any line where nobody has to do anything, such as a s
+      [tool] @hirearchy/revise_playbook {"tool_id":"hirearchy::revise_playbook","arguments":{"op":"add","reason":"Client confirmed C10; item is the own words of C10.","evidence":["C10"],"service":"weekly-meeting-memo","kind":"step","text":"
+      [tool ok] @hirearchy/revise_playbook {"tool_id":"hirearchy::revise_playbook","arguments":{"op":"add","reason":"Client confirmed C10; item is the own words of C10.","evidence":["C10"],"service":"weekly-meeting-memo","kind":"step","text":"
+  lead/writer@20261029T140558570151            P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261029T140628783814                   P1=0 P2=0 P3=0 events(all)=0 events(revise_playbook)=0
+  lead@20261029T140638967905                   P1=0 P2=0 P3=3 events(all)=3 events(revise_playbook)=0
+  lead@20261029T140825061606                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/writer@20261029T140857201263            P1=0 P2=0 P3=3 events(all)=3 events(revise_playbook)=0
+  lead@20261029T140923384296                   P1=0 P2=0 P3=3 events(all)=3 events(revise_playbook)=0
+  lead@20261029T141103190500                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/writer@20261029T141127367966            P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261029T141155576882                   P1=0 P2=0 P3=3 events(all)=3 events(revise_playbook)=0
+  lead@20261029T141346460944                   P1=0 P2=0 P3=3 events(all)=3 events(revise_playbook)=0
+  lead/writer@20261029T141422712537            P1=0 P2=0 P3=0 events(all)=0 events(revise_playbook)=0
+  lead/writer@20261029T141434904361            P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261029T141501032045                   P1=0 P2=0 P3=3 events(all)=3 events(revise_playbook)=0
+  lead@20261029T141837889844                   P1=0 P2=0 P3=0 events(all)=0 events(revise_playbook)=0
+  lead@20261029T141850150150                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/writer@20261029T141922404981            P1=0 P2=0 P3=6 events(all)=6 events(revise_playbook)=0
+  lead@20261029T141954637023                   P1=0 P2=0 P3=3 events(all)=3 events(revise_playbook)=0
+  lead@20261029T142345748642                   P1=2 P2=2 P3=4 events(all)=4 events(revise_playbook)=2
+      [tool] @hirearchy/revise_playbook {"tool_id":"hirearchy::revise_playbook","arguments":{"service":"weekly-meeting-memo","op":"edit","item":"P8","text":"The memo starts with a one-line \"Summary:\" of the meeting, followed by the \"Acti
+      [tool failed] @hirearchy/revise_playbook {"tool_id":"hirearchy::revise_playbook","arguments":{"service":"weekly-meeting-memo","op":"edit","item":"P8","text":"The memo starts with a one-line \"Summary:\" of the meeting, followed by the \"Acti
+      [tool] @hirearchy/revise_playbook {"tool_id":"hirearchy::revise_playbook","arguments":{"op":"edit","reason":"C11 (client-confirmed) replaces C9 after rejection R3; item is the own words of C11.","item":"P8","text":"The memo starts wit
+      [tool ok] @hirearchy/revise_playbook {"tool_id":"hirearchy::revise_playbook","arguments":{"op":"edit","reason":"C11 (client-confirmed) replaces C9 after rejection R3; item is the own words of C11.","item":"P8","text":"The memo starts wit
+  lead/writer@20261029T142422097545            P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261029T142450334806                   P1=0 P2=0 P3=3 events(all)=3 events(revise_playbook)=0
+  lead@20261029T143558415553                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/writer@20261029T143626597740            P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261029T143700907430                   P1=0 P2=0 P3=3 events(all)=3 events(revise_playbook)=0
+
+full arguments and result verbatim, from the org-run session (tool_call with args.tool_id == hirearchy::revise_playbook):
+--- run lead@20261029T134535648827 session sess_a2466d49-3c5a-4333-9ac4-d54d021e72c8 call toolu_bdrk_01W3rUEm6vNRCDq4xCgXY54A at 2026-10-29T13:45:53.283Z
+ARGUMENTS: {
+ "tool_id": "hirearchy::revise_playbook",
+ "arguments": {
+  "service": "weekly-meeting-memo",
+  "op": "add",
+  "kind": "step",
+  "text": "The memo starts with a one-line \"Summary:\" of the meeting, followed by the \"Decisions\" section, then the \"Actions\" section, in that order.",
+  "after": "P2",
+  "evidence": [
+   "C9"
+  ],
+  "reason": "Own words of C9, added by contract v2 amendment the client confirmed (R1)."
+ }
+}
+RESULT: playbook of weekly-meeting-memo is now v2: added P8 (step), admitted (c) on R1, C9. It starts new and is watched: a related client rejection warns it, a second retires it. root was told without being woken.
+--- run lead@20261029T140520362606 session sess_2555e7b0-c3a2-409c-a862-22704ba2183d call toolu_bdrk_01LwpchWufW4RYp4NNk8KMW8 at 2026-10-29T14:05:42.469Z
+ARGUMENTS: {
+ "tool_id": "hirearchy::revise_playbook",
+ "arguments": {
+  "service": "weekly-meeting-memo",
+  "op": "add",
+  "kind": "step",
+  "text": "The Actions table leaves out any line where nobody has to do anything, such as a statement that something stays as it is. (WHY R2; C10)",
+  "after": "P8",
+  "reason": "Client confirmed C10 (R2, 'Marta keeps the agenda as sent' is not an action item); item is the own words of C10.",
+  "evidence": [
+   "C10",
+   "R2"
+  ]
+ }
+}
+RESULT: MCP tool error: Error executing tool revise_playbook: refused: C10 is confirmed by the client, so an item citing it may be only its own words: this item is not. Write it as a step with text "The Actions table leaves out any line where nobody has to do anything, such as a statement that something stays as it is." (or a rule with then "The Actions table leaves out any line where nobody has to do anything, such as a statement that something stays as it is." and no when) to add C10. A different way of doing it needs a second case the client rejected on the same criterion (rule (b)). Nothing was written: change it again with those words, or send root (`send`) this question once: "We would add to how we deliver weekly-meeting-memo: The Actions table leaves out any line where nobody has to do anything, such as a statement that something stays as it is. (WHY R2; C10). Is that what you want from now on? If yes, please add it to the contract as a criterion."
+--- run lead@20261029T140520362606 session sess_2555e7b0-c3a2-409c-a862-22704ba2183d call toolu_bdrk_01HF3enbrNJessvk9rMaJBcc at 2026-10-29T14:05:45.320Z
+ARGUMENTS: {
+ "tool_id": "hirearchy::revise_playbook",
+ "arguments": {
+  "op": "add",
+  "reason": "Client confirmed C10; item is the own words of C10.",
+  "evidence": [
+   "C10"
+  ],
+  "service": "weekly-meeting-memo",
+  "kind": "step",
+  "text": "The Actions table leaves out any line where nobody has to do anything, such as a statement that something stays as it is.",
+  "after": "P8"
+ }
+}
+RESULT: playbook of weekly-meeting-memo is now v3: added P9 (step), admitted (c) on R2, C10. It starts new and is watched: a related client rejection warns it, a second retires it. root was told without being woken.
+--- run lead@20261029T142345748642 session sess_13d9cb15-2845-40fa-82eb-56bb10b477c0 call toolu_bdrk_015LhEmeMHXCR3ogkBaNxDAf at 2026-10-29T14:24:10.414Z
+ARGUMENTS: {
+ "tool_id": "hirearchy::revise_playbook",
+ "arguments": {
+  "service": "weekly-meeting-memo",
+  "op": "edit",
+  "item": "P8",
+  "text": "The memo starts with a one-line \"Summary:\" of the meeting, followed by the \"Actions\" section, then the \"Decisions\" section, in that order. (WHY R3; C11)",
+  "reason": "Client changed the order (R3); C11 is client-confirmed and replaces C9. Item is the own words of C11.",
+  "evidence": [
+   "C11",
+   "R3"
+  ]
+ }
+}
+RESULT: MCP tool error: Error executing tool revise_playbook: refused: C11 is confirmed by the client, so an item citing it may be only its own words: this item is not. Write it as a step with text "The memo starts with a one-line "Summary:" of the meeting, followed by the "Actions" section, then the "Decisions" section, in that order." (or a rule with then "The memo starts with a one-line "Summary:" of the meeting, followed by the "Actions" section, then the "Decisions" section, in that order." and no when) to add C11. A different way of doing it needs a second case the client rejected on the same criterion (rule (b)). Nothing was written: change it again with those words, or send root (`send`) this question once: "We would add to how we deliver weekly-meeting-memo: The memo starts with a one-line "Summary:" of the meeting, followed by the "Actions" section, then the "Decisions" section, in that order. (WHY R3; C11). Is that what you want from now on? If yes, please add it to the contract as a criterion."
+--- run lead@20261029T142345748642 session sess_13d9cb15-2845-40fa-82eb-56bb10b477c0 call toolu_bdrk_014VaS3VbL6iZEPUAmwUoL6k at 2026-10-29T14:24:15.376Z
+ARGUMENTS: {
+ "tool_id": "hirearchy::revise_playbook",
+ "arguments": {
+  "op": "edit",
+  "reason": "C11 (client-confirmed) replaces C9 after rejection R3; item is the own words of C11.",
+  "item": "P8",
+  "text": "The memo starts with a one-line \"Summary:\" of the meeting, followed by the \"Actions\" section, then the \"Decisions\" section, in that order.",
+  "evidence": [
+   "C11"
+  ],
+  "service": "weekly-meeting-memo"
+ }
+}
+RESULT: playbook of weekly-meeting-memo is now v4: edited P8, admitted (c) on R3, C11. Its watch starts again. root was told without being woken.
+
+service.revise events:
+- 2026-10-29T13:35:18.542784+00:00 {"ts": "2026-10-29T13:35:18.542784+00:00", "proc": "mcp", "pid": 80982, "kind": "service.revise", "actor": "root", "run": null, "trace": null, "owner": "lead", "service": "weekly-meeting-memo", "version": 1, "by": "root", "admitted": "client"}
+- 2026-10-29T13:45:53.278807+00:00 {"ts": "2026-10-29T13:45:53.278807+00:00", "proc": "mcp", "pid": 84146, "kind": "service.revise", "actor": "lead", "run": "lead@20261029T134535648827", "trace": null, "owner": "lead", "service": "weekly-meeting-memo", "version": 2, "by": "lead", "admitted": "c"}
+- 2026-10-29T14:05:45.311402+00:00 {"ts": "2026-10-29T14:05:45.311402+00:00", "proc": "mcp", "pid": 92519, "kind": "service.revise", "actor": "lead", "run": "lead@20261029T140520362606", "trace": null, "owner": "lead", "service": "weekly-meeting-memo", "version": 3, "by": "lead", "admitted": "c"}
+- 2026-10-29T14:24:15.363476+00:00 {"ts": "2026-10-29T14:24:15.363476+00:00", "proc": "mcp", "pid": 2739, "kind": "service.revise", "actor": "lead", "run": "lead@20261029T142345748642", "trace": null, "owner": "lead", "service": "weekly-meeting-memo", "version": 4, "by": "lead", "admitted": "c"}
+
+PLAYBOOK versions (org git history of lead/services/weekly-meeting-memo/PLAYBOOK.md and history/):
+5866989 2026-10-29T13:35:18Z root: applied blueprint (2 agents), task 20261029T133518543841-root-4955 -> lead, services: weekly-meeting-memo
+b0715e0 2026-10-29T13:46:17Z lead: run ok, 5 message(s) [lead/runs/20261029T134535648827.log]
+b6e6d02 2026-10-29T14:06:06Z lead: run ok, 4 message(s) [lead/runs/20261029T140520362606.log]
+3aba6eb 2026-10-29T14:24:32Z lead: run ok, 4 message(s) [lead/runs/20261029T142345748642.log]
+history files now: PLAYBOOK.v1.md, PLAYBOOK.v2.md, PLAYBOOK.v3.md, SERVICE.v1.md, SERVICE.v2.md, SERVICE.v3.md

@@ -1,0 +1,85 @@
+# client questions (protocol 7.2); facts only
+
+Result messages root received (lead -> root), with the product parser's items (hirearchy.kernel._text.client_questions):
+- id 20261029T133659621367-lead-6a10 folder=read created=2026-10-29T13:36:59+00:00 answers(reply_to)=20261029T133518543841-root-4955 status=done from=lead
+  raw 'Questions for the client' text: Questions for the client:
+- Marta's Due (C5): notes say "book the on-call training room for Oct 14". Oct 14 is the training date, not a booking deadline, so Due is "none". Say if you want 2026-10-14.
+- Sam's Due (C5): "before Friday" (meeting Monday 5 Oct) is not a single clear date, so Due is "none".
+
+Memo: lead/writer/work/memo-2026-10-05.md (97 words per the writer; well under 400).
+My check against 2026-10-05.md, C1-C8 all met: only that meeting; Decisions section has 2 decisions in the notes' words; Actions table Owner | Action | Due has 5 rows (Priya 2026-10-09, Dev 2026-10-08, Sam none, Marta none, Lee none); all names are in the Present list so no "(not in attendee list)" marks; nothing outside the notes.
+Coverage by my own check: 7 of 7 (2 of 2 decisions, 5 of 5 commitments). No separate verifier in the plan.
+  parsed items (2): ['Marta\'s Due (C5): notes say "book the on-call training room for Oct 14". Oct 14 is the training date, not a booking deadline, so Due is "none". Say if you want 2026-10-14.', 'Sam\'s Due (C5): "before Friday" (meeting Monday 5 Oct) is not a single clear date, so Due is "none".']
+- id 20261029T134027735786-lead-be31 folder=read created=2026-10-29T13:40:27+00:00 answers(reply_to)=20261029T133841717115-root-6dfb status=done from=lead
+  raw 'Questions for the client' text: (none)
+  parsed items (0): []
+- id 20261029T134254356274-lead-e7cf folder=read created=2026-10-29T13:42:54+00:00 answers(reply_to)=20261029T134137516157-root-2478 status=done from=lead
+  raw 'Questions for the client' text: (none)
+  parsed items (0): []
+- id 20261029T134658299152-lead-57b2 folder=read created=2026-10-29T13:46:58+00:00 answers(reply_to)=20261029T134535371982-root-e020 status=done from=lead
+  raw 'Questions for the client' text: (none)
+  parsed items (0): []
+- id 20261029T135127212575-lead-73af folder=read created=2026-10-29T13:51:27+00:00 answers(reply_to)=20261029T135020907593-root-5d5e status=done from=lead
+  raw 'Questions for the client' text: (none)
+  parsed items (0): []
+- id 20261029T135418350510-lead-e355 folder=read created=2026-10-29T13:54:18+00:00 answers(reply_to)=20261029T135244730879-root-a163 status=done from=lead
+  raw 'Questions for the client' text: Questions for the client: none.
+  parsed items (0): []
+- id 20261029T135710645402-lead-218e folder=read created=2026-10-29T13:57:10+00:00 answers(reply_to)=20261029T135548333153-root-f836 status=done from=lead
+  raw 'Questions for the client' text: (none)
+  parsed items (0): []
+- id 20261029T135955542371-lead-1700 folder=read created=2026-10-29T13:59:55+00:00 answers(reply_to)=20261029T135831104369-root-5e7a status=done from=lead
+  raw 'Questions for the client' text: (none)
+  parsed items (0): []
+- id 20261029T140250197794-lead-020d folder=read created=2026-10-29T14:02:50+00:00 answers(reply_to)=20261029T140117776426-root-8d00 status=done from=lead
+  raw 'Questions for the client' text: (none)
+  parsed items (0): []
+- id 20261029T140705692361-lead-76f4 folder=read created=2026-10-29T14:07:05+00:00 answers(reply_to)=20261029T140519645983-root-ebbc status=done from=lead
+  raw 'Questions for the client' text: (none)
+  parsed items (0): []
+- id 20261029T140945047663-lead-0cf8 folder=read created=2026-10-29T14:09:45+00:00 answers(reply_to)=20261029T140824580301-root-605b status=done from=lead
+  raw 'Questions for the client' text: (none)
+  parsed items (0): []
+- id 20261029T141222053152-lead-d1c0 folder=read created=2026-10-29T14:12:22+00:00 answers(reply_to)=20261029T141102711053-root-9df1 status=done from=lead
+  raw 'Questions for the client' text: (none)
+  parsed items (0): []
+- id 20261029T141533260584-lead-0dec folder=read created=2026-10-29T14:15:33+00:00 answers(reply_to)=20261029T141346074674-root-4ec3 status=done from=lead
+  raw 'Questions for the client' text: Questions for the client:
+- Lee's row: notes say "Lee will check the SSO renewal invoice against the quote on Wednesday." Due is set to 2026-11-04 (the coming Wednesday after Monday 2 November). C5 allows a date only when the notes and meeting date make it clear. If you read it as not clear, Due should be "none".
+
+Memo: lead/writer/work/memo-2026-11-02.md (146 words per read, 15 lines, modified 14:14:54 UTC). Copy it to /private/tmp/hirearchy-p2/C1-1793280632/deliverables.
+My check against notes/2026-11-02.md: decisions 3 of 3 covered; commitments 5 of 5 covered (Dev 2026-11-13, Priya 2026-11-06, JD 2026-11-05 marked not in attendee list, Marta none, Lee 2026-11-04). C1-C10 met: Summary: is line 1, then Decisions, then Actions; no 'stays as is' row (R1, R2 respected). The 'AI team' hire-a-fact-checker line, the meeting close and the next meeting date are left out; nobody was hired. No verifier was in the plan, so there is no coverage line from one.
+  parsed items (1): ['Lee\'s row: notes say "Lee will check the SSO renewal invoice against the quote on Wednesday." Due is set to 2026-11-04 (the coming Wednesday after Monday 2 November). C5 allows a date only when the notes and meeting date make it clear. If you read it as not clear, Due should be "none".']
+- id 20261029T142021765823-lead-9000 folder=read created=2026-10-29T14:20:21+00:00 answers(reply_to)=20261029T141835117946-root-723b status=done from=lead
+  raw 'Questions for the client' text: Questions for the client:
+- Sam's "by Friday" (C5): the memo gives Due 2026-11-13 (Friday after Monday 9 Nov). The notes say only "by Friday"; the writer was unsure and "none" is the alternative. Which do you want?
+
+Memo: lead/writer/work/memo-2026-11-09.md (read: 142 words, 15 lines, modified 14:19:48 UTC).
+My check against the notes: decisions 3 of 3 covered (gateway switch-off to Fri 20 Nov; rate limiter plan approved as written; Jo joins on-call from Mon 16 Nov); commitments 5 of 5 covered (Marta, Dev, Priya, Sam, Lee).
+C1-C10 met: Summary: is line 1, then Decisions, then Actions; 142 <= 400 words; Jo marked (not in attendee list); Lee's SSO log Due none; no 'Wednesday' review row and no 'stays as is' rows (R1, R2 checked); nothing outside the notes.
+  parsed items (1): ['Sam\'s "by Friday" (C5): the memo gives Due 2026-11-13 (Friday after Monday 9 Nov). The notes say only "by Friday"; the writer was unsure and "none" is the alternative. Which do you want?']
+- id 20261029T142513380533-lead-9b8e folder=read created=2026-10-29T14:25:13+00:00 answers(reply_to)=20261029T142345130834-root-bce0 status=done from=lead
+  raw 'Questions for the client' text: Questions for the client:
+- Sam's "by Friday" is shown as Due 2026-11-13 (C5). The notes give the meeting date, Monday 9 Nov 2026, but no explicit date for that Friday. Please confirm.
+
+Memo reordered: Summary line, then Actions, then Decisions (C11). My own check against the notes file (read: 142 words, 15 lines, modified 14:24:37 UTC):
+- C1, C7 met: only 2026-11-09 content.
+- C2 met: 142 words, limit 400.
+- C3 met: 3 of 3 decisions, in the notes' words.
+- C4 and C5 met: 5 of 5 commitments (Marta, Dev, Priya, Sam in prose, Lee in prose) in an Owner | Action | Due table. Due is an ISO date, or none for Lee.
+- C6 met: Jo is marked (not in attendee list).
+- C8 met: 5 of 5 commitments and 3 of 3 decisions covered. This is my own check; the plan has no separate verifier.
+- C10 met: no row where nobody has to act.
+- C11 met: order is Summary, Actions, Decisions.
+Every other cell and wording is unchanged, including Sam | 2026-11-13.
+  parsed items (1): ['Sam\'s "by Friday" is shown as Due 2026-11-13 (C5). The notes give the meeting date, Monday 9 Nov 2026, but no explicit date for that Friday. Please confirm.']
+- id 20261029T143727530828-lead-f99d folder=read created=2026-10-29T14:37:27+00:00 answers(reply_to)=20261029T143558022215-root-44d7 status=done from=lead
+  raw 'Questions for the client' text: (none)
+  parsed items (0): []
+
+progress replies the assistant received that contain 'for the client: ask the user before you copy or deliver':
+- call #17 2026-10-29T13:37:01.034Z turn 3 hirearchy::progress: ['"Memo for the 5 October 2026 platform team weekly" [service weekly-meeting-memo v1]: done. runs 3 of 12 (9 returned). last activity 0s ago. artifacts withheld (ask first). 2 questions for the client: ask the user before you copy or deliver. no feedback yet. (task 20261029T133518543841-root-4955)']
+- call #134 2026-10-29T14:15:35.377Z turn 17 hirearchy::progress: ['"Memo for the 2 November 2026 platform team weekly" [service weekly-meeting-memo v3]: done. runs 3 of 12 (9 returned). last activity 1s ago. artifacts withheld (ask first). 1 question for the client: ask the user before you copy or deliver. no feedback yet. (task 20261029T141346074674-root-4ec3)']
+- call #150 2026-10-29T14:20:22.735Z turn 19 hirearchy::progress: ['"Memo for the 9 November 2026 platform team weekly" [service weekly-meeting-memo v3]: done. runs 3 of 12 (9 returned). last activity 0s ago. artifacts withheld (ask first). 1 question for the client: ask the user before you copy or deliver. no feedback yet. (task 20261029T141835117946-root-723b)']
+- call #163 2026-10-29T14:25:15.620Z turn 22 hirearchy::progress: ['"Rework memo 2026-11-09: Actions before Decisions" [service weekly-meeting-memo v3]: done. runs 3 of 5 (2 returned). last activity 1s ago. artifacts withheld (ask first). 1 question for the client: ask the user before you copy or deliver. no feedback yet. case total: 6 runs used of 17 handed down (contract: 12 per request). (task 20261029T142345130834-root-bce0)']
+count: 4

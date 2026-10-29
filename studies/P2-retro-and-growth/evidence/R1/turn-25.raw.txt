@@ -1,0 +1,24 @@
+The action list for the 9 November meeting is at `/private/tmp/hirearchy-p2/R1-1793275867/deliverables/2026-11-09-ops-actions.md`. It's the first request run through the new `ops-action-list` service. I checked it against the notes myself, and the copy is identical to the team's file.
+
+- **Format and length:** met. It is markdown with a title line naming the meeting date, and 81 words by `wc` (the lead counted 55), well under the 350 limit and one page.
+- **Table and sections:** met. It has one table with the columns Owner | Action | Due and no other sections.
+- **All action items:** met, 5 of 5. Sam's and Lee's items are prose commitments. Jo joining the on-call rotation is a decision, so it has no row of its own. Sam's task of adding Jo is the row.
+- **Due dates:** met. They are ISO dates or "none", in due order:
+
+| Owner | Due |
+|---|---|
+| Marta | 2026-11-11 |
+| Sam | 2026-11-13 |
+| Priya | 2026-11-16 |
+| Dev | 2026-11-20 |
+| Lee | none |
+
+- **Sam's date:** his "by Friday" was said at the Monday 9 November meeting, so it reads as Friday 13 November. This matches your accepted memo.
+- **Lee's audit log check:** the notes say no date was given, so Due is "none".
+- **Owner names:** met. They are written as in the notes.
+- **Nothing invented:** met. Every row appears in the notes.
+- **Lead's check:** met, 5 of 5 rows verified.
+
+Runs: 3 of 8 planned (5 returned).
+
+Keep it, or what should change?

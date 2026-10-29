@@ -1,0 +1,5870 @@
+{
+ "service": "weekly-meeting-memo",
+ "owner": "lead",
+ "states": {
+  "turn-03": [
+   {
+    "item": "P1",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P2",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P3",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P4",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P5",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P6",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P7",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   }
+  ],
+  "turn-04": [
+   {
+    "item": "P1",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P2",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P3",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P4",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P5",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P6",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P7",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   }
+  ],
+  "turn-05": [
+   {
+    "item": "P1",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P2",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P3",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P4",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P5",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P6",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P7",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   }
+  ],
+  "turn-06": [
+   {
+    "item": "P1",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P2",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P3",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P4",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P5",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P6",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P7",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P8",
+    "kind": "step",
+    "state": "new",
+    "k": 3,
+    "r": [
+     1,
+     1
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": "2026-10-29T13:45:53.277380+00:00",
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   }
+  ],
+  "turn-07": [
+   {
+    "item": "P1",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P2",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P3",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P4",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P5",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P6",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P7",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P8",
+    "kind": "step",
+    "state": "new",
+    "k": 3,
+    "r": [
+     1,
+     1
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": "2026-10-29T13:45:53.277380+00:00",
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   }
+  ],
+  "turn-08": [
+   {
+    "item": "P1",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P2",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P3",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P4",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P5",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P6",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P7",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P8",
+    "kind": "step",
+    "state": "new",
+    "k": 3,
+    "r": [
+     1,
+     1
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": "2026-10-29T13:45:53.277380+00:00",
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   }
+  ],
+  "turn-09": [
+   {
+    "item": "P1",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P2",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P3",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P4",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P5",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P6",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P7",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P8",
+    "kind": "step",
+    "state": "new",
+    "k": 3,
+    "r": [
+     1,
+     1
+    ],
+    "clean": 0,
+    "waiting": 1,
+    "related": [],
+    "pending": [],
+    "since": "2026-10-29T13:45:53.277380+00:00",
+    "carried": "",
+    "retire_due": false,
+    "judged": [
+     {
+      "case": "20261029T135244730879-root-a163",
+      "judged_task": null,
+      "J": null,
+      "judging_verdict": null,
+      "superseded_before": 0
+     }
+    ],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   }
+  ],
+  "turn-10": [
+   {
+    "item": "P1",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P2",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P3",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P4",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P5",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P6",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P7",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P8",
+    "kind": "step",
+    "state": "new",
+    "k": 3,
+    "r": [
+     1,
+     1
+    ],
+    "clean": 1,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": "2026-10-29T13:45:53.277380+00:00",
+    "carried": "",
+    "retire_due": false,
+    "judged": [
+     {
+      "case": "20261029T135244730879-root-a163",
+      "judged_task": "20261029T135244730879-root-a163",
+      "J": "2026-10-29T13:54:18.350510+00:00",
+      "judging_verdict": "20261029T135547317036-root-baa0",
+      "superseded_before": 0
+     }
+    ],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   }
+  ],
+  "turn-11": [
+   {
+    "item": "P1",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P2",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P3",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P4",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P5",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P6",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P7",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P8",
+    "kind": "step",
+    "state": "new",
+    "k": 3,
+    "r": [
+     1,
+     1
+    ],
+    "clean": 1,
+    "waiting": 1,
+    "related": [],
+    "pending": [],
+    "since": "2026-10-29T13:45:53.277380+00:00",
+    "carried": "",
+    "retire_due": false,
+    "judged": [
+     {
+      "case": "20261029T135244730879-root-a163",
+      "judged_task": "20261029T135244730879-root-a163",
+      "J": "2026-10-29T13:54:18.350510+00:00",
+      "judging_verdict": "20261029T135547317036-root-baa0",
+      "superseded_before": 0
+     },
+     {
+      "case": "20261029T135831104369-root-5e7a",
+      "judged_task": null,
+      "J": null,
+      "judging_verdict": null,
+      "superseded_before": 0
+     }
+    ],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   }
+  ],
+  "turn-12": [
+   {
+    "item": "P1",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P2",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P3",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P4",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P5",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P6",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P7",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P8",
+    "kind": "step",
+    "state": "new",
+    "k": 3,
+    "r": [
+     1,
+     1
+    ],
+    "clean": 1,
+    "waiting": 1,
+    "related": [],
+    "pending": [],
+    "since": "2026-10-29T13:45:53.277380+00:00",
+    "carried": "",
+    "retire_due": false,
+    "judged": [
+     {
+      "case": "20261029T135244730879-root-a163",
+      "judged_task": "20261029T135244730879-root-a163",
+      "J": "2026-10-29T13:54:18.350510+00:00",
+      "judging_verdict": "20261029T135547317036-root-baa0",
+      "superseded_before": 0
+     },
+     {
+      "case": "20261029T135831104369-root-5e7a",
+      "judged_task": null,
+      "J": null,
+      "judging_verdict": null,
+      "superseded_before": 0
+     }
+    ],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   }
+  ],
+  "turn-13": [
+   {
+    "item": "P1",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P2",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P3",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P4",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P5",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P6",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P7",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P8",
+    "kind": "step",
+    "state": "new",
+    "k": 3,
+    "r": [
+     1,
+     1
+    ],
+    "clean": 1,
+    "waiting": 0,
+    "related": [],
+    "pending": [
+     "R2"
+    ],
+    "since": "2026-10-29T13:45:53.277380+00:00",
+    "carried": "",
+    "retire_due": false,
+    "judged": [
+     {
+      "case": "20261029T135244730879-root-a163",
+      "judged_task": "20261029T135244730879-root-a163",
+      "J": "2026-10-29T13:54:18.350510+00:00",
+      "judging_verdict": "20261029T135547317036-root-baa0",
+      "superseded_before": 0
+     },
+     {
+      "case": "20261029T135831104369-root-5e7a",
+      "judged_task": "20261029T140117776426-root-8d00",
+      "J": "2026-10-29T14:02:50.197794+00:00",
+      "judging_verdict": "20261029T140412342725-root-28e3",
+      "superseded_before": 1
+     }
+    ],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [
+     "R2"
+    ],
+    "warned_window": []
+   }
+  ],
+  "turn-14": [
+   {
+    "item": "P1",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P2",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P3",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P4",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P5",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P6",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P7",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P8",
+    "kind": "step",
+    "state": "new",
+    "k": 3,
+    "r": [
+     1,
+     1
+    ],
+    "clean": 2,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": "2026-10-29T13:45:53.277380+00:00",
+    "carried": "",
+    "retire_due": false,
+    "judged": [
+     {
+      "case": "20261029T135244730879-root-a163",
+      "judged_task": "20261029T135244730879-root-a163",
+      "J": "2026-10-29T13:54:18.350510+00:00",
+      "judging_verdict": "20261029T135547317036-root-baa0",
+      "superseded_before": 0
+     },
+     {
+      "case": "20261029T135831104369-root-5e7a",
+      "judged_task": "20261029T140117776426-root-8d00",
+      "J": "2026-10-29T14:02:50.197794+00:00",
+      "judging_verdict": "20261029T140412342725-root-28e3",
+      "superseded_before": 1
+     }
+    ],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [
+     "R2"
+    ],
+    "warned_window": []
+   },
+   {
+    "item": "P9",
+    "kind": "step",
+    "state": "new",
+    "k": 3,
+    "r": [
+     1,
+     3
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": "2026-10-29T14:05:45.309656+00:00",
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   }
+  ],
+  "turn-15": [
+   {
+    "item": "P1",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P2",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P3",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P4",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P5",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P6",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P7",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P8",
+    "kind": "step",
+    "state": "new",
+    "k": 3,
+    "r": [
+     1,
+     1
+    ],
+    "clean": 2,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": "2026-10-29T13:45:53.277380+00:00",
+    "carried": "",
+    "retire_due": false,
+    "judged": [
+     {
+      "case": "20261029T135244730879-root-a163",
+      "judged_task": "20261029T135244730879-root-a163",
+      "J": "2026-10-29T13:54:18.350510+00:00",
+      "judging_verdict": "20261029T135547317036-root-baa0",
+      "superseded_before": 0
+     },
+     {
+      "case": "20261029T135831104369-root-5e7a",
+      "judged_task": "20261029T140117776426-root-8d00",
+      "J": "2026-10-29T14:02:50.197794+00:00",
+      "judging_verdict": "20261029T140412342725-root-28e3",
+      "superseded_before": 1
+     }
+    ],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [
+     "R2"
+    ],
+    "warned_window": []
+   },
+   {
+    "item": "P9",
+    "kind": "step",
+    "state": "new",
+    "k": 3,
+    "r": [
+     1,
+     3
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": "2026-10-29T14:05:45.309656+00:00",
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   }
+  ],
+  "turn-16": [
+   {
+    "item": "P1",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P2",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P3",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P4",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P5",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P6",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P7",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P8",
+    "kind": "step",
+    "state": "new",
+    "k": 3,
+    "r": [
+     1,
+     1
+    ],
+    "clean": 2,
+    "waiting": 1,
+    "related": [],
+    "pending": [],
+    "since": "2026-10-29T13:45:53.277380+00:00",
+    "carried": "",
+    "retire_due": false,
+    "judged": [
+     {
+      "case": "20261029T135244730879-root-a163",
+      "judged_task": "20261029T135244730879-root-a163",
+      "J": "2026-10-29T13:54:18.350510+00:00",
+      "judging_verdict": "20261029T135547317036-root-baa0",
+      "superseded_before": 0
+     },
+     {
+      "case": "20261029T135831104369-root-5e7a",
+      "judged_task": "20261029T140117776426-root-8d00",
+      "J": "2026-10-29T14:02:50.197794+00:00",
+      "judging_verdict": "20261029T140412342725-root-28e3",
+      "superseded_before": 1
+     },
+     {
+      "case": "20261029T141102711053-root-9df1",
+      "judged_task": null,
+      "J": null,
+      "judging_verdict": null,
+      "superseded_before": 0
+     }
+    ],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [
+     "R2"
+    ],
+    "warned_window": []
+   },
+   {
+    "item": "P9",
+    "kind": "step",
+    "state": "new",
+    "k": 3,
+    "r": [
+     1,
+     3
+    ],
+    "clean": 0,
+    "waiting": 1,
+    "related": [],
+    "pending": [],
+    "since": "2026-10-29T14:05:45.309656+00:00",
+    "carried": "",
+    "retire_due": false,
+    "judged": [
+     {
+      "case": "20261029T141102711053-root-9df1",
+      "judged_task": null,
+      "J": null,
+      "judging_verdict": null,
+      "superseded_before": 0
+     }
+    ],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   }
+  ],
+  "turn-17": [
+   {
+    "item": "P1",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P2",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P3",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P4",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P5",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P6",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P7",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P8",
+    "kind": "step",
+    "state": "kept",
+    "k": 3,
+    "r": [
+     1,
+     1
+    ],
+    "clean": 3,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": "2026-10-29T13:45:53.277380+00:00",
+    "carried": "",
+    "retire_due": false,
+    "judged": [
+     {
+      "case": "20261029T135244730879-root-a163",
+      "judged_task": "20261029T135244730879-root-a163",
+      "J": "2026-10-29T13:54:18.350510+00:00",
+      "judging_verdict": "20261029T135547317036-root-baa0",
+      "superseded_before": 0
+     },
+     {
+      "case": "20261029T135831104369-root-5e7a",
+      "judged_task": "20261029T140117776426-root-8d00",
+      "J": "2026-10-29T14:02:50.197794+00:00",
+      "judging_verdict": "20261029T140412342725-root-28e3",
+      "superseded_before": 1
+     },
+     {
+      "case": "20261029T141102711053-root-9df1",
+      "judged_task": "20261029T141102711053-root-9df1",
+      "J": "2026-10-29T14:12:22.053152+00:00",
+      "judging_verdict": "20261029T141344753643-root-36f1",
+      "superseded_before": 0
+     }
+    ],
+    "E": "2026-10-29T14:12:22.053152+00:00",
+    "D": "2026-10-29T14:13:44.753643+00:00",
+    "K": "2026-10-29T14:13:44.753643+00:00",
+    "window": [
+     "R2"
+    ],
+    "warned_window": []
+   },
+   {
+    "item": "P9",
+    "kind": "step",
+    "state": "new",
+    "k": 3,
+    "r": [
+     1,
+     3
+    ],
+    "clean": 1,
+    "waiting": 1,
+    "related": [],
+    "pending": [],
+    "since": "2026-10-29T14:05:45.309656+00:00",
+    "carried": "",
+    "retire_due": false,
+    "judged": [
+     {
+      "case": "20261029T141102711053-root-9df1",
+      "judged_task": "20261029T141102711053-root-9df1",
+      "J": "2026-10-29T14:12:22.053152+00:00",
+      "judging_verdict": "20261029T141344753643-root-36f1",
+      "superseded_before": 0
+     },
+     {
+      "case": "20261029T141346074674-root-4ec3",
+      "judged_task": null,
+      "J": null,
+      "judging_verdict": null,
+      "superseded_before": 0
+     }
+    ],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   }
+  ],
+  "turn-18": [
+   {
+    "item": "P1",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P2",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P3",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P4",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P5",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P6",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P7",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P8",
+    "kind": "step",
+    "state": "kept",
+    "k": 3,
+    "r": [
+     1,
+     1
+    ],
+    "clean": 3,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": "2026-10-29T13:45:53.277380+00:00",
+    "carried": "",
+    "retire_due": false,
+    "judged": [
+     {
+      "case": "20261029T135244730879-root-a163",
+      "judged_task": "20261029T135244730879-root-a163",
+      "J": "2026-10-29T13:54:18.350510+00:00",
+      "judging_verdict": "20261029T135547317036-root-baa0",
+      "superseded_before": 0
+     },
+     {
+      "case": "20261029T135831104369-root-5e7a",
+      "judged_task": "20261029T140117776426-root-8d00",
+      "J": "2026-10-29T14:02:50.197794+00:00",
+      "judging_verdict": "20261029T140412342725-root-28e3",
+      "superseded_before": 1
+     },
+     {
+      "case": "20261029T141102711053-root-9df1",
+      "judged_task": "20261029T141102711053-root-9df1",
+      "J": "2026-10-29T14:12:22.053152+00:00",
+      "judging_verdict": "20261029T141344753643-root-36f1",
+      "superseded_before": 0
+     }
+    ],
+    "E": "2026-10-29T14:12:22.053152+00:00",
+    "D": "2026-10-29T14:13:44.753643+00:00",
+    "K": "2026-10-29T14:13:44.753643+00:00",
+    "window": [
+     "R2"
+    ],
+    "warned_window": []
+   },
+   {
+    "item": "P9",
+    "kind": "step",
+    "state": "new",
+    "k": 3,
+    "r": [
+     1,
+     3
+    ],
+    "clean": 1,
+    "waiting": 1,
+    "related": [],
+    "pending": [],
+    "since": "2026-10-29T14:05:45.309656+00:00",
+    "carried": "",
+    "retire_due": false,
+    "judged": [
+     {
+      "case": "20261029T141102711053-root-9df1",
+      "judged_task": "20261029T141102711053-root-9df1",
+      "J": "2026-10-29T14:12:22.053152+00:00",
+      "judging_verdict": "20261029T141344753643-root-36f1",
+      "superseded_before": 0
+     },
+     {
+      "case": "20261029T141346074674-root-4ec3",
+      "judged_task": null,
+      "J": null,
+      "judging_verdict": null,
+      "superseded_before": 0
+     }
+    ],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   }
+  ],
+  "turn-19": [
+   {
+    "item": "P1",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P2",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P3",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P4",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P5",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P6",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P7",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P8",
+    "kind": "step",
+    "state": "kept",
+    "k": 3,
+    "r": [
+     1,
+     1
+    ],
+    "clean": 3,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": "2026-10-29T13:45:53.277380+00:00",
+    "carried": "",
+    "retire_due": false,
+    "judged": [
+     {
+      "case": "20261029T135244730879-root-a163",
+      "judged_task": "20261029T135244730879-root-a163",
+      "J": "2026-10-29T13:54:18.350510+00:00",
+      "judging_verdict": "20261029T135547317036-root-baa0",
+      "superseded_before": 0
+     },
+     {
+      "case": "20261029T135831104369-root-5e7a",
+      "judged_task": "20261029T140117776426-root-8d00",
+      "J": "2026-10-29T14:02:50.197794+00:00",
+      "judging_verdict": "20261029T140412342725-root-28e3",
+      "superseded_before": 1
+     },
+     {
+      "case": "20261029T141102711053-root-9df1",
+      "judged_task": "20261029T141102711053-root-9df1",
+      "J": "2026-10-29T14:12:22.053152+00:00",
+      "judging_verdict": "20261029T141344753643-root-36f1",
+      "superseded_before": 0
+     }
+    ],
+    "E": "2026-10-29T14:12:22.053152+00:00",
+    "D": "2026-10-29T14:13:44.753643+00:00",
+    "K": "2026-10-29T14:13:44.753643+00:00",
+    "window": [
+     "R2"
+    ],
+    "warned_window": []
+   },
+   {
+    "item": "P9",
+    "kind": "step",
+    "state": "new",
+    "k": 3,
+    "r": [
+     1,
+     3
+    ],
+    "clean": 2,
+    "waiting": 1,
+    "related": [],
+    "pending": [],
+    "since": "2026-10-29T14:05:45.309656+00:00",
+    "carried": "",
+    "retire_due": false,
+    "judged": [
+     {
+      "case": "20261029T141102711053-root-9df1",
+      "judged_task": "20261029T141102711053-root-9df1",
+      "J": "2026-10-29T14:12:22.053152+00:00",
+      "judging_verdict": "20261029T141344753643-root-36f1",
+      "superseded_before": 0
+     },
+     {
+      "case": "20261029T141346074674-root-4ec3",
+      "judged_task": "20261029T141346074674-root-4ec3",
+      "J": "2026-10-29T14:15:33.260584+00:00",
+      "judging_verdict": "20261029T141835093604-root-c43c",
+      "superseded_before": 0
+     },
+     {
+      "case": "20261029T141835117946-root-723b",
+      "judged_task": null,
+      "J": null,
+      "judging_verdict": null,
+      "superseded_before": 0
+     }
+    ],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   }
+  ],
+  "turn-20": [
+   {
+    "item": "P1",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P2",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P3",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P4",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P5",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P6",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P7",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P8",
+    "kind": "step",
+    "state": "kept",
+    "k": 3,
+    "r": [
+     1,
+     1
+    ],
+    "clean": 3,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": "2026-10-29T13:45:53.277380+00:00",
+    "carried": "",
+    "retire_due": false,
+    "judged": [
+     {
+      "case": "20261029T135244730879-root-a163",
+      "judged_task": "20261029T135244730879-root-a163",
+      "J": "2026-10-29T13:54:18.350510+00:00",
+      "judging_verdict": "20261029T135547317036-root-baa0",
+      "superseded_before": 0
+     },
+     {
+      "case": "20261029T135831104369-root-5e7a",
+      "judged_task": "20261029T140117776426-root-8d00",
+      "J": "2026-10-29T14:02:50.197794+00:00",
+      "judging_verdict": "20261029T140412342725-root-28e3",
+      "superseded_before": 1
+     },
+     {
+      "case": "20261029T141102711053-root-9df1",
+      "judged_task": "20261029T141102711053-root-9df1",
+      "J": "2026-10-29T14:12:22.053152+00:00",
+      "judging_verdict": "20261029T141344753643-root-36f1",
+      "superseded_before": 0
+     }
+    ],
+    "E": "2026-10-29T14:12:22.053152+00:00",
+    "D": "2026-10-29T14:13:44.753643+00:00",
+    "K": "2026-10-29T14:13:44.753643+00:00",
+    "window": [
+     "R2"
+    ],
+    "warned_window": []
+   },
+   {
+    "item": "P9",
+    "kind": "step",
+    "state": "new",
+    "k": 3,
+    "r": [
+     1,
+     3
+    ],
+    "clean": 2,
+    "waiting": 1,
+    "related": [],
+    "pending": [],
+    "since": "2026-10-29T14:05:45.309656+00:00",
+    "carried": "",
+    "retire_due": false,
+    "judged": [
+     {
+      "case": "20261029T141102711053-root-9df1",
+      "judged_task": "20261029T141102711053-root-9df1",
+      "J": "2026-10-29T14:12:22.053152+00:00",
+      "judging_verdict": "20261029T141344753643-root-36f1",
+      "superseded_before": 0
+     },
+     {
+      "case": "20261029T141346074674-root-4ec3",
+      "judged_task": "20261029T141346074674-root-4ec3",
+      "J": "2026-10-29T14:15:33.260584+00:00",
+      "judging_verdict": "20261029T141835093604-root-c43c",
+      "superseded_before": 0
+     },
+     {
+      "case": "20261029T141835117946-root-723b",
+      "judged_task": null,
+      "J": null,
+      "judging_verdict": null,
+      "superseded_before": 0
+     }
+    ],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   }
+  ],
+  "turn-21": [
+   {
+    "item": "P1",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P2",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P3",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P4",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P5",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P6",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P7",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P8",
+    "kind": "step",
+    "state": "kept",
+    "k": 3,
+    "r": [
+     1,
+     1
+    ],
+    "clean": 3,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": "2026-10-29T13:45:53.277380+00:00",
+    "carried": "",
+    "retire_due": false,
+    "judged": [
+     {
+      "case": "20261029T135244730879-root-a163",
+      "judged_task": "20261029T135244730879-root-a163",
+      "J": "2026-10-29T13:54:18.350510+00:00",
+      "judging_verdict": "20261029T135547317036-root-baa0",
+      "superseded_before": 0
+     },
+     {
+      "case": "20261029T135831104369-root-5e7a",
+      "judged_task": "20261029T140117776426-root-8d00",
+      "J": "2026-10-29T14:02:50.197794+00:00",
+      "judging_verdict": "20261029T140412342725-root-28e3",
+      "superseded_before": 1
+     },
+     {
+      "case": "20261029T141102711053-root-9df1",
+      "judged_task": "20261029T141102711053-root-9df1",
+      "J": "2026-10-29T14:12:22.053152+00:00",
+      "judging_verdict": "20261029T141344753643-root-36f1",
+      "superseded_before": 0
+     }
+    ],
+    "E": "2026-10-29T14:12:22.053152+00:00",
+    "D": "2026-10-29T14:13:44.753643+00:00",
+    "K": "2026-10-29T14:13:44.753643+00:00",
+    "window": [
+     "R2"
+    ],
+    "warned_window": []
+   },
+   {
+    "item": "P9",
+    "kind": "step",
+    "state": "new",
+    "k": 3,
+    "r": [
+     1,
+     3
+    ],
+    "clean": 2,
+    "waiting": 0,
+    "related": [],
+    "pending": [
+     "R3"
+    ],
+    "since": "2026-10-29T14:05:45.309656+00:00",
+    "carried": "",
+    "retire_due": false,
+    "judged": [
+     {
+      "case": "20261029T141102711053-root-9df1",
+      "judged_task": "20261029T141102711053-root-9df1",
+      "J": "2026-10-29T14:12:22.053152+00:00",
+      "judging_verdict": "20261029T141344753643-root-36f1",
+      "superseded_before": 0
+     },
+     {
+      "case": "20261029T141346074674-root-4ec3",
+      "judged_task": "20261029T141346074674-root-4ec3",
+      "J": "2026-10-29T14:15:33.260584+00:00",
+      "judging_verdict": "20261029T141835093604-root-c43c",
+      "superseded_before": 0
+     },
+     {
+      "case": "20261029T141835117946-root-723b",
+      "judged_task": "20261029T141835117946-root-723b",
+      "J": "2026-10-29T14:20:21.765823+00:00",
+      "judging_verdict": "20261029T142246216862-root-4d83",
+      "superseded_before": 0
+     }
+    ],
+    "E": "2026-10-29T14:20:21.765823+00:00",
+    "D": "2026-10-29T14:22:46.216862+00:00",
+    "K": null,
+    "window": [
+     "R3"
+    ],
+    "warned_window": []
+   }
+  ],
+  "turn-22": [
+   {
+    "item": "P1",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P2",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P3",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P4",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P5",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P6",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P7",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P8",
+    "kind": "step",
+    "state": "new",
+    "k": 3,
+    "r": [
+     1,
+     6
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": "2026-10-29T14:24:15.360971+00:00",
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P9",
+    "kind": "step",
+    "state": "kept",
+    "k": 3,
+    "r": [
+     1,
+     3
+    ],
+    "clean": 3,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": "2026-10-29T14:05:45.309656+00:00",
+    "carried": "",
+    "retire_due": false,
+    "judged": [
+     {
+      "case": "20261029T141102711053-root-9df1",
+      "judged_task": "20261029T141102711053-root-9df1",
+      "J": "2026-10-29T14:12:22.053152+00:00",
+      "judging_verdict": "20261029T141344753643-root-36f1",
+      "superseded_before": 0
+     },
+     {
+      "case": "20261029T141346074674-root-4ec3",
+      "judged_task": "20261029T141346074674-root-4ec3",
+      "J": "2026-10-29T14:15:33.260584+00:00",
+      "judging_verdict": "20261029T141835093604-root-c43c",
+      "superseded_before": 0
+     },
+     {
+      "case": "20261029T141835117946-root-723b",
+      "judged_task": "20261029T141835117946-root-723b",
+      "J": "2026-10-29T14:20:21.765823+00:00",
+      "judging_verdict": "20261029T142246216862-root-4d83",
+      "superseded_before": 0
+     }
+    ],
+    "E": "2026-10-29T14:20:21.765823+00:00",
+    "D": "2026-10-29T14:22:46.216862+00:00",
+    "K": "2026-10-29T14:23:41.110768+00:00",
+    "window": [
+     "R3"
+    ],
+    "warned_window": []
+   }
+  ],
+  "turn-23": [
+   {
+    "item": "P1",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P2",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P3",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P4",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P5",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P6",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P7",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P8",
+    "kind": "step",
+    "state": "new",
+    "k": 3,
+    "r": [
+     1,
+     6
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": "2026-10-29T14:24:15.360971+00:00",
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P9",
+    "kind": "step",
+    "state": "kept",
+    "k": 3,
+    "r": [
+     1,
+     3
+    ],
+    "clean": 3,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": "2026-10-29T14:05:45.309656+00:00",
+    "carried": "",
+    "retire_due": false,
+    "judged": [
+     {
+      "case": "20261029T141102711053-root-9df1",
+      "judged_task": "20261029T141102711053-root-9df1",
+      "J": "2026-10-29T14:12:22.053152+00:00",
+      "judging_verdict": "20261029T141344753643-root-36f1",
+      "superseded_before": 0
+     },
+     {
+      "case": "20261029T141346074674-root-4ec3",
+      "judged_task": "20261029T141346074674-root-4ec3",
+      "J": "2026-10-29T14:15:33.260584+00:00",
+      "judging_verdict": "20261029T141835093604-root-c43c",
+      "superseded_before": 0
+     },
+     {
+      "case": "20261029T141835117946-root-723b",
+      "judged_task": "20261029T141835117946-root-723b",
+      "J": "2026-10-29T14:20:21.765823+00:00",
+      "judging_verdict": "20261029T142246216862-root-4d83",
+      "superseded_before": 0
+     }
+    ],
+    "E": "2026-10-29T14:20:21.765823+00:00",
+    "D": "2026-10-29T14:22:46.216862+00:00",
+    "K": "2026-10-29T14:23:41.110768+00:00",
+    "window": [
+     "R3"
+    ],
+    "warned_window": []
+   }
+  ],
+  "turn-24": [
+   {
+    "item": "P1",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P2",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P3",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P4",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P5",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P6",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P7",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P8",
+    "kind": "step",
+    "state": "new",
+    "k": 3,
+    "r": [
+     1,
+     6
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": "2026-10-29T14:24:15.360971+00:00",
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P9",
+    "kind": "step",
+    "state": "kept",
+    "k": 3,
+    "r": [
+     1,
+     3
+    ],
+    "clean": 3,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": "2026-10-29T14:05:45.309656+00:00",
+    "carried": "",
+    "retire_due": false,
+    "judged": [
+     {
+      "case": "20261029T141102711053-root-9df1",
+      "judged_task": "20261029T141102711053-root-9df1",
+      "J": "2026-10-29T14:12:22.053152+00:00",
+      "judging_verdict": "20261029T141344753643-root-36f1",
+      "superseded_before": 0
+     },
+     {
+      "case": "20261029T141346074674-root-4ec3",
+      "judged_task": "20261029T141346074674-root-4ec3",
+      "J": "2026-10-29T14:15:33.260584+00:00",
+      "judging_verdict": "20261029T141835093604-root-c43c",
+      "superseded_before": 0
+     },
+     {
+      "case": "20261029T141835117946-root-723b",
+      "judged_task": "20261029T141835117946-root-723b",
+      "J": "2026-10-29T14:20:21.765823+00:00",
+      "judging_verdict": "20261029T142246216862-root-4d83",
+      "superseded_before": 0
+     }
+    ],
+    "E": "2026-10-29T14:20:21.765823+00:00",
+    "D": "2026-10-29T14:22:46.216862+00:00",
+    "K": "2026-10-29T14:23:41.110768+00:00",
+    "window": [
+     "R3"
+    ],
+    "warned_window": []
+   }
+  ],
+  "turn-25": [
+   {
+    "item": "P1",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P2",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P3",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P4",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P5",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P6",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P7",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P8",
+    "kind": "step",
+    "state": "new",
+    "k": 3,
+    "r": [
+     1,
+     6
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": "2026-10-29T14:24:15.360971+00:00",
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P9",
+    "kind": "step",
+    "state": "kept",
+    "k": 3,
+    "r": [
+     1,
+     3
+    ],
+    "clean": 3,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": "2026-10-29T14:05:45.309656+00:00",
+    "carried": "",
+    "retire_due": false,
+    "judged": [
+     {
+      "case": "20261029T141102711053-root-9df1",
+      "judged_task": "20261029T141102711053-root-9df1",
+      "J": "2026-10-29T14:12:22.053152+00:00",
+      "judging_verdict": "20261029T141344753643-root-36f1",
+      "superseded_before": 0
+     },
+     {
+      "case": "20261029T141346074674-root-4ec3",
+      "judged_task": "20261029T141346074674-root-4ec3",
+      "J": "2026-10-29T14:15:33.260584+00:00",
+      "judging_verdict": "20261029T141835093604-root-c43c",
+      "superseded_before": 0
+     },
+     {
+      "case": "20261029T141835117946-root-723b",
+      "judged_task": "20261029T141835117946-root-723b",
+      "J": "2026-10-29T14:20:21.765823+00:00",
+      "judging_verdict": "20261029T142246216862-root-4d83",
+      "superseded_before": 0
+     }
+    ],
+    "E": "2026-10-29T14:20:21.765823+00:00",
+    "D": "2026-10-29T14:22:46.216862+00:00",
+    "K": "2026-10-29T14:23:41.110768+00:00",
+    "window": [
+     "R3"
+    ],
+    "warned_window": []
+   }
+  ],
+  "turn-26": [
+   {
+    "item": "P1",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P2",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P3",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P4",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P5",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P6",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P7",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P8",
+    "kind": "step",
+    "state": "new",
+    "k": 3,
+    "r": [
+     1,
+     6
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": "2026-10-29T14:24:15.360971+00:00",
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P9",
+    "kind": "step",
+    "state": "kept",
+    "k": 3,
+    "r": [
+     1,
+     3
+    ],
+    "clean": 3,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": "2026-10-29T14:05:45.309656+00:00",
+    "carried": "",
+    "retire_due": false,
+    "judged": [
+     {
+      "case": "20261029T141102711053-root-9df1",
+      "judged_task": "20261029T141102711053-root-9df1",
+      "J": "2026-10-29T14:12:22.053152+00:00",
+      "judging_verdict": "20261029T141344753643-root-36f1",
+      "superseded_before": 0
+     },
+     {
+      "case": "20261029T141346074674-root-4ec3",
+      "judged_task": "20261029T141346074674-root-4ec3",
+      "J": "2026-10-29T14:15:33.260584+00:00",
+      "judging_verdict": "20261029T141835093604-root-c43c",
+      "superseded_before": 0
+     },
+     {
+      "case": "20261029T141835117946-root-723b",
+      "judged_task": "20261029T141835117946-root-723b",
+      "J": "2026-10-29T14:20:21.765823+00:00",
+      "judging_verdict": "20261029T142246216862-root-4d83",
+      "superseded_before": 0
+     }
+    ],
+    "E": "2026-10-29T14:20:21.765823+00:00",
+    "D": "2026-10-29T14:22:46.216862+00:00",
+    "K": "2026-10-29T14:23:41.110768+00:00",
+    "window": [
+     "R3"
+    ],
+    "warned_window": []
+   }
+  ],
+  "turn-27": [
+   {
+    "item": "P1",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P2",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P3",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P4",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P5",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P6",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P7",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P8",
+    "kind": "step",
+    "state": "new",
+    "k": 3,
+    "r": [
+     1,
+     6
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": "2026-10-29T14:24:15.360971+00:00",
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P9",
+    "kind": "step",
+    "state": "kept",
+    "k": 3,
+    "r": [
+     1,
+     3
+    ],
+    "clean": 3,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": "2026-10-29T14:05:45.309656+00:00",
+    "carried": "",
+    "retire_due": false,
+    "judged": [
+     {
+      "case": "20261029T141102711053-root-9df1",
+      "judged_task": "20261029T141102711053-root-9df1",
+      "J": "2026-10-29T14:12:22.053152+00:00",
+      "judging_verdict": "20261029T141344753643-root-36f1",
+      "superseded_before": 0
+     },
+     {
+      "case": "20261029T141346074674-root-4ec3",
+      "judged_task": "20261029T141346074674-root-4ec3",
+      "J": "2026-10-29T14:15:33.260584+00:00",
+      "judging_verdict": "20261029T141835093604-root-c43c",
+      "superseded_before": 0
+     },
+     {
+      "case": "20261029T141835117946-root-723b",
+      "judged_task": "20261029T141835117946-root-723b",
+      "J": "2026-10-29T14:20:21.765823+00:00",
+      "judging_verdict": "20261029T142246216862-root-4d83",
+      "superseded_before": 0
+     }
+    ],
+    "E": "2026-10-29T14:20:21.765823+00:00",
+    "D": "2026-10-29T14:22:46.216862+00:00",
+    "K": "2026-10-29T14:23:41.110768+00:00",
+    "window": [
+     "R3"
+    ],
+    "warned_window": []
+   }
+  ],
+  "end": [
+   {
+    "item": "P1",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P2",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P3",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P4",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P5",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P6",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P7",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P8",
+    "kind": "step",
+    "state": "new",
+    "k": 3,
+    "r": [
+     1,
+     6
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": "2026-10-29T14:24:15.360971+00:00",
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P9",
+    "kind": "step",
+    "state": "kept",
+    "k": 3,
+    "r": [
+     1,
+     3
+    ],
+    "clean": 3,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": "2026-10-29T14:05:45.309656+00:00",
+    "carried": "",
+    "retire_due": false,
+    "judged": [
+     {
+      "case": "20261029T141102711053-root-9df1",
+      "judged_task": "20261029T141102711053-root-9df1",
+      "J": "2026-10-29T14:12:22.053152+00:00",
+      "judging_verdict": "20261029T141344753643-root-36f1",
+      "superseded_before": 0
+     },
+     {
+      "case": "20261029T141346074674-root-4ec3",
+      "judged_task": "20261029T141346074674-root-4ec3",
+      "J": "2026-10-29T14:15:33.260584+00:00",
+      "judging_verdict": "20261029T141835093604-root-c43c",
+      "superseded_before": 0
+     },
+     {
+      "case": "20261029T141835117946-root-723b",
+      "judged_task": "20261029T141835117946-root-723b",
+      "J": "2026-10-29T14:20:21.765823+00:00",
+      "judging_verdict": "20261029T142246216862-root-4d83",
+      "superseded_before": 0
+     }
+    ],
+    "E": "2026-10-29T14:20:21.765823+00:00",
+    "D": "2026-10-29T14:22:46.216862+00:00",
+    "K": "2026-10-29T14:23:41.110768+00:00",
+    "window": [
+     "R3"
+    ],
+    "warned_window": []
+   }
+  ],
+  "files-end": [
+   {
+    "item": "P1",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P2",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P3",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P4",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P5",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P6",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P7",
+    "kind": "step",
+    "state": "kept",
+    "k": 0,
+    "r": [
+     0,
+     0
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": null,
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P8",
+    "kind": "step",
+    "state": "new",
+    "k": 3,
+    "r": [
+     1,
+     6
+    ],
+    "clean": 0,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": "2026-10-29T14:24:15.360971+00:00",
+    "carried": "",
+    "retire_due": false,
+    "judged": [],
+    "E": null,
+    "D": null,
+    "K": null,
+    "window": [],
+    "warned_window": []
+   },
+   {
+    "item": "P9",
+    "kind": "step",
+    "state": "kept",
+    "k": 3,
+    "r": [
+     1,
+     3
+    ],
+    "clean": 3,
+    "waiting": 0,
+    "related": [],
+    "pending": [],
+    "since": "2026-10-29T14:05:45.309656+00:00",
+    "carried": "",
+    "retire_due": false,
+    "judged": [
+     {
+      "case": "20261029T141102711053-root-9df1",
+      "judged_task": "20261029T141102711053-root-9df1",
+      "J": "2026-10-29T14:12:22.053152+00:00",
+      "judging_verdict": "20261029T141344753643-root-36f1",
+      "superseded_before": 0
+     },
+     {
+      "case": "20261029T141346074674-root-4ec3",
+      "judged_task": "20261029T141346074674-root-4ec3",
+      "J": "2026-10-29T14:15:33.260584+00:00",
+      "judging_verdict": "20261029T141835093604-root-c43c",
+      "superseded_before": 0
+     },
+     {
+      "case": "20261029T141835117946-root-723b",
+      "judged_task": "20261029T141835117946-root-723b",
+      "J": "2026-10-29T14:20:21.765823+00:00",
+      "judging_verdict": "20261029T142246216862-root-4d83",
+      "superseded_before": 0
+     }
+    ],
+    "E": "2026-10-29T14:20:21.765823+00:00",
+    "D": "2026-10-29T14:22:46.216862+00:00",
+    "K": "2026-10-29T14:23:41.110768+00:00",
+    "window": [
+     "R3"
+    ],
+    "warned_window": []
+   }
+  ]
+ }
+}

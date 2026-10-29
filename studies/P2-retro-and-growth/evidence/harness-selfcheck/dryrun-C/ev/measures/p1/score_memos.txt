@@ -1,0 +1,6 @@
+score_memos ev: 0 versions, 0 final memos; reviewer None (owner lead)
+
+memo       ver sha      D    A    wrong  extra  Summary order words copied  review
+
+final memos: decisions 0 of 8, actions 0 of 15, wrong dates 0, extra rows 0, Summary 0 of 6
+delivered (copied) versions: n/a (0 of 0)

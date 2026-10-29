@@ -1,0 +1,52 @@
+{
+  "schemaVersion": "1.0.0",
+  "dataModelVersion": 1,
+  "id": "sess_990793ad-2f95-4cfd-a194-5e4fc257cf31",
+  "title": "Weekly meeting memo team",
+  "agentMode": "hirearchy-study-p2-R1-assistant",
+  "workspacePaths": [
+    "/private/tmp/hirearchy-p2/R1-1793275867"
+  ],
+  "rootPaths": [
+    "/private/tmp/hirearchy-p2/R1-1793275867"
+  ],
+  "createdAt": "2026-10-29T12:12:52.574Z",
+  "lastModifiedAt": "2026-10-29T13:26:34.977Z",
+  "modelId": "claude-sonnet-5.5",
+  "autopilot": true,
+  "effortLevel": "high",
+  "contextSnapshotModelDisplay": {
+    "modelId": "claude-sonnet-5.5",
+    "display": "Claude Sonnet 5.5"
+  },
+  "semanticReviewEnabled": true,
+  "disableAutoCompaction": false,
+  "ftaEnabled": false,
+  "workflowsEnabled": false,
+  "specPlanEnabled": false,
+  "specWorkflow": "quick",
+  "specSkipClarificationEnabled": true,
+  "memoryConfig": {
+    "mode": "read_write",
+    "reflection": true
+  },
+  "memoryConfigSource": "explicit",
+  "description": "Asking which notes file \"this week\" means for the new ops action list.",
+  "status": "idle",
+  "_meta": {
+    "kiro": {
+      "settings": {
+        "memory": {
+          "mode": "read_write",
+          "reflection": true
+        },
+        "workflows": {
+          "enabled": false
+        },
+        "goal": {
+          "enabled": false
+        }
+      }
+    }
+  }
+}

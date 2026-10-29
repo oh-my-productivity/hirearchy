@@ -1,0 +1,78 @@
+{
+ "files": [
+  "p2/applies.json",
+  "p2/plans.json",
+  "rederived/p2/signals.json",
+  "org-files/retros.json"
+ ],
+ "parts": {
+  "(0)": {
+   "files": [
+    "p2/applies.json",
+    "p2/plans.json",
+    "rederived/p2/signals.json",
+    "org-files/retros.json"
+   ],
+   "reason": "3 applied plan(s)",
+   "steps": [],
+   "verdict": "PASS"
+  },
+  "(a)": {
+   "files": [
+    "p2/applies.json",
+    "p2/plans.json",
+    "rederived/p2/signals.json",
+    "org-files/retros.json"
+   ],
+   "reason": "every criterion has one source",
+   "steps": [],
+   "verdict": "PASS"
+  },
+  "(b)": {
+   "files": [
+    "p2/applies.json",
+    "p2/plans.json",
+    "rederived/p2/signals.json",
+    "org-files/retros.json"
+   ],
+   "reason": "every quote is in the recorded words",
+   "steps": [],
+   "verdict": "PASS"
+  },
+  "(c)": {
+   "files": [
+    "p2/applies.json",
+    "p2/plans.json",
+    "rederived/p2/signals.json",
+    "org-files/retros.json"
+   ],
+   "reason": "2 source line(s) as derived",
+   "steps": [],
+   "verdict": "PASS"
+  },
+  "(d)": {
+   "files": [
+    "p2/applies.json",
+    "p2/plans.json",
+    "rederived/p2/signals.json",
+    "org-files/retros.json"
+   ],
+   "reason": "[[\"Decisions and actions use the notes' own words.\", \"Owners: initials or full names?\", [\"decisions\", \"and\", \"actions\", \"own\"]]]",
+   "steps": [],
+   "verdict": "REPORTED"
+  },
+  "(e)": {
+   "files": [
+    "p2/applies.json",
+    "p2/plans.json",
+    "rederived/p2/signals.json",
+    "org-files/retros.json"
+   ],
+   "reason": "[[\"PASS\", \"clarify|weekly-memo|C4|decisionsandactionsusethenotesownwords\"], [\"HELD BACK (B1)\", \"clarify|weekly-memo|C5|thememostartswithaonelinesummarythenthed\"], [\"HELD BACK (B1)\", \"clarify|weekly-memo|C6|adeadlinethenotesgiveinwordsisturnedinto\"]]",
+   "steps": [],
+   "verdict": "HELD BACK (B1)/PASS"
+  }
+ },
+ "reason": "(0) PASS; (a) PASS; (b) PASS; (c) PASS; (d) REPORTED; (e) HELD BACK (B1)/PASS",
+ "verdict": "PASS"
+}

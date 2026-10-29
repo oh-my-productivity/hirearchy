@@ -1,0 +1,1 @@
+env -u KIRO_HOME kiro-cli chat --v3 --no-interactive --trust-all-tools --effort high --agent hirearchy-study-p2-C1-assistant 'Hi! After each of our weekly team meetings I want a short memo from my notes: what we decided and who does what. My notes are in /tmp/hirearchy-p2/C1-1793280632/notes (one file per meeting). Can you set up a team that does this for me every week?'

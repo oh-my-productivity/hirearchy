@@ -1,0 +1,3 @@
+Memo 1's first delivered version (D8): turn 3's reply copied 2026-10-05-memo.md into deliverables/ and presented it ("Keep it, or what should change?").
+It is the result of root's task 20261029T121630346755-root-d28e (no rework), result message read/20261029T121811107223-lead-a9c6.md.
+--revises argument: 20261029T121630346755-root-d28e. No scheduler running (no .runtime/scheduler.pid; no process naming the sandbox).

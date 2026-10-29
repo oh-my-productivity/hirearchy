@@ -1,0 +1,21 @@
+######## TURN 5  start 12:21:35  end 12:24:19  elapsed 164s  (local, 2026-10-29; UTC wall-clock start 2026-10-29T12:21:35Z end 2026-10-29T12:24:19Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Yes, add it.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-05.stderr.txt):
+The corrected memo is at `/private/tmp/hirearchy-p2/R1-1793275867/deliverables/2026-10-05-memo.md`. I copied it over the earlier version and checked the two files are identical.
+
+- **Your corrections:** met. Sam's Due is 2026-10-09 and Marta's is 2026-10-14. The memo opens with a one-line "Summary:", then Decisions, then the action items table. I removed Sam's and Marta's entries from "Unclear".
+- **Lasting rule:** the Summary-first order is now a standing check (C9) on every future memo.
+- **Other checks:** all still met.
+  - It is 251 words by `wc`; the lead counted 218.
+  - It has 2 decisions and 5 rows, with the Owner | Action | Due columns.
+  - Lee's Due is "none".
+  - "Unclear" is the last heading.
+  - The lead reports 7 of 7 verified.
+- **Sam and Marta's dates:** these apply to this memo only. The rule for relative deadlines (C5) is unchanged, so a future "before Friday" may still come out as "none" unless the notes make the date clear. Tell me if you want that written in as a rule too.
+
+An extra rework request, 20261029T121913557638-root-5ea7, appears in the record under my seat. It ran before your corrections and changed nothing in the memo. It used 1 run, which counts as mine, not yours.
+
+Runs: 7 for this case against the 12 approved. That is 6 on your requests and 1 on that extra rework.
+
+Keep it, or what should change?

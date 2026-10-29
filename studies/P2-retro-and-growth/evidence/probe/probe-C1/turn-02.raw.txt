@@ -1,0 +1,15 @@
+I ran `services`. This is its reply:
+
+```
+Services you can request (from your direct reports):
+- probe-memo (offered by lead; contract v1, playbook v0): One short memo from one notes file
+  inputs: notes_file* (the notes file)   (* required)
+  each request: 12 runs; acceptance criteria (lead/services/probe-memo/SERVICE.md):
+    C1: At most 400 words.
+  record: no requests yet
+  playbook: none yet
+```
+
+The org offers one service, `probe-memo`, which `lead` provides. It turns one notes file into a memo of at most 400 words. Each request costs 12 runs. No requests have been made yet.
+
+I called the tool before loading it, and the call worked anyway. I then loaded it, which wasn't needed.

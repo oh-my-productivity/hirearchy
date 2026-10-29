@@ -1,0 +1,8 @@
+turn 1: effort stops 0 of 0 run logs (none); cmd without --effort high 0; 'failed to set effort' 0
+turn 2: effort stops 0 of 0 run logs (none); cmd without --effort high 0; 'failed to set effort' 0
+turn 3: effort stops 0 of 3 run logs (none); cmd without --effort high 0; 'failed to set effort' 0
+turn 4: effort stops 0 of 6 run logs (none); cmd without --effort high 0; 'failed to set effort' 0
+turn 5: effort stops 1 of 10 run logs (lead/runs/20261029T104930658411.log); cmd without --effort high 0; 'failed to set effort' 1
+turn 6: effort stops 1 of 13 run logs (lead/runs/20261029T104930658411.log); cmd without --effort high 0; 'failed to set effort' 1
+turn 7: effort stops 1 of 13 run logs (lead/runs/20261029T104930658411.log); cmd without --effort high 0; 'failed to set effort' 1
+turn end: effort stops 1 of 13 run logs (lead/runs/20261029T104930658411.log); cmd without --effort high 0; 'failed to set effort' 1

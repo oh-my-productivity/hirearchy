@@ -1,0 +1,5 @@
+[10/29/26 12:08:30] INFO     Processing request of type            server.py:733
+                             CallToolRequest                                    
+                    INFO     Processing request of type            server.py:733
+                             ListToolsRequest                                   
+{"write": "wrote lead/writer/AGENT.md (organization file). charter frontmatter of `lead/writer`: nothing kept from the old frontmat", "hire": "hired ops-helper\n", "plan": "PLAN FOR YOU (a change to your organization)\nWhy: dry run: retire the helper\nYour organization now: 3 agents, 1 service(", "apply": "applied the change 44cd783d7997 to /private/tmp/hirearchy-p2/selfcheck-R-1793275673/f7-a/org\nretired: ops-helper\nNothing", "define": "defined service `extra-svc` (contract v1) for lead: lead/services/extra-svc/SERVICE.md. It has no playbook yet: lead wri", "retire": "retired service `extra-svc` of lead; files kept at lead/services/.retired/extra-svc-20261029T120832617070\n", "hire2": "hired ops-keeper\n"}

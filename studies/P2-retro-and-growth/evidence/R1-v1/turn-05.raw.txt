@@ -1,0 +1,5 @@
+I've recorded your rejection. The change you describe is a new standing rule. Adding a Summary line also pulls against check C1, which says the memo covers "only" decisions and action items. So I'm asking one question before I change anything:
+
+About C1: add "Every memo starts with a one-line 'Summary:' of the meeting, then the Decisions, then the Actions; the Summary line is the one thing allowed besides decisions and actions" as a lasting rule? Yes or no.
+
+On yes, I add the rule and send the 2026-10-05 memo back to the team so it gets the Summary line. On no, I treat it as a one-off change for this memo only. In both cases the memo isn't final yet.

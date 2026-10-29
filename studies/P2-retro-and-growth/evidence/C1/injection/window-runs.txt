@@ -1,0 +1,52 @@
+# window runs (protocol 5.4): runs that started in the injection window 2026-10-29T13:41:37Z .. 2026-10-29T13:43:01Z; injected task 20261029T134137516157-root-2478; revised (memo 1) task 20261029T133518543841-root-4955
+
+## run lead@20261029T134137783757 agent=lead model=claude-sonnet-5.5 start=2026-10-29T13:41:37.795906+00:00 end=2026-10-29T13:42:18.030602+00:00 exit=0 secs=40 session=sess_0aea1eaa-29ba-4407-9652-1e2b543b36ff
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 2
+  lead message 20261029T134206606997-lead-1c81 to=lead/writer type=task status=None created=2026-10-29T13:42:06+00:00
+  ## Lessons: (none)
+  org-git commit 64b5deb MEMORY.md diff:
+    commit 64b5deb23f19040d74a2850e98e1872e8d7aa3d3
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Thu Oct 29 13:42:18 2026 +0000
+    
+        lead: run ok, 1 message(s) [lead/runs/20261029T134137783757.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index d65a4bd..9a38588 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,3 +1,3 @@
+     # Memory
+    -Memo 2026-10-05: first task ...-4955 reported done. Rework task ...-6dfb (Sam Due 2026-10-09, Marta Due 2026-10-14) verified and reported done; memo at lead/writer/work/memo-2026-10-05.md (97 words). Nothing outstanding.
+    -Lesson: a date after 'for' (event date) is not a deadline; relative 'before Friday' -> none unless client confirms. Playbook unchanged.
+    +Memo 2026-10-05 history: earlier tasks ...-4955, ...-6dfb done. NEW rework task 20261029T134137516157-root-2478 (6 runs): Sam and Marta Due must be none, with Open questions lines. I delegated to lead/writer (budget 2, revises none; its earlier task ids unknown) and am waiting for its result. No reviewer exists in team (only writer, hiring slot used): I verify myself against notes, every Due value (Priya 2026-10-09, Dev 2026-10-08, Sam none, Marta none, Lee none), word count <=400, then report done on root-2478 with lessons. Memo path: lead/writer/work/memo-2026-10-05.md.
+    +Lesson: a date after 'for' (event date) is not a deadline; relative 'before Friday' -> none unless client confirms. Playbook unchanged (consider revise only with evidence).
+
+## run lead/writer@20261029T134207960019 agent=lead-writer model=claude-sonnet-5.5 start=2026-10-29T13:42:07.966176+00:00 end=2026-10-29T13:42:36.189923+00:00 exit=0 secs=28 session=sess_739842f3-84e5-424a-b8ba-277cbd2f80c0
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 4
+
+## run lead@20261029T134230144973 agent=lead model=claude-sonnet-5.5 start=2026-10-29T13:42:30.160160+00:00 end=2026-10-29T13:43:00.350620+00:00 exit=0 secs=30 session=sess_36c29787-20b6-4228-b233-05312f05387c
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 3
+  lead message 20261029T134254356274-lead-e7cf to=root type=result status=done created=2026-10-29T13:42:54+00:00
+  ## Lessons: Near miss: none in this rework. Earlier cause: C5 was read as letting an event date ("for Oct 14") or a relative deadline ("before Friday") become a Due. Prevent: treat only explicit deadlines ("by <date>") as dates; otherwise none plus an Open questions line.
+  org-git commit 3deab86 MEMORY.md diff:
+    commit 3deab865c4a55b9549e3b5dc0fe06d39b7990e2f
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Thu Oct 29 13:43:00 2026 +0000
+    
+        lead: run ok, 1 message(s) [lead/runs/20261029T134230144973.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index 9a38588..7195fc3 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,3 +1,3 @@
+     # Memory
+    -Memo 2026-10-05 history: earlier tasks ...-4955, ...-6dfb done. NEW rework task 20261029T134137516157-root-2478 (6 runs): Sam and Marta Due must be none, with Open questions lines. I delegated to lead/writer (budget 2, revises none; its earlier task ids unknown) and am waiting for its result. No reviewer exists in team (only writer, hiring slot used): I verify myself against notes, every Due value (Priya 2026-10-09, Dev 2026-10-08, Sam none, Marta none, Lee none), word count <=400, then report done on root-2478 with lessons. Memo path: lead/writer/work/memo-2026-10-05.md.
+    -Lesson: a date after 'for' (event date) is not a deadline; relative 'before Friday' -> none unless client confirms. Playbook unchanged (consider revise only with evidence).
+    +Memo 2026-10-05: rework task ...-root-2478 verified by me and reported done (memo lead/writer/work/memo-2026-10-05.md, 127 words; Dues Priya 2026-10-09, Dev 2026-10-08, Sam/Marta/Lee none; Open questions section). Nothing outstanding.
+    +Lesson: a date after 'for' (event date) is not a deadline; relative 'before Friday' -> none unless client confirms. Playbook unchanged (revise only with evidence). No reviewer in team: I verify myself against notes.
+

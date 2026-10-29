@@ -1,0 +1,33 @@
+## POLL CHECK (protocol 4.14; progress(task_id) only), script md5 51384711db3354da7157e386662eff6e, org /private/tmp/hirearchy-p2/preflight-C-1793268897/org, task 20261029T101614892442-root-486e, max 120s, 2026-10-29T10:16:15Z (local 10:16:15 WET)
+--- progress at 2026-10-29T10:16:15Z (local 10:16:15 WET) -> reply at 2026-10-29T10:16:15Z (local 10:16:15 WET)
+args: {"task_id": "20261029T101614892442-root-486e", "wait_seconds": 119}
+reply:
+Not waiting: no scheduler is running, so nothing will change. "Open task for the poll check": working. unread work: lead. runs 0 of 2. last activity 0s ago. (task 20261029T101614892442-root-486e)
+scheduler: stopped - open tasks do not move until it is started (start() or `hirearchy run`)
+poll 1: reply after 0.0s (did not wait); pausing 5.0s before the next poll
+--- progress at 2026-10-29T10:16:20Z (local 10:16:20 WET) -> reply at 2026-10-29T10:16:20Z (local 10:16:20 WET)
+args: {"task_id": "20261029T101614892442-root-486e", "wait_seconds": 114}
+reply:
+Not waiting: no scheduler is running, so nothing will change. "Open task for the poll check": working. unread work: lead. runs 0 of 2. last activity 5s ago. (task 20261029T101614892442-root-486e)
+scheduler: stopped - open tasks do not move until it is started (start() or `hirearchy run`)
+poll 2: reply after 0.0s (did not wait); pausing 10.0s before the next poll
+--- progress at 2026-10-29T10:16:30Z (local 10:16:30 WET) -> reply at 2026-10-29T10:16:30Z (local 10:16:30 WET)
+args: {"task_id": "20261029T101614892442-root-486e", "wait_seconds": 104}
+reply:
+Not waiting: no scheduler is running, so nothing will change. "Open task for the poll check": working. unread work: lead. runs 0 of 2. last activity 15s ago. (task 20261029T101614892442-root-486e)
+scheduler: stopped - open tasks do not move until it is started (start() or `hirearchy run`)
+poll 3: reply after 0.0s (did not wait); pausing 20.0s before the next poll
+--- progress at 2026-10-29T10:16:50Z (local 10:16:50 WET) -> reply at 2026-10-29T10:16:50Z (local 10:16:50 WET)
+args: {"task_id": "20261029T101614892442-root-486e", "wait_seconds": 84}
+reply:
+Not waiting: no scheduler is running, so nothing will change. "Open task for the poll check": working. unread work: lead. runs 0 of 2. last activity 35s ago. (task 20261029T101614892442-root-486e)
+scheduler: stopped - open tasks do not move until it is started (start() or `hirearchy run`)
+poll 4: reply after 0.0s (did not wait); pausing 40.0s before the next poll
+--- progress at 2026-10-29T10:17:30Z (local 10:17:30 WET) -> reply at 2026-10-29T10:17:30Z (local 10:17:30 WET)
+args: {"task_id": "20261029T101614892442-root-486e", "wait_seconds": 44}
+reply:
+Not waiting: no scheduler is running, so nothing will change. "Open task for the poll check": working. unread work: lead. runs 0 of 2. last activity 1m ago. (task 20261029T101614892442-root-486e)
+scheduler: stopped - open tasks do not move until it is started (start() or `hirearchy run`)
+poll 5: reply after 0.0s (did not wait); pausing 45.0s before the next poll
+window cap: 120 seconds passed
+polling ended (window cap: 120 seconds passed): progress(task_id) polls 5, quick replies 5, paused 120.0s in all

@@ -1,0 +1,12 @@
+Questions for you are pending, so I'm reading the report before copying anything.I have not copied the 19 October memo into `deliverables/` yet. The lead has two questions about dates that only you can answer. I also made an empty tool call just now; it did nothing.
+
+The memo is drafted and the lead has checked it. It has 3 decisions and 6 action rows, 3 of 3 and 6 of 6 verified, at 358 words by `wc` (the lead counted 318). It opens with "Summary:" and ends with "Unclear".
+
+1. **Lee's SSO sign-off.** The notes say he will sign off once legal replies, "probably by end of next week". The draft has Due as "none" and lists it under "Unclear". Should it be 2026-10-30?
+2. **Dev removing the deploy freeze.** The notes say Oct 24, which is a Saturday. The draft keeps 2026-10-24 as written and flags it under "Unclear". Keep that date, or use a different one?
+
+Please answer both in your reply. If you keep both as they are, I'll copy the memo as it stands. If you want a change, I'll send it back to the team, which should cost about 3 more runs, so the total stays under the 12 approved.
+
+So far the memo has used 4 of 12 runs.
+
+I'll also offer a short retrospective on how the team has worked once this memo is settled.

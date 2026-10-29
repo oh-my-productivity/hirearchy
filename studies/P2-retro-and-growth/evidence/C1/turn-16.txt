@@ -1,0 +1,22 @@
+######## TURN 16  start 14:10:46  end 14:12:40  elapsed 114s  (local, 2026-10-29; UTC wall-clock start 2026-10-29T14:10:46Z end 2026-10-29T14:12:40Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Keep it. I don't know anything about that rework - I didn't ask for it. Now 2026-10-26.md please. I'll wait.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-16.stderr.txt):
+The memo for 26 October is at `/private/tmp/hirearchy-p2/C1-1793280632/deliverables/memo-2026-10-26.md`. I read it against the notes before copying, and the two files are identical. I also recorded your "keep it" on the 19 Oct action list.
+
+- **C1 (only that meeting):** met.
+- **C2 (400 words or fewer):** met, 210 by `wc`.
+- **C3 (Decisions section):** met, 3 of 3.
+- **C4 (Actions table):** met, 5 of 5.
+- **C5 (ISO dates, "none" if no date):** met. Sam's "by Friday" became 2026-10-30, since the meeting was on Monday 26 Oct. Lee's runbook update was given "no date" in the notes, so it is "none".
+- **C6 (names not on the attendee list):** met. Jo isn't named in the memo.
+- **C7 (nothing beyond the notes):** met.
+- **C8 (lead's coverage check):** met, 8 of 8.
+- **C9 (Summary line first):** met.
+- **C10 (no "nobody has to act" lines):** met. "SSO renewal is signed" is a status update, so it is not an action.
+
+The team used 3 of the 12 runs, and 9 came back. The lead had no questions for you.
+
+The stray rework is still unexplained and logged as mine, not yours.
+
+Keep it, or what should change? If you also want the ops action list for 26 October, say so.

@@ -1,0 +1,413 @@
+# shell writes (protocol 7.2): every execute_bash call of the assistant; facts only
+
+[2026-10-29T13:40:35.248Z] call #29 turn 4 status=completed flags=['writes into the deliverable folder', 'touches S/org']
+COMMAND: mkdir -p /private/tmp/hirearchy-p2/C1-1793280632/deliverables && cp /private/tmp/hirearchy-p2/C1-1793280632/org/lead/writer/work/memo-2026-10-05.md /private/tmp/hirearchy-p2/C1-1793280632/deliverables/memo-2026-10-05.md && cmp /private/tmp/hirearchy-p2/C1-1793280632/org/lead/writer/work/memo-2026-10-05.md /private/tmp/hirearchy-p2/C1-1793280632/deliverables/memo-2026-10-05.md && wc -w /private/tmp/hirearchy-p2/C1-1793280632/deliverables/memo-2026-10-05.md
+RESULT: Output:
+     127 /private/tmp/hirearchy-p2/C1-1793280632/deliverables/memo-2026-10-05.md
+
+
+Exit Code: 0
+
+[2026-10-29T13:45:13.018Z] call #39 turn 6 status=completed flags=['touches S/org']
+COMMAND: cd /private/tmp/hirearchy-p2/C1-1793280632 && diff org/lead/writer/work/memo-2026-10-05.md deliverables/memo-2026-10-05.md && echo SAME; cat org/lead/writer/work/memo-2026-10-05.md
+RESULT: Output:
+16,17c16,17
+< | Sam | Look into the flaky CI before Friday | none |
+< | Marta | Book the on-call training room for Oct 14 | none |
+---
+> | Sam | Look into the flaky CI before Friday | 2026-10-09 |
+> | Marta | Book the on-call training room for Oct 14 | 2026-10-14 |
+19,23d18
+< 
+< ## Open questions
+< 
+< - Sam, flaky CI: the notes give only "before Friday" and no date.
+< - Marta, on-call training room: Oct 14 is the training date; the notes give no booking deadline.
+# Platform team weekly, Monday 5 October 2026
+
+Present: Priya, Sam, Lee, Marta, Dev.
+
+## Decisions
+
+- Push the gateway migration to the week of 26 October.
+- Adopt Renovate with a weekly Monday batch of dependency PRs, starting with the three core repos.
+
+## Actions
+
+| Owner | Action | Due |
+|---|---|---|
+| Priya | Draft the RFC for the new per-key rate limiter | 2026-10-09 |
+| Dev | Enable Renovate on the three core repos | 2026-10-08 |
+| Sam | Look into the flaky CI before Friday | none |
+| Marta | Book the on-call training room for Oct 14 | none |
+| Lee | Ping the vendor about the SSO certificate this week and report back | none |
+
+## Open questions
+
+- Sam, flaky CI: the notes give only "before Friday" and no date.
+- Marta, on-call training room: Oct 14 is the training date; the notes give no booking deadline.
+
+
+Exit Code: 0
+
+[2026-10-29T13:47:08.832Z] call #48 turn 6 status=completed flags=['writes into the deliverable folder', 'touches S/org']
+COMMAND: cd /private/tmp/hirearchy-p2/C1-1793280632 && cp org/lead/writer/work/memo-2026-10-05.md deliverables/memo-2026-10-05.md && cmp org/lead/writer/work/memo-2026-10-05.md deliverables/memo-2026-10-05.md && echo IDENTICAL && wc -w deliverables/memo-2026-10-05.md && head -1 deliverables/memo-2026-10-05.md | cut -c1-60
+RESULT: Output:
+IDENTICAL
+     146 deliverables/memo-2026-10-05.md
+Summary: Platform team weekly, Monday 5 October 2026 (Presen
+
+
+Exit Code: 0
+
+[2026-10-29T13:51:35.166Z] call #60 turn 8 status=completed flags=['writes into the deliverable folder', 'touches S/org']
+COMMAND: cd /private/tmp/hirearchy-p2/C1-1793280632 && cp org/lead/writer/work/action-list-2026-10-05.md deliverables/action-list-2026-10-05.md && cmp org/lead/writer/work/action-list-2026-10-05.md deliverables/action-list-2026-10-05.md && echo IDENTICAL && wc -w deliverables/action-list-2026-10-05.md && ls deliverables
+RESULT: Output:
+IDENTICAL
+      91 deliverables/action-list-2026-10-05.md
+action-list-2026-10-05.md
+memo-2026-10-05.md
+
+
+Exit Code: 0
+
+[2026-10-29T13:54:28.502Z] call #68 turn 9 status=completed flags=['writes into the deliverable folder', 'touches S/org']
+COMMAND: cd /private/tmp/hirearchy-p2/C1-1793280632 && cp org/lead/writer/work/memo-2026-10-12.md deliverables/memo-2026-10-12.md && cmp org/lead/writer/work/memo-2026-10-12.md deliverables/memo-2026-10-12.md && echo IDENTICAL && wc -w deliverables/memo-2026-10-12.md && head -1 deliverables/memo-2026-10-12.md | cut -c1-40
+RESULT: Output:
+IDENTICAL
+     192 deliverables/memo-2026-10-12.md
+Summary: Platform team weekly, Monday 12
+
+
+Exit Code: 0
+
+[2026-10-29T13:57:16.164Z] call #76 turn 10 status=completed flags=['touches S/org']
+COMMAND: find /private/tmp/hirearchy-p2/C1-1793280632/org -name 'action-list-2026-10-12*' -not -path '*/.git/*'
+RESULT: Output:
+/private/tmp/hirearchy-p2/C1-1793280632/org/lead/writer/work/action-list-2026-10-12.md
+
+
+Exit Code: 0
+
+[2026-10-29T13:57:21.962Z] call #78 turn 10 status=completed flags=['writes into the deliverable folder', 'touches S/org']
+COMMAND: cd /private/tmp/hirearchy-p2/C1-1793280632 && cp org/lead/writer/work/action-list-2026-10-12.md deliverables/action-list-2026-10-12.md && cmp org/lead/writer/work/action-list-2026-10-12.md deliverables/action-list-2026-10-12.md && echo IDENTICAL && wc -w deliverables/action-list-2026-10-12.md
+RESULT: Output:
+IDENTICAL
+     104 deliverables/action-list-2026-10-12.md
+
+
+Exit Code: 0
+
+[2026-10-29T14:02:58.516Z] call #96 turn 12 status=completed flags=['writes into the deliverable folder', 'touches S/org']
+COMMAND: cd /private/tmp/hirearchy-p2/C1-1793280632 && cp org/lead/writer/work/memo-2026-10-19.md deliverables/memo-2026-10-19.md && cmp org/lead/writer/work/memo-2026-10-19.md deliverables/memo-2026-10-19.md && echo IDENTICAL && wc -w deliverables/memo-2026-10-19.md && ls deliverables
+RESULT: Output:
+IDENTICAL
+     203 deliverables/memo-2026-10-19.md
+action-list-2026-10-05.md
+action-list-2026-10-12.md
+memo-2026-10-05.md
+memo-2026-10-12.md
+memo-2026-10-19.md
+
+
+Exit Code: 0
+
+[2026-10-29T14:07:11.412Z] call #106 turn 14 status=completed flags=['touches S/org']
+COMMAND: cat /private/tmp/hirearchy-p2/C1-1793280632/org/lead/writer/work/memo-2026-10-19.md; ls -l /private/tmp/hirearchy-p2/C1-1793280632/org/lead/writer/work/memo-2026-10-19.md
+RESULT: Output:
+Summary: Platform team weekly, Monday 19 October 2026 (Present: Priya, Sam, Lee, Marta, Dev): decided to go ahead with the demo without the rate limiter, to renew with the current SSO vendor for twelve months, and to move this weekly to Monday 14:00; five action items.
+
+## Decisions
+
+- Go ahead with the customer demo but leave the rate limiter out of it.
+- Renew with the current SSO vendor for twelve months and revisit the market next year.
+- Move this weekly from Monday 10:00 to Monday 14:00, starting with the meeting on 26 October.
+
+## Actions
+
+| Owner | Action | Due |
+|---|---|---|
+| Lee | Sign off on the renewal once legal replies, probably by end of next week | 2026-10-30 |
+| Marta | Collect demo feedback and circulate it | 2026-10-23 |
+| Dev | Remove the deploy freeze in the pipeline config | 2026-10-24 |
+| Priya | Present the rate limiter benchmark results at the next meeting on Oct 26 | 2026-10-26 |
+| Sam | Pair with Jo (not in attendee list) on the CI pipeline during that first week | none |
+-rw-r--r--@ 1 aminalizadeh  wheel  1016 Oct 29 14:06 /private/tmp/hirearchy-p2/C1-1793280632/org/lead/writer/work/memo-2026-10-19.md
+
+
+Exit Code: 0
+
+[2026-10-29T14:07:14.897Z] call #107 turn 14 status=completed flags=['writes into the deliverable folder', 'touches S/org']
+COMMAND: cd /private/tmp/hirearchy-p2/C1-1793280632 && cp org/lead/writer/work/memo-2026-10-19.md deliverables/memo-2026-10-19.md && cmp org/lead/writer/work/memo-2026-10-19.md deliverables/memo-2026-10-19.md && echo IDENTICAL && wc -w deliverables/memo-2026-10-19.md
+RESULT: Output:
+IDENTICAL
+     192 deliverables/memo-2026-10-19.md
+
+
+Exit Code: 0
+
+[2026-10-29T14:08:25.333Z] call #112 turn 15 status=failed flags=['touches S/org']
+COMMAND: cat /private/tmp/hirearchy-p2/C1-1793280632/org/lead/writer/work/action-list-2026-10-19.md
+RESULT: Output:
+cat: /private/tmp/hirearchy-p2/C1-1793280632/org/lead/writer/work/action-list-2026-10-19.md: No such file or directory
+
+
+Exit Code: 1
+
+[2026-10-29T14:09:57.944Z] call #115 turn 15 status=completed flags=['touches S/org']
+COMMAND: sleep 5; cat /private/tmp/hirearchy-p2/C1-1793280632/org/lead/writer/work/action-list-2026-10-19.md
+RESULT: Output:
+# Action list: Platform team weekly, Monday 19 October 2026
+
+| Owner | Action | Due |
+|---|---|---|
+| Lee | Sign off on the renewal once legal replies, probably by end of next week | 2026-10-30 |
+| Marta | Collect demo feedback and circulate it | 2026-10-23 |
+| Dev | Remove the deploy freeze in the pipeline config | 2026-10-24 |
+| Priya | Present the rate limiter benchmark results at the next meeting on Oct 26 | 2026-10-26 |
+| Sam | Pair with Jo (not in attendee list) on the CI pipeline during that first week | none |
+
+
+Exit Code: 0
+
+[2026-10-29T14:10:01.084Z] call #116 turn 15 status=completed flags=['writes into the deliverable folder', 'touches S/org']
+COMMAND: cd /private/tmp/hirearchy-p2/C1-1793280632 && cp org/lead/writer/work/action-list-2026-10-19.md deliverables/action-list-2026-10-19.md && cmp org/lead/writer/work/action-list-2026-10-19.md deliverables/action-list-2026-10-19.md && echo IDENTICAL && wc -w deliverables/action-list-2026-10-19.md
+RESULT: Output:
+IDENTICAL
+     104 deliverables/action-list-2026-10-19.md
+
+
+Exit Code: 0
+
+[2026-10-29T14:12:30.952Z] call #124 turn 16 status=completed flags=['touches S/org']
+COMMAND: sleep 3; cat /private/tmp/hirearchy-p2/C1-1793280632/org/lead/writer/work/memo-2026-10-26.md
+RESULT: Output:
+Summary: Platform team weekly, Monday 26 October 2026 (Present: Priya, Sam, Lee, Marta, Dev): decided to cut over to the new gateway on Wednesday 28 October, to turn the rate limiter on for the large-plan customers first, and to widen the weekly Renovate batch to all repos starting in November; five action items.
+
+## Decisions
+
+- Cut over to the new gateway on Wednesday 28 October, in the morning, with the old gateway kept as a fallback.
+- Turn the rate limiter on for the large-plan customers first and wait a week before anyone else gets it.
+- Widen the weekly Renovate batch to all repos starting in November.
+
+## Actions
+
+| Owner | Action | Due |
+|---|---|---|
+| Dev | Run the gateway cutover on Oct 28 | 2026-10-28 |
+| Priya | Enable the rate limiter flag for the large-plan customers by Oct 30 | 2026-10-30 |
+| Marta | Send the demo feedback summary to the product team by Oct 27 | 2026-10-27 |
+| Sam | Write up onboarding notes for the pipeline by Friday so the next new hire has them | 2026-10-30 |
+| Lee | Update the SSO runbook with the new certificate dates when he gets a chance | none |
+
+
+Exit Code: 0
+
+[2026-10-29T14:12:35.646Z] call #125 turn 16 status=completed flags=['writes into the deliverable folder', 'touches S/org']
+COMMAND: cd /private/tmp/hirearchy-p2/C1-1793280632 && cp org/lead/writer/work/memo-2026-10-26.md deliverables/memo-2026-10-26.md && cmp org/lead/writer/work/memo-2026-10-26.md deliverables/memo-2026-10-26.md && echo IDENTICAL && wc -w deliverables/memo-2026-10-26.md
+RESULT: Output:
+IDENTICAL
+     210 deliverables/memo-2026-10-26.md
+
+
+Exit Code: 0
+
+[2026-10-29T14:13:52.363Z] call #133 turn 17 status=failed flags=['touches S/org']
+COMMAND: sleep 3; cat /private/tmp/hirearchy-p2/C1-1793280632/org/lead/writer/work/memo-2026-11-02.md
+RESULT: Output:
+cat: /private/tmp/hirearchy-p2/C1-1793280632/org/lead/writer/work/memo-2026-11-02.md: No such file or directory
+
+
+Exit Code: 1
+
+[2026-10-29T14:15:43.881Z] call #136 turn 17 status=completed flags=['touches S/org']
+COMMAND: sleep 5; cat /private/tmp/hirearchy-p2/C1-1793280632/org/lead/writer/work/memo-2026-11-02.md
+RESULT: Output:
+Summary: Platform team weekly, Monday 2 November 2026. Present: Priya, Sam, Lee, Marta, Dev. The gateway cutover went through without customer impact; decisions on the old gateway, the rate limiter and the customer deck.
+
+## Decisions
+- Keep the old gateway running as a fallback until Friday 13 November and switch it off then.
+- Roll the rate limiter out to all plans from Monday 16 November.
+- Send the customer the quarterly review deck this week rather than wait for the review itself.
+
+## Actions
+| Owner | Action | Due |
+|---|---|---|
+| Dev | Switch off the old gateway on Nov 13. | 2026-11-13 |
+| Priya | Write the rollout plan for all plans. | 2026-11-06 |
+| JD (not in attendee list) | Send the deck to the customer. | 2026-11-05 |
+| Marta | Set up the quarterly review meeting with the customer once they confirm a slot. No date yet. | none |
+| Lee | Check the SSO renewal invoice against the quote on Wednesday. | 2026-11-04 |
+
+
+Exit Code: 0
+
+[2026-10-29T14:16:45.231Z] call #137 turn 18 status=completed flags=['writes into the deliverable folder', 'touches S/org']
+COMMAND: cd /private/tmp/hirearchy-p2/C1-1793280632 && cp org/lead/writer/work/memo-2026-11-02.md deliverables/memo-2026-11-02.md && cmp org/lead/writer/work/memo-2026-11-02.md deliverables/memo-2026-11-02.md && echo IDENTICAL && wc -w deliverables/memo-2026-11-02.md && head -1 deliverables/memo-2026-11-02.md | cut -c1-30
+RESULT: Output:
+IDENTICAL
+     176 deliverables/memo-2026-11-02.md
+Summary: Platform team weekly,
+
+
+Exit Code: 0
+
+[2026-10-29T14:18:30.223Z] call #144 turn 19 status=failed flags=['touches S/org']
+COMMAND: sleep 5; cat /private/tmp/hirearchy-p2/C1-1793280632/org/lead/writer/work/memo-2026-11-09.md
+RESULT: Output:
+cat: /private/tmp/hirearchy-p2/C1-1793280632/org/lead/writer/work/memo-2026-11-09.md: No such file or directory
+
+
+Exit Code: 1
+
+[2026-10-29T14:18:43.640Z] call #149 turn 19 status=failed flags=['touches S/org']
+COMMAND: sleep 5; cat /private/tmp/hirearchy-p2/C1-1793280632/org/lead/writer/work/memo-2026-11-09.md
+RESULT: Output:
+cat: /private/tmp/hirearchy-p2/C1-1793280632/org/lead/writer/work/memo-2026-11-09.md: No such file or directory
+
+
+Exit Code: 1
+
+[2026-10-29T14:20:32.293Z] call #152 turn 19 status=completed flags=['touches S/org']
+COMMAND: sleep 5; find /private/tmp/hirearchy-p2/C1-1793280632/org -name 'memo-2026-11-09*' -not -path '*/.git/*' -exec cat {} \;
+RESULT: Output:
+Summary: Platform team weekly, Monday 9 November 2026. Present: Priya, Sam, Lee, Marta, Dev. The old gateway switch-off moved to 20 November, the rate limiter rollout plan was approved and the on-call rotation gets a new member.
+
+## Decisions
+- Move the switch-off of the old gateway to Friday 20 November.
+- Approve Priya's rate limiter rollout plan as written.
+- Jo (not in attendee list) joins the on-call rotation from Monday 16 November.
+
+## Actions
+| Owner | Action | Due |
+|---|---|---|
+| Marta | Circulate the quarterly review notes by Nov 11. | 2026-11-11 |
+| Dev | Switch off the old gateway on Nov 20. | 2026-11-20 |
+| Priya | Start the rate limiter rollout to all plans on Nov 16. | 2026-11-16 |
+| Sam | Add Jo (not in attendee list) to the on-call rotation by Friday. | 2026-11-13 |
+| Lee | Go through the SSO audit log at some point to check for old service accounts. No date was given. | none |
+
+
+Exit Code: 0
+
+[2026-10-29T14:21:39.585Z] call #153 turn 20 status=completed flags=['writes into the deliverable folder', 'touches S/org']
+COMMAND: cd /private/tmp/hirearchy-p2/C1-1793280632 && cp org/lead/writer/work/memo-2026-11-09.md deliverables/memo-2026-11-09.md && cmp org/lead/writer/work/memo-2026-11-09.md deliverables/memo-2026-11-09.md && echo IDENTICAL && wc -w deliverables/memo-2026-11-09.md && ls deliverables
+RESULT: Output:
+IDENTICAL
+     172 deliverables/memo-2026-11-09.md
+action-list-2026-10-05.md
+action-list-2026-10-12.md
+action-list-2026-10-19.md
+memo-2026-10-05.md
+memo-2026-10-12.md
+memo-2026-10-19.md
+memo-2026-10-26.md
+memo-2026-11-02.md
+memo-2026-11-09.md
+
+
+Exit Code: 0
+
+[2026-10-29T14:23:51.884Z] call #162 turn 22 status=completed flags=['touches S/org']
+COMMAND: sleep 5; cat /private/tmp/hirearchy-p2/C1-1793280632/org/lead/writer/work/memo-2026-11-09.md
+RESULT: Output:
+Summary: Platform team weekly, Monday 9 November 2026. Present: Priya, Sam, Lee, Marta, Dev. The old gateway switch-off moved to 20 November, the rate limiter rollout plan was approved and the on-call rotation gets a new member.
+
+## Decisions
+- Move the switch-off of the old gateway to Friday 20 November.
+- Approve Priya's rate limiter rollout plan as written.
+- Jo (not in attendee list) joins the on-call rotation from Monday 16 November.
+
+## Actions
+| Owner | Action | Due |
+|---|---|---|
+| Marta | Circulate the quarterly review notes by Nov 11. | 2026-11-11 |
+| Dev | Switch off the old gateway on Nov 20. | 2026-11-20 |
+| Priya | Start the rate limiter rollout to all plans on Nov 16. | 2026-11-16 |
+| Sam | Add Jo (not in attendee list) to the on-call rotation by Friday. | 2026-11-13 |
+| Lee | Go through the SSO audit log at some point to check for old service accounts. No date was given. | none |
+
+
+Exit Code: 0
+
+[2026-10-29T14:25:26.830Z] call #165 turn 22 status=completed flags=['touches S/org']
+COMMAND: sleep 5; cd /private/tmp/hirearchy-p2/C1-1793280632/org; ls -l --time-style=full-iso lead/writer/work/ 2>/dev/null || ls -l lead/writer/work/; find . -name 'memo-2026-11-09*' -not -path './.git/*' -exec ls -l {} \; ; cat lead/writer/work/memo-2026-11-09.md
+RESULT: Output:
+total 72
+-rw-r--r--@ 1 aminalizadeh  wheel   446 Oct 29 13:51 action-list-2026-10-05.md
+-rw-r--r--@ 1 aminalizadeh  wheel   529 Oct 29 13:56 action-list-2026-10-12.md
+-rw-r--r--@ 1 aminalizadeh  wheel   524 Oct 29 14:09 action-list-2026-10-19.md
+-rw-r--r--@ 1 aminalizadeh  wheel   768 Oct 29 13:46 memo-2026-10-05.md
+-rw-r--r--@ 1 aminalizadeh  wheel  1016 Oct 29 13:53 memo-2026-10-12.md
+-rw-r--r--@ 1 aminalizadeh  wheel  1016 Oct 29 14:06 memo-2026-10-19.md
+-rw-r--r--@ 1 aminalizadeh  wheel  1104 Oct 29 14:11 memo-2026-10-26.md
+-rw-r--r--@ 1 aminalizadeh  wheel   939 Oct 29 14:14 memo-2026-11-02.md
+-rw-r--r--@ 1 aminalizadeh  wheel   910 Oct 29 14:24 memo-2026-11-09.md
+-rw-r--r--@ 1 aminalizadeh  wheel  910 Oct 29 14:24 ./lead/writer/work/memo-2026-11-09.md
+Summary: Platform team weekly, Monday 9 November 2026. Present: Priya, Sam, Lee, Marta, Dev. The old gateway switch-off moved to 20 November, the rate limiter rollout plan was approved and the on-call rotation gets a new member.
+
+## Actions
+| Owner | Action | Due |
+|---|---|---|
+| Marta | Circulate the quarterly review notes by Nov 11. | 2026-11-11 |
+| Dev | Switch off the old gateway on Nov 20. | 2026-11-20 |
+| Priya | Start the rate limiter rollout to all plans on Nov 16. | 2026-11-16 |
+| Sam | Add Jo (not in attendee list) to the on-call rotation by Friday. | 2026-11-13 |
+| Lee | Go through the SSO audit log at some point to check for old service accounts. No date was given. | none |
+
+## Decisions
+- Move the swi
+
+[2026-10-29T14:25:31.544Z] call #166 turn 22 status=completed flags=['writes into the deliverable folder', 'touches S/org']
+COMMAND: cd /private/tmp/hirearchy-p2/C1-1793280632 && cp org/lead/writer/work/memo-2026-11-09.md deliverables/memo-2026-11-09.md && cmp org/lead/writer/work/memo-2026-11-09.md deliverables/memo-2026-11-09.md && echo IDENTICAL && wc -w deliverables/memo-2026-11-09.md && grep -n '^Summary\|^## ' deliverables/memo-2026-11-09.md | cut -c1-30
+RESULT: Output:
+IDENTICAL
+     172 deliverables/memo-2026-11-09.md
+1:Summary: Platform team weekl
+3:## Actions
+12:## Decisions
+
+
+Exit Code: 0
+
+[2026-10-29T14:35:49.519Z] call #181 turn 25 status=failed flags=['touches S/org']
+COMMAND: sleep 5; cat /private/tmp/hirearchy-p2/C1-1793280632/org/lead/writer/work/action-list-2026-11-09.md
+RESULT: Output:
+cat: /private/tmp/hirearchy-p2/C1-1793280632/org/lead/writer/work/action-list-2026-11-09.md: No such file or directory
+
+
+Exit Code: 1
+
+[2026-10-29T14:36:03.894Z] call #185 turn 25 status=failed flags=['touches S/org']
+COMMAND: sleep 5; cat /private/tmp/hirearchy-p2/C1-1793280632/org/lead/writer/work/action-list-2026-11-09.md
+RESULT: Output:
+cat: /private/tmp/hirearchy-p2/C1-1793280632/org/lead/writer/work/action-list-2026-11-09.md: No such file or directory
+
+
+Exit Code: 1
+
+[2026-10-29T14:37:38.680Z] call #188 turn 25 status=completed flags=['touches S/org']
+COMMAND: sleep 5; find /private/tmp/hirearchy-p2/C1-1793280632/org -name 'action-list-2026-11-09*' -not -path '*/.git/*' -exec cat {} \;
+RESULT: Output:
+# Action list: Platform team weekly, Monday 9 November 2026
+
+| Owner | Action | Due |
+|---|---|---|
+| Marta | Circulate the quarterly review notes by Nov 11 | 2026-11-11 |
+| Dev | Switch off the old gateway on Nov 20 | 2026-11-20 |
+| Priya | Start the rate limiter rollout to all plans on Nov 16 | 2026-11-16 |
+| Sam | Add Jo (not in attendee list) to the on-call rotation by Friday | 2026-11-13 |
+| Lee | Go through the SSO audit log at some point to check for old service accounts | none |
+
+
+Exit Code: 0
+
+[2026-10-29T14:37:41.970Z] call #189 turn 25 status=completed flags=['writes into the deliverable folder', 'touches S/org']
+COMMAND: cd /private/tmp/hirearchy-p2/C1-1793280632 && cp org/lead/writer/work/action-list-2026-11-09.md deliverables/action-list-2026-11-09.md && cmp org/lead/writer/work/action-list-2026-11-09.md deliverables/action-list-2026-11-09.md && echo IDENTICAL && wc -w deliverables/action-list-2026-11-09.md
+RESULT: Output:
+IDENTICAL
+     102 deliverables/action-list-2026-11-09.md
+
+
+Exit Code: 0
+

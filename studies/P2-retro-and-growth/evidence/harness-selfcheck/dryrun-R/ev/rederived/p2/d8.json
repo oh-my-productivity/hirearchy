@@ -1,0 +1,46 @@
+[
+ {
+  "date": "2026-10-29",
+  "id": "e5fff0b87338",
+  "item": "B1.2",
+  "kind": "agent added",
+  "label": "change",
+  "subject": "lead/c6-checker"
+ },
+ {
+  "date": "2026-10-29",
+  "id": "bc5deaa8032b",
+  "item": "B1.1",
+  "kind": "service added",
+  "label": "change",
+  "subject": "lead/action-list-for"
+ },
+ {
+  "date": "2026-10-29",
+  "id": null,
+  "item": null,
+  "kind": "service added",
+  "label": "plan",
+  "subject": "lead/weekly-memo"
+ },
+ {
+  "date": "2026-10-29",
+  "id": "e5fff0b87338",
+  "item": null,
+  "kind": "charter changed",
+  "label": "change",
+  "subject": "lead",
+  "t1": "2026-10-29T12:07:57+00:00",
+  "t2": "2026-10-29T12:08:55+00:00"
+ },
+ {
+  "date": "2026-10-29",
+  "id": null,
+  "item": null,
+  "kind": "charter changed",
+  "label": "outside the tools",
+  "subject": "lead/writer",
+  "t1": "2026-10-29T12:07:57+00:00",
+  "t2": "2026-10-29T12:08:57+00:00"
+ }
+]

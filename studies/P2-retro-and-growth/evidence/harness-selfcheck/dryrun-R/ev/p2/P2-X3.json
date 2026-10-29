@@ -1,0 +1,17 @@
+{
+ "files": [
+  "charter-history.txt",
+  "charter-history-commits.txt",
+  "rederived/p2/edits.json",
+  "retro/end.since-apply.json",
+  "events/",
+  "assistant-session-messages.jsonl"
+ ],
+ "reason": "edits: harness 1 ['lead/writer/AGENT.md'], product 1; 1 `outside the tools` label(s) (step 5)",
+ "steps": [
+  "harness 1 (D8 labels of the re-derivation 1), product 1 (PF-0 on changes the re-derivation does not count, taken out and reported under P2-E: 0; PF-0 on counted changes: 0)",
+  "step 4: root writes of AGENT.md 0 (admitted 0); agents' refusals {'CHARTER-PLAN': 0, 'CHARTER-ADDED': 0}",
+  "step 5: hand writes into the org 0 []; possible (reported) []; `outside the tools` labels 1"
+ ],
+ "verdict": "FAIL"
+}

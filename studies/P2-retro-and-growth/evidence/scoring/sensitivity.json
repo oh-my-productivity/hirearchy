@@ -1,0 +1,320 @@
+{
+ "control": {
+  "R1": {
+   "verdicts_equal_EV": true,
+   "gate_flat_equal_EV": true
+  },
+  "C1": {
+   "verdicts_equal_EV": true,
+   "gate_flat_equal_EV": true
+  },
+  "exit": "**Phase 2's exit criterion: FAIL** (not PASS: P2-X1, P2-X2, P2-X3, P2-L, P2-B, P2-W, G1(a), G1(f), empty-argument calls, delivered versions (P2's form))"
+ },
+ "5a": {
+  "R1": {
+   "frozen": "NOT DETERMINED (FAIL-CLOSED: no total in empty-calls.txt)",
+   "corrected": "FAIL (23)",
+   "total_line": [
+    "total: session-store empty-argument failed calls: 23 (tool_call 22, tool_load 1)",
+    "total 'is not available' in turn stderr: 23"
+   ]
+  },
+  "C1": {
+   "frozen": "NOT DETERMINED (FAIL-CLOSED: no total in empty-calls.txt)",
+   "corrected": "FAIL (35)",
+   "total_line": [
+    "total: session-store empty-argument failed calls: 35 (tool_call 34, tool_load 1)",
+    "total 'is not available' in turn stderr: 35"
+   ]
+  }
+ },
+ "5b-seat": {
+  "R1": {
+   "rebuild": {
+    "seat": null,
+    "verifiers": [],
+    "files": 11,
+    "versions": 17,
+    "renamed": []
+   },
+   "frozen": "NOT DETERMINED (FAIL-CLOSED: no delivered version was scored (0 of 0))",
+   "corrected": "NOT DETERMINED (FAIL-CLOSED: no delivered version was scored (0 of 0))",
+   "score": {
+    "versions_scored": 0,
+    "copied": 0,
+    "bad": [],
+    "exempt_rejected": [],
+    "not_determined": [],
+    "score_p2_verdict": "PASS",
+    "per_version": [],
+    "finals": [
+     "2026-10-05 trap=None wrong=0 extra=0",
+     "2026-10-12 trap=passes wrong=0 extra=0",
+     "2026-10-19 trap=passes wrong=0 extra=0",
+     "2026-10-26 trap=passes wrong=0 extra=0",
+     "2026-11-02 trap=passes wrong=0 extra=0",
+     "2026-11-09 trap=None wrong=0 extra=0"
+    ]
+   }
+  },
+  "C1": {
+   "rebuild": {
+    "seat": null,
+    "verifiers": [],
+    "files": 10,
+    "versions": 16,
+    "renamed": []
+   },
+   "frozen": "NOT DETERMINED (FAIL-CLOSED: no delivered version was scored (0 of 0))",
+   "corrected": "PASS",
+   "score": {
+    "versions_scored": 12,
+    "copied": 9,
+    "bad": [],
+    "exempt_rejected": [
+     "2026-10-05 v2",
+     "2026-10-19 v2",
+     "2026-11-09 v1"
+    ],
+    "not_determined": [],
+    "score_p2_verdict": "PASS",
+    "per_version": [
+     "2026-10-05 v1 copied=False lena=rejected trap=None wrong_outside_trap=2 extra=0",
+     "2026-10-05 v2 copied=True lena=rejected trap=None wrong_outside_trap=0 extra=0",
+     "2026-10-05 v3 copied=False lena=rejected trap=None wrong_outside_trap=2 extra=0",
+     "2026-10-05 v4 copied=True lena=accepted trap=None wrong_outside_trap=0 extra=0",
+     "2026-10-12 v1 copied=True lena=accepted trap=passes wrong_outside_trap=0 extra=0",
+     "2026-10-19 v1 copied=False lena=rejected trap=fails wrong_outside_trap=0 extra=1",
+     "2026-10-19 v2 copied=True lena=rejected trap=passes wrong_outside_trap=0 extra=1",
+     "2026-10-19 v3 copied=True lena=accepted trap=passes wrong_outside_trap=0 extra=0",
+     "2026-10-26 v1 copied=True lena=accepted trap=passes wrong_outside_trap=0 extra=0",
+     "2026-11-02 v1 copied=True lena=accepted trap=passes wrong_outside_trap=0 extra=0",
+     "2026-11-09 v1 copied=True lena=rejected trap=None wrong_outside_trap=0 extra=0",
+     "2026-11-09 v2 copied=True lena=accepted trap=None wrong_outside_trap=0 extra=0"
+    ],
+    "finals": [
+     "2026-10-05 trap=None wrong=0 extra=0",
+     "2026-10-12 trap=passes wrong=0 extra=0",
+     "2026-10-19 trap=passes wrong=0 extra=0",
+     "2026-10-26 trap=passes wrong=0 extra=0",
+     "2026-11-02 trap=passes wrong=0 extra=0",
+     "2026-11-09 trap=None wrong=0 extra=0"
+    ]
+   }
+  }
+ },
+ "5b-seat-names": {
+  "R1": {
+   "rebuild": {
+    "seat": null,
+    "verifiers": [],
+    "files": 11,
+    "versions": 17,
+    "renamed": [
+     "lead/writer/work/2026-10-05-memo.md",
+     "lead/writer/work/2026-10-12-memo.md",
+     "lead/writer/work/2026-10-19-memo.md",
+     "lead/writer/work/2026-10-26-memo.md",
+     "lead/writer/work/2026-11-02-memo.md",
+     "lead/writer/work/2026-11-09-memo.md"
+    ]
+   },
+   "frozen": "NOT DETERMINED (FAIL-CLOSED: no delivered version was scored (0 of 0))",
+   "corrected": "PASS",
+   "score": {
+    "versions_scored": 11,
+    "copied": 9,
+    "bad": [],
+    "exempt_rejected": [
+     "2026-10-05 v1",
+     "2026-10-19 v2",
+     "2026-11-09 v1"
+    ],
+    "not_determined": [],
+    "score_p2_verdict": "PASS",
+    "per_version": [
+     "2026-10-05 v1 copied=True lena=rejected trap=None wrong_outside_trap=2 extra=0",
+     "2026-10-05 v2 copied=True lena=accepted trap=None wrong_outside_trap=0 extra=0",
+     "2026-10-12 v1 copied=False lena=accepted trap=passes wrong_outside_trap=0 extra=0",
+     "2026-10-12 v2 copied=True lena=accepted trap=passes wrong_outside_trap=0 extra=0",
+     "2026-10-19 v1 copied=False lena=rejected trap=fails wrong_outside_trap=0 extra=1",
+     "2026-10-19 v2 copied=True lena=rejected trap=passes wrong_outside_trap=0 extra=1",
+     "2026-10-19 v3 copied=True lena=accepted trap=passes wrong_outside_trap=0 extra=0",
+     "2026-10-26 v1 copied=True lena=accepted trap=passes wrong_outside_trap=0 extra=0",
+     "2026-11-02 v1 copied=True lena=accepted trap=passes wrong_outside_trap=0 extra=0",
+     "2026-11-09 v1 copied=True lena=rejected trap=None wrong_outside_trap=0 extra=0",
+     "2026-11-09 v2 copied=True lena=accepted trap=None wrong_outside_trap=0 extra=0"
+    ],
+    "finals": [
+     "2026-10-05 trap=None wrong=0 extra=0",
+     "2026-10-12 trap=passes wrong=0 extra=0",
+     "2026-10-19 trap=passes wrong=0 extra=0",
+     "2026-10-26 trap=passes wrong=0 extra=0",
+     "2026-11-02 trap=passes wrong=0 extra=0",
+     "2026-11-09 trap=None wrong=0 extra=0"
+    ]
+   }
+  },
+  "C1": {
+   "rebuild": {
+    "seat": null,
+    "verifiers": [],
+    "files": 10,
+    "versions": 16,
+    "renamed": []
+   },
+   "frozen": "NOT DETERMINED (FAIL-CLOSED: no delivered version was scored (0 of 0))",
+   "corrected": "PASS",
+   "score": {
+    "versions_scored": 12,
+    "copied": 9,
+    "bad": [],
+    "exempt_rejected": [
+     "2026-10-05 v2",
+     "2026-10-19 v2",
+     "2026-11-09 v1"
+    ],
+    "not_determined": [],
+    "score_p2_verdict": "PASS",
+    "per_version": [
+     "2026-10-05 v1 copied=False lena=rejected trap=None wrong_outside_trap=2 extra=0",
+     "2026-10-05 v2 copied=True lena=rejected trap=None wrong_outside_trap=0 extra=0",
+     "2026-10-05 v3 copied=False lena=rejected trap=None wrong_outside_trap=2 extra=0",
+     "2026-10-05 v4 copied=True lena=accepted trap=None wrong_outside_trap=0 extra=0",
+     "2026-10-12 v1 copied=True lena=accepted trap=passes wrong_outside_trap=0 extra=0",
+     "2026-10-19 v1 copied=False lena=rejected trap=fails wrong_outside_trap=0 extra=1",
+     "2026-10-19 v2 copied=True lena=rejected trap=passes wrong_outside_trap=0 extra=1",
+     "2026-10-19 v3 copied=True lena=accepted trap=passes wrong_outside_trap=0 extra=0",
+     "2026-10-26 v1 copied=True lena=accepted trap=passes wrong_outside_trap=0 extra=0",
+     "2026-11-02 v1 copied=True lena=accepted trap=passes wrong_outside_trap=0 extra=0",
+     "2026-11-09 v1 copied=True lena=rejected trap=None wrong_outside_trap=0 extra=0",
+     "2026-11-09 v2 copied=True lena=accepted trap=None wrong_outside_trap=0 extra=0"
+    ],
+    "finals": [
+     "2026-10-05 trap=None wrong=0 extra=0",
+     "2026-10-12 trap=passes wrong=0 extra=0",
+     "2026-10-19 trap=passes wrong=0 extra=0",
+     "2026-10-26 trap=passes wrong=0 extra=0",
+     "2026-11-02 trap=passes wrong=0 extra=0",
+     "2026-11-09 trap=None wrong=0 extra=0"
+    ]
+   }
+  }
+ },
+ "62": {
+  "R1": {
+   "frozen": "FAIL (['MISMATCH turn-03 P1 item pinned: item missing from the re-derivation', 'MISMATCH turn-03 P2 item pinned: item missing from the re-derivation', 'MISMATCH turn-03 P3 item pinned: item missing fr",
+   "corrected": "PASS",
+   "views": {
+    "lead--ops-action-list": {
+     "service_in_view": "ops-action-list",
+     "frozen_service_in_view": "weekly-meeting-memo",
+     "corrected_total": "0 mismatches (0 on pinned keys, 0 on unpinned keys); 0 services mismatches; 0 services lines unread; 0 lower-margin race matches (reported); 0 snapshots unread",
+     "frozen_total": "181 mismatches (181 on pinned keys, 0 on unpinned keys); 28 services mismatches; 0 services lines unread; 0 lower-margin race matches (reported); 0 snapshots unread"
+    },
+    "lead--weekly-meeting-memo": {
+     "service_in_view": "weekly-meeting-memo",
+     "frozen_service_in_view": "weekly-meeting-memo",
+     "corrected_total": "41 mismatches (28 on pinned keys, 13 on unpinned keys); 0 services mismatches; 0 services lines unread; 0 lower-margin race matches (reported); 0 snapshots unread",
+     "frozen_total": "41 mismatches (28 on pinned keys, 13 on unpinned keys); 0 services mismatches; 0 services lines unread; 0 lower-margin race matches (reported); 0 snapshots unread"
+    }
+   }
+  },
+  "C1": {
+   "frozen": "PASS",
+   "corrected": "PASS",
+   "views": {
+    "lead--weekly-meeting-memo": {
+     "service_in_view": "weekly-meeting-memo",
+     "frozen_service_in_view": "weekly-meeting-memo",
+     "corrected_total": "38 mismatches (26 on pinned keys, 12 on unpinned keys); 0 services mismatches; 0 services lines unread; 0 lower-margin race matches (reported); 0 snapshots unread",
+     "frozen_total": "38 mismatches (26 on pinned keys, 12 on unpinned keys); 0 services mismatches; 0 services lines unread; 0 lower-margin race matches (reported); 0 snapshots unread"
+    }
+   }
+  }
+ },
+ "63": {
+  "relative, frozen": {
+   "checker_due": false,
+   "service_due": true,
+   "windows": {
+    "ops-action-list": 0,
+    "weekly-meeting-memo": 0
+   },
+   "candidates": {
+    "ops-action-list": [],
+    "weekly-meeting-memo": []
+   }
+  },
+  "absolute, frozen": {
+   "checker_due": false,
+   "service_due": true,
+   "windows": {
+    "ops-action-list": 0,
+    "weekly-meeting-memo": 6
+   },
+   "candidates": {
+    "ops-action-list": [],
+    "weekly-meeting-memo": [
+     "checker-add|weekly-meeting-memo|C10",
+     "checker-add|weekly-meeting-memo|C11",
+     "checker-add|weekly-meeting-memo|C4",
+     "checker-add|weekly-meeting-memo|C5",
+     "checker-add|weekly-meeting-memo|C9"
+    ]
+   }
+  },
+  "relative, corrected": {
+   "checker_due": false,
+   "service_due": true,
+   "windows": {
+    "ops-action-list": 0,
+    "weekly-meeting-memo": 6
+   },
+   "candidates": {
+    "ops-action-list": [],
+    "weekly-meeting-memo": [
+     "checker-add|weekly-meeting-memo|C10",
+     "checker-add|weekly-meeting-memo|C11",
+     "checker-add|weekly-meeting-memo|C4",
+     "checker-add|weekly-meeting-memo|C5",
+     "checker-add|weekly-meeting-memo|C9"
+    ]
+   }
+  },
+  "p2/verdicts.txt with a relative, frozen reader equals EV's": false,
+  "p2/verdicts.txt with a relative, frozen reader": [
+   "P2-X1: FAIL (B2 shows B1.1 lapsed (step 8))",
+   "P2-X2: NOT REACHED (X2 not reached, not failed: the team passed the trap in memos ['2026-10-12', '2026-10-19', '2026-10-26', '2026-11-02'])",
+   "P2-X3: PASS",
+   "P2-L: PASS",
+   "P2-B: PASS",
+   "P2-W: PASS",
+   "P2-E: MISMATCH (5 finding(s): PF-0 0, PF-1 0, new 5)",
+   "P2-S: PASS"
+  ],
+  "p2/verdicts.txt with a relative, corrected reader equals EV's": true,
+  "p2/verdicts.txt with a relative, corrected reader": [
+   "P2-X1: FAIL (B2 shows B1.1 lapsed (step 8))",
+   "P2-X2: NOT REACHED (X2 not reached, not failed: the team passed the trap in memos ['2026-10-12', '2026-10-19', '2026-10-26', '2026-11-02'])",
+   "P2-X3: PASS",
+   "P2-L: PASS",
+   "P2-B: PASS",
+   "P2-W: PASS",
+   "P2-E: MISMATCH (5 finding(s): PF-0 0, PF-1 0, new 5)",
+   "P2-S: PASS"
+  ]
+ },
+ "all": {
+  "R1": {
+   "G1(f)": "PASS",
+   "empty-argument calls": "FAIL (23)",
+   "delivered versions (P2's form)": "PASS"
+  },
+  "C1": {
+   "empty-argument calls": "FAIL (35)",
+   "delivered versions (P2's form)": "PASS"
+  },
+  "exit": "**Phase 2's exit criterion: FAIL** (not PASS: P2-X1, P2-X2, P2-X3, P2-L, P2-B, P2-W, G1(a), empty-argument calls)"
+ }
+}

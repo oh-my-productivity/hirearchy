@@ -1,0 +1,5 @@
+setup-only probe-C1: init exit 0 hire exit 0 define-service exit 0 
+setup-only probe-R1: init exit 0 hire exit 0 define-service exit 0 
+setup-only probe-R2: init exit 0 hire exit 0 define-service exit 0 
+setup-only probe-C2: init exit 0 hire exit 0 define-service exit 0 
+probe setup: four orgs and two catalogs ok; retro in R only

@@ -1,0 +1,19 @@
+turn 1 exit 0 elapsed 22s
+turn 2 exit 0 elapsed 22s
+session copied
+skill proof (arm C): PROVED (1 disclosed text(s))
+after probe-C1: global skill: in place, md5 443e1bc4911aa4d6aaa6457e78f673c1
+turn 1 exit 0 elapsed 21s
+turn 2 exit 0 elapsed 21s
+session copied
+skill proof (arm R): PROVED (1 disclosed text(s))
+turn 1 exit 0 elapsed 25s
+turn 2 exit 0 elapsed 22s
+session copied
+skill proof (arm R): PROVED (1 disclosed text(s))
+turn 1 exit 0 elapsed 25s
+turn 2 exit 0 elapsed 17s
+session copied
+skill proof (arm C): PROVED (1 disclosed text(s))
+after probe-C2: global skill: in place, md5 443e1bc4911aa4d6aaa6457e78f673c1
+PROBE: PASS

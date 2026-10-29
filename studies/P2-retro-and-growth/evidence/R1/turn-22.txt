@@ -1,0 +1,40 @@
+######## TURN 22  start 13:16:29  end 13:17:50  elapsed 81s  (local, 2026-10-29; UTC wall-clock start 2026-10-29T13:16:29Z end 2026-10-29T13:17:50Z; exit code 0)
+######## LENA (prompt sent verbatim):
+1: Yes, make it a service. 2: Not now. 3: Not now.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-22.stderr.txt):
+Retro items 2 and 3 are left as they are, since you said "not now". Item 1 adds a second service, so you need to approve it first. Two changes from the retro's draft:
+
+- The retro draft hard-coded the 5 October dates and names. I wrote the checks generally instead, from the rules you gave and the lists you kept. Criterion 3 also includes your "stays as it is" rule from the memos, and criterion 7 is my default.
+- I named the service `ops-action-list`, and it saves files into `deliverables/` as `<meeting date>-ops-actions.md`.
+
+The budget warning is about cost, not risk. 8 runs per request covers one pass and one rework, which matched your three lists (3 to 6 runs each). A round of your corrections would need about 11. Say so if you want 11 instead.
+
+PLAN FOR YOU (a change to your organization)
+Why: Retro item 1, the user said yes to making the one-page ops action list a standing service
+Your organization now: 2 agents, 1 service(s): weekly-meeting-memo.
+Adds:
+- service ops-action-list of lead: One one-page action list (table of owner, action, due date) for the ops team from one meeting notes file.
+  You provide: notes_file (required). Each request: up to 8 runs, sent only when you ask.
+  Checks:
+    1. The deliverable is markdown, has at most 350 words as counted by read (this is the one-page limit), and a title line naming the meeting date.
+       from your words "at most one page" (my question: "How should one page be measured?"); words I added: the, deliverable, is, markdown, has, 350, words, as, +13 more
+    2. It contains one markdown table with exactly the columns Owner | Action | Due, and no other sections (no decisions, no summary).
+       my wording, from the one-off tasks I sent for you (2026-10-29); you accepted those deliveries
+    3. Every action item in the named notes file is a row, including those stated in prose, and no row is added that is not an action item in the notes; a statement that something stays as it is, where nobody has to do anything, gets no row.
+       from your words "Every action item in those notes." (my question: "Which actions should the list include?"); words I added: named, file, is, a, row, including, stated, prose, +18 more
+    4. Each Due value is an ISO date (YYYY-MM-DD) or 'none'. A relative deadline such as 'by Friday' is turned into a date only when the notes make the date clear; if the notes give no date, Due is 'none'.
+       from your words "turn vague deadlines into a date when the notes make it clear" (my question: "How to treat relative or vague dates?"); words I added: each, due, value, is, an, iso, yyyy, -, +13 more
+    5. Each Owner value uses the name exactly as written in the notes.
+       my wording, from the one-off tasks I sent for you (2026-10-29); you accepted those deliveries
+    6. Rows are ordered by Due ascending with 'none' last, ties in the order of the notes.
+       my wording, from the one-off tasks I sent for you (2026-10-29); you accepted those deliveries
+    7. Every statement is traceable to the named notes file; nothing is invented.
+       my default: you did not say this
+    8. The lead's report states that every table row was compared with the notes file, with the count verified (n of m, n = m).
+       my wording, from the one-off tasks I sent for you (2026-10-29); you accepted those deliveries
+  Delivered to: /private/tmp/hirearchy-p2/R1-1793275867/deliverables (I copy each result there after checking it)
+Budget: ops-action-list of lead: up to 8 runs per request; nothing else changes what a request costs.
+Unchanged: 2 agents and 1 service(s), their charters, contracts and playbooks.
+Warnings (1):
+- 8 runs per request covers one pass and one internal rework (the estimate is 8), not a round of your questions or a rejection, which takes about 3 more (1, plus 2 for each agent below lead): 11 per request covers one such round
+Nothing changes until you approve. Reply 'approve', or tell me what to change.

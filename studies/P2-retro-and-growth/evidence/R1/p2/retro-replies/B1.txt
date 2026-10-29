@@ -1,0 +1,207 @@
+RETRO BRIEF B1 (since the organization started, 2026-10-29: 12 verdicts of yours on 9 cases)
+What you said:
+- weekly-meeting-memo R1: "No, not right yet. Sam's CI item says 'before Friday', so that has a date, 2026-10-09, not 'none'. And Marta's room is…" (C9 added (v2))
+- weekly-meeting-memo R2: "Almost, but not right yet: 'Marta keeps the agenda as sent' isn't an action item, nobody has to do anything there. Take…" (C10 added (v3))
+- weekly-meeting-memo R3: "No: I've changed my mind - always put the action items before the decisions now, right after the one-line Summary." (removed C9 (replaced by C11))
+- and 9 accepts
+What got past a check:
+- weekly-meeting-memo: lead/writer delivered 20261029T121630346755-root-d28e (no check of the team signed it); you rejected it (R1, C9)
+- weekly-meeting-memo: lead/writer delivered 20261029T124626096325-root-750e (no check of the team signed it); you rejected it (R2, C10)
+- weekly-meeting-memo: lead/writer delivered 20261029T130759453335-root-5699 (no check of the team signed it); you rejected it (R3, C11)
+Did past changes hold:
+- weekly-meeting-memo contract v2 adds C9: not recurred in 8 cases where it was exercised
+- weekly-meeting-memo contract v3 adds C10: not recurred in 5 cases where it was exercised
+- weekly-meeting-memo P9 (v3): not recurred in 3 cases where it was exercised
+- weekly-meeting-memo contract v4 adds C11: INCONCLUSIVE (1 of 3 exercised cases)
+- weekly-meeting-memo P8 (v4): INCONCLUSIVE (0 of 3 exercised cases)
+Changes to your organization:
+- agent lead added (2026-10-29): from the plan you approved (2026-10-29)
+- agent lead/writer added (2026-10-29): from the plan you approved (2026-10-29)
+- service lead/weekly-meeting-memo added (2026-10-29): from the plan you approved (2026-10-29)
+- Unprompted charter edits: 0
+Questions (one short answer each; any you leave lapse with no change at the next brief):
+1. Make the repeated task "one - page ops action list for the meeting" a standing service of lead? You asked for it 3 times (2026-10-29). It costs nothing to set up; each request uses up to 8 runs, and is sent only when you ask.
+2. C1 of weekly-meeting-memo reads "The memo is markdown and has at most 40…". It rests on your words "a markdown memo, at most 400 words", your answer to "Format and length?"; the words the, is, has, as, counted, by, read are mine. Does it say what you meant?
+3. C10 of weekly-meeting-memo reads "A statement that something stays as it…". It rests on your words "Yes, add it."; the words a, statement, that, something, stays, as, is, where, +16 more are mine. Does it say what you meant?
+RETRO BRIEF END
+Details (for you; the user need not read them):
+D1 What you said:
+- weekly-meeting-memo R1 (case 20261029T121630346755-root-d28e, 2026-10-29): "No, not right yet. Sam's CI item says 'before Friday', so that has a date, 2026-10-09, not 'none'. And Marta's room is for the training on the 14th, so I want 2026-10-14 there. And always start the memo with a one-line 'Summary:' of the meeting, then the decisions, then the action items." (C9 added (v2))
+- weekly-meeting-memo R2 (case 20261029T124626096325-root-750e, 2026-10-29): "Almost, but not right yet: 'Marta keeps the agenda as sent' isn't an action item, nobody has to do anything there. Take that row out. The rest is fine." (C10 added (v3))
+- weekly-meeting-memo R3 (case 20261029T130759453335-root-5699, 2026-10-29): "No: I've changed my mind - always put the action items before the decisions now, right after the one-line Summary." (removed C9 (replaced by C11))
+- and 9 accepts
+D2 What got past a check:
+- weekly-meeting-memo: lead/writer delivered 20261029T121630346755-root-d28e (no check of the team signed it); you rejected it (R1, C9); cause contract-gap
+- weekly-meeting-memo: lead/writer delivered 20261029T124626096325-root-750e (no check of the team signed it); you rejected it (R2, C10); cause contract-gap
+- weekly-meeting-memo: lead/writer delivered 20261029T130759453335-root-5699 (no check of the team signed it); you rejected it (R3, C11); cause contract-gap
+D3 Rejections with no criterion yet:
+- weekly-meeting-memo R1: "No, not right yet. Sam's CI item says 'before Friday', so that has a date, 2026-10-09, not 'none'. And Marta's room is for the training on the 14th, so I want 2026-10-14 there. And always start the memo with a one-line 'Summary:' of the meeting, then the decisions, then the action items." (about removed C9 only)
+D4 Alarms and causes to settle:
+- weekly-meeting-memo: repeat alarm no (6 judged cases); cost alarm no (6 judged cases)
+D5 Work you ask for again and again:
+- lead: "One-page ops action list for the 2026-10-05 meeting" and 2 more (20261029T122710588867-root-c1b8, 20261029T123457206032-root-cabf, 20261029T125747104778-root-4a85), joined by their titles: 3 of 3 with your verdict
+D6 Idle or stranded agents:
+- none
+D7 Did past changes hold:
+- weekly-meeting-memo contract v2 adds C9: not recurred in 8 cases where it was exercised
+- weekly-meeting-memo contract v3 adds C10: not recurred in 5 cases where it was exercised
+- weekly-meeting-memo P9 (v3): not recurred in 3 cases where it was exercised
+- weekly-meeting-memo contract v4 adds C11: INCONCLUSIVE (1 of 3 exercised cases)
+- weekly-meeting-memo P8 (v4): INCONCLUSIVE (0 of 3 exercised cases)
+D8 Changes to your organization:
+- agent lead added (2026-10-29): from the plan you approved (2026-10-29)
+- agent lead/writer added (2026-10-29): from the plan you approved (2026-10-29)
+- service lead/weekly-meeting-memo added (2026-10-29): from the plan you approved (2026-10-29)
+- Unprompted charter edits since 2026-10-29: 0
+D9 Criteria and your words:
+- weekly-meeting-memo C1 "The memo is markdown and has at most 400 words as counted by read.": from your words "a markdown memo, at most 400 words" (my question: "Format and length?"); words I added: the, is, has, as, counted, by, read; exercised in 9 judged cases, 6 accepted
+- weekly-meeting-memo C2 "The memo has a Decisions section listing every decision made in the named notes…": from your words "what we decided" (my question: "Memo contents?"); words I added: the, has, a, decisions, section, listing, every, decision, +10 more; exercised in 9 judged cases, 6 accepted
+- weekly-meeting-memo C3 "The action items are a markdown table with exactly the columns Owner | Action |…": from your words "the action items as a table with columns Owner | Action | Due" (my question: "Format and length?"); words I added: are, markdown, exactly; exercised in 9 judged cases, 6 accepted
+- weekly-meeting-memo C4 "Every commitment in the notes is a row of the table, both those labelled ACTION…": from your words "if someone said they'd do something, it counts" (my question: "Do informal or unlabelled commitments count?"); words I added: every, commitment, in, the, notes, is, a, row, +13 more; exercised in 9 judged cases, 6 accepted
+- weekly-meeting-memo C5 "Each Due value is an ISO date (YYYY-MM-DD). A relative deadline such as 'by Fri…": from your words "turn vague deadlines into a date when the notes make it clear" (my question: "How to treat relative or vague dates?"); words I added: each, due, value, is, an, iso, yyyy, -, +13 more; exercised in 9 judged cases, 6 accepted
+- weekly-meeting-memo C6 "Each Owner value uses the name exactly as written in the notes.": from your words "For the Owner column: Use the words from the notes." (my question: "How should the Owner column read?"); words I added: each, value, uses, name, exactly, as, written, in; exercised in 9 judged cases, 6 accepted
+- weekly-meeting-memo C7 "Every statement in the memo is traceable to the notes file, and anything unclea…": my default: you did not say this; exercised in 9 judged cases, 6 accepted
+- weekly-meeting-memo C8 "The lead's check report states that every decision and every table row was comp…": from your words "No separate reviewer: the lead checks." (my question: "Review by another agent?"); words I added: s, check, report, states, that, every, decision, and, +13 more; exercised in 9 judged cases, 6 accepted
+- weekly-meeting-memo C10 "A statement that something stays as it is, where nobody has to do anything, is…": from your words "Yes, add it." (your answer about C4); words I added: a, statement, that, something, stays, as, is, where, +16 more; exercised in 5 judged cases, 4 accepted
+- weekly-meeting-memo C11 "The memo starts with a one-line 'Summary:' of the meeting, followed by the acti…": from your words "Yes, add it." (your answer about C9); words I added: the, memo, starts, with, a, one, -, line, +11 more; exercised in 1 judged cases, 1 accepted
+D10 Your team's own proposals:
+- Refusals since 2026-10-29: 4 (define_service 1, delegate 1, read 1, revise_playbook 1)
+- events before 2026-10-29 have expired (events_keep_days)
+D11 Playbooks:
+- weekly-meeting-memo: 273 of 1000 words; items: 8 kept, 1 new; 2 mirror items repeat 46 words of the contract (P8, P9)
+D12 Spend:
+- approved = root's hand-downs (the user's own approvals are not recorded; F-P1-10)
+- weekly-meeting-memo: 6 cases, 34 runs used against 12 approved per request; 0 cases above it
+D13 The last brief:
+- no earlier brief
+D14 Held back:
+- clarify clarify|weekly-meeting-memo|C2|thememohasadecisionssectionlistingeveryd (weight 0)
+- clarify clarify|weekly-meeting-memo|C3|theactionitemsareamarkdowntablewithexact (weight 0)
+- clarify clarify|weekly-meeting-memo|C4|everycommitmentinthenotesisarowofthetabl (weight 0)
+- clarify clarify|weekly-meeting-memo|C5|eachduevalueisanisodateyyyymmddarelative (weight 0)
+- clarify clarify|weekly-meeting-memo|C6|eachownervalueusesthenameexactlyaswritte (weight 0)
+- clarify clarify|weekly-meeting-memo|C8|theleadscheckreportstatesthateverydecisi (weight 0)
+Items:
+1. service (rung 2 of 7, adjust the standard: a one-off task has no contract to clarify (rung 1); a standing service gives these tasks one contract and lets the client's verdicts improve it)
+   Evidence: 20261029T122710588867-root-c1b8, 20261029T123457206032-root-cabf, 20261029T125747104778-root-4a85
+   Cost: up to 8 runs per request
+   Objection test (refuse it if it spends beyond the plan or lowers a criterion): spends within the plan: no run until you ask; lowers no criterion: the service's checks are the ones your tasks had
+   On yes: propose_org(blueprint=<the blueprint of this item>, extend="current")
+   {
+     "reason": "B1.1: 3 one-off tasks of one shape",
+     "extend": {
+       "add_services": [
+         {
+           "owner": "lead",
+           "name": "one-page-ops",
+           "description": "One-off request from the user (not the weekly-meeting-memo service, no new agents): from the notes file /tmp/hirearchy-p2/R1-1793275867/notes/2026-10-05.md make a one-page action list for the ops team. Each action with its owner and due date; at most one page. The user's words: \"a one-page action l…",
+           "inputs": [
+             {
+               "name": "request",
+               "description": "what this request is about",
+               "required": true
+             }
+           ],
+           "acceptance": [
+             {
+               "text": "The deliverable is markdown, has at most 350 words as counted by read (this is the one-page limit), and a title line naming the 2026-10-05 meeting.",
+               "from_tasks": [
+                 "20261029T122710588867-root-c1b8",
+                 "20261029T123457206032-root-cabf",
+                 "20261029T125747104778-root-4a85"
+               ]
+             },
+             {
+               "text": "It contains one markdown table with exactly the columns Owner | Action | Due, and no other sections (no decisions, no summary).",
+               "from_tasks": [
+                 "20261029T122710588867-root-c1b8",
+                 "20261029T123457206032-root-cabf",
+                 "20261029T125747104778-root-4a85"
+               ]
+             },
+             {
+               "text": "Every action item in the notes file is a row, including those stated in prose: Priya, Dev, Sam, Marta, Lee (5 of 5), and no row that is not in the notes.",
+               "from_tasks": [
+                 "20261029T122710588867-root-c1b8",
+                 "20261029T123457206032-root-cabf",
+                 "20261029T125747104778-root-4a85"
+               ]
+             },
+             {
+               "text": "Each Due value is an ISO date (YYYY-MM-DD) or 'none': Dev 2026-10-08, Priya 2026-10-09, Sam 2026-10-09, Marta 2026-10-14, Lee none.",
+               "from_tasks": [
+                 "20261029T122710588867-root-c1b8",
+                 "20261029T123457206032-root-cabf",
+                 "20261029T125747104778-root-4a85"
+               ]
+             },
+             {
+               "text": "Each Owner value uses the name exactly as written in the notes.",
+               "from_tasks": [
+                 "20261029T122710588867-root-c1b8",
+                 "20261029T123457206032-root-cabf",
+                 "20261029T125747104778-root-4a85"
+               ]
+             },
+             {
+               "text": "Rows are ordered by Due ascending with 'none' last, ties in the order of the notes.",
+               "from_tasks": [
+                 "20261029T122710588867-root-c1b8",
+                 "20261029T123457206032-root-cabf",
+                 "20261029T125747104778-root-4a85"
+               ]
+             },
+             {
+               "text": "Every statement is traceable to 2026-10-05.md; nothing is invented.",
+               "from_tasks": [
+                 "20261029T122710588867-root-c1b8",
+                 "20261029T123457206032-root-cabf",
+                 "20261029T125747104778-root-4a85"
+               ]
+             },
+             {
+               "text": "The lead's report states that every table row was compared with the notes file, with the count verified (n of m, n = m).",
+               "from_tasks": [
+                 "20261029T122710588867-root-c1b8",
+                 "20261029T123457206032-root-cabf",
+                 "20261029T125747104778-root-4a85"
+               ]
+             }
+           ],
+           "deliverable": {
+             "description": "<ASK THE USER: what one request produces>",
+             "path": "<ASK THE USER: where it goes>"
+           },
+           "budget": 8
+         }
+       ]
+     }
+   }
+   Revert: propose_org(blueprint=<the revert blueprint of this item>, extend="current"): it retires the service and keeps its record (defining it again continues it)
+   {
+     "reason": "revert of B1.1",
+     "extend": {
+       "retire_services": [
+         {
+           "owner": "lead",
+           "service": "one-page-ops",
+           "reason": "revert of B1.1"
+         }
+       ]
+     }
+   }
+2. clarify (rung 1 of 7, clarify: no rejection names it, so nothing else will ever show it again)
+   Evidence: weekly-meeting-memo/C1
+   Cost: no run
+   Objection test (refuse it if it spends beyond the plan or lowers a criterion): spends nothing; lowers no criterion (a no leads to your own wording, recorded with your words)
+   On yes: nothing to record: keep it
+   Revert: the same call back
+   Note: On no: ask what they meant, then define_service(owner, name, remove_acceptance=["C1"], add_acceptance=[<their wording>], words=<their answer, verbatim>)
+3. clarify (rung 1 of 7, clarify: no rejection names it, so nothing else will ever show it again)
+   Evidence: weekly-meeting-memo/C10
+   Cost: no run
+   Objection test (refuse it if it spends beyond the plan or lowers a criterion): spends nothing; lowers no criterion (a no leads to your own wording, recorded with your words)
+   On yes: nothing to record: keep it
+   Revert: the same call back
+   Note: On no: ask what they meant, then define_service(owner, name, remove_acceptance=["C10"], add_acceptance=[<their wording>], words=<their answer, verbatim>)
+Next: show the block from "RETRO BRIEF" to "RETRO BRIEF END" to the user exactly as written. Ask nothing else about it. For each item they answer yes, make its call (an extension: propose_org(..., extend="current"), show its PLAN FOR YOU, apply only after their approval; one item at a time). Record nothing for a no. Never add an item of your own.

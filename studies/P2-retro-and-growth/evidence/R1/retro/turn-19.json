@@ -1,0 +1,518 @@
+{
+  "id": "B1",
+  "at": "2026-10-29T13:12:01.923296+00:00",
+  "since": "2026-10-29T12:16:20+00:00",
+  "since_words": "since the organization started, 2026-10-29",
+  "verdicts": 11,
+  "cases": 9,
+  "recorded": true,
+  "shown_again": null,
+  "notes": [],
+  "sections": {
+    "d1": {
+      "heading": "What you said",
+      "block": [
+        "- weekly-meeting-memo R1: \"No, not right yet. Sam's CI item says 'before Friday', so that has a date, 2026-10-09, not 'none'. And Marta's room is\u2026\" (C9 added (v2))",
+        "- weekly-meeting-memo R2: \"Almost, but not right yet: 'Marta keeps the agenda as sent' isn't an action item, nobody has to do anything there. Take\u2026\" (C10 added (v3))",
+        "- weekly-meeting-memo R3: \"No: I've changed my mind - always put the action items before the decisions now, right after the one-line Summary.\" (no answer yet)",
+        "- and 8 accepts"
+      ],
+      "details": [
+        "- weekly-meeting-memo R1 (case 20261029T121630346755-root-d28e, 2026-10-29): \"No, not right yet. Sam's CI item says 'before Friday', so that has a date, 2026-10-09, not 'none'. And Marta's room is for the training on the 14th, so I want 2026-10-14 there. And always start the memo with a one-line 'Summary:' of the meeting, then the decisions, then the action items.\" (C9 added (v2))",
+        "- weekly-meeting-memo R2 (case 20261029T124626096325-root-750e, 2026-10-29): \"Almost, but not right yet: 'Marta keeps the agenda as sent' isn't an action item, nobody has to do anything there. Take that row out. The rest is fine.\" (C10 added (v3))",
+        "- weekly-meeting-memo R3 (case 20261029T130759453335-root-5699, 2026-10-29): \"No: I've changed my mind - always put the action items before the decisions now, right after the one-line Summary.\" (no answer yet)",
+        "- and 8 accepts"
+      ],
+      "counts": {
+        "rejections": 3,
+        "accepts": 8
+      },
+      "error": ""
+    },
+    "d2": {
+      "heading": "What got past a check",
+      "block": [
+        "- weekly-meeting-memo: lead/writer delivered 20261029T121630346755-root-d28e (no check of the team signed it); you rejected it (R1, C9)",
+        "- weekly-meeting-memo: lead/writer delivered 20261029T124626096325-root-750e (no check of the team signed it); you rejected it (R2, C10)",
+        "- weekly-meeting-memo: lead/writer delivered 20261029T130759453335-root-5699 (no check of the team signed it); you rejected it (R3)"
+      ],
+      "details": [
+        "- weekly-meeting-memo: lead/writer delivered 20261029T121630346755-root-d28e (no check of the team signed it); you rejected it (R1, C9); cause contract-gap",
+        "- weekly-meeting-memo: lead/writer delivered 20261029T124626096325-root-750e (no check of the team signed it); you rejected it (R2, C10); cause contract-gap",
+        "- weekly-meeting-memo: lead/writer delivered 20261029T130759453335-root-5699 (no check of the team signed it); you rejected it (R3); cause contract-gap"
+      ],
+      "counts": {
+        "escapes": 3,
+        "passed_by_a_check": 0,
+        "no_check_signed": 3
+      },
+      "error": ""
+    },
+    "d3": {
+      "heading": "Rejections with no criterion yet",
+      "block": [],
+      "details": [
+        "- weekly-meeting-memo R3: \"No: I've changed my mind - always put the action items before the decisions now, right after the one-line Summary.\" (unconfirmed)"
+      ],
+      "counts": {
+        "without_a_criterion": 1
+      },
+      "error": ""
+    },
+    "d4": {
+      "heading": "Alarms and causes to settle",
+      "block": [],
+      "details": [
+        "- weekly-meeting-memo: repeat alarm no (6 judged cases); cost alarm no (6 judged cases)"
+      ],
+      "counts": {
+        "alarms_firing": 0,
+        "untyped_causes": 0,
+        "disputed_causes": 0
+      },
+      "error": ""
+    },
+    "d5": {
+      "heading": "Work you ask for again and again",
+      "block": [],
+      "details": [
+        "- lead: \"One-page ops action list for the 2026-10-05 meeting\" and 2 more (20261029T122710588867-root-c1b8, 20261029T123457206032-root-cabf, 20261029T125747104778-root-4a85), joined by their titles: 3 of 3 with your verdict"
+      ],
+      "counts": {
+        "shape_groups": 1,
+        "largest_group_judged": 3
+      },
+      "error": ""
+    },
+    "d6": {
+      "heading": "Idle or stranded agents",
+      "block": [],
+      "details": [
+        "- none"
+      ],
+      "counts": {
+        "flagged": 0
+      },
+      "error": ""
+    },
+    "d7": {
+      "heading": "Did past changes hold",
+      "block": [
+        "- weekly-meeting-memo contract v2 adds C9: not recurred in 7 cases where it was exercised",
+        "- weekly-meeting-memo P8 (v2): not recurred in 3 cases where it was exercised",
+        "- weekly-meeting-memo contract v3 adds C10: not recurred in 4 cases where it was exercised",
+        "- weekly-meeting-memo P9 (v3): INCONCLUSIVE (2 of 3 exercised cases)"
+      ],
+      "details": [
+        "- weekly-meeting-memo contract v2 adds C9: not recurred in 7 cases where it was exercised",
+        "- weekly-meeting-memo P8 (v2): not recurred in 3 cases where it was exercised",
+        "- weekly-meeting-memo contract v3 adds C10: not recurred in 4 cases where it was exercised",
+        "- weekly-meeting-memo P9 (v3): INCONCLUSIVE (2 of 3 exercised cases)"
+      ],
+      "counts": {
+        "changes": 4,
+        "recurred": 0,
+        "not_evaluated": 0
+      },
+      "error": ""
+    },
+    "d8": {
+      "heading": "Changes to your organization",
+      "block": [
+        "- agent lead added (2026-10-29): from the plan you approved (2026-10-29)",
+        "- agent lead/writer added (2026-10-29): from the plan you approved (2026-10-29)",
+        "- service lead/weekly-meeting-memo added (2026-10-29): from the plan you approved (2026-10-29)",
+        "- Unprompted charter edits: 0"
+      ],
+      "details": [
+        "- agent lead added (2026-10-29): from the plan you approved (2026-10-29)",
+        "- agent lead/writer added (2026-10-29): from the plan you approved (2026-10-29)",
+        "- service lead/weekly-meeting-memo added (2026-10-29): from the plan you approved (2026-10-29)",
+        "- Unprompted charter edits since 2026-10-29: 0"
+      ],
+      "counts": {
+        "changes": 3,
+        "unprompted_charter_edits": 0
+      },
+      "error": ""
+    },
+    "d9": {
+      "heading": "Criteria and your words",
+      "block": [],
+      "details": [
+        "- weekly-meeting-memo C1 \"The memo is markdown and has at most 400 words as counted by read.\": from your words \"a markdown memo, at most 400 words\" (my question: \"Format and length?\"); words I added: the, is, has, as, counted, by, read; exercised in 8 judged cases, 5 accepted",
+        "- weekly-meeting-memo C2 \"The memo has a Decisions section listing every decision made in the named notes\u2026\": from your words \"what we decided\" (my question: \"Memo contents?\"); words I added: the, has, a, decisions, section, listing, every, decision, +10 more; exercised in 8 judged cases, 5 accepted",
+        "- weekly-meeting-memo C3 \"The action items are a markdown table with exactly the columns Owner | Action |\u2026\": from your words \"the action items as a table with columns Owner | Action | Due\" (my question: \"Format and length?\"); words I added: are, markdown, exactly; exercised in 8 judged cases, 5 accepted",
+        "- weekly-meeting-memo C4 \"Every commitment in the notes is a row of the table, both those labelled ACTION\u2026\": from your words \"if someone said they'd do something, it counts\" (my question: \"Do informal or unlabelled commitments count?\"); words I added: every, commitment, in, the, notes, is, a, row, +13 more; exercised in 8 judged cases, 5 accepted",
+        "- weekly-meeting-memo C5 \"Each Due value is an ISO date (YYYY-MM-DD). A relative deadline such as 'by Fri\u2026\": from your words \"turn vague deadlines into a date when the notes make it clear\" (my question: \"How to treat relative or vague dates?\"); words I added: each, due, value, is, an, iso, yyyy, -, +13 more; exercised in 8 judged cases, 5 accepted",
+        "- weekly-meeting-memo C6 \"Each Owner value uses the name exactly as written in the notes.\": from your words \"For the Owner column: Use the words from the notes.\" (my question: \"How should the Owner column read?\"); words I added: each, value, uses, name, exactly, as, written, in; exercised in 8 judged cases, 5 accepted",
+        "- weekly-meeting-memo C7 \"Every statement in the memo is traceable to the notes file, and anything unclea\u2026\": my default: you did not say this; exercised in 8 judged cases, 5 accepted",
+        "- weekly-meeting-memo C8 \"The lead's check report states that every decision and every table row was comp\u2026\": from your words \"No separate reviewer: the lead checks.\" (my question: \"Review by another agent?\"); words I added: s, check, report, states, that, every, decision, and, +13 more; exercised in 8 judged cases, 5 accepted",
+        "- weekly-meeting-memo C9 \"The memo starts with a one-line 'Summary:' of the meeting, followed by the Deci\u2026\": from your words \"Yes, add it.\" (your answer about C5); words I added: the, memo, starts, with, a, one, -, line, +11 more; exercised in 7 judged cases, 5 accepted",
+        "- weekly-meeting-memo C10 \"A statement that something stays as it is, where nobody has to do anything, is\u2026\": from your words \"Yes, add it.\" (your answer about C4); words I added: a, statement, that, something, stays, as, is, where, +16 more; exercised in 4 judged cases, 3 accepted"
+      ],
+      "counts": {
+        "sourced": 10,
+        "unknown_source": 0
+      },
+      "error": ""
+    },
+    "d10": {
+      "heading": "Your team's own proposals",
+      "block": [
+        "- none"
+      ],
+      "details": [
+        "- Refusals since 2026-10-29: 4 (define_service 1, delegate 1, read 1, revise_playbook 1)",
+        "- events before 2026-10-29 have expired (events_keep_days)"
+      ],
+      "counts": {
+        "proposals_refused": 0,
+        "refusals": 4
+      },
+      "error": ""
+    },
+    "d11": {
+      "heading": "Playbooks",
+      "block": [],
+      "details": [
+        "- weekly-meeting-memo: 273 of 1000 words; items: 8 kept, 1 new; 2 mirror items repeat 46 words of the contract (P8, P9)"
+      ],
+      "counts": {
+        "playbooks": 1,
+        "watch_retires": 0
+      },
+      "error": ""
+    },
+    "d12": {
+      "heading": "Spend",
+      "block": [],
+      "details": [
+        "- approved = root's hand-downs (the user's own approvals are not recorded; F-P1-10)",
+        "- weekly-meeting-memo: 6 cases, 31 runs used against 12 approved per request; 0 cases above it"
+      ],
+      "counts": {
+        "cases": 6,
+        "cases_above_approval": 0
+      },
+      "error": ""
+    },
+    "d13": {
+      "heading": "The last brief",
+      "block": [],
+      "details": [
+        "- no earlier brief"
+      ],
+      "counts": {
+        "items": 0,
+        "taken": 0,
+        "lapsed": 0
+      },
+      "error": ""
+    },
+    "d14": {
+      "heading": "Held back",
+      "block": [],
+      "details": [
+        "- clarify clarify|weekly-meeting-memo|C10|astatementthatsomethingstaysasitiswheren (weight 0)",
+        "- clarify clarify|weekly-meeting-memo|C2|thememohasadecisionssectionlistingeveryd (weight 0)",
+        "- clarify clarify|weekly-meeting-memo|C3|theactionitemsareamarkdowntablewithexact (weight 0)",
+        "- clarify clarify|weekly-meeting-memo|C4|everycommitmentinthenotesisarowofthetabl (weight 0)",
+        "- clarify clarify|weekly-meeting-memo|C5|eachduevalueisanisodateyyyymmddarelative (weight 0)",
+        "- clarify clarify|weekly-meeting-memo|C6|eachownervalueusesthenameexactlyaswritte (weight 0)",
+        "- clarify clarify|weekly-meeting-memo|C8|theleadscheckreportstatesthateverydecisi (weight 0)",
+        "- clarify clarify|weekly-meeting-memo|C9|thememostartswithaonelinesummaryofthemee (weight 0)"
+      ],
+      "counts": {
+        "held_back": 8
+      },
+      "error": ""
+    }
+  },
+  "items": [
+    {
+      "n": 1,
+      "kind": "service",
+      "key": "service|lead|20261029T122710588867-root-c1b8",
+      "evidence": [
+        "20261029T122710588867-root-c1b8",
+        "20261029T123457206032-root-cabf",
+        "20261029T125747104778-root-4a85"
+      ],
+      "weight": 3,
+      "rung": 2,
+      "rung_why": "a one-off task has no contract to clarify (rung 1); a standing service gives these tasks one contract and lets the client's verdicts improve it",
+      "question": "Make the repeated task \"one - page ops action list for the meeting\" a standing service of lead? You asked for it 3 times (2026-10-29). It costs nothing to set up; each request uses up to 8 runs, and is sent only when you ask.",
+      "cost": "up to 8 runs per request",
+      "objection": "spends within the plan: no run until you ask; lowers no criterion: the service's checks are the ones your tasks had",
+      "call": "propose_org(blueprint=<the blueprint of this item>, extend=\"current\")",
+      "revert": "propose_org(blueprint=<the revert blueprint of this item>, extend=\"current\"): it retires the service and keeps its record (defining it again continues it)",
+      "blueprint": "{\n  \"reason\": \"B1.1: 3 one-off tasks of one shape\",\n  \"extend\": {\n    \"add_services\": [\n      {\n        \"owner\": \"lead\",\n        \"name\": \"one-page-ops\",\n        \"description\": \"One-off request from the user (not the weekly-meeting-memo service, no new agents): from the notes file /tmp/hirearchy-p2/R1-1793275867/notes/2026-10-05.md make a one-page action list for the ops team. Each action with its owner and due date; at most one page. The user's words: \\\"a one-page action l\u2026\",\n        \"inputs\": [\n          {\n            \"name\": \"request\",\n            \"description\": \"what this request is about\",\n            \"required\": true\n          }\n        ],\n        \"acceptance\": [\n          {\n            \"text\": \"The deliverable is markdown, has at most 350 words as counted by read (this is the one-page limit), and a title line naming the 2026-10-05 meeting.\",\n            \"from_tasks\": [\n              \"20261029T122710588867-root-c1b8\",\n              \"20261029T123457206032-root-cabf\",\n              \"20261029T125747104778-root-4a85\"\n            ]\n          },\n          {\n            \"text\": \"It contains one markdown table with exactly the columns Owner | Action | Due, and no other sections (no decisions, no summary).\",\n            \"from_tasks\": [\n              \"20261029T122710588867-root-c1b8\",\n              \"20261029T123457206032-root-cabf\",\n              \"20261029T125747104778-root-4a85\"\n            ]\n          },\n          {\n            \"text\": \"Every action item in the notes file is a row, including those stated in prose: Priya, Dev, Sam, Marta, Lee (5 of 5), and no row that is not in the notes.\",\n            \"from_tasks\": [\n              \"20261029T122710588867-root-c1b8\",\n              \"20261029T123457206032-root-cabf\",\n              \"20261029T125747104778-root-4a85\"\n            ]\n          },\n          {\n            \"text\": \"Each Due value is an ISO date (YYYY-MM-DD) or 'none': Dev 2026-10-08, Priya 2026-10-09, Sam 2026-10-09, Marta 2026-10-14, Lee none.\",\n            \"from_tasks\": [\n              \"20261029T122710588867-root-c1b8\",\n              \"20261029T123457206032-root-cabf\",\n              \"20261029T125747104778-root-4a85\"\n            ]\n          },\n          {\n            \"text\": \"Each Owner value uses the name exactly as written in the notes.\",\n            \"from_tasks\": [\n              \"20261029T122710588867-root-c1b8\",\n              \"20261029T123457206032-root-cabf\",\n              \"20261029T125747104778-root-4a85\"\n            ]\n          },\n          {\n            \"text\": \"Rows are ordered by Due ascending with 'none' last, ties in the order of the notes.\",\n            \"from_tasks\": [\n              \"20261029T122710588867-root-c1b8\",\n              \"20261029T123457206032-root-cabf\",\n              \"20261029T125747104778-root-4a85\"\n            ]\n          },\n          {\n            \"text\": \"Every statement is traceable to 2026-10-05.md; nothing is invented.\",\n            \"from_tasks\": [\n              \"20261029T122710588867-root-c1b8\",\n              \"20261029T123457206032-root-cabf\",\n              \"20261029T125747104778-root-4a85\"\n            ]\n          },\n          {\n            \"text\": \"The lead's report states that every table row was compared with the notes file, with the count verified (n of m, n = m).\",\n            \"from_tasks\": [\n              \"20261029T122710588867-root-c1b8\",\n              \"20261029T123457206032-root-cabf\",\n              \"20261029T125747104778-root-4a85\"\n            ]\n          }\n        ],\n        \"deliverable\": {\n          \"description\": \"<ASK THE USER: what one request produces>\",\n          \"path\": \"<ASK THE USER: where it goes>\"\n        },\n        \"budget\": 8\n      }\n    ]\n  }\n}",
+      "revert_blueprint": "{\n  \"reason\": \"revert of B1.1\",\n  \"extend\": {\n    \"retire_services\": [\n      {\n        \"owner\": \"lead\",\n        \"service\": \"one-page-ops\",\n        \"reason\": \"revert of B1.1\"\n      }\n    ]\n  }\n}",
+      "effect": {
+        "service": "lead/one-page-ops"
+      },
+      "notes": [],
+      "state": ""
+    },
+    {
+      "n": 2,
+      "kind": "answer",
+      "key": "answer|R3",
+      "evidence": [
+        "R3"
+      ],
+      "weight": 1,
+      "rung": 1,
+      "rung_why": "the rejection has no answer yet, so its next request waits",
+      "question": "About C9: add \"<the rule, in their words>\" as a lasting rule? Yes or no.",
+      "cost": "no run",
+      "objection": "spends nothing; lowers no criterion",
+      "call": "on yes: define_service(owner=\"lead\", name=\"weekly-meeting-memo\", ..., answers=\"20261029T131124958232-root-b7f2\", about=<the id you asked about>, words=<their answer, verbatim>); on no: feedback(task_id=\"20261029T130759453335-root-5699\", verdict=\"reject\", confirms=\"20261029T131124958232-root-b7f2\", criterion=[\"none\"], [\"R<j>\"] or [\"C<k>\"], source=\"human\", note=<their answer, verbatim>)",
+      "revert": "none needed (a later corrected link changes it again)",
+      "blueprint": "",
+      "revert_blueprint": "",
+      "effect": {
+        "rejection": "R3"
+      },
+      "notes": [],
+      "state": ""
+    },
+    {
+      "n": 3,
+      "kind": "clarify",
+      "key": "clarify|weekly-meeting-memo|C1|thememoismarkdownandhasatmost400wordsasc",
+      "evidence": [
+        "weekly-meeting-memo/C1"
+      ],
+      "weight": 0,
+      "rung": 1,
+      "rung_why": "no rejection names it, so nothing else will ever show it again",
+      "question": "C1 of weekly-meeting-memo reads \"The memo is markdown and has at most 40\u2026\". It rests on your words \"a markdown memo, at most 400 words\", your answer to \"Format and length?\"; the words the, is, has, as, counted, by, read are mine. Does it say what you meant?",
+      "cost": "no run",
+      "objection": "spends nothing; lowers no criterion (a no leads to your own wording, recorded with your words)",
+      "call": "nothing to record: keep it",
+      "revert": "the same call back",
+      "blueprint": "",
+      "revert_blueprint": "",
+      "effect": {
+        "service": "weekly-meeting-memo",
+        "criterion": "C1"
+      },
+      "notes": [
+        "On no: ask what they meant, then define_service(owner, name, remove_acceptance=[\"C1\"], add_acceptance=[<their wording>], words=<their answer, verbatim>)"
+      ],
+      "state": ""
+    }
+  ],
+  "held_back": [
+    {
+      "n": 0,
+      "kind": "clarify",
+      "key": "clarify|weekly-meeting-memo|C10|astatementthatsomethingstaysasitiswheren",
+      "evidence": [
+        "weekly-meeting-memo/C10"
+      ],
+      "weight": 0,
+      "rung": 1,
+      "rung_why": "no rejection names it, so nothing else will ever show it again",
+      "question": "C10 of weekly-meeting-memo reads \"A statement that something stays as it\u2026\". It rests on your words \"Yes, add it.\"; the words a, statement, that, something, stays, as, is, where, +16 more are mine. Does it say what you meant?",
+      "cost": "no run",
+      "objection": "spends nothing; lowers no criterion (a no leads to your own wording, recorded with your words)",
+      "call": "nothing to record: keep it",
+      "revert": "the same call back",
+      "blueprint": "",
+      "revert_blueprint": "",
+      "effect": {
+        "service": "weekly-meeting-memo",
+        "criterion": "C10"
+      },
+      "notes": [
+        "On no: ask what they meant, then define_service(owner, name, remove_acceptance=[\"C10\"], add_acceptance=[<their wording>], words=<their answer, verbatim>)"
+      ],
+      "state": ""
+    },
+    {
+      "n": 0,
+      "kind": "clarify",
+      "key": "clarify|weekly-meeting-memo|C2|thememohasadecisionssectionlistingeveryd",
+      "evidence": [
+        "weekly-meeting-memo/C2"
+      ],
+      "weight": 0,
+      "rung": 1,
+      "rung_why": "no rejection names it, so nothing else will ever show it again",
+      "question": "C2 of weekly-meeting-memo reads \"The memo has a Decisions section listin\u2026\". It rests on your words \"what we decided\", your answer to \"Memo contents?\"; the words the, has, a, decisions, section, listing, every, decision, +10 more are mine. Does it say what you meant?",
+      "cost": "no run",
+      "objection": "spends nothing; lowers no criterion (a no leads to your own wording, recorded with your words)",
+      "call": "nothing to record: keep it",
+      "revert": "the same call back",
+      "blueprint": "",
+      "revert_blueprint": "",
+      "effect": {
+        "service": "weekly-meeting-memo",
+        "criterion": "C2"
+      },
+      "notes": [
+        "On no: ask what they meant, then define_service(owner, name, remove_acceptance=[\"C2\"], add_acceptance=[<their wording>], words=<their answer, verbatim>)"
+      ],
+      "state": ""
+    },
+    {
+      "n": 0,
+      "kind": "clarify",
+      "key": "clarify|weekly-meeting-memo|C3|theactionitemsareamarkdowntablewithexact",
+      "evidence": [
+        "weekly-meeting-memo/C3"
+      ],
+      "weight": 0,
+      "rung": 1,
+      "rung_why": "no rejection names it, so nothing else will ever show it again",
+      "question": "C3 of weekly-meeting-memo reads \"The action items are a markdown table w\u2026\". It rests on your words \"the action items as a table with column\u2026\", your answer to \"Format and length?\"; the words are, markdown, exactly are mine. Does it say what you meant?",
+      "cost": "no run",
+      "objection": "spends nothing; lowers no criterion (a no leads to your own wording, recorded with your words)",
+      "call": "nothing to record: keep it",
+      "revert": "the same call back",
+      "blueprint": "",
+      "revert_blueprint": "",
+      "effect": {
+        "service": "weekly-meeting-memo",
+        "criterion": "C3"
+      },
+      "notes": [
+        "On no: ask what they meant, then define_service(owner, name, remove_acceptance=[\"C3\"], add_acceptance=[<their wording>], words=<their answer, verbatim>)"
+      ],
+      "state": ""
+    },
+    {
+      "n": 0,
+      "kind": "clarify",
+      "key": "clarify|weekly-meeting-memo|C4|everycommitmentinthenotesisarowofthetabl",
+      "evidence": [
+        "weekly-meeting-memo/C4"
+      ],
+      "weight": 0,
+      "rung": 1,
+      "rung_why": "no rejection names it, so nothing else will ever show it again",
+      "question": "C4 of weekly-meeting-memo reads \"Every commitment in the notes is a row\u2026\". It rests on your words \"if someone said they'd do something, it\u2026\", your answer to \"Do informal or unlabelled commitments c\u2026\"; the words every, commitment, in, the, notes, is, a, row, +13 more are mine. Does it say what you meant?",
+      "cost": "no run",
+      "objection": "spends nothing; lowers no criterion (a no leads to your own wording, recorded with your words)",
+      "call": "nothing to record: keep it",
+      "revert": "the same call back",
+      "blueprint": "",
+      "revert_blueprint": "",
+      "effect": {
+        "service": "weekly-meeting-memo",
+        "criterion": "C4"
+      },
+      "notes": [
+        "On no: ask what they meant, then define_service(owner, name, remove_acceptance=[\"C4\"], add_acceptance=[<their wording>], words=<their answer, verbatim>)"
+      ],
+      "state": ""
+    },
+    {
+      "n": 0,
+      "kind": "clarify",
+      "key": "clarify|weekly-meeting-memo|C5|eachduevalueisanisodateyyyymmddarelative",
+      "evidence": [
+        "weekly-meeting-memo/C5"
+      ],
+      "weight": 0,
+      "rung": 1,
+      "rung_why": "no rejection names it, so nothing else will ever show it again",
+      "question": "C5 of weekly-meeting-memo reads \"Each Due value is an ISO date (YYYY-MM-\u2026\". It rests on your words \"turn vague deadlines into a date when t\u2026\", your answer to \"How to treat relative or vague dates?\"; the words each, due, value, is, an, iso, yyyy, -, +13 more are mine. Does it say what you meant?",
+      "cost": "no run",
+      "objection": "spends nothing; lowers no criterion (a no leads to your own wording, recorded with your words)",
+      "call": "nothing to record: keep it",
+      "revert": "the same call back",
+      "blueprint": "",
+      "revert_blueprint": "",
+      "effect": {
+        "service": "weekly-meeting-memo",
+        "criterion": "C5"
+      },
+      "notes": [
+        "On no: ask what they meant, then define_service(owner, name, remove_acceptance=[\"C5\"], add_acceptance=[<their wording>], words=<their answer, verbatim>)"
+      ],
+      "state": ""
+    },
+    {
+      "n": 0,
+      "kind": "clarify",
+      "key": "clarify|weekly-meeting-memo|C6|eachownervalueusesthenameexactlyaswritte",
+      "evidence": [
+        "weekly-meeting-memo/C6"
+      ],
+      "weight": 0,
+      "rung": 1,
+      "rung_why": "no rejection names it, so nothing else will ever show it again",
+      "question": "C6 of weekly-meeting-memo reads \"Each Owner value uses the name exactly\u2026\". It rests on your words \"For the Owner column: Use the words fro\u2026\", your answer to \"How should the Owner column read?\"; the words each, value, uses, name, exactly, as, written, in are mine. Does it say what you meant?",
+      "cost": "no run",
+      "objection": "spends nothing; lowers no criterion (a no leads to your own wording, recorded with your words)",
+      "call": "nothing to record: keep it",
+      "revert": "the same call back",
+      "blueprint": "",
+      "revert_blueprint": "",
+      "effect": {
+        "service": "weekly-meeting-memo",
+        "criterion": "C6"
+      },
+      "notes": [
+        "On no: ask what they meant, then define_service(owner, name, remove_acceptance=[\"C6\"], add_acceptance=[<their wording>], words=<their answer, verbatim>)"
+      ],
+      "state": ""
+    },
+    {
+      "n": 0,
+      "kind": "clarify",
+      "key": "clarify|weekly-meeting-memo|C8|theleadscheckreportstatesthateverydecisi",
+      "evidence": [
+        "weekly-meeting-memo/C8"
+      ],
+      "weight": 0,
+      "rung": 1,
+      "rung_why": "no rejection names it, so nothing else will ever show it again",
+      "question": "C8 of weekly-meeting-memo reads \"The lead's check report states that eve\u2026\". It rests on your words \"No separate reviewer: the lead checks.\", your answer to \"Review by another agent?\"; the words s, check, report, states, that, every, decision, and, +13 more are mine. Does it say what you meant?",
+      "cost": "no run",
+      "objection": "spends nothing; lowers no criterion (a no leads to your own wording, recorded with your words)",
+      "call": "nothing to record: keep it",
+      "revert": "the same call back",
+      "blueprint": "",
+      "revert_blueprint": "",
+      "effect": {
+        "service": "weekly-meeting-memo",
+        "criterion": "C8"
+      },
+      "notes": [
+        "On no: ask what they meant, then define_service(owner, name, remove_acceptance=[\"C8\"], add_acceptance=[<their wording>], words=<their answer, verbatim>)"
+      ],
+      "state": ""
+    },
+    {
+      "n": 0,
+      "kind": "clarify",
+      "key": "clarify|weekly-meeting-memo|C9|thememostartswithaonelinesummaryofthemee",
+      "evidence": [
+        "weekly-meeting-memo/C9"
+      ],
+      "weight": 0,
+      "rung": 1,
+      "rung_why": "no rejection names it, so nothing else will ever show it again",
+      "question": "C9 of weekly-meeting-memo reads \"The memo starts with a one-line 'Summar\u2026\". It rests on your words \"Yes, add it.\"; the words the, memo, starts, with, a, one, -, line, +11 more are mine. Does it say what you meant?",
+      "cost": "no run",
+      "objection": "spends nothing; lowers no criterion (a no leads to your own wording, recorded with your words)",
+      "call": "nothing to record: keep it",
+      "revert": "the same call back",
+      "blueprint": "",
+      "revert_blueprint": "",
+      "effect": {
+        "service": "weekly-meeting-memo",
+        "criterion": "C9"
+      },
+      "notes": [
+        "On no: ask what they meant, then define_service(owner, name, remove_acceptance=[\"C9\"], add_acceptance=[<their wording>], words=<their answer, verbatim>)"
+      ],
+      "state": ""
+    }
+  ]
+}

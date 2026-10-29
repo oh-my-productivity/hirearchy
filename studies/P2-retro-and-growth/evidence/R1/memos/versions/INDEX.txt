@@ -1,0 +1,2 @@
+lead/work/2026-10-12-check.md v1 5d5e5a0 2026-10-29T12:33:02Z md5 6cda12f8fb3ccb6401fa2ef422a1a939
+lead/work/2026-10-12-check.md working tree md5 6cda12f8fb3ccb6401fa2ef422a1a939 (committed head: 6cda12f8fb3ccb6401fa2ef422a1a939)

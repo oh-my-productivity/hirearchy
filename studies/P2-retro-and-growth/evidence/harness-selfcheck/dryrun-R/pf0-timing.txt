@@ -1,0 +1,2 @@
+try same 1 (built as same): first record 2026-10-29T12:08:43.276466+00:00 | older commit t1 2026-10-29T12:08:43+00:00 | product: - charter of lead/writer changed: body (2026-10-29): by lead, or outside the tools (the event log does not reach back)
+try earlier 1 (built as earlier): first record 2026-10-29T12:08:45.621325+00:00 | older commit t1 2026-10-29T12:08:46+00:00 | product: - charter of lead/writer changed: body (2026-10-29): outside the tools (a hand edit or the terminal)

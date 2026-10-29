@@ -1,0 +1,56 @@
+turn 01: root's new service requests by notes date: (none)
+turn 01: root's one-off tasks: (none)
+turn 02: root's new service requests by notes date: (none)
+turn 02: root's one-off tasks: (none)
+turn 03: root's new service requests by notes date: 2026-10-05(weekly-meeting-memo)
+turn 03: root's one-off tasks: (none)
+turn 04: root's new service requests by notes date: 2026-10-05(weekly-meeting-memo)
+turn 04: root's one-off tasks: (none)
+turn 05: root's new service requests by notes date: 2026-10-05(weekly-meeting-memo)
+turn 05: root's one-off tasks: (none)
+turn 06: root's new service requests by notes date: 2026-10-05(weekly-meeting-memo)
+turn 06: root's one-off tasks: (none)
+turn 07: root's new service requests by notes date: 2026-10-05(weekly-meeting-memo)
+turn 07: root's one-off tasks: 20261029T122710588867-root-c1b8 "One-page ops action list for the 2026-10-05 meeting" -> lead
+turn 08: root's new service requests by notes date: 2026-10-05(weekly-meeting-memo) 2026-10-12(weekly-meeting-memo)
+turn 08: root's one-off tasks: 20261029T122710588867-root-c1b8 "One-page ops action list for the 2026-10-05 meeting" -> lead
+turn 09: root's new service requests by notes date: 2026-10-05(weekly-meeting-memo) 2026-10-12(weekly-meeting-memo)
+turn 09: root's one-off tasks: 20261029T122710588867-root-c1b8 "One-page ops action list for the 2026-10-05 meeting" -> lead; 20261029T123457206032-root-cabf "One-page ops action list for the 2026-10-12 meeting" -> lead
+turn 10: root's new service requests by notes date: 2026-10-05(weekly-meeting-memo) 2026-10-12(weekly-meeting-memo)
+turn 10: root's one-off tasks: 20261029T122710588867-root-c1b8 "One-page ops action list for the 2026-10-05 meeting" -> lead; 20261029T123457206032-root-cabf "One-page ops action list for the 2026-10-12 meeting" -> lead
+turn 11: root's new service requests by notes date: 2026-10-05(weekly-meeting-memo) 2026-10-12(weekly-meeting-memo) 2026-10-19(weekly-meeting-memo)
+turn 11: root's one-off tasks: 20261029T122710588867-root-c1b8 "One-page ops action list for the 2026-10-05 meeting" -> lead; 20261029T123457206032-root-cabf "One-page ops action list for the 2026-10-12 meeting" -> lead
+turn 12: root's new service requests by notes date: 2026-10-05(weekly-meeting-memo) 2026-10-12(weekly-meeting-memo) 2026-10-19(weekly-meeting-memo)
+turn 12: root's one-off tasks: 20261029T122710588867-root-c1b8 "One-page ops action list for the 2026-10-05 meeting" -> lead; 20261029T123457206032-root-cabf "One-page ops action list for the 2026-10-12 meeting" -> lead
+turn 13: root's new service requests by notes date: 2026-10-05(weekly-meeting-memo) 2026-10-12(weekly-meeting-memo) 2026-10-19(weekly-meeting-memo)
+turn 13: root's one-off tasks: 20261029T122710588867-root-c1b8 "One-page ops action list for the 2026-10-05 meeting" -> lead; 20261029T123457206032-root-cabf "One-page ops action list for the 2026-10-12 meeting" -> lead
+turn 14: root's new service requests by notes date: 2026-10-05(weekly-meeting-memo) 2026-10-12(weekly-meeting-memo) 2026-10-19(weekly-meeting-memo)
+turn 14: root's one-off tasks: 20261029T122710588867-root-c1b8 "One-page ops action list for the 2026-10-05 meeting" -> lead; 20261029T123457206032-root-cabf "One-page ops action list for the 2026-10-12 meeting" -> lead
+turn 15: root's new service requests by notes date: 2026-10-05(weekly-meeting-memo) 2026-10-12(weekly-meeting-memo) 2026-10-19(weekly-meeting-memo)
+turn 15: root's one-off tasks: 20261029T122710588867-root-c1b8 "One-page ops action list for the 2026-10-05 meeting" -> lead; 20261029T123457206032-root-cabf "One-page ops action list for the 2026-10-12 meeting" -> lead; 20261029T125747104778-root-4a85 "One-page ops action list for the 2026-10-19 meeting" -> lead
+turn 16: root's new service requests by notes date: 2026-10-05(weekly-meeting-memo) 2026-10-12(weekly-meeting-memo) 2026-10-19(weekly-meeting-memo) 2026-10-26(weekly-meeting-memo)
+turn 16: root's one-off tasks: 20261029T122710588867-root-c1b8 "One-page ops action list for the 2026-10-05 meeting" -> lead; 20261029T123457206032-root-cabf "One-page ops action list for the 2026-10-12 meeting" -> lead; 20261029T125747104778-root-4a85 "One-page ops action list for the 2026-10-19 meeting" -> lead
+turn 17: root's new service requests by notes date: 2026-10-05(weekly-meeting-memo) 2026-10-12(weekly-meeting-memo) 2026-10-19(weekly-meeting-memo) 2026-10-26(weekly-meeting-memo) 2026-11-02(weekly-meeting-memo)
+turn 17: root's one-off tasks: 20261029T122710588867-root-c1b8 "One-page ops action list for the 2026-10-05 meeting" -> lead; 20261029T123457206032-root-cabf "One-page ops action list for the 2026-10-12 meeting" -> lead; 20261029T125747104778-root-4a85 "One-page ops action list for the 2026-10-19 meeting" -> lead
+turn 18: root's new service requests by notes date: 2026-10-05(weekly-meeting-memo) 2026-10-12(weekly-meeting-memo) 2026-10-19(weekly-meeting-memo) 2026-10-26(weekly-meeting-memo) 2026-11-02(weekly-meeting-memo) 2026-11-09(weekly-meeting-memo)
+turn 18: root's one-off tasks: 20261029T122710588867-root-c1b8 "One-page ops action list for the 2026-10-05 meeting" -> lead; 20261029T123457206032-root-cabf "One-page ops action list for the 2026-10-12 meeting" -> lead; 20261029T125747104778-root-4a85 "One-page ops action list for the 2026-10-19 meeting" -> lead
+turn 19: root's new service requests by notes date: 2026-10-05(weekly-meeting-memo) 2026-10-12(weekly-meeting-memo) 2026-10-19(weekly-meeting-memo) 2026-10-26(weekly-meeting-memo) 2026-11-02(weekly-meeting-memo) 2026-11-09(weekly-meeting-memo)
+turn 19: root's one-off tasks: 20261029T122710588867-root-c1b8 "One-page ops action list for the 2026-10-05 meeting" -> lead; 20261029T123457206032-root-cabf "One-page ops action list for the 2026-10-12 meeting" -> lead; 20261029T125747104778-root-4a85 "One-page ops action list for the 2026-10-19 meeting" -> lead
+turn 20: root's new service requests by notes date: 2026-10-05(weekly-meeting-memo) 2026-10-12(weekly-meeting-memo) 2026-10-19(weekly-meeting-memo) 2026-10-26(weekly-meeting-memo) 2026-11-02(weekly-meeting-memo) 2026-11-09(weekly-meeting-memo)
+turn 20: root's one-off tasks: 20261029T122710588867-root-c1b8 "One-page ops action list for the 2026-10-05 meeting" -> lead; 20261029T123457206032-root-cabf "One-page ops action list for the 2026-10-12 meeting" -> lead; 20261029T125747104778-root-4a85 "One-page ops action list for the 2026-10-19 meeting" -> lead
+turn 21: root's new service requests by notes date: 2026-10-05(weekly-meeting-memo) 2026-10-12(weekly-meeting-memo) 2026-10-19(weekly-meeting-memo) 2026-10-26(weekly-meeting-memo) 2026-11-02(weekly-meeting-memo) 2026-11-09(weekly-meeting-memo)
+turn 21: root's one-off tasks: 20261029T122710588867-root-c1b8 "One-page ops action list for the 2026-10-05 meeting" -> lead; 20261029T123457206032-root-cabf "One-page ops action list for the 2026-10-12 meeting" -> lead; 20261029T125747104778-root-4a85 "One-page ops action list for the 2026-10-19 meeting" -> lead
+turn 22: root's new service requests by notes date: 2026-10-05(weekly-meeting-memo) 2026-10-12(weekly-meeting-memo) 2026-10-19(weekly-meeting-memo) 2026-10-26(weekly-meeting-memo) 2026-11-02(weekly-meeting-memo) 2026-11-09(weekly-meeting-memo)
+turn 22: root's one-off tasks: 20261029T122710588867-root-c1b8 "One-page ops action list for the 2026-10-05 meeting" -> lead; 20261029T123457206032-root-cabf "One-page ops action list for the 2026-10-12 meeting" -> lead; 20261029T125747104778-root-4a85 "One-page ops action list for the 2026-10-19 meeting" -> lead
+turn 23: root's new service requests by notes date: 2026-10-05(weekly-meeting-memo) 2026-10-12(weekly-meeting-memo) 2026-10-19(weekly-meeting-memo) 2026-10-26(weekly-meeting-memo) 2026-11-02(weekly-meeting-memo) 2026-11-09(weekly-meeting-memo)
+turn 23: root's one-off tasks: 20261029T122710588867-root-c1b8 "One-page ops action list for the 2026-10-05 meeting" -> lead; 20261029T123457206032-root-cabf "One-page ops action list for the 2026-10-12 meeting" -> lead; 20261029T125747104778-root-4a85 "One-page ops action list for the 2026-10-19 meeting" -> lead
+turn 24: root's new service requests by notes date: 2026-10-05(weekly-meeting-memo) 2026-10-12(weekly-meeting-memo) 2026-10-19(weekly-meeting-memo) 2026-10-26(weekly-meeting-memo) 2026-11-02(weekly-meeting-memo) 2026-11-09(weekly-meeting-memo)
+turn 24: root's one-off tasks: 20261029T122710588867-root-c1b8 "One-page ops action list for the 2026-10-05 meeting" -> lead; 20261029T123457206032-root-cabf "One-page ops action list for the 2026-10-12 meeting" -> lead; 20261029T125747104778-root-4a85 "One-page ops action list for the 2026-10-19 meeting" -> lead
+turn 25: root's new service requests by notes date: 2026-10-05(weekly-meeting-memo) 2026-10-12(weekly-meeting-memo) 2026-10-19(weekly-meeting-memo) 2026-10-26(weekly-meeting-memo) 2026-11-02(weekly-meeting-memo) 2026-11-09(weekly-meeting-memo) 2026-11-09(ops-action-list)
+turn 25: root's one-off tasks: 20261029T122710588867-root-c1b8 "One-page ops action list for the 2026-10-05 meeting" -> lead; 20261029T123457206032-root-cabf "One-page ops action list for the 2026-10-12 meeting" -> lead; 20261029T125747104778-root-4a85 "One-page ops action list for the 2026-10-19 meeting" -> lead
+turn 26: root's new service requests by notes date: 2026-10-05(weekly-meeting-memo) 2026-10-12(weekly-meeting-memo) 2026-10-19(weekly-meeting-memo) 2026-10-26(weekly-meeting-memo) 2026-11-02(weekly-meeting-memo) 2026-11-09(weekly-meeting-memo) 2026-11-09(ops-action-list)
+turn 26: root's one-off tasks: 20261029T122710588867-root-c1b8 "One-page ops action list for the 2026-10-05 meeting" -> lead; 20261029T123457206032-root-cabf "One-page ops action list for the 2026-10-12 meeting" -> lead; 20261029T125747104778-root-4a85 "One-page ops action list for the 2026-10-19 meeting" -> lead
+turn 27: root's new service requests by notes date: 2026-10-05(weekly-meeting-memo) 2026-10-12(weekly-meeting-memo) 2026-10-19(weekly-meeting-memo) 2026-10-26(weekly-meeting-memo) 2026-11-02(weekly-meeting-memo) 2026-11-09(weekly-meeting-memo) 2026-11-09(ops-action-list)
+turn 27: root's one-off tasks: 20261029T122710588867-root-c1b8 "One-page ops action list for the 2026-10-05 meeting" -> lead; 20261029T123457206032-root-cabf "One-page ops action list for the 2026-10-12 meeting" -> lead; 20261029T125747104778-root-4a85 "One-page ops action list for the 2026-10-19 meeting" -> lead
+turn 28: root's new service requests by notes date: 2026-10-05(weekly-meeting-memo) 2026-10-12(weekly-meeting-memo) 2026-10-19(weekly-meeting-memo) 2026-10-26(weekly-meeting-memo) 2026-11-02(weekly-meeting-memo) 2026-11-09(weekly-meeting-memo) 2026-11-09(ops-action-list)
+turn 28: root's one-off tasks: 20261029T122710588867-root-c1b8 "One-page ops action list for the 2026-10-05 meeting" -> lead; 20261029T123457206032-root-cabf "One-page ops action list for the 2026-10-12 meeting" -> lead; 20261029T125747104778-root-4a85 "One-page ops action list for the 2026-10-19 meeting" -> lead

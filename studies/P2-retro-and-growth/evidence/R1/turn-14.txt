@@ -1,0 +1,18 @@
+######## TURN 14  start 12:54:04  end 12:56:37  elapsed 153s  (local, 2026-10-29; UTC wall-clock start 2026-10-29T12:54:04Z end 2026-10-29T12:56:37Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Yes, add it.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-14.stderr.txt):
+I removed the Marta agenda row from the 19 October memo. The corrected version is at `/private/tmp/hirearchy-p2/R1-1793275867/deliverables/2026-10-19-memo.md`, and the copy is identical to the team's file. The rule is now a standing check (C10) on every future memo, so a statement that something stays as it is gets no row.
+
+I checked the memo against the notes myself:
+- **Your correction:** met. The Marta agenda row is gone, and so is its "Unclear" bullet. The table has 5 of 5 rows: Marta 2026-10-23, Dev 2026-10-24, Priya 2026-10-26, Lee 2026-10-30, Sam none.
+- **Everything else:** unchanged and met.
+  - 3 decisions are listed.
+  - It opens with "Summary:", then Decisions, then the table.
+  - "Unclear" is last and keeps the Sam/Jo and demo-date bullets.
+  - The memo is 274 words by `wc` (the lead counted 241), under 400.
+- **Lead's check:** met, 3 of 3 decisions and 5 of 5 rows verified.
+
+Runs: 10 of the 12 approved for this memo.
+
+Keep it, or what should change?

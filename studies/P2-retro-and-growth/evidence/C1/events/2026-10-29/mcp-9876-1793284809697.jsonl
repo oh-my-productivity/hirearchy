@@ -1,0 +1,3 @@
+{"v":1,"ts":"2026-10-29T14:40:09.698068+00:00","seq":1,"proc":"mcp","pid":9876,"kind":"tool.call","actor":"root","run":null,"trace":null,"tool":"status","ok":true,"ms":699.93,"error":null,"error_type":null,"args":{}}
+{"v":1,"ts":"2026-10-29T14:40:09.776070+00:00","seq":2,"proc":"mcp","pid":9876,"kind":"tool.call","actor":"root","run":null,"trace":null,"tool":"observe","ok":true,"ms":74.15,"error":null,"error_type":null,"args":{"view":"events","since":"24h","errors_only":false,"limit":100}}
+{"v":1,"ts":"2026-10-29T14:40:09.860755+00:00","seq":3,"proc":"mcp","pid":9876,"kind":"tool.call","actor":"root","run":null,"trace":null,"tool":"quality","ok":true,"ms":870.73,"error":null,"error_type":null,"args":{}}

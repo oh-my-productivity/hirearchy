@@ -1,0 +1,38 @@
+######## hirearchy --root /tmp/hirearchy-p2/R1-1793270268/org services (/Volumes/workspace/hirearchy)
+Services you can request (from your direct reports):
+- weekly-meeting-memo (offered by lead; contract v2, playbook v2): One markdown memo with the decisions and the action-item table from one weekly meeting-notes file.
+  inputs: notes_file* (File name of the meeting notes in the notes folder, e.g. 2026-10-05.md)   (* required)
+  each request: 12 runs; acceptance criteria (lead/services/weekly-meeting-memo/SERVICE.md):
+    C1: The memo covers only the decisions and the action items of the requested notes file, with a Decisions section and an Actions section.
+    C2: The memo is at most 400 words as counted by read.
+    C3: Every decision in the notes file is listed in the Decisions section, and nothing is listed there that the notes do not state as decided or agreed.
+    C4: Every commitment in the notes file is a row in the Actions table, including informal ones in prose (for example 'Sam said he'd look into ...'), and no row is an invented commitment.
+    C5: The Actions section is a table with exactly the columns Owner | Action | Due.
+    C6: The Owner cell uses the words the notes use for that person or group.
+    C7: The Due cell is an ISO date (YYYY-MM-DD). A vague deadline (for example 'before Friday') is turned into a date, using the meeting date in the notes, only when the notes make that date clear; otherwise the cell is 'none'.
+    C8: The lead's check report matches every decision and every action row of the memo against the notes file (n of m, n = m), and every commitment in the notes file has a row.
+    C9: Every memo starts with a one-line 'Summary:' of the meeting, then the Decisions, then the Actions; the Summary line is the one thing allowed besides decisions and actions.
+  record: 1 request(s): 1 done, 0 failed, 0 open; 1 reworked; avg 12 runs; feedback 1 accept (1 after a reject), 0 reject
+  regression list (the client's rejections):
+    R1 (case 20261029T104227032002-root-b870, about C9): "No, not right yet. Always start the memo with a one-line 'Summary:' of the meeting, then the decisions, then the action items." (items citing it: P8)
+  playbook v2 (2026-10-29): "C9 was added by an amendment the client confirmed (R1); this step is its own words."; 8 items (0 rules); watched: P8 new (0 of 3 clean cases, k 3)
+
+######## hirearchy --root /tmp/hirearchy-p2/R1-1793270268/org progress (/Volumes/workspace/hirearchy)
+"Memo for the 2026-10-05 weekly" [service weekly-meeting-memo v1]: done. runs 3 of 12 (9 returned). last activity 6m ago. artifacts: lead/writer/work/memo-2026-10-05.md, lead/work/check.md. case total: 12 runs used: 9 by the user's requests, 3 by your relayed rework 20261029T104827993019-root-269a; 33 handed down (contract: 12 per request). The runs of your relayed rework are your own spend, not the user's: report them to the user as yours, and never ask the user to fund them. (task 20261029T104227032002-root-b870)
+"Rework memo 2026-10-05: two Due dates" [service weekly-meeting-memo v1]: done. runs 3 of 9 (6 returned). last activity 6m ago. artifacts: lead/writer/work/memo-2026-10-05.md, lead/work/check.md. case total: 12 runs used: 9 by the user's requests, 3 by your relayed rework 20261029T104827993019-root-269a; 33 handed down (contract: 12 per request). The runs of your relayed rework are your own spend, not the user's: report them to the user as yours, and never ask the user to fund them. (task 20261029T104533934917-root-f18f)
+"Rework memo 2026-10-05: unclear due dates" [service weekly-meeting-memo v1]: done. runs 3 of 6 (3 returned). last activity 6m ago. artifacts: lead/writer/work/memo-2026-10-05.md, lead/work/check.md. case total: 12 runs used: 9 by the user's requests, 3 by your relayed rework 20261029T104827993019-root-269a; 33 handed down (contract: 12 per request). The runs of your relayed rework are your own spend, not the user's: report them to the user as yours, and never ask the user to fund them. (task 20261029T104827993019-root-269a)
+"Rework memo 2026-10-05: add Summary line" [service weekly-meeting-memo v1]: done. runs 3 of 6 (3 returned). last activity 6m ago. artifacts: lead/writer/work/memo-2026-10-05.md, lead/work/check.md. case total: 12 runs used: 9 by the user's requests, 3 by your relayed rework 20261029T104827993019-root-269a; 33 handed down (contract: 12 per request). The runs of your relayed rework are your own spend, not the user's: report them to the user as yours, and never ask the user to fund them. (task 20261029T105348971545-root-bc2c)
+scheduler: stopped (finished: no open tasks)
+
+######## hirearchy --root /tmp/hirearchy-p2/R1-1793270268/org status (/Volumes/workspace/hirearchy)
+root (human): unread 0, delegated 0
+  lead [Manager] idle  budget=0 open=0 delegated=0 unread=0 services: weekly-meeting-memo
+    writer [Writer] idle  budget=0 open=0 delegated=0 unread=0
+
+scheduler: stopped (finished: no open tasks)
+
+######## hirearchy --root /tmp/hirearchy-p2/R1-1793270268/org health (/Volumes/workspace/hirearchy)
+2 agents, 0 flagged
+lead idle, budget 0/40, runs 9, open 0, done 4 failed 0 blocked 0 rework 0 (+3 by the client), escapes 0 of 2 judged (+1 not its: 1 contract-gap), re-checks after a FAIL 0 (author rework runs 0), runs/task 2.0, empty 0 (+1 failed), last activity 7m ago | branch: runs 13, open 0, done 8, failed 0, blocked 0, rework 0, worst none
+  writer idle, budget 0/10, runs 4, open 0, done 4 failed 0 blocked 0 rework 0 (+3 by the client), escapes 0 of 2 judged (+1 not its: 1 contract-gap), re-checks after a FAIL 0 (author rework runs 0), runs/task 1.0, empty 0, last activity 8m ago
+

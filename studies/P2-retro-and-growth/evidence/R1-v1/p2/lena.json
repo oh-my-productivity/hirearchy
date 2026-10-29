@@ -1,0 +1,69 @@
+{
+ "act_req": [
+  [
+   7,
+   "2026-10-05"
+  ]
+ ],
+ "condition_turn": null,
+ "condition_written": null,
+ "ext_no": 0,
+ "item_lines": {
+  "EXT-NO": [],
+  "ITEM-CAUSE": [],
+  "ITEM-CHECKER": [],
+  "ITEM-CLARIFY-W": [],
+  "ITEM-NOT-NOW": [],
+  "ITEM-SERVICE": [],
+  "PLAN-APPROVE": [],
+  "RETRO-ASK": [],
+  "RETRO-YES": []
+ },
+ "lines": 7,
+ "list_bounds": [
+  7
+ ],
+ "passed_trap": [],
+ "raw": 7,
+ "retro_places": {
+  "L0": null,
+  "misplaced": [],
+  "retro1": null,
+  "retro2": null
+ },
+ "rows_by_turn": {
+  "1": [],
+  "2": [
+   "K1",
+   "K2",
+   "K3",
+   "K38",
+   "K5 (yes/no form)"
+  ],
+  "3": [
+   "K8"
+  ],
+  "4": [
+   "K13",
+   "K13"
+  ],
+  "5": [],
+  "6": [
+   "K26"
+  ],
+  "7": [
+   "K10"
+  ]
+ },
+ "trap_memos": {},
+ "trap_unreached": [
+  "2026-10-12",
+  "2026-10-19",
+  "2026-10-26",
+  "2026-11-02"
+ ],
+ "unknown_rules": [],
+ "unread": [],
+ "week_list": [],
+ "x2_not_reached": false
+}

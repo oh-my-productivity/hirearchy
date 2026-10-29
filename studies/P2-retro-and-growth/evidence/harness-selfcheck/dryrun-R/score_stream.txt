@@ -1,0 +1,5 @@
+ok: score-extract_p2-checks.txt
+ok: score-watch_views.txt
+ok: measures/score_p2-output.txt
+ok: score-gate_p1.txt
+score_stream selfcheck-R: 0 failed command(s)

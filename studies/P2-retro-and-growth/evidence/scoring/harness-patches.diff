@@ -1,0 +1,23 @@
+diff h-frozen/gate_p1.py h-5a/gate_p1.py
+339c339
+<     m = re.findall(r"^total: (\d+)", ec, re.M)
+---
+>     m = re.findall(r"^total: (?:session-store empty-argument failed calls: )?(\d+)", ec, re.M)
+Common subdirectories: h-frozen/keys and h-5a/keys
+Common subdirectories: h-frozen/selfcheck and h-5a/selfcheck
+Common subdirectories: h-frozen/keys and h-62/keys
+diff h-frozen/rederive_watch.py h-62/rederive_watch.py
+1397c1397
+<     w = load_world(stream)
+---
+>     w = load_world(stream, stream.name.split("--", 1)[1] if "--" in stream.name else None)
+Common subdirectories: h-frozen/selfcheck and h-62/selfcheck
+Common subdirectories: h-frozen/keys and h-63/keys
+diff h-frozen/rederive_p2.py h-63/rederive_p2.py
+103,104c103,104
+<         (d / "msgs").symlink_to(self.ev / "msgs")
+<         src = self.ev / "services-all" / svc_dir
+---
+>         (d / "msgs").symlink_to(self.ev.resolve() / "msgs")
+>         src = self.ev.resolve() / "services-all" / svc_dir
+Common subdirectories: h-frozen/selfcheck and h-63/selfcheck

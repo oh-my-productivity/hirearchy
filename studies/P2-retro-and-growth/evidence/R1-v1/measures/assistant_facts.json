@@ -1,0 +1,497 @@
+{
+  "arm": "R",
+  "copies": {
+    "ask_first": {
+      "k": 0,
+      "n": 2
+    },
+    "count": 2,
+    "hand_edits": {
+      "k": 0,
+      "n": 2
+    },
+    "list": [
+      {
+        "ask_first_shown": false,
+        "call": 25,
+        "case": "2026-10-05",
+        "checked_version": null,
+        "command": "mkdir -p /private/tmp/hirearchy-p2/R1-1793270268/deliverables && cp /private/tmp/hirearchy-p2/R1-1793270268/org/lead/writer/work/memo-2026-10-05.md /private/tmp/hirearchy-p2/R1-1793270268/deliverables/memo-2026-10-05.md && cmp /private/tmp/hirearchy-p2/R1-1793270268/org/lead/writer/work/memo-2026-10-05.md /private/tmp/hirearchy-p2/R1-1793270268/deliverables/memo-2026-10-05.md && wc -w /private/tmp",
+        "hand_edit": null,
+        "human_feedback_after": [
+          {
+            "call": 27,
+            "task": "20261029T104533934917-root-f18f",
+            "turn": 5,
+            "verdict": "reject"
+          },
+          {
+            "call": 43,
+            "task": "20261029T105348971545-root-bc2c",
+            "turn": 7,
+            "verdict": "accept"
+          }
+        ],
+        "latest_result": {
+          "created": "2026-10-29T10:47:10+00:00",
+          "id": "20261029T104710281447-lead-420f",
+          "reply_to": "20261029T104533934917-root-f18f",
+          "status": "done"
+        },
+        "progress_call": 21,
+        "source_path": "lead/writer/work/memo-2026-10-05.md",
+        "source_version": null,
+        "tool": "execute_bash",
+        "ts": "2026-10-29T10:47:22.446Z",
+        "turn": 4
+      },
+      {
+        "ask_first_shown": false,
+        "call": 42,
+        "case": "2026-10-05",
+        "checked_version": null,
+        "command": "cd /private/tmp/hirearchy-p2/R1-1793270268 && cp org/lead/writer/work/memo-2026-10-05.md deliverables/memo-2026-10-05.md && cmp org/lead/writer/work/memo-2026-10-05.md deliverables/memo-2026-10-05.md && wc -w deliverables/memo-2026-10-05.md && ls deliverables",
+        "hand_edit": null,
+        "human_feedback_after": [
+          {
+            "call": 43,
+            "task": "20261029T105348971545-root-bc2c",
+            "turn": 7,
+            "verdict": "accept"
+          }
+        ],
+        "latest_result": {
+          "created": "2026-10-29T10:55:23+00:00",
+          "id": "20261029T105523835395-lead-f096",
+          "reply_to": "20261029T105348971545-root-bc2c",
+          "status": "done"
+        },
+        "progress_call": 38,
+        "source_path": "lead/writer/work/memo-2026-10-05.md",
+        "source_version": null,
+        "tool": "execute_bash",
+        "ts": "2026-10-29T10:55:33.462Z",
+        "turn": 6
+      }
+    ]
+  },
+  "cost": {
+    "assistant_credits": 15.4757,
+    "assistant_seconds": 582,
+    "org_credits": {
+      "outside": 11.1871,
+      "window": 0.0
+    },
+    "org_runs": {
+      "outside": 13,
+      "outside_by_seat": {
+        "lead": 9,
+        "lead-writer": 4
+      },
+      "total": 13,
+      "window": 0,
+      "window_by_seat": {}
+    },
+    "org_seconds": {
+      "outside": 484,
+      "window": 0
+    },
+    "user_turns": 7,
+    "wall_seconds": 1128,
+    "wall_time": "18:48"
+  },
+  "flagged": {
+    "by_result": {},
+    "counts": {
+      "items": 0,
+      "needs_d5": 0,
+      "never_copied": 0,
+      "notes": 0,
+      "questions": 0,
+      "results_with_items": 0,
+      "superseded": 0
+    },
+    "items": []
+  },
+  "grants": [],
+  "human_reworks": {
+    "count": 2,
+    "list": [
+      {
+        "budget_arg": null,
+        "call": 19,
+        "held": false,
+        "reply_budget": 9,
+        "topup": false,
+        "turn": 4
+      },
+      {
+        "budget_arg": null,
+        "call": 36,
+        "held": false,
+        "reply_budget": 6,
+        "topup": false,
+        "turn": 6
+      }
+    ],
+    "without_budget": 2
+  },
+  "injected_task": "20261029T104827993019-root-269a",
+  "lasis": {
+    "accepted": {
+      "k": 0,
+      "n": 0
+    },
+    "accepted_turns": [],
+    "turns": [],
+    "uses": 0
+  },
+  "measures": {
+    "ask_first_copies": {
+      "k": 0,
+      "n": 2
+    },
+    "assistant_credits": 15.4757,
+    "assistant_seconds": 582,
+    "boundary_failure_files": 0,
+    "copies": 2,
+    "d1_never_recorded": {
+      "k": 0,
+      "n": 1
+    },
+    "d23_about_differs": {
+      "k": 0,
+      "n": 1
+    },
+    "d23_without_reading": {
+      "k": 0,
+      "n": 1
+    },
+    "deliverable_notes": 0,
+    "delivered_without_verdict": {
+      "k": 0,
+      "n": 2
+    },
+    "facade_refusals": 0,
+    "flagged_items": 0,
+    "flagged_needs_d5": 0,
+    "flagged_never_copied": 0,
+    "flagged_notes": 0,
+    "flagged_questions": 0,
+    "flagged_results": 0,
+    "flagged_superseded": 0,
+    "grants": 0,
+    "hand_edits": {
+      "k": 0,
+      "n": 2
+    },
+    "held_replies": 0,
+    "human_rejects": 1,
+    "human_reworks": 2,
+    "human_reworks_without_budget": 2,
+    "inbox_calls": 3,
+    "lasis_accepted": {
+      "k": 0,
+      "n": 0
+    },
+    "lasis_uses": 0,
+    "lena_keep_l_budget_q": 0,
+    "lena_yes_h4": 0,
+    "m_c_8": {
+      "k": 7,
+      "n": 7
+    },
+    "memo1_turns": 5,
+    "memo2_turns": null,
+    "memo3_turns": null,
+    "org_credits_outside": 11.1871,
+    "org_credits_window": 0.0,
+    "org_runs_outside": 13,
+    "org_runs_window": 0,
+    "org_seconds_outside": 484,
+    "org_seconds_window": 0,
+    "other_refusals": 0,
+    "p2_refusals": 1,
+    "p2_unrated": 1,
+    "p4_refusals": 0,
+    "plans": 1,
+    "plans_with_budget_line": {
+      "k": 0,
+      "n": 1
+    },
+    "relayed_reworks_by_assistant": 0,
+    "root_unread_at_end": 0,
+    "run_end_killed": 0,
+    "run_orphan": 0,
+    "scheduler_signals": 0,
+    "schedulers_assistant": 3,
+    "schedulers_running_at_turn_end": {
+      "k": 0,
+      "n": 3
+    },
+    "schedulers_script": 1,
+    "schedulers_total": 4,
+    "schedulers_with_exit": {
+      "k": 4,
+      "n": 4
+    },
+    "shell_commands": 3,
+    "shell_reads": 0,
+    "skill_stratum": "A",
+    "sleep_entries": 7,
+    "survival_pairs": {
+      "k": 0,
+      "n": 0
+    },
+    "topup_replies": 0,
+    "turns_showing_budget_line": 0,
+    "unexplained_signals": {
+      "k": 0,
+      "n": 0
+    },
+    "user_turns": 7,
+    "wall_seconds": 1128,
+    "wall_time": "18:48"
+  },
+  "memo_turns": [
+    {
+      "accept_call": 43,
+      "accept_turn": 7,
+      "case": "2026-10-05",
+      "copies": [
+        4,
+        6
+      ],
+      "request_call": 12,
+      "request_turn": 3,
+      "turns": 5
+    }
+  ],
+  "owner": "lead",
+  "plan": {
+    "lena_keep_l_budget_q": 0,
+    "lena_yes_h4": 0,
+    "list": [
+      {
+        "call": 10,
+        "has_budget_line": false,
+        "lines": [],
+        "shown_verbatim_in_turn": false,
+        "turn": 2
+      }
+    ],
+    "plans": 1,
+    "plans_with_budget_line": {
+      "k": 0,
+      "n": 1
+    },
+    "turns_showing_line": 0
+  },
+  "reads": {
+    "inbox_calls": 3,
+    "read_calls": 0,
+    "root_unread_at_end": 0,
+    "shell_reads": 0
+  },
+  "refusals": {
+    "by_kind": {
+      "P2-UNRATED": 1
+    },
+    "facade_total": 0,
+    "list": [
+      {
+        "call": 29,
+        "kind": "P2-UNRATED",
+        "text": "MCP tool error: Error executing tool define_service: refused: 1 delivered request(s) of `weekly-meeting-memo` have no verdict yet: 20261029T104827993019-root-269a. Record a verdict on each with feedback first: on a delivery the user saw, the user's own, a rejection then its one question (CLI: hirear",
+        "tool": "define_service",
+        "turn": 6
+      }
+    ],
+    "other_total": 0,
+    "p2_total": 1,
+    "p4_total": 0
+  },
+  "rejects": {
+    "about_differs_from_reading": {
+      "k": 0,
+      "n": 1
+    },
+    "d1_candidate_turns": [
+      5
+    ],
+    "d1_never_recorded": [],
+    "human_rejects": [
+      {
+        "call": 27,
+        "criterion": [
+          "C1"
+        ],
+        "defines_after": [
+          {
+            "about": "C1",
+            "answers": "20261029T105129733247-root-9230",
+            "call": 29,
+            "refusal": "P2-UNRATED",
+            "status": "refused",
+            "ts": "2026-10-29T10:53:16.330Z",
+            "turn": 6
+          },
+          {
+            "about": "C1",
+            "answers": "20261029T105129733247-root-9230",
+            "call": 35,
+            "refusal": null,
+            "status": "admitted",
+            "ts": "2026-10-29T10:53:41.298Z",
+            "turn": 6
+          }
+        ],
+        "task": "20261029T104533934917-root-f18f",
+        "ts": "2026-10-29T10:51:29.776Z",
+        "turn": 5,
+        "turn_files_between": [
+          "turn-05.txt"
+        ],
+        "window_end": {
+          "call": 35,
+          "kind": "define_service",
+          "turn": 6
+        }
+      }
+    ],
+    "without_reading": {
+      "k": 0,
+      "n": 1
+    }
+  },
+  "relayed_reworks": {
+    "injected": "20261029T104827993019-root-269a",
+    "sent": []
+  },
+  "schedulers": {
+    "assistant_started": 3,
+    "boundary_failure_files": [],
+    "m_c_1": {
+      "k": 0,
+      "n": 3
+    },
+    "m_c_2_pairs": {
+      "k": 0,
+      "n": 0
+    },
+    "m_c_2_runs": {
+      "k": 0,
+      "n": 0
+    },
+    "m_c_4": {
+      "k": 4,
+      "n": 4
+    },
+    "m_c_6": {
+      "k": 0,
+      "n": 0
+    },
+    "m_c_7": {
+      "k": 0,
+      "n": 0
+    },
+    "m_c_8": {
+      "k": 7,
+      "n": 7
+    },
+    "per_scheduler": [
+      {
+        "began_in_turn": 3,
+        "classes": [],
+        "exit_reason": "finished: no open tasks",
+        "pid": 2943,
+        "starter": "assistant"
+      },
+      {
+        "began_in_turn": 4,
+        "classes": [],
+        "exit_reason": "finished: no open tasks",
+        "pid": 3980,
+        "starter": "assistant"
+      },
+      {
+        "began_in_turn": null,
+        "classes": [],
+        "exit_reason": "finished: no open tasks",
+        "pid": 4881,
+        "starter": "script"
+      },
+      {
+        "began_in_turn": 6,
+        "classes": [],
+        "exit_reason": "finished: no open tasks",
+        "pid": 6423,
+        "starter": "assistant"
+      }
+    ],
+    "reasons": [
+      "finished: no open tasks"
+    ],
+    "run_end_killed": 0,
+    "run_orphan": 0,
+    "script_started": 1,
+    "signals": [],
+    "sleep_entries": 7,
+    "stop_calls": 0,
+    "total": 4,
+    "unknown_starter": 0
+  },
+  "script": {
+    "md5": "61f51c012dfff9305836990bef47cf4d",
+    "name": "assistant_facts.py"
+  },
+  "seat": "lead-writer",
+  "service": "weekly-meeting-memo",
+  "skill": {
+    "disclose_calls": 1,
+    "first_disclose": {
+      "call": 1,
+      "ts": "2026-10-29T10:38:49.353Z",
+      "turn": 1,
+      "uri": "file:///private/tmp/hirearchy-p2/R1-1793270268/.kiro/skills/hirearchy/SKILL.md"
+    },
+    "first_feedback": {
+      "call": 27,
+      "ts": "2026-10-29T10:51:29.776Z",
+      "turn": 5,
+      "uri": null
+    },
+    "first_propose_org": {
+      "call": 8,
+      "ts": "2026-10-29T10:40:48.958Z",
+      "turn": 2,
+      "uri": null
+    },
+    "installed_skill_notes": 0,
+    "skill_md5": null,
+    "stratum": "A"
+  },
+  "source_files": [
+    "assistant-session-messages.jsonl",
+    "client-questions.txt",
+    "events/",
+    "lena-lines.txt",
+    "memos/versions/INDEX.txt",
+    "msgs/",
+    "session-turn-times-utc.txt",
+    "skill-check.txt",
+    "turn-times.txt"
+  ],
+  "stream": "R1",
+  "topup_held": {
+    "held": [],
+    "topup": []
+  },
+  "verdicts": {
+    "delivered_versions": 2,
+    "delivered_without_verdict": {
+      "k": 0,
+      "n": 2
+    }
+  }
+}

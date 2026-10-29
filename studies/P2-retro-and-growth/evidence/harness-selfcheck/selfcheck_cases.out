@@ -1,0 +1,169 @@
+ok  10.1's example: words I added: decisions, and, actions, own
+ok  added words none
+ok  symbols are tokens, sentence punctuation is not
+ok  line_key drops markers and punctuation
+ok  over 8 added words: +k more
+ok  equal title skeletons without digits: one group of 3, reached at the third judged
+ok  criteria keys equal once digit runs are #
+ok  an empty criteria key never matches
+ok  Jaccard 4/6 = 0.67 >= 0.6 joins
+ok  Jaccard 3/5 = 0.6 exactly joins
+ok  Jaccard 2/4 = 0.5 does not
+ok  token sets of 2 never match by overlap (but equal criteria keys do)
+ok  another assignee never joins
+ok  a case without a verdict is in the group but not counted
+ok  7.1: 3 judged cases of one shape, a top-level assignee, no service: fires, key service|lead|t1, rung 2
+ok  7.1: 2 judged of 3: no item
+ok  7.1: an unjudged third case is not counted
+ok  7.1: a nested assignee: no item, D5 line `assignee lead/writer is not a top-level agent`
+ok  7.1: a retired assignee: no item
+ok  7.1: a service of the assignee with the group's criteria key (a taken item's effect, renamed or not): no item
+ok  7.1: shape_cases 2 (ORG.md retro:) fires on 2
+ok  7.2: three cases failing one lineage class (a new criterion, then two `same as R1`), no verifier: checker-add|memo|C4, rung 4
+ok  7.2: the threshold time is the third case's answer
+ok  7.2: a pending (unanswered) third rejection counts for no class
+ok  7.2: a `none` link (no lasting rule) counts for no class
+ok  7.2: lineage through a removal (C4 replaced C3): R2 on C3 and R3 on C4 meet one class {C3, C4}
+ok  7.2: a verifier signed the failing deliveries: checker-fix|memo|lead/reviewer|C4, rung 2
+ok  7.2: the window of the last 10 judged cases drops the oldest failing case
+ok  7.2: window_cases 12 keeps it
+ok  7.2: a relayed rejection weighs 0
+ok  7.2 (b): two escapes signed by one verifier, no class: checker-fix on that verifier
+ok  7.2: an answer `about` [the class] keeps the case in it (F7: the K30 path); one candidate per evidence set (reading 8)
+ok  7.2: an answer about an id outside the class splits the case off (F7: K30c's reason)
+ok  7.5: source user, 3 added words, 3 accepts: fires (rung 1, weight 0)
+ok  7.5: 2 added words: no
+ok  7.5: 2 accepts: no
+ok  7.5: source amendment, 3 added words, 3 accepts: fires
+ok  7.5: source tasks fires after 3 accepts whatever its words
+ok  7.5: source default never; unknown never
+ok  7.5: once per key: an asked key does not fire again (its rule still holds)
+ok  7.5: a rejected exercised case is exercised, not accepted
+ok  D7: an amendment exercised in no later case: INCONCLUSIVE (0 of 3)
+ok  D7: exercised in 3 later judged cases with no related rejection: not recurred in 3
+ok  D7: a later rejection whose subjects meet the target: recurred in case <case> (R2)
+ok  D7: a later case whose request carried a version without the target is not exercised
+ok  D7: the outcome order (4.4): recurred before the window
+ok  ledger: B1's service item taken (its SERVICE.md, approved in a change, after B1), the others lapsed at B2
+ok  ledger: the order of B1 (weight, then rung: service 2 before checker-add 4; clarify weight 0 last) holds
+ok  ledger: checker-add before service at equal weight breaks 4.5a's order
+ok  ledger: a checker-add item taken by a verifier under the owner, approved in a change
+ok  ledger: a non-verifier under the owner does not take it
+ok  ledger: a clarify item taken by a version that removes its criterion
+ok  ledger: a clarify key is asked once per wording
+ok  ledger: a lapsed key offered again without new evidence is suppressed
+ok  ledger: new evidence brings it back, and its lapsed count is 1
+ok  ledger: a wrong lapsed count is reported
+ok  ledger: a cause offered after two lapses is suppressed
+ok  ledger: more than 3 items breaks the cap
+ok  ledger: held back while the items do not fill the cap breaks it
+ok  ledger: cap 2 (ORG.md retro: items) with 3 items breaks it
+ok  L21 and the content rule: the body edit and the untagged/unapplied line count (2); the hire, the tagged lines and named limits, the deletion, the re-created address and .retired do not
+ok  before t0 nothing counts
+ok  D8: tagged added-section lines of an applied extension and the limits its line names: `from your change abc`
+ok  D8: a tagged line of a change that was not applied: outside the tools
+ok  D8: a top-level charter's body edit: outside the tools
+ok  D8: a nested body edit with the parent's `write` between the commits: `by lead` (an unprompted edit)
+ok  D8: the same edit with no `write` event while the log covers the window: outside the tools
+ok  D8: the same edit beyond the event log's horizon: `by lead, or outside the tools (...)`
+ok  D8: events off (no event at all): the horizon label
+ok  D8: the log's first record in the same second as the older commit (whole seconds, reading 1): the log covers it, outside the tools
+ok  D8: a nested `tools` change: outside the tools (agents' frontmatter changes are refused, 6.6)
+ok  D8: a nested role change with the parent's write: by lead
+ok  D8: a nested higher max_children: outside the tools; lower: by lead
+ok  D8: an added-section line that lost its tag (an agent's or a hand rewrite): outside the tools
+ok  D8: a reworded line that keeps an applied tag reads `from your change` (4.5's content test, literally; CHARTER-ADDED refuses it through the tools, 6.6: protocol 13.2 reading 11)
+ok  D8: every label of agents and services (plan, change with its item, taken back, the legacy plan heading, inside the plan, by root outside a plan; retires from RETIRED.md; a retired agent's and service's creation listed too)
+ok  the product's D8 lines parsed (every label form seen in the throwaway orgs, and taken back)
+ok  D7 lines parsed
+ok  D13 lines parsed
+ok  PF-0: the horizon label where the log covers t1 (a CLI record at or before it) and no MCP-path record is at or before t1: one PF-0
+ok  PF-0 near miss: an MCP-path record before t1 (the product's horizon reading cannot explain the label): new, not PF-0
+ok  PF-0 near miss: no event at all (the design's own horizon label): new, not PF-0
+ok  PF-0 near miss: the label names another agent than the parent: new
+ok  PF-1: the creation of an agent retired in the window missing from the product's D8, its retire line present: one PF-1
+ok  PF-1 near miss: a live agent's creation missing (no retire in the window): new, beside the PF-1
+ok  PF-1 near miss: the creation and its retire both missing from the product: new, new (not PF-1)
+ok  PF-1 near miss: a service's creation missing while only an agent of that name was retired: new
+ok  a label difference on one change is one new finding (the product and the harness line paired)
+ok  X1 PASS on the constructed stream
+ok  X1 step 1: two ACT-REQ windows, the stream not cut: NOT DETERMINED is not reached; FAIL? no: an absent event after a natural end is FAIL
+ok  X1 step 1: two windows in a stream cut at a cap: NOT DETERMINED (cut)
+ok  X1 step 2: a repeat without a human verdict fails closed
+ok  X1 step 3: no brief after the third judged one-off: FAIL
+ok  X1 step 3 with end.txt missing: NOT DETERMINED (FAIL-CLOSED: the end is not recorded)
+ok  X1 step 4: the brief holds no service item: FAIL
+ok  X1 step 5: no ITEM-SERVICE line: FAIL; in a stream stopped at 260 credits: NOT DETERMINED (cut)
+ok  X1 step 6: no applied extension: FAIL; approved not True: FAIL; a plan_id that no propose_org returned: FAIL
+ok  X1 step 7: SERVICE.md v1 not approved in that change: FAIL
+ok  X1 step 8: lapsed in the next brief: FAIL; no next brief: NOT DETERMINED (not reached)
+ok  F5: ACT-REQ at turn 5, a K54 answer at turn 6, the task at turn 6's reply, LIST-KEEP at turn 7: the window holds the task, bounds recorded
+ok  amendment 1: ACT-REQ at turn 7, the composed EXT-NO + L-INJ + K62-K66 line at turn 8, the task in turn 8's reply, LIST-KEEP at turn 9: one window, one task, to turn 9
+ok  D2: WEEK-LIST at turn 20, a K58 + K55 + K63/K64/K66 answer line at turn 21, the task in turn 21's reply, LIST-KEEP at turn 22: the week window runs to turn 22 and holds the task as a one-off
+ok  X2 step 1: the trap failed in three memos but no class holds three: NOT DETERMINED naming the split
+ok  X2 step 2: the first brief after the threshold holds no checker-add item: FAIL
+ok  X2: two memos passed the trap: NOT REACHED
+ok  X2 step 1: a stream capped after one trap failure: NOT DETERMINED (cut)
+ok  X3 PASS: 0 edits both sides; root's charter write refused; CHARTER-PLAN and CHARTER-ADDED refusals counted (1 and 1)
+ok  X3 step 1: a history shorter than git log fails closed
+ok  X3 step 2: a harness count of 1: FAIL
+ok  X3 step 3: the product's count `unknown` fails closed
+ok  X3 step 5: an `outside the tools` label: FAIL
+ok  X3 step 4: an admitted root write of an AGENT.md: FAIL
+ok  X3 step 5: a hand write into the org by the assistant: FAIL
+ok  12.6 (2): a PF-0 label on a change the re-derivation does not count: X3 PASS, the line taken out and reported under P2-E
+ok  12.6 (2): a PF-0 label on a change the re-derivation counts: X3 FAIL as written
+ok  12.6 (2): the same label without PF-0's signature (an MCP record before t1): X3 FAIL (the product counts an edit the harness does not)
+ok  P2-E: a PF-0 pair and a PF-1 line are classified and counted per stream (PF-0 1, PF-1 1, new 0)
+ok  hand writes: a read that redirects elsewhere, or stderr to /dev/null, is no write into the org
+ok  L PASS on two records with a taken line
+ok  L step 2: a missing D13 line: FAIL
+ok  L step 2: a lapsed key offered again without new evidence: FAIL
+ok  L step 2: the product's D13 against the re-derived state: a disagreement is a finding, not L's FAIL
+ok  L step 3: a reply shown again that carries another id: FAIL
+ok  L step 1: a record with 4 items: FAIL
+ok  L with no recorded brief fails closed
+ok  B PASS: every change labelled from your change (applied) or the plan
+ok  B step 1: `taken back` of a plan_id root applied (the product's undo) is reported, not FAIL; of another id: FAIL
+ok  B step 1: `by root, outside a plan`: FAIL; a change id never applied: FAIL
+ok  B step 2: a ledger item after memo 5's request that names a fact-checker: FAIL
+ok  D-UNNOMINATED: a nominated extension with a renamed service and another budget is nominated
+ok  D-UNNOMINATED: two yes'd items combined in one extension are nominated
+ok  D-UNNOMINATED: a fact-checker no item nominated (only the service was yes'd) is unnominated
+ok  D-UNNOMINATED: a checker added with no checker-add item yes'd is unnominated
+ok  F29: a second verifier proposed after the checker-add item's apply is unnominated (EXT-NO)
+ok  F29: the checker-add extension itself, before its apply, is nominated by content
+ok  F29: a fact-checker extension after memo 5 while the checker-add item is yes'd and taken is unnominated, its id in the reason or not
+ok  F29: the same while the item is open, without its id: unnominated; with its id at the start of its reason: nominated
+ok  F29 end to end: her ITEM-CHECKER line opens B1.2, the applied verifier under lead takes it; the checker plan is nominated, the later fact-checker plan citing B1.2 is not
+ok  F29: a fact-checker plan after memo 5's request, nominated or not, fails P2-B step 2 (12.1)
+ok  F23 near misses: a checker-add plan whose charter_extra says 'facts from the notes', and a service whose deliverable is an 'artifact': P2-B PASS
+ok  F23: an added agent whose role is 'Fact Checker' after memo 5's request: P2-B FAIL
+ok  F22: a health-review note and `lead is out of budget` with no wake key are listed and pass; a `wake: false` quiet note about a hire is not counted
+ok  F22: an `A checker joined your team` note to root with no wake key fails step 4
+ok  F27: retro 1 recorded before the third failing case's answer: X2 step 1 NOT DETERMINED, naming the retro call and the feedback call
+ok  W (0)-(c) PASS on a sourced plan whose PLAN FOR YOU shows the derived words under the criterion
+ok  W (c): the source line's list differs from added_words: FAIL
+ok  W (0) and (a): a string criterion with no words: FAIL
+ok  W (0): an extension whose only criteria are from_tasks copies needs no needs.elicitation (design 10.1 item 3)
+ok  W (b): a quote not in the recorded words: FAIL
+ok  W (0): no applied plan: FAIL (fail closed)
+ok  W (e): the clarify key offered twice: FAIL
+ok  W (e): never due: VACUOUS
+ok  E: no recorded brief fails closed
+ok  S: no recorded brief: NOT DETERMINED
+ok  S: an order or cap finding of the ledger re-derivation is a MISMATCH
+ok  S T12: the product's D5 group read from the reply
+ok  the end: no end.txt is not known
+ok  the end: a CAP line is a cut at its turn
+ok  PF-0 timing, all builds 'same second': the old rule reads FAIL
+ok  PF-0 timing, all builds 'same second': PASS, the earlier second 'not reached', covered by named constructed cases
+ok  PF-0 timing, a 'same second' build the classifier did not read as PF-0 (a misclassified build): FAIL
+ok  PF-0 timing, an 'earlier second' build the classifier did not read as no difference: FAIL
+ok  PF-0 timing, both timings built and classified: PASS, nothing 'not reached'
+ok  PF-0 timing, only 'earlier second' builds: FAIL (no PF-0 reproduced)
+ok  PF-0 timing, no build at all (or only builds that were neither): FAIL, fail closed
+ok  PF-0 timing, a misclassified build stands over a reproduced PF-0: FAIL
+ok  an 'earlier second' build: the product gives the design's label, the classifier finds no difference (the constructed case the timing verdict names)
+ok  the timing verdict's named cases exist in this file
+selfcheck_cases: 168 of 168 ok

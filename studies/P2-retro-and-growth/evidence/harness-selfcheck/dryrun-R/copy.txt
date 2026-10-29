@@ -1,0 +1,8 @@
+/Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/harness/copy_org_evidence.sh:20: no matches found: /tmp/hirearchy-p2/selfcheck-R-1793275673/org/read/*
+/Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/harness/copy_org_evidence.sh:23: no matches found: /tmp/hirearchy-p2/selfcheck-R-1793275673/org/lead/c6-checker/inbox/*
+/Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/harness/copy_org_evidence.sh:23: no matches found: /tmp/hirearchy-p2/selfcheck-R-1793275673/org/lead/c6-checker/read/*
+/Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/harness/copy_org_evidence.sh:23: no matches found: /tmp/hirearchy-p2/selfcheck-R-1793275673/org/lead/c6-checker/sent/*
+/Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/harness/copy_org_evidence.sh:23: no matches found: /tmp/hirearchy-p2/selfcheck-R-1793275673/org/lead/writer/inbox/*
+/Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/harness/copy_org_evidence.sh:26: no matches found: /tmp/hirearchy-p2/selfcheck-R-1793275673/org/lead/c6-checker/runs/*.log
+/Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/harness/copy_org_evidence.sh:64: no matches found: /tmp/hirearchy-p2/selfcheck-R-1793275673/deliverables/*
+copied; services lead--action-list-for lead--weekly-memo ; charter commits 3

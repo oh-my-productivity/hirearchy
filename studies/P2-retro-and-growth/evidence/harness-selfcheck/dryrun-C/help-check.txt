@@ -1,0 +1,25 @@
+OK init --mission
+OK quality --json
+OK services (help exit 0)
+OK check (help exit 0)
+OK progress (help exit 0)
+OK status (help exit 0)
+OK health (help exit 0)
+OK obs trace (help exit 0)
+OK hire --role
+OK hire --charter
+OK define-service --description
+OK define-service --input
+OK define-service --acceptance
+OK define-service --deliverable
+OK define-service --path
+OK define-service --budget
+OK task --title
+OK task --goal
+OK task --acceptance
+OK task --budget
+OK run --until-done
+OK run --max-runs
+OK plan --allow-root
+OK apply --allow-root
+OK --root --root

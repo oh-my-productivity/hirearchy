@@ -1,0 +1,5 @@
+note: memories block lengths: probe-C1=6982, probe-R1=6982, probe-R2=6982, probe-C2=6982
+note: arm R: loaded tools whose hash equals the catalog's: 0 of 2 (reported)
+note: arm C: loaded tools whose hash equals the catalog's: 0 of 2 (reported)
+note: catalogs: R 27 tools, C 26; differing entries: ['apply_org', 'blueprint_example', 'define_service', 'hire', 'propose_org', 'retro']
+PROBE: PASS

@@ -1,0 +1,228 @@
+[
+ {
+  "blueprint": {
+   "agents": [
+    {
+     "children": [
+      {
+       "model": "cheap",
+       "name": "writer",
+       "template": "writer",
+       "tools": [
+        "read"
+       ]
+      }
+     ],
+     "model": "strong",
+     "name": "lead",
+     "template": "manager"
+    }
+   ],
+   "mission": "Every week, turn the notes of one platform-team meeting into a short memo that says what was decided and who does what by when.\n",
+   "needs": {
+    "approval": "Plan first; ask before any spend beyond the budget.",
+    "budget_runs": 12,
+    "inputs": [
+     "/tmp/hirearchy-p2/C1-1793280632/notes"
+    ],
+    "kind": "writing",
+    "model_policy": "one model for all",
+    "models": {
+     "cheap": "claude-sonnet-5.5",
+     "strong": "claude-sonnet-5.5"
+    },
+    "progress": "One line when I ask.",
+    "quality_bar": "Every statement comes from the meeting file, in the notes' own words; where the file is silent (for example no date), the memo says none.",
+    "review": false,
+    "scope": "For one meeting file per request: the decisions made and the action items (who does what, by when). Anything someone said they would do counts, including informal commitments written in prose. Nothing outside that meeting's file.",
+    "sources": "Only the files in needs.inputs; no web."
+   },
+   "services": [
+    {
+     "acceptance": [
+      "Covers only the meeting in the file named in the request and nothing else.",
+      "At most 400 words as counted by read.",
+      "The memo has a section titled \"Decisions\" that lists every decision in the notes, worded as in the notes.",
+      "The memo has a section titled \"Actions\" with a markdown table with the columns Owner | Action | Due, with one row for every commitment in the notes, including informal ones written in prose (\"X said he would ...\"), worded as in the notes.",
+      "Due is an ISO date (YYYY-MM-DD). A relative deadline such as \"before Friday\" becomes a date only when the notes and the meeting date make it clear; otherwise, and when the notes give no date, Due is \"none\".",
+      "A name that is not in the attendee list is used as written in the notes and marked \"(not in attendee list)\".",
+      "Nothing appears in the memo that is not in the notes file.",
+      "The lead's check against the notes shows every decision and every commitment covered (n of m with n = m)."
+     ],
+     "budget": 12,
+     "deliverable": {
+      "description": "One markdown memo for the meeting",
+      "format": "markdown",
+      "max_words": 400,
+      "path": "/private/tmp/hirearchy-p2/C1-1793280632/deliverables"
+     },
+     "description": "One short markdown memo from one meeting's notes with the decisions and a table of action items.",
+     "inputs": [
+      {
+       "description": "File name of the meeting notes inside the notes folder, for example 2026-10-05.md",
+       "name": "notes_file",
+       "required": true
+      }
+     ],
+     "locked": false,
+     "name": "weekly-meeting-memo",
+     "owner": "lead"
+    }
+   ],
+   "task": {
+    "inputs": {
+     "notes_file": "2026-10-05.md"
+    },
+    "service": "weekly-meeting-memo",
+    "title": "Memo for the 5 October 2026 platform team weekly"
+   }
+  },
+  "extend": null,
+  "plan_id": null,
+  "reason": "",
+  "result": "Tool \"hirearchy::propose_org\" has not been loaded yet. Load it first \u2014 tool_load({ \"tool_ids\": [\"hirearchy::propose_org\"] }) \u2014 and read the schema it returns before calling. If you requested the load and this call in the same response, the schema was not available yet: call again now that the load result is in front of you.",
+  "t": "2026-10-29T13:33:57.637Z"
+ },
+ {
+  "blueprint": {
+   "agents": [
+    {
+     "children": [
+      {
+       "model": "cheap",
+       "name": "writer",
+       "template": "writer",
+       "tools": [
+        "read"
+       ]
+      }
+     ],
+     "model": "strong",
+     "name": "lead",
+     "template": "manager"
+    }
+   ],
+   "mission": "Every week, turn the notes of one platform-team meeting into a short memo that says what was decided and who does what by when.\n",
+   "needs": {
+    "approval": "Plan first; ask before any spend beyond the budget.",
+    "budget_runs": 12,
+    "inputs": [
+     "/tmp/hirearchy-p2/C1-1793280632/notes"
+    ],
+    "kind": "writing",
+    "model_policy": "one model for all",
+    "models": {
+     "cheap": "claude-sonnet-5.5",
+     "strong": "claude-sonnet-5.5"
+    },
+    "progress": "One line when I ask.",
+    "quality_bar": "Every statement comes from the meeting file, in the notes' own words; where the file is silent (for example no date), the memo says none.",
+    "review": false,
+    "scope": "For one meeting file per request: the decisions made and the action items (who does what, by when). Anything someone said they would do counts, including informal commitments written in prose. Nothing outside that meeting's file.",
+    "sources": "Only the files in needs.inputs; no web."
+   },
+   "services": [
+    {
+     "acceptance": [
+      "Covers only the meeting in the file named in the request and nothing else.",
+      "At most 400 words as counted by read.",
+      "The memo has a section titled \"Decisions\" that lists every decision in the notes, worded as in the notes.",
+      "The memo has a section titled \"Actions\" with a markdown table with the columns Owner | Action | Due, with one row for every commitment in the notes, including informal ones written in prose (\"X said he would ...\"), worded as in the notes.",
+      "Due is an ISO date (YYYY-MM-DD). A relative deadline such as \"before Friday\" becomes a date only when the notes and the meeting date make it clear; otherwise, and when the notes give no date, Due is \"none\".",
+      "A name that is not in the attendee list is used as written in the notes and marked \"(not in attendee list)\".",
+      "Nothing appears in the memo that is not in the notes file.",
+      "The lead's check against the notes shows every decision and every commitment covered (n of m with n = m)."
+     ],
+     "budget": 12,
+     "deliverable": {
+      "description": "One markdown memo for the meeting",
+      "format": "markdown",
+      "max_words": 400,
+      "path": "/private/tmp/hirearchy-p2/C1-1793280632/deliverables"
+     },
+     "description": "One short markdown memo from one meeting's notes with the decisions and a table of action items.",
+     "inputs": [
+      {
+       "description": "File name of the meeting notes inside the notes folder, for example 2026-10-05.md",
+       "name": "notes_file",
+       "required": true
+      }
+     ],
+     "locked": false,
+     "name": "weekly-meeting-memo",
+     "owner": "lead"
+    }
+   ],
+   "task": {
+    "inputs": {
+     "notes_file": "2026-10-05.md"
+    },
+    "service": "weekly-meeting-memo",
+    "title": "Memo for the 5 October 2026 platform team weekly"
+   }
+  },
+  "extend": null,
+  "plan_id": "7bd6a2c072a5",
+  "reason": "",
+  "result": "Target organization: /private/tmp/hirearchy-p2/C1-1793280632/org (none yet: create_org(mission=...) comes first, then apply_org)\n\nShow the block below to the user exactly as written, from its first line up to (not including) the marker line; one plain-words intro line before it is fine.\n\nPLAN FOR YOU\nGoal: Every week, turn the notes of one platform-team meeting into a short memo that says what was decided and who does what by when.\nWhat I understood you need:\n- Scope: For one meeting file per request: the decisions made and the action items (who does what, by when). Anything someone said they would do counts, including informal commitments written in prose. Nothing outside that meeting's file.\n- Your files (read-only): /tmp/hirearchy-p2/C1-1793280632/notes\n- Quality bar: Every statement comes from the meeting file, in the notes' own words; where the file is silent (for example no date), the memo says none.\n- Sources: Only the files in needs.inputs; no web.\n- Workspace: none (nothing writes files or runs commands)\n- Models: claude-sonnet-5.5 (high effort) for every agent\nTeam (2 agents):\n- lead (Manager, model claude-sonnet-5.5): directs the team; does not produce the work itself; can read files only in /private/tmp/hirearchy-p2/C1-1793280632/notes and the organization's own files; cannot change your files\n  - writer (Writer, model claude-sonnet-5.5): can read files only in /private/tmp/hirearchy-p2/C1-1793280632/notes and the organization's own files; cannot change your files\nBudget: up to 12 runs per request (one run = one working session of one agent), your cap per request is 12; the minimum for one review and rework is 8, and a round of your questions or a rejection takes about 3 more (11 in all). Unspent runs come back to you.\n  lead starts with 12, hands down writer 3 and keeps 9 for planning, checking and rework.\nIf a check still fails after one rework, I'll come back to you with options before spending the reserve; nothing beyond a request's budget is spent without your OK.\nChecking: no independent reviewer (you did not ask for one). I still re-check the final result against every service check below.\nServices (kept ready, requested whenever you want):\n- weekly-meeting-memo: One short markdown memo from one meeting's notes with the decisions and a table of action items.\n  You provide: notes_file (required)\n  Each request: up to 12 runs\n  Checks:\n    1. Covers only the meeting in the file named in the request and nothing else.\n    2. At most 400 words as counted by read.\n    3. The memo has a section titled \"Decisions\" that lists every decision in the notes, worded as in the notes.\n    4. The memo has a section titled \"Actions\" with a markdown table with the columns Owner | Action | Due, with one row for every commitment in the notes, including informal ones written in prose (\"X said he would ...\"), worded as in the notes.\n    5. Due is an ISO date (YYYY-MM-DD). A relative deadline such as \"before Friday\" becomes a date only when the notes and the meeting date make it clear; otherwise, and when the notes give no date, Due is \"none\".\n    6. A name that is not in the attendee list is used as written in the notes and marked \"(not in attendee list)\".\n    7. Nothing appears in the memo that is not in the notes file.\n    8. The lead's check against the notes shows every decision and every commitment covered (n of m with n = m).\n  Delivered to: /private/tmp/hirearchy-p2/C1-1793280632/deliverables (I copy each result there after checking it)\nAfter each request the lead records lessons; before the next one it reviews them with your feedback and may improve how the team works (its playbook). It cannot change these checks: only you can, through me.\nFirst request, started on approval: weekly-meeting-memo (notes_file: 2026-10-05.md).\nCheckpoints: approval - Plan first; ask before any spend beyond the budget; progress - One line when I ask; any spend beyond the budget needs your OK.\nNothing is created or started until you approve. Reply 'approve', or tell me what to change.\n\n--- machine marker: the user block ends above; do not show this line or anything below it ---\n\nDetails (the full plan, for you; the user need not read it):\n# Plan for approval\n\nGoal: Every week, turn the notes of one platform-team meeting into a short memo that says what was decided and who does what by when.\n\nNeeds as understood:\n- Scope: For one meeting file per request: the decisions made and the action items (who does what, by when). Anything someone said they would do counts, including informal commitments written in prose. Nothing outside that meeting's file.\n- Deliverable: per service (see Services below)\n- Quality bar: Every statement comes from the meeting file, in the notes' own words; where the file is silent (for example no date), the memo says none.\n- Sources / tools: Only the files in needs.inputs; no web.\n- Workspace: none (no agent writes files or runs commands)\n- Model policy: one model for all\n- Review: not required\n\nOrganization (2 agents):\n- lead [manager] Manager: model=claude-sonnet-5.5, tools=read\n  Access: kiro read only in /private/tmp/hirearchy-p2/C1-1793280632/notes and in the organization's own files (read-only)\n  - writer [writer] Writer: model=claude-sonnet-5.5, tools=read\n    Access: kiro read only in /private/tmp/hirearchy-p2/C1-1793280632/notes and in the organization's own files (read-only)\n\nBudget per request (your cap: 12), estimate 8 for one pass + one review/rework cycle, 11 with one round of your questions or a rejection:\n  A ceiling: runs the team does not spend come back automatically with the final report of each request.\n  service weekly-meeting-memo: 12 runs per request\n    lead: starts with 12, hands down writer 3 (each includes its rework/re-check run), keeps 9 (own 5 + slack 4)\n    lead/writer: 3 runs (2 work + 1 rework)\n\nReview / verification:\n- no independent reviewer (review not requested)\n- the assistant re-checks the final deliverable against every acceptance criterion before telling you it is done\n\nDeliverable:\n- per service (see Services below)\n\nServices (1), offered by lead and defined by root (the contract: only root can change it):\n- weekly-meeting-memo: One short markdown memo from one meeting's notes with the decisions and a table of action items.\n  inputs: notes_file (required)\n  budget: 12 runs per request\n  deliverable: One markdown memo for the meeting [markdown, max 400 words]; delivered to: /private/tmp/hirearchy-p2/C1-1793280632/deliverables (I copy each result there after checking it)\n  acceptance (the contract, travels with every request):\n    1. Covers only the meeting in the file named in the request and nothing else.\n    2. At most 400 words as counted by read.\n    3. The memo has a section titled \"Decisions\" that lists every decision in the notes, worded as in the notes.\n    4. The memo has a section titled \"Actions\" with a markdown table with the columns Owner | Action | Due, with one row for every commitment in the notes, including informal ones written in prose (\"X said he would ...\"), worded as in the notes.\n    5. Due is an ISO date (YYYY-MM-DD). A relative deadline such as \"before Friday\" becomes a date only when the notes and the meeting date make it clear; otherwise, and when the notes give no date, Due is \"none\".\n    6. A name that is not in the attendee list is used as written in the notes and marked \"(not in attendee list)\".\n    7. Nothing appears in the memo that is not in the notes file.\n    8. The lead's check against the notes shows every decision and every commitment covered (n of m with n = m).\n  playbook v1: generated from the team (steps, budget plan):\n    ## Steps\n    1. Read the request in your prompt: its inputs, every acceptance criterion and the deliverable. The criteria come from the contract and can only be met, never changed; copy the relevant ones verbatim into every task you delegate.\n    2. Delegate to `writer` (Writer) with `budget=3`: its part of the request, with the criteria it must meet.\n    3. Read the final artifact yourself and check it against EVERY criterion of the request, quoting counts from your own `read` output.\n    4. Report: `done` only if every criterion is met (else `blocked` with the deviation and a recommended decision). Name the deliverable's path (the assistant copies it to /private/tmp/hirearchy-p2/C1-1793280632/deliverables) and pass `lessons` as an after-action review: Expected / Happened / Caught at / Cause / Prevent (the system cause, not a person), or Near miss when nothing went wrong.\n    \n    ## Budget plan\n    Request budget: 12 runs (the contract's). Hand down no more than this up front, each with `budget=` set explicitly:\n    - writer: 3 runs (2 work + 1 rework or re-check)\n    - you (lead): keep 9 runs: your own 5 (plan, process each result, final check, report, one rework cycle) and 4 of slack.\n    Unspent runs return to your parent with your final report.\nAfter each request the lead records lessons; before the next one it reviews them with your feedback and may improve how the team works (its playbook). It cannot change these checks: only you can, through me.\nFirst request: service weekly-meeting-memo: notes_file: 2026-10-05.md; title: Memo for the 5 October 2026 platform team weekly\n\nCheckpoints:\n- Approval: Plan first; ask before any spend beyond the budget.\n- Progress: One line when I ask.\n- Any spend beyond the budget needs your OK.\n\nWarnings (1):\n- services[weekly-meeting-memo].deliverable.path: no agent can write to /private/tmp/hirearchy-p2/C1-1793280632/deliverables (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)\n\nReply 'approve' or tell me what to change.\n\nplan_id: 7bd6a2c072a5\nNext: show the PLAN FOR YOU block above to the user exactly as written (a plain-words intro line before it is fine) and wait for their explicit approval. Then apply_org(blueprint=<this exact YAML>, approved=True, plan_id=\"7bd6a2c072a5\"). If you change the blueprint, call propose_org again: the plan_id changes.",
+  "t": "2026-10-29T13:34:05.543Z"
+ },
+ {
+  "blueprint": {
+   "agents": [
+    {
+     "children": [
+      {
+       "model": "cheap",
+       "name": "writer",
+       "template": "writer",
+       "tools": [
+        "read"
+       ]
+      }
+     ],
+     "model": "strong",
+     "name": "lead",
+     "template": "manager"
+    }
+   ],
+   "mission": "Every week, turn the notes of one platform-team meeting into a short memo that says what was decided and who does what by when. One extra one-off job: a one-page action list for the ops team from the 5 October 2026 notes.\n",
+   "needs": {
+    "approval": "Plan first; ask before any spend beyond the budget.",
+    "budget_runs": 8,
+    "inputs": [
+     "/tmp/hirearchy-p2/C1-1793280632/notes"
+    ],
+    "kind": "writing",
+    "model_policy": "one model for all",
+    "models": {
+     "cheap": "claude-sonnet-5.5",
+     "strong": "claude-sonnet-5.5"
+    },
+    "progress": "One line when I ask.",
+    "quality_bar": "Every statement comes from 2026-10-05.md, in the notes' own words; where the file is silent (for example no date), Due is none.",
+    "review": false,
+    "scope": "A one-off, one-page action list for the ops team from the notes of the 5 October 2026 platform team weekly (2026-10-05.md): every action item in those notes, each with its owner and due date. Nothing else from the meeting.",
+    "sources": "Only the files in needs.inputs; no web."
+   },
+   "task": {
+    "acceptance": [
+     "Uses only the meeting in 2026-10-05.md.",
+     "Has a short title with the meeting date, then one markdown table with the columns Owner | Action | Due, and nothing else (no summary, no decisions section).",
+     "The table has one row for every action item in the notes, including informal ones written in prose (n of m with n = m in the lead's check against the notes), worded as in the notes.",
+     "Every row has an owner, an action and a due date; Due is an ISO date (YYYY-MM-DD), or none when the notes give no date. Sam's flaky CI is 2026-10-09 and Marta's on-call training room is 2026-10-14.",
+     "At most 250 words as counted by read.",
+     "Nothing appears that is not in the notes file."
+    ],
+    "goal": "Read /tmp/hirearchy-p2/C1-1793280632/notes/2026-10-05.md and write a one-page action list for the ops team as a markdown file named action-list-2026-10-05.md: a short title with the meeting date, then one table with the columns Owner | Action | Due, with one row for every action item in the notes, including informal ones written in prose. Use the notes' own words. Due dates in ISO format; the client confirmed Sam's \"before Friday\" is 2026-10-09 and Marta's \"for Oct 14\" is 2026-10-14; where the notes give no date, Due is none. No summary and no decisions section.\n",
+    "title": "One-page action list for the ops team from the 5 October 2026 notes",
+    "to": "lead"
+   }
+  },
+  "extend": null,
+  "plan_id": null,
+  "reason": "",
+  "result": "Target organization: /private/tmp/hirearchy-p2/C1-1793280632/org (exists, 2 agent(s) besides root; apply_org adds to it)\n\nDRAFT - NOT READY (it has errors: fix the blueprint and propose again; do not show this to the user)\nGoal: Every week, turn the notes of one platform-team meeting into a short memo that says what was decided and who does what by when. One extra one-off job: a one-page action list for the ops team from the 5 October 2026 notes.\nWhat I understood you need:\n- Scope: A one-off, one-page action list for the ops team from the notes of the 5 October 2026 platform team weekly (2026-10-05.md): every action item in those notes, each with its owner and due date. Nothing else from the meeting.\n- Your files (read-only): /tmp/hirearchy-p2/C1-1793280632/notes\n- Quality bar: Every statement comes from 2026-10-05.md, in the notes' own words; where the file is silent (for example no date), Due is none.\n- Sources: Only the files in needs.inputs; no web.\n- Workspace: none (nothing writes files or runs commands)\n- Models: claude-sonnet-5.5 (high effort) for every agent\nTeam (2 agents):\n- lead (Manager, model claude-sonnet-5.5): directs the team; does not produce the work itself; can read files only in /private/tmp/hirearchy-p2/C1-1793280632/notes and the organization's own files; cannot change your files\n  - writer (Writer, model claude-sonnet-5.5): can read files only in /private/tmp/hirearchy-p2/C1-1793280632/notes and the organization's own files; cannot change your files\nBudget: 8 runs planned (one run = one working session of one agent), your cap is 8; the minimum for one review and rework is 8. Unspent runs come back to you.\n  lead starts with 8, hands down writer 3 and keeps 5 for planning, checking and rework.\nIf the check still fails after one rework, I'll come back to you with options; the plan has no reserve beyond that rework, and nothing beyond the 8 planned runs is spent without your OK.\nChecking: no independent reviewer (you did not ask for one). I still re-check the final result against every success check below.\nDeliverable: (missing)\n  Delivered to: inside the organization folder (no location given)\nDone when ALL of these hold:\n  1. Uses only the meeting in 2026-10-05.md.\n  2. Has a short title with the meeting date, then one markdown table with the columns Owner | Action | Due, and nothing else (no summary, no decisions section).\n  3. The table has one row for every action item in the notes, including informal ones written in prose (n of m with n = m in the lead's check against the notes), worded as in the notes.\n  4. Every row has an owner, an action and a due date; Due is an ISO date (YYYY-MM-DD), or none when the notes give no date. Sam's flaky CI is 2026-10-09 and Marta's on-call training room is 2026-10-14.\n  5. At most 250 words as counted by read.\n  6. Nothing appears that is not in the notes file.\nCheckpoints: approval - Plan first; ask before any spend beyond the budget; progress - One line when I ask; any spend beyond the budget needs your OK.\nWarnings (1):\n- 8 runs leaves almost no slack over the estimate of 8; expect a stall on the first surprise\nErrors (2):\n- agents[lead]: lead already exists in this organization; pick another name or retire it first\n- needs.deliverable: state the deliverable: description, format, length and where it should end up (needs.deliverable.description)\nCannot apply yet.\n\n--- machine marker: the user block ends above; do not show this line or anything below it ---\n\nDetails (the full plan, for you; the user need not read it):\n# Plan for approval\n\nGoal: Every week, turn the notes of one platform-team meeting into a short memo that says what was decided and who does what by when. One extra one-off job: a one-page action list for the ops team from the 5 October 2026 notes.\n\nNeeds as understood:\n- Scope: A one-off, one-page action list for the ops team from the notes of the 5 October 2026 platform team weekly (2026-10-05.md): every action item in those notes, each with its owner and due date. Nothing else from the meeting.\n- Deliverable: (not specified)\n- Quality bar: Every statement comes from 2026-10-05.md, in the notes' own words; where the file is silent (for example no date), Due is none.\n- Sources / tools: Only the files in needs.inputs; no web.\n- Workspace: none (no agent writes files or runs commands)\n- Model policy: one model for all\n- Review: not required\n\nOrganization (2 agents):\n- lead [manager] Manager: model=claude-sonnet-5.5, tools=read\n  Access: kiro read only in /private/tmp/hirearchy-p2/C1-1793280632/notes and in the organization's own files (read-only)\n  - writer [writer] Writer: model=claude-sonnet-5.5, tools=read\n    Access: kiro read only in /private/tmp/hirearchy-p2/C1-1793280632/notes and in the organization's own files (read-only)\n\nBudget: 8 runs planned (your cap: 8), estimate 8 for one pass + one review/rework cycle:\n  This is a ceiling: runs the team does not spend come back automatically, agent by agent, with their final reports, until what is left returns to you.\n  lead: starts with 8, hands down writer 3 (each includes its rework/re-check run), keeps 5 (own 5)\n  lead/writer: 3 runs (2 work + 1 rework)\n\nReview / verification:\n- no independent reviewer (review not requested)\n- the assistant re-checks the final deliverable against every acceptance criterion before telling you it is done\n\nDeliverable:\n- (missing)\n- Final location: inside the organization (no path given)\n\nFirst task: to lead: One-page action list for the ops team from the 5 October 2026 notes\n  1. Uses only the meeting in 2026-10-05.md.\n  2. Has a short title with the meeting date, then one markdown table with the columns Owner | Action | Due, and nothing else (no summary, no decisions section).\n  3. The table has one row for every action item in the notes, including informal ones written in prose (n of m with n = m in the lead's check against the notes), worded as in the notes.\n  4. Every row has an owner, an action and a due date; Due is an ISO date (YYYY-MM-DD), or none when the notes give no date. Sam's flaky CI is 2026-10-09 and Marta's on-call training room is 2026-10-14.\n  5. At most 250 words as counted by read.\n  6. Nothing appears that is not in the notes file.\n\nCheckpoints:\n- Approval: Plan first; ask before any spend beyond the budget.\n- Progress: One line when I ask.\n- Any spend beyond the budget needs your OK.\n\nWarnings (1):\n- task.budget: 8 runs leaves almost no slack over the estimate of 8; expect a stall on the first surprise\n\nErrors (2) - must be fixed before this can be applied:\n- agents[lead]: lead already exists in this organization; pick another name or retire it first\n- needs.deliverable: state the deliverable: description, format, length and where it should end up (needs.deliverable.description)\n\nCannot apply yet: tell me what to change.\n\nplan_id: none (the blueprint has errors). Fix them and call propose_org again; do not ask the user to approve this.",
+  "t": "2026-10-29T13:50:04.389Z"
+ }
+]

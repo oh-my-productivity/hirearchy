@@ -1,0 +1,19 @@
+# P2 freeze
+freeze time (UTC): 2026-10-29T09:59:30Z
+basis: /Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/manager-decision-prereg-loop.md (sections 'The loop is CLOSED by decision after iteration 3' and 'Go-ahead to freeze'), prereg-closing-pass.md, and its self-check 19 of 19 (harness-selfcheck/selfcheck-summary.txt, 2026-10-29T09:51:20Z). prereg-review.json stays CHANGES_REQUESTED (review 3's record, unedited); the freeze rests on the manager's closure decision, not on an APPROVED verdict. The manager's explicit go-ahead to this step was received in the workflow.
+arm R product sha (git -C /Volumes/workspace/hirearchy rev-parse HEAD): 3d6b28aa17a70a3f95854c73c2f479b6361a71de
+arm C product sha (git -C /Volumes/workspace/hirearchy/.worktrees/p2-arm-c rev-parse HEAD): aac6af1b47b721515106f03f1dd6eb6758da6e55
+check 1: git diff --stat 3d6b28aa HEAD -- src skills pyproject.toml uv.lock: EMPTY
+check 2: arm-C worktree HEAD aac6af1b (expected aac6af1b), tree CLEAN
+global skill md5 before: 443e1bc4911aa4d6aaa6457e78f673c1 (expected 443e1bc4911aa4d6aaa6457e78f673c1)
+check 3: md5s written: protocol.md5 (protocol.md, standing-rules-streams.md) and harness/MD5SUMS (75 files; excludes MD5SUMS itself and __pycache__)
+--- protocol.md5
+50dde0f4f28ef81521c35a6c10cf98c3  protocol.md
+909fbb79c838b69a2d620089545c3ae6  standing-rules-streams.md
+md5 of harness/MD5SUMS: 051ef84206cd0375926be5a9c45b9cd4
+--- self-check on the frozen files (started after the md5s were written; harness/MD5SUMS re-verified afterwards: no file changed)
+result: SELFCHECK: 18 of 19 parts passed. FAIL: "dry run, arm R" (harness-selfcheck/dryrun-R.out, dryrun-R/pf0-timing.txt): 1 mismatch,
+"PF-0: terminal-only orgs with a hand edit of a nested charter, both timings built: expected yes, got no". All 8 tries built the 'same second'
+timing; none built the 'an earlier second' timing (dryrun.sh:106-134). Arm C dry run and the other 17 parts passed.
+status: the step stopped here with a warning to the manager. No frozen file was edited.
+global skill md5 after: 443e1bc4911aa4d6aaa6457e78f673c1

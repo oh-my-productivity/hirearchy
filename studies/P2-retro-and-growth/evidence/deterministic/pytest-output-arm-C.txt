@@ -1,0 +1,3 @@
+.............................                                            [100%]
+29 passed in 6.78s
+UV_LINK_MODE=copy uv run pytest -q tests/e2e/test_org_growth_1.py  3.39s user 2.50s system 74% cpu 7.926 total

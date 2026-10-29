@@ -1,0 +1,7 @@
+memories-block check, restarted R1, after turn 1, before Lena's turn-2 line, 2026-10-29T12:13:56Z
+blocks found in the session store: 1 distinct: 1
+block 0: length 6903 chars, md5 2a977c304f129e36c42faa735a5cd5ed
+matched words: none
+words searched (case-insensitive except P2, ACT-REQ, Lena): P2, study, Lena, facilitator, decision table, K<n>, answer key, harness, trap, ACT-REQ, retro 1/2, amendment, arms R/C, R1, C1, hirearchy-study, manager. Result: none.
+extra look (lines of the block with hirearchy / workflow / protocol): two unrelated user-preference titles (a narrated-video workflow, a katana video project, sub-agent delegation) and the repo name oh-my-productivity/hirearchy: not about the study. Not a stop.
+memories.db md5 before R1 (setup): 78502051db9553346ff820af169bd21a (manager-decision-memories-before-R1.md). The block's text is in the assistant session store (assistant-session-messages.jsonl), not copied here.

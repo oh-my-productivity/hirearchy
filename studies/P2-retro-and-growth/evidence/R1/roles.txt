@@ -1,0 +1,7 @@
+# roles (protocol 4.1), recorded by the stream step as they appear
+[A-crit] = C9 (the criterion added by the answer to R1 at turn 5: "The memo starts with a one-line 'Summary:' of the meeting, followed by the Decisions section, then the action items table."; contract v2; the question named C5). Source: services/turn-05.txt.
+[trap-crit] = (not yet)
+[widened] = (not yet)
+[order-new] = C11 (added by the answer to A-M at turn 20; it replaced C9, so [A-crit] is no longer current)
+[study service] = weekly-meeting-memo (lead)
+[list service] = (not yet)

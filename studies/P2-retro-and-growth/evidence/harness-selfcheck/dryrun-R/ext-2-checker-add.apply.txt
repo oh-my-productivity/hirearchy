@@ -1,0 +1,7 @@
+org: /private/tmp/hirearchy-p2/selfcheck-R-1793275673/org
+applied the change e5fff0b87338 to /private/tmp/hirearchy-p2/selfcheck-R-1793275673/org
+added 1 agent(s): lead/c6-checker
+changed limits: lead
+charter lines: 1 added, 0 taken out
+budget of weekly-memo of lead: 12 -> 14 runs per request
+Nothing runs because of it.

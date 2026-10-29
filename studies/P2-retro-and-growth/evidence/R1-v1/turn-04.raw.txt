@@ -1,0 +1,14 @@
+Your first memo is at `/private/tmp/hirearchy-p2/R1-1793270268/deliverables/memo-2026-10-05.md`. I checked it against the notes myself.
+
+- Covers only decisions and actions, in a Decisions section and an Actions section: met
+- At most 400 words: met (117 by `wc`; the team counted 87 by `read`)
+- Every decision listed, none invented: met (2 of 2)
+- Every commitment has a row, including informal ones, and none is invented: met (5 of 5)
+- Actions table has columns Owner | Action | Due: met
+- Owner uses the names from the notes: met
+- Due is an ISO date, or `none`: met. Sam is 2026-10-09 and Marta is 2026-10-14, both as you answered. Lee stays `none`.
+- The lead's check matches every decision and action row against the notes: met
+
+Runs: 6 for this memo, against the 12 per memo you approved. That covers the first draft plus the rework for your two date answers.
+
+Each week, ask me with the notes file name, for example "memo for 2026-10-12.md". The team doesn't run on a timer. Do you want to keep this memo, or change anything?

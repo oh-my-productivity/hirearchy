@@ -1,0 +1,3 @@
+{"v":1,"ts":"2026-10-29T13:17:15.501708+00:00","seq":1,"proc":"mcp","pid":68807,"kind":"tool.call","actor":"root","run":null,"trace":null,"tool":"propose_org","ok":true,"ms":2.87,"error":null,"error_type":null,"args":{"blueprint_chars":3468,"extend_chars":7}}
+{"v":1,"ts":"2026-10-29T13:17:25.859207+00:00","seq":2,"proc":"mcp","pid":68807,"kind":"tool.call","actor":"root","run":null,"trace":null,"tool":"propose_org","ok":true,"ms":9.9,"error":null,"error_type":null,"args":{"blueprint_chars":3509,"extend_chars":7}}
+{"v":1,"ts":"2026-10-29T13:17:40.145455+00:00","seq":3,"proc":"mcp","pid":68807,"kind":"tool.call","actor":"root","run":null,"trace":null,"tool":"propose_org","ok":true,"ms":9.03,"error":null,"error_type":null,"args":{"blueprint_chars":3425,"extend_chars":7}}

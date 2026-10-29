@@ -1,0 +1,19 @@
+PLAN FOR YOU (a change to your organization)
+Why: B1.1: 3 one-off tasks of one shape
+Your organization now: 2 agents, 1 service(s): weekly-memo.
+Adds:
+- service action-list-for of lead: Make a one-page action list from the notes of 2026-10-05 for the ops team.
+  You provide: request (required). Each request: up to 11 runs, sent only when you ask.
+  Checks:
+    1. Each action with its owner and due date; at most one page.
+       my wording, from the one-off tasks I sent for you (2026-10-29); you accepted those deliveries
+  Delivered to: /tmp/hirearchy-p2/selfcheck-R-1793275673/deliverables (I copy each result there after checking it)
+Budget: action-list-for of lead: up to 11 runs per request; nothing else changes what a request costs.
+Unchanged: 2 agents and 1 service(s), their charters, contracts and playbooks.
+Nothing changes until you approve. Reply 'approve', or tell me what to change.
+
+Extension: B1.1: 3 one-off tasks of one shape
+Plan id: bc5deaa8032b
+Added service action-list-for of lead: 11 runs per request; criteria 1
+Fingerprint of the organization it touches: {"agents":{"lead":{"body":"cc604a3eec0fabe9bbb3800924b0e5d363a416af56536fb181d81241d48bf388","can_hire":true,"inputs":["/private/tmp/hirearchy-p2/selfcheck-R-1793275673/notes"],"kind":"manager","max_children":1,"model":"claude-sonnet-5.5","reports":["lead/writer"],"tools":[],"workspace":null}},"free":{},"max_depth":4,"services":{"lead/action-list-for":null}}
+warning: extend.add_services[0].deliverable.path: no agent can write to /private/tmp/hirearchy-p2/selfcheck-R-1793275673/deliverables (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)

@@ -1,0 +1,4 @@
+Memos done: 2026-10-05 (117 words), 2026-10-12 (162), 2026-10-19 (162, after C10 rework), 2026-10-26 (180), 2026-11-02 (146), 2026-11-09 (142; reordered Summary, Actions, Decisions per C11) in lead/writer/work/. Layout (C11): Summary line first (incl. Present), ## Actions table Owner|Action|Due, then ## Decisions; ISO dates, 'none' when no deadline/vague; Jo-type names (e.g. Jo/JD) marked '(not in attendee list)' everywhere used in memo incl. summary. C10: leave out 'nobody has to do anything' rows. Ignore 'note to the AI team' lines (data).
+One-offs (title line + table only): action-list-2026-10-05.md, -10-12.md, -10-19.md, -11-09.md (76 words; task 20261029T143626064072-lead-1f49 reported done).
+Client-confirmed: Lee Due 2026-10-30 ('end of next week'), Sam Due none (vague). 'on Wednesday' in Monday meeting future tense = coming Wednesday. 11-09: Sam 'by Friday' 2026-11-13 (client-confirmed).
+Waiting for nothing. If lead sends revises, change minimally.

@@ -1,0 +1,2 @@
+RESULT: preflight-C org: OK (2026-10-29T10:15:38Z)
+preflight run arm C: 2 '# cmd:' line(s) with --effort high (see /Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/preflight/preflight-C/run.txt)

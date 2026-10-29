@@ -1,0 +1,57 @@
+# teardown-verify (read-only checks after the deletions) 2026-10-29T15:18:47Z
+== md5 gate (arm.sh md5gate_ok)
+md5gate_rc=0
+== freeze
+== freeze (protocol 2.2) at 2026-10-29T15:18:47Z
+REPO_R HEAD: 3d6b28aa17a70a3f95854c73c2f479b6361a71de (required 3d6b28aa17a70a3f95854c73c2f479b6361a71de)
+REPO_R diff --stat 3d6b28aa17a70a3f95854c73c2f479b6361a71de HEAD -- src skills pyproject.toml uv.lock: []
+REPO_C HEAD: aac6af1b47b721515106f03f1dd6eb6758da6e55 (required aac6af1b47b721515106f03f1dd6eb6758da6e55)
+REPO_C status --porcelain: []
+freeze_ok_rc=0
+== git -C /Volumes/workspace/hirearchy diff --stat 3d6b28aa HEAD -- src skills pyproject.toml uv.lock (bytes of output)
+0
+== arm-C worktree HEAD / porcelain lines
+aac6af1b47b721515106f03f1dd6eb6758da6e55
+0
+== skill_move.sh status
+global skill: in place, md5 443e1bc4911aa4d6aaa6457e78f673c1
+no unrestored move
+rc=0
+== global skill
+SKILL.md
+MD5 (/Users/aminalizadeh/.kiro/skills/hirearchy/SKILL.md) = 443e1bc4911aa4d6aaa6457e78f673c1
+== ~/.kiro/agents (names + md5)
+MD5 (/Users/aminalizadeh/.kiro/agents/agent_config.json.example) = 469663a50de0219d33236817c4529564
+MD5 (/Users/aminalizadeh/.kiro/agents/claude-opus-5.5.json) = 4067177e78606be3c9f1cad422e74749
+MD5 (/Users/aminalizadeh/.kiro/agents/claude-sonnet-5.5.json) = dc760943047953826f80957f377789af
+MD5 (/Users/aminalizadeh/.kiro/agents/evolve.json) = 064b1e0cf4d9f6879be4163ebd752a9e
+MD5 (/Users/aminalizadeh/.kiro/agents/explainer.json) = 3d471c904b614ea6d8ef5c2a5ca6937d
+MD5 (/Users/aminalizadeh/.kiro/agents/hirearchy-organization-9d66c1-web-fetch-web-search.json) = 51adddec75ab1e70bf88529802095a55
+MD5 (/Users/aminalizadeh/.kiro/agents/telegram_bot.json) = a8b6eef2889e7307a40f73a9e172f4d6
+== study profiles in ~/.kiro/agents (grep -c -E 'study|p2')
+0
+== settings md5 / mtime (UTC)
+f21924126253d2f829fd25ad189e4825 2026-10-29T12:35:19Z cli.json
+9070b152a85eb85fd8d103b52c33325d 2026-10-06T12:57:35Z cli.json.lock
+9ca5275ee24dfa57e57c763e717e2387 2026-10-29T12:38:08Z mcp.json
+9783c84529e98aa1aa715134fb1772b5 2026-10-11T11:58:31Z mcp.json.bak
+bb5260020f18cd27dfc2b4eaf4c87904 2026-10-15T06:02:56Z mcp.json.bak-rea
+ef61b154924410819b7fc948ac79c498 2026-10-12T07:39:24Z mcp.json.bak-whatsapp
+b326b5062b2f0e69046810717534cb09 2026-10-10T03:10:39Z session-response-indexing.json
+f40574c6fbf6162026f9b8c21182a7a7 2026-10-01T04:14:51Z survey_state.json
+f9e25c32a0322e98da5db1415bd6b839 2026-10-29T14:44:52Z workflow_survey_state.json
+== memories.db
+42d6e6eb81ad82e594664cc09474e8d8 163840 2026-10-29T15:14:34Z
+memories.db
+== user's org, stat only
+      31
+7ba5d9206b4c800d27a2f2d195137764
+== /tmp/hirearchy-p2 now: directories / loose files
+       0
+      65
+== processes naming a P2 path
+       0
+== worktree still present
+/Volumes/workspace/hirearchy                           3d6b28aa [main]
+/Volumes/workspace/hirearchy/.worktrees/org-growth-p2  3d6b28aa [feat/org-growth-phase-2]
+/Volumes/workspace/hirearchy/.worktrees/p2-arm-c       aac6af1b (detached HEAD)

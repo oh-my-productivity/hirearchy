@@ -1,0 +1,23 @@
+######## TURN 6  start 13:44:41  end 13:47:14  elapsed 153s  (local, 2026-10-29; UTC wall-clock start 2026-10-29T13:44:41Z end 2026-10-29T13:47:14Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Yes, add it.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-06.stderr.txt):
+The reworked memo is at `/private/tmp/hirearchy-p2/C1-1793280632/deliverables/memo-2026-10-05.md`. It replaces the earlier copy, and the two files are identical.
+
+I added your rule as a lasting criterion (C9), so every future memo starts with the "Summary:" line, then Decisions, then Actions.
+
+- **C1 (only that meeting):** met.
+- **C2 (400 words or fewer):** met, 146 by `wc`.
+- **C3 (Decisions section):** met, 2 of 2 decisions.
+- **C4 (Actions table):** met, 5 of 5 commitments.
+- **C5 (ISO dates, "none" if no date):** met. Sam is 2026-10-09, Marta is 2026-10-14 and Lee is "none".
+- **C6 (names not on the attendee list):** met. All names are on the list.
+- **C7 (nothing beyond the notes):** met.
+- **C8 (lead's coverage check):** met, n = m.
+- **C9 (Summary line first):** met.
+
+**A rework I did not mean to send.** A relayed rework ("Rework memo 2026-10-05: unclear due dates") was recorded from my seat. It reverted Sam's and Marta's dates to "none" and added an "Open questions" section. I can't trace where it came from. I caught it when the contract change was refused, rejected that version, and restarted from the version you had judged.
+
+**Runs.** The full case used 15 runs: 12 for your requests (the planned 12 per memo) and 3 for that stray rework. The 3 are mine, not yours.
+
+Keep it, or what should change?

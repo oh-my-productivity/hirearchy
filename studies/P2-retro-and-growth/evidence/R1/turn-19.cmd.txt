@@ -1,0 +1,1 @@
+env -u KIRO_HOME kiro-cli chat --v3 --no-interactive --trust-all-tools --resume --effort high --agent hirearchy-study-p2-R1-assistant 'No: I'\''ve changed my mind - always put the action items before the decisions now, right after the one-line Summary. Yes, let'\''s do it.'

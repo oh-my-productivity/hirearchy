@@ -1,0 +1,19 @@
+######## TURN 12  start 12:49:42  end 12:52:14  elapsed 152s  (local, 2026-10-29; UTC wall-clock start 2026-10-29T12:49:42Z end 2026-10-29T12:52:14Z; exit code 0)
+######## LENA (prompt sent verbatim):
+1: Yes, Lee's 2026-10-30 is right. 2: Dev's 2026-10-24 is right. I'll wait.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-12.stderr.txt):
+The 19 October memo is at `/private/tmp/hirearchy-p2/R1-1793275867/deliverables/2026-10-19-memo.md`. I checked it against the notes myself, and the copy is identical to the team's file.
+
+- **Your answers:** met. Lee's Due is 2026-10-30 and Dev's is 2026-10-24. I removed both from "Unclear".
+- **Length:** met. 305 words by `wc` (the lead counted 267), under 400.
+- **Order:** met. It opens with "Summary:", then Decisions, then the table, and "Unclear" is last.
+- **Decisions:** met, 3 of 3. They are the demo going ahead without the rate limiter, the 12-month SSO renewal, and the weekly moving to Monday 14:00 from 26 October.
+- **Action table:** met. It has the columns Owner | Action | Due, with 6 of 6 rows. The rows are Marta (feedback) 2026-10-23, Dev 2026-10-24, Priya 2026-10-26, Marta (agenda) none, Lee 2026-10-30, and Sam none.
+- **Owner names:** met. They are written as in the notes.
+- **Lead's check:** met, 3 of 3 decisions and 6 of 6 rows verified.
+
+Three items stay under "Unclear" with no date: Sam pairing with Jo during Jo's first week, Marta keeping the agenda as sent, and the demo date ("later this week").
+
+Runs: 7 of the 12 approved for this memo (4 for the first draft, 3 for your date answers).
+
+Keep it, or what should change?

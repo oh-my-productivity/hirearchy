@@ -1,0 +1,1 @@
+env -u KIRO_HOME kiro-cli chat --v3 --no-interactive --trust-all-tools --resume --effort high --agent hirearchy-study-p2-probe-C1-assistant 'Now run the hirearchy services tool and show me its reply.'

@@ -1,0 +1,19 @@
+Everything is done and judged, and nothing is open. All 6 memos and 4 ops action lists are in `deliverables`, the team is idle, and the scheduler has stopped.
+
+**Results.** You accepted 3 memos and all 4 action lists on first delivery. You rejected 1 memo, 9 November, to change the order. For the 5 Oct and 19 Oct memos you answered the date questions before giving a verdict, so those first drafts have no verdict. The check against your notes found every decision and action each time (n = m).
+
+**Rules you added.** There are 3, one per rejection. Each was something the memo rules hadn't covered, not a mistake in reading your notes.
+
+- **Summary first:** the memo starts with a one-line "Summary:".
+- **No "nobody has to act" lines:** the Actions table leaves them out.
+- **Actions before Decisions:** after the Summary, Actions come first (C11, which replaced C9).
+
+**Cost.** 45 charged runs for everything.
+- The 6 memos used 36 runs against 72 approved, so no case went over its budget.
+- The 4 action lists used 3 runs each, against 8 allowed.
+- 3 of the 45 runs were the stray rework, charged to me and not to you.
+- 4 more runs failed on a model-service throttle and weren't charged.
+
+**The rework you didn't ask for.** The log shows it as a request marked "relayed" that came in through the same channel I use. It arrived at 13:41:37, with its own note, at the same instant as one of my status polls. I made no request then. I can't identify the sender, and nothing like it has appeared in the 3 hours since. The log also shows read-only CLI commands (`quality`, `services`) running under the root seat between my calls. They aren't mine, but they don't send work either, so I can't link them to the rework. I'm leaving it there.
+
+**Next.** Ask for any meeting file by name and I'll request the memo.

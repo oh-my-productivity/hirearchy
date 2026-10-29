@@ -1,0 +1,12 @@
+score_memos R1: 0 versions, 6 final memos; reviewer None (owner lead)
+
+memo       ver sha      D    A    wrong  extra  Summary order words copied  review
+
+final memos: decisions 17 of 8, actions 30 of 15, wrong dates 0, extra rows 0, Summary 5 of 6
+  2026-10-05 md5 0570090127a1d7244a6511bd6a0596c1
+  2026-10-12 md5 b847cbcc38ef5216dde69d583e50567c
+  2026-10-19 md5 c6b455aa925e399e6e08f4a41dd6261b
+  2026-10-26 md5 b9bd9e485f9f3e9ccf3cca99148909fd
+  2026-11-02 md5 819bfb05b5a313d49c2e072d79d38c9f
+  2026-11-09 md5 44d386af2ace043828c1579db1771a94
+delivered (copied) versions: n/a (0 of 0)

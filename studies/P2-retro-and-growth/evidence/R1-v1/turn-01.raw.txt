@@ -1,0 +1,14 @@
+I read two of your notes to see the format. Here is what I'd set up, plus a few questions.
+
+**Proposed setup.** This is a standing service, not a one-off. After each meeting you give me the notes file, and a small team writes the memo. A writer drafts it from your notes only (no web), and a separate reviewer checks it against the notes. I can't run it on a timer. You'll need to ask me each week ("memo for 2026-11-16.md"), and it takes a few minutes.
+
+**Questions** (reply "defaults" to accept the proposed answers):
+
+1. **What counts as a decision or an action?** Your notes mix labelled items ("ACTION: Dev to switch off the old gateway on Nov 20", "we decided…") with informal ones ("Sam said he'd look into the flaky CI before Friday", "Lee would ping the vendor, no hard date"). *Default:* include every decision and every commitment, labelled or not, each with an owner.
+2. **Relative or missing dates** ("before Friday", "this week", "at some point"). *Default:* turn them into a calendar date using the meeting date (so "before Friday" in the 9 Nov meeting becomes 13 Nov). If there's no date, write "no date set". The alternative is to copy the wording as written.
+3. **Format and length.** *Default:* markdown, at most 300 words. It has a "Decisions" section and an "Actions" section with owner, task and due date. It comes without extra sections like attendees or discussion summary.
+4. **Where it goes.** *Default:* a new folder called `deliverables` here, in `/private/tmp/hirearchy-p2/R1-1793270268/deliverables/`, named after the meeting date, e.g. `memo-2026-11-16.md`.
+5. **What changes each week and what stays fixed.** *Default:* only the notes file changes. It's read-only, and it comes from your `notes` folder. The format, criteria and place stay fixed.
+6. **Review.** *Default:* a separate reviewer checks every decision and action in the memo against the notes. It also flags anything in the notes that is ambiguous, for example an owner who isn't named.
+7. **Budget per memo.** I'll give you the number in the plan. All agents run claude-sonnet-5.5 at high effort.
+8. **First run.** Should I also produce a memo now from the latest notes (`2026-11-09.md`) to test it? *Default:* yes.

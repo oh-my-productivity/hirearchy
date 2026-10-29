@@ -1,0 +1,164 @@
+{
+ "cases": [
+  {
+   "assignee": "lead",
+   "criteria": [
+    "1. The deliverable is markdown, has at most 350 words as counted by read (this is the one-page limit), and a title line naming the 2026-10-05 meeting.",
+    "2. It contains one markdown table with exactly the columns Owner | Action | Due, and no other sections (no decisions, no summary).",
+    "3. Every action item in the notes file is a row, including those stated in prose: Priya, Dev, Sam, Marta, Lee (5 of 5), and no row that is not in the notes.",
+    "4. Each Due value is an ISO date (YYYY-MM-DD) or 'none': Dev 2026-10-08, Priya 2026-10-09, Sam 2026-10-09, Marta 2026-10-14, Lee none.",
+    "5. Each Owner value uses the name exactly as written in the notes.",
+    "6. Rows are ordered by Due ascending with 'none' last, ties in the order of the notes.",
+    "7. Every statement is traceable to 2026-10-05.md; nothing is invented.",
+    "8. The lead's report states that every table row was compared with the notes file, with the count verified (n of m, n = m)."
+   ],
+   "head": "20261029T122710588867-root-c1b8",
+   "judged": true,
+   "judged_at": "2026-10-29T12:30:06.690580+00:00",
+   "key": [
+    "eachduevalueisanisodateyyyymmddornonedev#priya#sam#marta#leenone",
+    "eachownervalueusesthenameexactlyaswritteninthenotes",
+    "everyactioniteminthenotesfileisarowincludingthosestatedinprosepriyadevsammartalee#of#andnorowthatisnotinthenotes",
+    "everystatementistraceableto#mdnothingisinvented",
+    "itcontainsonemarkdowntablewithexactlythecolumnsowneractiondueandnoothersectionsnodecisionsnosummary",
+    "rowsareorderedbydueascendingwithnonelasttiesintheorderofthenotes",
+    "thedeliverableismarkdownhasatmost#wordsascountedbyreadthisistheonepagelimitandatitlelinenamingthe#meeting",
+    "theleadsreportstatesthateverytablerowwascomparedwiththenotesfilewiththecountverifiednofmnm"
+   ],
+   "skeleton": [
+    "one",
+    "-",
+    "page",
+    "ops",
+    "action",
+    "list",
+    "for",
+    "the",
+    "meeting"
+   ],
+   "tasks": [
+    "20261029T122710588867-root-c1b8"
+   ],
+   "title": "One-page ops action list for the 2026-10-05 meeting",
+   "tokens": "{'value', 'as', 'in', 'a', 'nothing', 'or', 'including', 'that', 'an', 'and', 'each', 'item', 'title', 'none', 'states', 'are', 'with', 'marta', 'written', 'report', 'date', 'name', 'priya', 'limit', '-', 'of', 'invented', 'lee', 'n', 'has', 'summary', 'columns', 'uses', 'iso', 'to', 'no', 'compared', 'exactly', '=', 'ties', 'file', 'those', 'other', 'stated', 's', 'ordered', 'md', 'meeting', 'last', 'prose', '|', 'at', 'markdown', 'yyyy', 'every', 'counted', 'table', 'traceable', 'contains', 'count', 'notes', 'decisions', 'ascending', 'naming', 'the', 'by', 'owner', 'it', 'sam', 'deliverable', 'line', 'due', 'read', 'sections', 'dd', 'verified', 'one', 'dev', 'not', 'order', 'statement', 'this', 'action', 'most', 'lead', 'was', 'words', 'rows', 'page', 'mm', 'row', 'm', 'is'}"
+  },
+  {
+   "assignee": "lead",
+   "criteria": [
+    "1. The deliverable is markdown, has at most 350 words as counted by read (this is the one-page limit), and a title line naming the 2026-10-12 meeting.",
+    "2. It contains one markdown table with exactly the columns Owner | Action | Due, and no other sections (no decisions, no summary).",
+    "3. Every action item in the notes file is a row, including those stated in prose: Dev, Marta, Priya, Sam, Lee (5 of 5), and no row that is not in the notes.",
+    "4. Each Due value is an ISO date (YYYY-MM-DD) or 'none': Dev 2026-10-14, Marta 2026-10-16, Priya 2026-10-20, Sam 2026-10-21, Lee none.",
+    "5. Each Owner value uses the name exactly as written in the notes.",
+    "6. Rows are ordered by Due ascending with 'none' last, ties in the order of the notes.",
+    "7. Every statement is traceable to 2026-10-12.md; nothing is invented.",
+    "8. The lead's report states that every table row was compared with the notes file, with the count verified (n of m, n = m)."
+   ],
+   "head": "20261029T123457206032-root-cabf",
+   "judged": true,
+   "judged_at": "2026-10-29T12:46:25.825356+00:00",
+   "key": [
+    "eachduevalueisanisodateyyyymmddornonedev#marta#priya#sam#leenone",
+    "eachownervalueusesthenameexactlyaswritteninthenotes",
+    "everyactioniteminthenotesfileisarowincludingthosestatedinprosedevmartapriyasamlee#of#andnorowthatisnotinthenotes",
+    "everystatementistraceableto#mdnothingisinvented",
+    "itcontainsonemarkdowntablewithexactlythecolumnsowneractiondueandnoothersectionsnodecisionsnosummary",
+    "rowsareorderedbydueascendingwithnonelasttiesintheorderofthenotes",
+    "thedeliverableismarkdownhasatmost#wordsascountedbyreadthisistheonepagelimitandatitlelinenamingthe#meeting",
+    "theleadsreportstatesthateverytablerowwascomparedwiththenotesfilewiththecountverifiednofmnm"
+   ],
+   "skeleton": [
+    "one",
+    "-",
+    "page",
+    "ops",
+    "action",
+    "list",
+    "for",
+    "the",
+    "meeting"
+   ],
+   "tasks": [
+    "20261029T123457206032-root-cabf"
+   ],
+   "title": "One-page ops action list for the 2026-10-12 meeting",
+   "tokens": "{'value', 'as', 'in', 'a', 'nothing', 'or', 'including', 'that', 'an', 'and', 'each', 'item', 'title', 'none', 'states', 'are', 'with', 'marta', 'written', 'report', 'date', 'name', 'priya', 'limit', '-', 'of', 'invented', 'lee', 'n', 'has', 'summary', 'columns', 'uses', 'iso', 'to', 'no', 'compared', 'exactly', '=', 'ties', 'file', 'those', 'other', 'stated', 's', 'ordered', 'md', 'meeting', 'last', 'prose', '|', 'at', 'markdown', 'yyyy', 'every', 'counted', 'table', 'traceable', 'contains', 'count', 'notes', 'decisions', 'ascending', 'naming', 'the', 'by', 'owner', 'it', 'sam', 'deliverable', 'line', 'due', 'read', 'sections', 'dd', 'verified', 'one', 'dev', 'not', 'order', 'statement', 'this', 'action', 'most', 'lead', 'was', 'words', 'rows', 'page', 'mm', 'row', 'm', 'is'}"
+  },
+  {
+   "assignee": "lead",
+   "criteria": [
+    "1. The deliverable is markdown, has at most 350 words as counted by read (this is the one-page limit), and a title line naming the 2026-10-19 meeting.",
+    "2. It contains one markdown table with exactly the columns Owner | Action | Due, and no other sections (no decisions, no summary).",
+    "3. Every action item in the notes file is a row, including those stated in prose: Marta, Dev, Priya, Lee, Sam (5 of 5), and no row that is not an action item in the notes; 'Marta keeps the agenda as sent' gets no row.",
+    "4. Each Due value is an ISO date (YYYY-MM-DD) or 'none': Marta 2026-10-23, Dev 2026-10-24, Priya 2026-10-26, Lee 2026-10-30, Sam none.",
+    "5. Each Owner value uses the name exactly as written in the notes.",
+    "6. Rows are ordered by Due ascending with 'none' last, ties in the order of the notes.",
+    "7. Every statement is traceable to 2026-10-19.md; nothing is invented.",
+    "8. The lead's report states that every table row was compared with the notes file, with the count verified (n of m, n = m)."
+   ],
+   "head": "20261029T125747104778-root-4a85",
+   "judged": true,
+   "judged_at": "2026-10-29T13:01:01.594702+00:00",
+   "key": [
+    "eachduevalueisanisodateyyyymmddornonemarta#dev#priya#lee#samnone",
+    "eachownervalueusesthenameexactlyaswritteninthenotes",
+    "everyactioniteminthenotesfileisarowincludingthosestatedinprosemartadevpriyaleesam#of#andnorowthatisnotanactioniteminthenotesmartakeepstheagendaassentgetsnorow",
+    "everystatementistraceableto#mdnothingisinvented",
+    "itcontainsonemarkdowntablewithexactlythecolumnsowneractiondueandnoothersectionsnodecisionsnosummary",
+    "rowsareorderedbydueascendingwithnonelasttiesintheorderofthenotes",
+    "thedeliverableismarkdownhasatmost#wordsascountedbyreadthisistheonepagelimitandatitlelinenamingthe#meeting",
+    "theleadsreportstatesthateverytablerowwascomparedwiththenotesfilewiththecountverifiednofmnm"
+   ],
+   "skeleton": [
+    "one",
+    "-",
+    "page",
+    "ops",
+    "action",
+    "list",
+    "for",
+    "the",
+    "meeting"
+   ],
+   "tasks": [
+    "20261029T125747104778-root-4a85"
+   ],
+   "title": "One-page ops action list for the 2026-10-19 meeting",
+   "tokens": "{'value', 'as', 'in', 'a', 'nothing', 'or', 'including', 'that', 'an', 'and', 'each', 'item', 'title', 'none', 'states', 'are', 'with', 'marta', 'written', 'keeps', 'report', 'date', 'name', 'priya', 'limit', '-', 'of', 'invented', 'lee', 'n', 'has', 'summary', 'columns', 'uses', 'iso', 'to', 'no', 'compared', 'exactly', '=', 'ties', 'file', 'those', 'other', 'stated', 's', 'ordered', 'sent', 'md', 'meeting', 'last', 'prose', '|', 'at', 'markdown', 'yyyy', 'every', 'counted', 'table', 'traceable', 'contains', 'count', 'notes', 'gets', 'decisions', 'ascending', 'naming', 'the', 'by', 'owner', 'it', 'sam', 'deliverable', 'line', 'due', 'read', 'sections', 'dd', 'verified', 'one', 'dev', 'not', 'order', 'statement', 'agenda', 'this', 'action', 'most', 'lead', 'was', 'words', 'rows', 'page', 'mm', 'row', 'm', 'is'}"
+  }
+ ],
+ "groups": [
+  {
+   "assignee": "lead",
+   "criteria_key": [
+    "eachduevalueisanisodateyyyymmddornonemarta#dev#priya#lee#samnone",
+    "eachownervalueusesthenameexactlyaswritteninthenotes",
+    "everyactioniteminthenotesfileisarowincludingthosestatedinprosemartadevpriyaleesam#of#andnorowthatisnotanactioniteminthenotesmartakeepstheagendaassentgetsnorow",
+    "everystatementistraceableto#mdnothingisinvented",
+    "itcontainsonemarkdowntablewithexactlythecolumnsowneractiondueandnoothersectionsnodecisionsnosummary",
+    "rowsareorderedbydueascendingwithnonelasttiesintheorderofthenotes",
+    "thedeliverableismarkdownhasatmost#wordsascountedbyreadthisistheonepagelimitandatitlelinenamingthe#meeting",
+    "theleadsreportstatesthateverytablerowwascomparedwiththenotesfilewiththecountverifiednofmnm"
+   ],
+   "heads": [
+    "20261029T122710588867-root-c1b8",
+    "20261029T123457206032-root-cabf",
+    "20261029T125747104778-root-4a85"
+   ],
+   "judged": [
+    "20261029T122710588867-root-c1b8",
+    "20261029T123457206032-root-cabf",
+    "20261029T125747104778-root-4a85"
+   ],
+   "reached_at": "2026-10-29T13:01:01.594702+00:00",
+   "relations": [
+    "title"
+   ],
+   "titles": [
+    "One-page ops action list for the 2026-10-05 meeting",
+    "One-page ops action list for the 2026-10-12 meeting",
+    "One-page ops action list for the 2026-10-19 meeting"
+   ]
+  }
+ ]
+}

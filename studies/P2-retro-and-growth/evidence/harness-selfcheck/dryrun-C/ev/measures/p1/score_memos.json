@@ -1,0 +1,171 @@
+{
+  "answer_key": {
+    "md5": "2fb69bbef857c2bd4862cd5dd8be9da8",
+    "meetings": {
+      "2026-10-05": {
+        "actions": 5,
+        "decisions": 2,
+        "dues_match": true,
+        "owners_match": true
+      },
+      "2026-10-12": {
+        "actions": 5,
+        "decisions": 3,
+        "dues_match": true,
+        "owners_match": true
+      },
+      "2026-10-19": {
+        "actions": 5,
+        "decisions": 3,
+        "dues_match": true,
+        "owners_match": true
+      }
+    },
+    "ok": true,
+    "path": "/Volumes/workspace/hirearchy/studies/P1-itemized-playbook/evidence/answer-key.md"
+  },
+  "answer_key_p1": {
+    "md5": "d340ff638fa7efe1a7ece8808d9a6168",
+    "meetings": {
+      "2026-10-26": {
+        "actions": 5,
+        "decisions": 3,
+        "dues_match": true,
+        "owners_match": true
+      },
+      "2026-11-02": {
+        "actions": 5,
+        "decisions": 3,
+        "dues_match": true,
+        "owners_match": true
+      },
+      "2026-11-09": {
+        "actions": 5,
+        "decisions": 3,
+        "dues_match": true,
+        "owners_match": true
+      }
+    },
+    "ok": true,
+    "path": "/Volumes/workspace/hirearchy/studies/P1-itemized-playbook/evidence/answer-key-p1.md"
+  },
+  "copies": [],
+  "could_not_derive": [],
+  "delivered": {
+    "k": 0,
+    "n": 0
+  },
+  "final_totals": {
+    "actions": {
+      "k": 0,
+      "n": 15
+    },
+    "decisions": {
+      "k": 0,
+      "n": 8
+    },
+    "extra_rows": 0,
+    "memos": 0,
+    "summary": {
+      "k": 0,
+      "n": 6
+    },
+    "wrong_dates": 0
+  },
+  "finals": [],
+  "label": "ev",
+  "p1_no_regression": {
+    "delivered_bad": [],
+    "delivered_versions": 0,
+    "mechanical_pass": false,
+    "per_memo": {
+      "2026-10-05": {
+        "final": null,
+        "pass": false,
+        "why": "no final memo (E7 10.4: a memo not delivered fails)"
+      },
+      "2026-10-12": {
+        "final": null,
+        "pass": false,
+        "why": "no final memo (E7 10.4: a memo not delivered fails)"
+      },
+      "2026-10-19": {
+        "final": null,
+        "pass": false,
+        "why": "no final memo (E7 10.4: a memo not delivered fails)"
+      },
+      "2026-10-26": {
+        "final": null,
+        "pass": false,
+        "why": "no final memo (E7 10.4: a memo not delivered fails)"
+      },
+      "2026-11-02": {
+        "final": null,
+        "pass": false,
+        "why": "no final memo (E7 10.4: a memo not delivered fails)"
+      },
+      "2026-11-09": {
+        "final": null,
+        "pass": false,
+        "why": "no final memo (E7 10.4: a memo not delivered fails)"
+      }
+    },
+    "reported": {
+      "2026-10-05": {
+        "final": null,
+        "ok": false,
+        "why": "no final memo"
+      },
+      "2026-10-12": {
+        "final": null,
+        "ok": false,
+        "why": "no final memo"
+      },
+      "2026-10-19": {
+        "final": null,
+        "ok": false,
+        "why": "no final memo"
+      },
+      "2026-10-26": {
+        "final": null,
+        "ok": false,
+        "why": "no final memo"
+      },
+      "2026-11-02": {
+        "final": null,
+        "ok": false,
+        "why": "no final memo"
+      },
+      "2026-11-09": {
+        "final": null,
+        "ok": false,
+        "why": "no final memo"
+      }
+    },
+    "reported_ok": false
+  },
+  "review_tasks": 0,
+  "review_unmapped": [],
+  "roles": {
+    "children": [
+      "lead/writer"
+    ],
+    "detected_by": null,
+    "owner": "lead",
+    "reviewer": null,
+    "reviewer_dir": null,
+    "roles": {
+      "lead/writer": "Writer"
+    }
+  },
+  "script": {
+    "md5": "4a63660bc6040f443b6fbf997e57b4e2",
+    "name": "score_memos.py"
+  },
+  "source_files": [
+    "/Volumes/workspace/hirearchy/studies/P1-itemized-playbook/evidence/answer-key.md",
+    "org-files/lead-writer-AGENT.md",
+    "org-git-log.txt"
+  ],
+  "versions": []
+}

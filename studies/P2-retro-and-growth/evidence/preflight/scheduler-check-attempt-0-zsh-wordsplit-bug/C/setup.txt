@@ -1,0 +1,7 @@
+org: /private/tmp/hirearchy-p2/preflight-sched-C-1793269282/org
+initialized organization at /private/tmp/hirearchy-p2/preflight-sched-C-1793269282/org
+edit /private/tmp/hirearchy-p2/preflight-sched-C-1793269282/org/ORG.md to set the mission and limits
+org: /private/tmp/hirearchy-p2/preflight-sched-C-1793269282/org
+hired lead
+org: /private/tmp/hirearchy-p2/preflight-sched-C-1793269282/org
+task 20261029T102123175221-root-6048 -> lead (budget 2)

@@ -1,0 +1,188 @@
+# deliverables log (protocol 7.2, D6); facts only
+
+[2026-10-29T12:18:26.352Z] call #16 turn 3 execute_bash
+COMMAND: mkdir -p /private/tmp/hirearchy-p2/R1-1793275867/deliverables && cp /private/tmp/hirearchy-p2/R1-1793275867/org/lead/writer/work/2026-10-05-memo.md /private/tmp/hirearchy-p2/R1-1793275867/deliverables/2026-10-05-memo.md && cmp /private/tmp/hirearchy-p2/R1-1793275867/org/lead/writer/work/2026-10-05-memo.md /private/tmp/hirearchy-p2/R1-1793275867/deliverables/2026-10-05-memo.md && ls -l /private/tmp/hirearchy-p2/R1-1793275867/deliverables && wc -w /private/tmp/hirearchy-p2/R1-1793275867/deliverables/2026-10-05-memo.md
+source file(s): ['lead/writer/work/2026-10-05-memo.md -> org-git commit at that time: 9218bf1 2026-10-29T12:17:40Z', 'lead/writer/work/2026-10-05-memo.md -> org-git commit at that time: 9218bf1 2026-10-29T12:17:40Z']
+result: Output:
+total 8
+-rw-r--r--@ 1 aminalizadeh  wheel  1547 Oct 29 12:18 2026-10-05-memo.md
+     287 /private/tmp/hirearchy-p2/R1-1793275867/deliverables/2026-10-05-memo.md
+
+
+Exit Code: 0
+
+[2026-10-29T12:24:13.050Z] call #36 turn 5 execute_bash
+COMMAND: cd /private/tmp/hirearchy-p2/R1-1793275867 && cp org/lead/writer/work/2026-10-05-memo.md deliverables/2026-10-05-memo.md && cmp org/lead/writer/work/2026-10-05-memo.md deliverables/2026-10-05-memo.md && echo identical && ls -l deliverables
+source file(s): ['lead/writer/work/2026-10-05-memo.md -> org-git commit at that time: 75c5c8b 2026-10-29T12:23:32Z', 'lead/writer/work/2026-10-05-memo.md -> org-git commit at that time: 75c5c8b 2026-10-29T12:23:32Z']
+result: Output:
+identical
+total 8
+-rw-r--r--@ 1 aminalizadeh  wheel  1389 Oct 29 12:24 2026-10-05-memo.md
+
+
+Exit Code: 0
+
+[2026-10-29T12:28:56.407Z] call #45 turn 7 execute_bash
+COMMAND: cd /private/tmp/hirearchy-p2/R1-1793275867 && cp org/lead/writer/work/2026-10-05-ops-actions.md deliverables/ && cmp org/lead/writer/work/2026-10-05-ops-actions.md deliverables/2026-10-05-ops-actions.md && ls -l deliverables
+source file(s): ['lead/writer/work/2026-10-05-ops-actions.md -> org-git commit at that time: 4c99c19 2026-10-29T12:28:27Z', 'lead/writer/work/2026-10-05-ops-actions.md -> org-git commit at that time: 4c99c19 2026-10-29T12:28:27Z']
+result: Output:
+total 16
+-rw-r--r--@ 1 aminalizadeh  wheel  1389 Oct 29 12:24 2026-10-05-memo.md
+-rw-r--r--@ 1 aminalizadeh  wheel   421 Oct 29 12:28 2026-10-05-ops-actions.md
+
+
+Exit Code: 0
+
+[2026-10-29T12:33:22.107Z] call #54 turn 8 execute_bash
+COMMAND: cp org/lead/writer/work/2026-10-12-memo.md deliverables/2026-10-12-memo.md && cmp org/lead/writer/work/2026-10-12-memo.md deliverables/2026-10-12-memo.md && ls -l deliverables
+source file(s): ['lead/writer/work/2026-10-12-memo.md -> org-git commit at that time: 34a6fda 2026-10-29T12:32:31Z', 'lead/writer/work/2026-10-12-memo.md -> org-git commit at that time: 34a6fda 2026-10-29T12:32:31Z']
+result: Output:
+total 24
+-rw-r--r--@ 1 aminalizadeh  wheel  1389 Oct 29 12:24 2026-10-05-memo.md
+-rw-r--r--@ 1 aminalizadeh  wheel   421 Oct 29 12:28 2026-10-05-ops-actions.md
+-rw-r--r--@ 1 aminalizadeh  wheel  1955 Oct 29 12:33 2026-10-12-memo.md
+
+
+Exit Code: 0
+
+[2026-10-29T12:45:06.637Z] call #63 turn 10 execute_bash
+COMMAND: cp org/lead/writer/work/2026-10-12-ops-actions.md deliverables/ && cmp org/lead/writer/work/2026-10-12-ops-actions.md deliverables/2026-10-12-ops-actions.md && ls -l deliverables
+source file(s): ['lead/writer/work/2026-10-12-ops-actions.md -> org-git commit at that time: 203a8f1 2026-10-29T12:37:04Z', 'lead/writer/work/2026-10-12-ops-actions.md -> org-git commit at that time: 203a8f1 2026-10-29T12:37:04Z']
+result: Output:
+total 32
+-rw-r--r--@ 1 aminalizadeh  wheel  1389 Oct 29 12:24 2026-10-05-memo.md
+-rw-r--r--@ 1 aminalizadeh  wheel   421 Oct 29 12:28 2026-10-05-ops-actions.md
+-rw-r--r--@ 1 aminalizadeh  wheel  1955 Oct 29 12:33 2026-10-12-memo.md
+-rw-r--r--@ 1 aminalizadeh  wheel   471 Oct 29 12:45 2026-10-12-ops-actions.md
+
+
+Exit Code: 0
+
+[2026-10-29T12:52:07.667Z] call #78 turn 12 execute_bash
+COMMAND: cp org/lead/writer/work/2026-10-19-memo.md deliverables/2026-10-19-memo.md && cmp org/lead/writer/work/2026-10-19-memo.md deliverables/2026-10-19-memo.md && ls -l deliverables
+source file(s): ['lead/writer/work/2026-10-19-memo.md -> org-git commit at that time: 66b7f94 2026-10-29T12:51:24Z', 'lead/writer/work/2026-10-19-memo.md -> org-git commit at that time: 66b7f94 2026-10-29T12:51:24Z']
+result: Output:
+total 40
+-rw-r--r--@ 1 aminalizadeh  wheel  1389 Oct 29 12:24 2026-10-05-memo.md
+-rw-r--r--@ 1 aminalizadeh  wheel   421 Oct 29 12:28 2026-10-05-ops-actions.md
+-rw-r--r--@ 1 aminalizadeh  wheel  1955 Oct 29 12:33 2026-10-12-memo.md
+-rw-r--r--@ 1 aminalizadeh  wheel   471 Oct 29 12:45 2026-10-12-ops-actions.md
+-rw-r--r--@ 1 aminalizadeh  wheel  1655 Oct 29 12:52 2026-10-19-memo.md
+
+
+Exit Code: 0
+
+[2026-10-29T12:56:31.406Z] call #87 turn 14 execute_bash
+COMMAND: cp org/lead/writer/work/2026-10-19-memo.md deliverables/2026-10-19-memo.md && cmp org/lead/writer/work/2026-10-19-memo.md deliverables/2026-10-19-memo.md && echo identical && ls -l deliverables/2026-10-19-memo.md
+source file(s): ['lead/writer/work/2026-10-19-memo.md -> org-git commit at that time: e45a874 2026-10-29T12:56:01Z', 'lead/writer/work/2026-10-19-memo.md -> org-git commit at that time: e45a874 2026-10-29T12:56:01Z']
+result: Output:
+identical
+-rw-r--r--@ 1 aminalizadeh  wheel  1506 Oct 29 12:56 deliverables/2026-10-19-memo.md
+
+
+Exit Code: 0
+
+[2026-10-29T12:59:35.650Z] call #96 turn 15 execute_bash
+COMMAND: cp org/lead/writer/work/2026-10-19-ops-actions.md deliverables/ && cmp org/lead/writer/work/2026-10-19-ops-actions.md deliverables/2026-10-19-ops-actions.md && ls -l deliverables
+source file(s): ['lead/writer/work/2026-10-19-ops-actions.md -> org-git commit at that time: ffecc52 2026-10-29T12:59:04Z', 'lead/writer/work/2026-10-19-ops-actions.md -> org-git commit at that time: ffecc52 2026-10-29T12:59:04Z']
+result: Output:
+total 48
+-rw-r--r--@ 1 aminalizadeh  wheel  1389 Oct 29 12:24 2026-10-05-memo.md
+-rw-r--r--@ 1 aminalizadeh  wheel   421 Oct 29 12:28 2026-10-05-ops-actions.md
+-rw-r--r--@ 1 aminalizadeh  wheel  1955 Oct 29 12:33 2026-10-12-memo.md
+-rw-r--r--@ 1 aminalizadeh  wheel   471 Oct 29 12:45 2026-10-12-ops-actions.md
+-rw-r--r--@ 1 aminalizadeh  wheel  1506 Oct 29 12:56 2026-10-19-memo.md
+-rw-r--r--@ 1 aminalizadeh  wheel   457 Oct 29 12:59 2026-10-19-ops-actions.md
+
+
+Exit Code: 0
+
+[2026-10-29T13:03:04.219Z] call #103 turn 16 execute_bash
+COMMAND: cp org/lead/writer/work/2026-10-26-memo.md deliverables/2026-10-26-memo.md && cmp org/lead/writer/work/2026-10-26-memo.md deliverables/2026-10-26-memo.md && echo identical && ls -l deliverables
+source file(s): ['lead/writer/work/2026-10-26-memo.md -> org-git commit at that time: ce8193d 2026-10-29T13:02:21Z', 'lead/writer/work/2026-10-26-memo.md -> org-git commit at that time: ce8193d 2026-10-29T13:02:21Z']
+result: Output:
+identical
+total 56
+-rw-r--r--@ 1 aminalizadeh  wheel  1389 Oct 29 12:24 2026-10-05-memo.md
+-rw-r--r--@ 1 aminalizadeh  wheel   421 Oct 29 12:28 2026-10-05-ops-actions.md
+-rw-r--r--@ 1 aminalizadeh  wheel  1955 Oct 29 12:33 2026-10-12-memo.md
+-rw-r--r--@ 1 aminalizadeh  wheel   471 Oct 29 12:45 2026-10-12-ops-actions.md
+-rw-r--r--@ 1 aminalizadeh  wheel  1506 Oct 29 12:56 2026-10-19-memo.md
+-rw-r--r--@ 1 aminalizadeh  wheel   457 Oct 29 12:59 2026-10-19-ops-actions.md
+-rw-r--r--@ 1 aminalizadeh  wheel  1223 Oct 29 13:03 2026-10-26-memo.md
+
+
+Exit Code: 0
+
+[2026-10-29T13:06:40.809Z] call #113 turn 17 execute_bash
+COMMAND: cp org/lead/writer/work/2026-11-02-memo.md deliverables/2026-11-02-memo.md && cmp org/lead/writer/work/2026-11-02-memo.md deliverables/2026-11-02-memo.md && echo identical && ls -l deliverables/2026-11-02-memo.md
+source file(s): ['lead/writer/work/2026-11-02-memo.md -> org-git commit at that time: 5557143 2026-10-29T13:06:02Z', 'lead/writer/work/2026-11-02-memo.md -> org-git commit at that time: 5557143 2026-10-29T13:06:02Z']
+result: Output:
+identical
+-rw-r--r--@ 1 aminalizadeh  wheel  1161 Oct 29 13:06 deliverables/2026-11-02-memo.md
+
+
+Exit Code: 0
+
+[2026-10-29T13:09:48.439Z] call #123 turn 18 execute_bash
+COMMAND: ls -l notes/2026-11-09.md; cat notes/2026-11-09.md; cp org/lead/writer/work/2026-11-09-memo.md deliverables/2026-11-09-memo.md && cmp org/lead/writer/work/2026-11-09-memo.md deliverables/2026-11-09-memo.md && echo identical
+source file(s): ['lead/writer/work/2026-11-09-memo.md -> org-git commit at that time: 2dfe55f 2026-10-29T13:08:58Z', 'lead/writer/work/2026-11-09-memo.md -> org-git commit at that time: 2dfe55f 2026-10-29T13:08:58Z']
+result: Output:
+-rw-r--r--@ 1 aminalizadeh  staff  994 Oct 27 13:49 notes/2026-11-09.md
+# Platform team weekly, Monday 9 November 2026
+
+Present: Priya, Sam, Lee, Marta, Dev.
+
+The quarterly review deck went out last week and the customer confirmed the review for Wednesday. ACTION: Marta to circulate the quarterly review notes by Nov 11.
+
+Dev asked for one more week with the old gateway: a partner integration still calls it directly. We decided to move the switch-off of the old gateway to Friday 20 November. ACTION: Dev to switch off the old gateway on Nov 20.
+
+Priya's rollout plan for the rate limiter 
+
+[2026-10-29T13:14:16.394Z] call #135 turn 20 execute_bash
+COMMAND: cp org/lead/writer/work/2026-11-09-memo.md deliverables/2026-11-09-memo.md && cmp org/lead/writer/work/2026-11-09-memo.md deliverables/2026-11-09-memo.md && echo identical && ls -l deliverables/2026-11-09-memo.md
+source file(s): ['lead/writer/work/2026-11-09-memo.md -> org-git commit at that time: 9efff5b 2026-10-29T13:13:45Z', 'lead/writer/work/2026-11-09-memo.md -> org-git commit at that time: 9efff5b 2026-10-29T13:13:45Z']
+result: Output:
+identical
+-rw-r--r--@ 1 aminalizadeh  wheel  875 Oct 29 13:14 deliverables/2026-11-09-memo.md
+
+
+Exit Code: 0
+
+[2026-10-29T13:23:24.452Z] call #151 turn 25 execute_bash
+COMMAND: cp org/lead/writer/work/2026-11-09-ops-actions.md deliverables/ && cmp org/lead/writer/work/2026-11-09-ops-actions.md deliverables/2026-11-09-ops-actions.md && echo identical && ls -l deliverables/2026-11-09-ops-actions.md
+source file(s): ['lead/writer/work/2026-11-09-ops-actions.md -> org-git commit at that time: c4cedc6 2026-10-29T13:22:46Z', 'lead/writer/work/2026-11-09-ops-actions.md -> org-git commit at that time: c4cedc6 2026-10-29T13:22:46Z']
+result: Output:
+identical
+-rw-r--r--@ 1 aminalizadeh  wheel  396 Oct 29 13:23 deliverables/2026-11-09-ops-actions.md
+
+
+Exit Code: 0
+
+any other write into the deliverable folder (not by the assistant): none can be seen from the assistant session; the folder holds:
+  2026-10-05-memo.md size 1389 mtime 12:24:13 local md5 0570090127a1d7244a6511bd6a0596c1
+  2026-10-05-ops-actions.md size 421 mtime 12:28:56 local md5 d613abf0e72e3052be27f3751e2e892f
+  2026-10-12-memo.md size 1955 mtime 12:33:22 local md5 b847cbcc38ef5216dde69d583e50567c
+  2026-10-12-ops-actions.md size 471 mtime 12:45:06 local md5 f43b89c4765741900f9e2052d5a63a0a
+  2026-10-19-memo.md size 1506 mtime 12:56:31 local md5 c6b455aa925e399e6e08f4a41dd6261b
+  2026-10-19-ops-actions.md size 457 mtime 12:59:35 local md5 f9dbe0371bd4bd9e8843dc43fe868af8
+  2026-10-26-memo.md size 1223 mtime 13:03:04 local md5 b9bd9e485f9f3e9ccf3cca99148909fd
+  2026-11-02-memo.md size 1161 mtime 13:06:40 local md5 819bfb05b5a313d49c2e072d79d38c9f
+  2026-11-09-memo.md size 875 mtime 13:14:16 local md5 44d386af2ace043828c1579db1771a94
+  2026-11-09-ops-actions.md size 396 mtime 13:23:24 local md5 b0f0bc8089deb7670dffd89e9ab65c08
+
+final ls -la:
+total 80
+drwxr-xr-x@ 12 aminalizadeh  wheel   384 Oct 29 13:23 .
+drwxr-xr-x@  7 aminalizadeh  wheel   224 Oct 29 12:19 ..
+-rw-r--r--@  1 aminalizadeh  wheel  1389 Oct 29 12:24 2026-10-05-memo.md
+-rw-r--r--@  1 aminalizadeh  wheel   421 Oct 29 12:28 2026-10-05-ops-actions.md
+-rw-r--r--@  1 aminalizadeh  wheel  1955 Oct 29 12:33 2026-10-12-memo.md
+-rw-r--r--@  1 aminalizadeh  wheel   471 Oct 29 12:45 2026-10-12-ops-actions.md
+-rw-r--r--@  1 aminalizadeh  wheel  1506 Oct 29 12:56 2026-10-19-memo.md
+-rw-r--r--@  1 aminalizadeh  wheel   457 Oct 29 12:59 2026-10-19-ops-actions.md
+-rw-r--r--@  1 aminalizadeh  wheel  1223 Oct 29 13:03 2026-10-26-memo.md
+-rw-r--r--@  1 aminalizadeh  wheel  1161 Oct 29 13:06 2026-11-02-memo.md
+-rw-r--r--@  1 aminalizadeh  wheel   875 Oct 29 13:14 2026-11-09-memo.md
+-rw-r--r--@  1 aminalizadeh  wheel   396 Oct 29 13:23 2026-11-09-ops-actions.md
+

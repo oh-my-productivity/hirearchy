@@ -1,0 +1,7 @@
+turn 1: running credits 1.24 (assistant 1.24 + org runs 0.00; 0 org runs)
+turn 2: running credits 3.85 (assistant 3.85 + org runs 0.00; 0 org runs)
+turn 3: running credits 8.78 (assistant 6.14 + org runs 2.64; 3 org runs)
+turn 4: running credits 13.79 (assistant 8.39 + org runs 5.41; 6 org runs)
+turn 5: running credits 18.07 (assistant 9.93 + org runs 8.14; 10 org runs)
+turn 6: running credits 24.64 (assistant 13.45 + org runs 11.19; 13 org runs)
+turn 7: running credits 26.66 (assistant 15.48 + org runs 11.19; 13 org runs)

@@ -1,0 +1,39 @@
+# P2 products record (step 0, setup-arm-c)
+recorded: 2026-10-29T04:04:33Z
+arm C worktree: created fresh by 'git worktree add --detach .worktrees/p2-arm-c aac6af1b', then 'uv sync'
+
+## arm R (/Volumes/workspace/hirearchy)
+sha: 3d6b28aa17a70a3f95854c73c2f479b6361a71de
+branch: main
+--- git status
+On branch main
+Your branch is ahead of 'origin/main' by 413 commits.
+  (use "git push" to publish your local commits)
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	docs/research/
+	studies/P2-retro-and-growth/
+
+nothing added to commit but untracked files present (use "git add" to track)
+--- git status --short
+?? docs/research/
+?? studies/P2-retro-and-growth/
+SKILL.md md5: 443e1bc4911aa4d6aaa6457e78f673c1
+--- uv run hirearchy --help (first line)
+usage: hirearchy [-h] [--root ROOT]
+
+## arm C (/Volumes/workspace/hirearchy/.worktrees/p2-arm-c)
+sha: aac6af1b47b721515106f03f1dd6eb6758da6e55
+--- git status
+Not currently on any branch.
+nothing to commit, working tree clean
+--- git status --short
+SKILL.md md5: b10238639f48ab351fa44a06aed03ffb
+--- uv run hirearchy --help (first line)
+usage: hirearchy [-h] [--root ROOT]
+
+## post-help re-check
+arm R status --short: ?? docs/research/ ?? studies/P2-retro-and-growth/ 
+arm C status --short: []
+freeze diff arm R: []

@@ -1,0 +1,46 @@
+######## hirearchy --root /tmp/hirearchy-p2/selfcheck-C-1793275756/org services (/Volumes/workspace/hirearchy/.worktrees/p2-arm-c)
+Services you can request (from your direct reports):
+- weekly-memo (offered by lead; contract v3, playbook v1): One memo of decisions and action items from one meeting's notes file.
+  inputs: notes_file* (the notes file name, e.g. 2026-10-05.md)   (* required)
+  each request: 12 runs; acceptance criteria (lead/services/weekly-memo/SERVICE.md):
+    C1: One memo per notes file, at most 400 words.
+    C2: The memo lists every decision and every commitment in the notes, informal ones included.
+    C3: The action items are a table Owner | Action | Due, with ISO dates and 'none' if there's no date.
+    C4: Decisions and actions use the notes' own words.
+    C5: The memo starts with a one-line 'Summary:', then the decisions, then the action items.
+    C6: A deadline the notes give in words is turned into its ISO date, counted from the meeting's day.
+  record: 4 request(s): 4 done, 0 failed, 0 open; 4 reworked; avg 6.8 runs; feedback 4 accept (4 after a reject), 0 reject
+  regression list (the client's rejections):
+    R1 (case 20261029T120921070812-root-dd62, about C5): "No, not right yet. Always start the memo with a one-line 'Summary:' of the meeting, then the decisions, then the action items."
+    R2 (case 20261029T120921129687-root-e6b6, about C6): "Not right yet: Sam's due should be 2026-10-21. Always turn a deadline the notes give in words into its date, counted from the meeting's day."
+    R3 (case 20261029T120921202160-root-cf1c, about C6): "Not right yet: Lee's due should be 2026-10-30."
+    R4 (case 20261029T120921501452-root-a43f, about C6): "Not right yet: Sam's due should be 2026-10-30."
+  playbook v1 (2026-10-29): "initial playbook"; 7 items (0 rules), none watched
+
+######## hirearchy --root /tmp/hirearchy-p2/selfcheck-C-1793275756/org progress (/Volumes/workspace/hirearchy/.worktrees/p2-arm-c)
+"weekly-memo: 2026-10-05.md" [service weekly-memo v1]: done. runs 3 of 12 (9 returned). last activity 3s ago. no artifacts. case total: 9 runs used: 6 by the user's requests, 3 by your relayed rework 20261029T120921079765-root-966f; 33 handed down (contract: 12 per request). The runs of your relayed rework are your own spend, not the user's: report them to the user as yours, and never ask the user to fund them. (task 20261029T120921070812-root-dd62)
+"weekly-memo: 2026-10-05.md" [service weekly-memo v1]: done. runs 3 of 12 (9 returned). last activity 3s ago. no artifacts. case total: 9 runs used: 6 by the user's requests, 3 by your relayed rework 20261029T120921079765-root-966f; 33 handed down (contract: 12 per request). The runs of your relayed rework are your own spend, not the user's: report them to the user as yours, and never ask the user to fund them. (task 20261029T120921079765-root-966f)
+"weekly-memo: 2026-10-05.md" [service weekly-memo v1]: done. runs 3 of 9 (6 returned). last activity 3s ago. no artifacts. case total: 9 runs used: 6 by the user's requests, 3 by your relayed rework 20261029T120921079765-root-966f; 33 handed down (contract: 12 per request). The runs of your relayed rework are your own spend, not the user's: report them to the user as yours, and never ask the user to fund them. (task 20261029T120921104047-root-0253)
+"Action list for the ops team (2026-10-05)": done. runs 1 of 4 (3 returned). last activity 3s ago. no artifacts. (task 20261029T120921119467-root-56da)
+"weekly-memo: 2026-10-12.md" [service weekly-memo v1]: done. runs 3 of 12 (9 returned). last activity 3s ago. no artifacts. case total: 6 runs used of 21 handed down (contract: 12 per request). (task 20261029T120921129687-root-e6b6)
+"weekly-memo: 2026-10-12.md" [service weekly-memo v1]: done. runs 3 of 9 (6 returned). last activity 3s ago. no artifacts. case total: 6 runs used of 21 handed down (contract: 12 per request). (task 20261029T120921166423-root-5f3e)
+"Action list for the ops team (2026-10-12)": done. runs 1 of 4 (3 returned). last activity 3s ago. no artifacts. (task 20261029T120921188435-root-d596)
+"weekly-memo: 2026-10-19.md" [service weekly-memo v1]: done. runs 3 of 12 (9 returned). last activity 3s ago. no artifacts. case total: 6 runs used of 21 handed down (contract: 12 per request). (task 20261029T120921202160-root-cf1c)
+"weekly-memo: 2026-10-19.md" [service weekly-memo v1]: done. runs 3 of 9 (6 returned). last activity 3s ago. no artifacts. case total: 6 runs used of 21 handed down (contract: 12 per request). (task 20261029T120921456932-root-7b42)
+"Action list for the ops team (2026-10-19)": done. runs 1 of 4 (3 returned). last activity 3s ago. no artifacts. (task 20261029T120921483324-root-87e8)
+"weekly-memo: 2026-10-26.md" [service weekly-memo v1]: done. runs 3 of 12 (9 returned). last activity 3s ago. no artifacts. case total: 6 runs used of 21 handed down (contract: 12 per request). (task 20261029T120921501452-root-a43f)
+"weekly-memo: 2026-10-26.md" [service weekly-memo v1]: done. runs 3 of 9 (6 returned). last activity 3s ago. no artifacts. case total: 6 runs used of 21 handed down (contract: 12 per request). (task 20261029T120921787406-root-1153)
+scheduler: stopped
+
+######## hirearchy --root /tmp/hirearchy-p2/selfcheck-C-1793275756/org status (/Volumes/workspace/hirearchy/.worktrees/p2-arm-c)
+root (human): unread 12, delegated 0
+  lead [Manager] idle  budget=0 open=0 delegated=0 unread=0 services: weekly-memo
+    writer [Writer] idle  budget=0 open=0 delegated=0 unread=0
+
+scheduler: stopped
+
+######## hirearchy --root /tmp/hirearchy-p2/selfcheck-C-1793275756/org health (/Volumes/workspace/hirearchy/.worktrees/p2-arm-c)
+2 agents, 2 flagged
+lead idle, budget 0/117, runs 21, open 0, done 12 failed 0 blocked 0 rework 0 (+5 by the client), escapes 2 of 11 judged (+2 not its: 2 contract-gap), re-checks after a FAIL 0 (author rework runs 0), runs/task 1.8, empty 21, last activity 4s ago | branch: runs 30, open 0, done 21, failed 0, blocked 0, rework 0, worst wasteful | !wasteful: 21 of 21 runs sent no message
+  writer idle, budget 0/18, runs 9, open 0, done 9 failed 0 blocked 0 rework 0, escapes 2 of 8 judged (+2 not its: 2 contract-gap), re-checks after a FAIL 0 (author rework runs 0), runs/task 1.0, empty 9, last activity 4s ago | !wasteful: 9 of 9 runs sent no message
+

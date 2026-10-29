@@ -1,0 +1,42 @@
+
+# --- scheduler started 2026-10-29 10:42:31Z: /Volumes/workspace/hirearchy/.venv/bin/hirearchy --root /private/tmp/hirearchy-p2/R1-1793270268/org run --until-done
+org: /private/tmp/hirearchy-p2/R1-1793270268/org
+lead: started run (1 message(s))
+lead/writer: started run (1 message(s))
+lead: run finished in 36s
+lead: started run (1 message(s))
+lead/writer: run finished in 38s
+lead: run finished in 50s
+scheduler exiting: finished: no open tasks
+
+# --- scheduler started 2026-10-29 10:45:36Z: /Volumes/workspace/hirearchy/.venv/bin/hirearchy --root /private/tmp/hirearchy-p2/R1-1793270268/org run --until-done
+org: /private/tmp/hirearchy-p2/R1-1793270268/org
+lead: started run (1 message(s))
+lead/writer: started run (1 message(s))
+lead: run finished in 42s
+lead: started run (1 message(s))
+lead/writer: run finished in 36s
+lead: run finished in 44s
+scheduler exiting: finished: no open tasks
+
+# --- scheduler started 2026-10-29 10:48:27Z: /Volumes/workspace/hirearchy/.venv/bin/hirearchy --root /private/tmp/hirearchy-p2/R1-1793270268/org run --until-done
+org: /private/tmp/hirearchy-p2/R1-1793270268/org
+lead: started run (1 message(s))
+lead/writer: started run (1 message(s))
+lead: run finished in 46s
+lead: started run (1 message(s))
+lead/writer: run finished in 30s
+lead: run stopped because kiro-cli did not set its effort: not charged, relaunched
+lead: started run (2 message(s))
+lead: run finished in 36s
+scheduler exiting: finished: no open tasks
+
+# --- scheduler started 2026-10-29 10:53:51Z: /Volumes/workspace/hirearchy/.venv/bin/hirearchy --root /private/tmp/hirearchy-p2/R1-1793270268/org run --until-done
+org: /private/tmp/hirearchy-p2/R1-1793270268/org
+lead: started run (5 message(s))
+lead/writer: started run (1 message(s))
+lead: run finished in 44s
+lead: started run (1 message(s))
+lead/writer: run finished in 34s
+lead: run finished in 36s
+scheduler exiting: finished: no open tasks

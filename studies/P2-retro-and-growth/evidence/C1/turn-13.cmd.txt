@@ -1,0 +1,1 @@
+env -u KIRO_HOME kiro-cli chat --v3 --no-interactive --trust-all-tools --resume --effort high --agent hirearchy-study-p2-C1-assistant 'Almost, but not right yet: '\''Marta keeps the agenda as sent'\'' isn'\''t an action item, nobody has to do anything there. Take that row out. The rest is fine. I don'\''t know anything about that rework - I didn'\''t ask for it.'

@@ -1,0 +1,1 @@
+env -u KIRO_HOME kiro-cli chat --v3 --no-interactive --trust-all-tools --resume --effort high --agent hirearchy-study-p2-C1-assistant 'Make the action list for this week. I don'\''t know anything about that rework - I didn'\''t ask for it. I'\''ll wait.'

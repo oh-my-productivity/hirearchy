@@ -1,0 +1,26 @@
+{
+ "reason": "B1.2: 3 cases failed C6",
+ "extend": {
+  "add_agents": [
+   {
+    "parent": "lead",
+    "name": "c6-checker",
+    "template": "reviewer",
+    "charter_extra": "Check C6 of weekly-memo on every request: A deadline the notes give in words is turned into its ISO date, counted from the meeting's day.. Report criteria met n of m like every check."
+   }
+  ],
+  "limits": [
+   {
+    "agent": "lead",
+    "max_children": 2
+   }
+  ],
+  "budgets": [
+   {
+    "owner": "lead",
+    "service": "weekly-memo",
+    "budget": 14
+   }
+  ]
+ }
+}

@@ -1,0 +1,16 @@
+Matches the notes. Copying.The action list for 12 October is at `/private/tmp/hirearchy-p2/C1-1793280632/deliverables/action-list-2026-10-12.md`. I copied it from the team's output and the two files are identical.
+
+I used the same format and rules as the 5 Oct list. I also recorded your "keep it" on the 12 Oct memo.
+
+- **Only the 12 Oct meeting:** met.
+- **Title with the date, then one Owner | Action | Due table, nothing else:** met.
+- **Every action item listed:** met, 5 of 5, including Sam's and Lee's informal ones, in the notes' wording.
+- **Owner, action and an ISO due date (or "none") on every row:** met. Sam's is 2026-10-21, as in your accepted memo. Lee's is "none" because the notes say only "during the demo week".
+- **At most 250 words:** met, 104 by `wc`.
+- **Nothing beyond the notes:** met.
+
+The team used 3 of the 8 runs I allowed, and 5 came back. As before, I gave the job straight to the lead and writer rather than showing you a new plan, since the team and rules haven't changed.
+
+I still can't explain the stray rework from earlier. It stays logged as mine, not yours.
+
+Keep it, or what should change?

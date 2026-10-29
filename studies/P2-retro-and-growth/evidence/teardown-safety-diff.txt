@@ -1,0 +1,154 @@
+1,3c1,3
+< label: preflight-before
+< date: Thu Oct 29 10:13:50 WET 2026
+< date_utc: 2026-10-29T10:13:50Z  epoch: 1793268830
+---
+> label: teardown-after
+> date: Thu Oct 29 15:14:45 WET 2026
+> date_utc: 2026-10-29T15:14:45Z  epoch: 1793286885
+6c6
+< MD5 (/Users/aminalizadeh/.kiro/settings/cli.json) = 8d75907973b5f3720d5bd4de5eaff7d8
+---
+> MD5 (/Users/aminalizadeh/.kiro/settings/cli.json) = f21924126253d2f829fd25ad189e4825
+8c8
+< MD5 (/Users/aminalizadeh/.kiro/settings/mcp.json) = 767d7d34ab140172ef643ffcc7ca39e1
+---
+> MD5 (/Users/aminalizadeh/.kiro/settings/mcp.json) = 9ca5275ee24dfa57e57c763e717e2387
+14c14
+< MD5 (/Users/aminalizadeh/.kiro/settings/workflow_survey_state.json) = 2079174b169f2a98397ed7871e972b03
+---
+> MD5 (/Users/aminalizadeh/.kiro/settings/workflow_survey_state.json) = f9e25c32a0322e98da5db1415bd6b839
+18c18
+< MD5 (/Users/aminalizadeh/.kiro/memories/memories.db) = ba97f447639184d1fb7da9eccf2b2e8c
+---
+> MD5 (/Users/aminalizadeh/.kiro/memories/memories.db) = 42d6e6eb81ad82e594664cc09474e8d8
+20c20
+< drwx------@  3 aminalizadeh  staff      96 Oct 29 10:13 .
+---
+> drwx------@  3 aminalizadeh  staff      96 Oct 29 15:14 .
+22c22
+< -rw-------@  1 aminalizadeh  staff  151552 Oct 29 05:13 memories.db
+---
+> -rw-------@  1 aminalizadeh  staff  163840 Oct 29 15:14 memories.db
+25c25
+< drwx------@  9 aminalizadeh  staff   288 Oct 28 04:39 .
+---
+> drwx------@  9 aminalizadeh  staff   288 Oct 29 14:41 .
+74c74
+< drwxr-x---+ 146 aminalizadeh  staff  4672 Oct 29 06:42 ..
+---
+> drwxr-x---+ 146 aminalizadeh  staff  4672 Oct 29 15:13 ..
+106a107,113
+> am-new.md
+> amend1-orig
+> amend1-r1v1-check
+> amend1-red
+> amend1-selfcheck-run.txt
+> amend1-selfcheck-run2.txt
+> C1-1793280632
+114a122,127
+> preflight-C-1793268897
+> preflight-R-1793268869
+> preflight-sched-C-1793269282
+> preflight-sched-C-1793269583
+> preflight-sched-R-1793269133
+> preflight-sched-R-1793269552
+126a140,145
+> probe-C1-1793269625
+> probe-C1-1793272643
+> probe-C1-1793273091
+> probe-C1-1793274205
+> probe-C1-1793275155
+> probe-C1-1793275657
+138a158,163
+> probe-C2-1793269884
+> probe-C2-1793272647
+> probe-C2-1793273095
+> probe-C2-1793274209
+> probe-C2-1793275159
+> probe-C2-1793275661
+150a176,181
+> probe-R1-1793269712
+> probe-R1-1793272644
+> probe-R1-1793273093
+> probe-R1-1793274207
+> probe-R1-1793275157
+> probe-R1-1793275658
+162a194,242
+> probe-R2-1793269796
+> probe-R2-1793272646
+> probe-R2-1793273094
+> probe-R2-1793274208
+> probe-R2-1793275158
+> probe-R2-1793275660
+> R1-1793270268
+> R1-1793275867
+> r1-finish.console.txt
+> r1-injection.console.txt
+> r1-t7-assistant.txt
+> r1-turn-01.console.txt
+> r1-turn-02.console.txt
+> r1-turn-03.console.txt
+> r1-turn-04.console.txt
+> r1-turn-05.console.txt
+> r1-turn-06.console.txt
+> r1-turn-07.console.txt
+> r1b-finish.console.txt
+> r1b-injection.console.txt
+> r1b-memblock.txt
+> r1b-turn-01.console.txt
+> r1b-turn-02.console.txt
+> r1b-turn-03.console.txt
+> r1b-turn-04.console.txt
+> r1b-turn-05.console.txt
+> r1b-turn-06.console.txt
+> r1b-turn-07.console.txt
+> r1b-turn-08.console.txt
+> r1b-turn-09.console.txt
+> r1b-turn-10.console.txt
+> r1b-turn-11.console.txt
+> r1b-turn-12.console.txt
+> r1b-turn-13.console.txt
+> r1b-turn-14.console.txt
+> r1b-turn-15.console.txt
+> r1b-turn-16.console.txt
+> r1b-turn-17.console.txt
+> r1b-turn-18.console.txt
+> r1b-turn-19.console.txt
+> r1b-turn-20.console.txt
+> r1b-turn-21.console.txt
+> r1b-turn-22.console.txt
+> r1b-turn-23.console.txt
+> r1b-turn-24.console.txt
+> r1b-turn-25.console.txt
+> r1b-turn-26.console.txt
+> r1b-turn-27.console.txt
+> r1b-turn-28.console.txt
+163a244,253
+> review-a1
+> rulings-cases
+> rulings-green
+> rulings-green-amend1.out
+> rulings-orig
+> rulings-red
+> rulings-red-amend1.out
+> rulings-sc.out
+> rulings-sec4.md
+> rulings-selfcheck-run.txt
+167a258
+> selfcheck-amend1
+181a273,277
+> selfcheck-C-1793272741
+> selfcheck-C-1793273190
+> selfcheck-C-1793274303
+> selfcheck-C-1793275254
+> selfcheck-C-1793275756
+202a299,303
+> selfcheck-R-1793272658
+> selfcheck-R-1793273107
+> selfcheck-R-1793274221
+> selfcheck-R-1793275171
+> selfcheck-R-1793275673
+209a311,312
+> sra-d.md
+> sra-new.md

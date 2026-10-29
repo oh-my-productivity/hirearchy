@@ -1,0 +1,19 @@
+{
+ "files": [
+  "p2/oneoffs.json",
+  "msgs/sent/",
+  "org-files/retros.json",
+  "p2/lena.json",
+  "p2/applies.json",
+  "services-all/",
+  "p2/retro-replies/",
+  "end.txt"
+ ],
+ "reason": "B1.1 taken in B2",
+ "steps": [
+  "1-2: repeats ['20261029T120757850378-root-ed57', '20261029T120757916711-root-8082', '20261029T120758245555-root-635c'], third judged at 2026-10-29T12:07:58.254903+00:00",
+  "3-4: B1.1 service|lead|20261029T120757850378-root-ed57",
+  "6-7: applied bc5deaa8032b; lead--action-list-for v1 approved_in change bc5deaa8032b"
+ ],
+ "verdict": "PASS"
+}

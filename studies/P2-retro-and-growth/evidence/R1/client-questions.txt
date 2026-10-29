@@ -1,0 +1,54 @@
+# client questions (protocol 7.2); facts only
+
+Result messages root received (lead -> root), with the product parser's items (hirearchy.kernel._text.client_questions):
+- id 20261029T125155034021-lead-6826 folder=inbox created=2026-10-29T12:51:55+00:00 answers(reply_to)=20261029T125003917827-root-5858 status=done from=lead
+  raw 'Questions for the client' text: Near miss: the first version guessed hedged dates for Lee and Dev; asking the client via Questions for the client settled them without guessing. Prevent: keep hedged dates as none + Unclear until the client decides.
+  parsed items (0): []
+- id 20261029T125622482573-lead-1839 folder=inbox created=2026-10-29T12:56:22+00:00 answers(reply_to)=20261029T125435379557-root-7468 status=done from=lead
+  raw 'Questions for the client' text: (none)
+  parsed items (0): []
+- id 20261029T125926269885-lead-9087 folder=inbox created=2026-10-29T12:59:26+00:00 answers(reply_to)=20261029T125747104778-root-4a85 status=done from=lead
+  raw 'Questions for the client' text: (none)
+  parsed items (0): []
+- id 20261029T130247298833-lead-9a3f folder=inbox created=2026-10-29T13:02:47+00:00 answers(reply_to)=20261029T130102202128-root-c11b status=done from=lead
+  raw 'Questions for the client' text: (none)
+  parsed items (0): []
+- id 20261029T130626187472-lead-d3a9 folder=inbox created=2026-10-29T13:06:26+00:00 answers(reply_to)=20261029T130435793673-root-f5c0 status=done from=lead
+  raw 'Questions for the client' text: (none)
+  parsed items (0): []
+- id 20261029T130931118643-lead-1fdb folder=inbox created=2026-10-29T13:09:31+00:00 answers(reply_to)=20261029T130759453335-root-5699 status=done from=lead
+  raw 'Questions for the client' text: (none)
+  parsed items (0): []
+- id 20261029T131404638412-lead-898a folder=inbox created=2026-10-29T13:14:04+00:00 answers(reply_to)=20261029T131242430542-root-0f42 status=done from=lead
+  raw 'Questions for the client' text: (none)
+  parsed items (0): []
+- id 20261029T132313783522-lead-b5cc folder=inbox created=2026-10-29T13:23:13+00:00 answers(reply_to)=20261029T132116440288-root-b3ec status=done from=lead
+  raw 'Questions for the client' text: (none)
+  parsed items (0): []
+- id 20261029T121811107223-lead-a9c6 folder=read created=2026-10-29T12:18:11+00:00 answers(reply_to)=20261029T121630346755-root-d28e status=done from=lead
+  raw 'Questions for the client' text: (none)
+  parsed items (0): []
+- id 20261029T121950652283-lead-10eb folder=read created=2026-10-29T12:19:50+00:00 answers(reply_to)=20261029T121913557638-root-5ea7 status=done from=lead
+  raw 'Questions for the client' text: (none)
+  parsed items (0): []
+- id 20261029T122352949270-lead-971a folder=read created=2026-10-29T12:23:52+00:00 answers(reply_to)=20261029T122228932381-root-6eed status=done from=lead
+  raw 'Questions for the client' text: (none)
+  parsed items (0): []
+- id 20261029T122845282288-lead-c0b5 folder=read created=2026-10-29T12:28:45+00:00 answers(reply_to)=20261029T122710588867-root-c1b8 status=done from=lead
+  raw 'Questions for the client' text: (none)
+  parsed items (0): []
+- id 20261029T123256426255-lead-9938 folder=read created=2026-10-29T12:32:56+00:00 answers(reply_to)=20261029T123006918979-root-a9da status=done from=lead
+  raw 'Questions for the client' text: (none)
+  parsed items (0): []
+- id 20261029T124131403407-lead-f23b folder=read created=2026-10-29T12:41:31+00:00 answers(reply_to)=20261029T123457206032-root-cabf status=done from=lead
+  raw 'Questions for the client' text: (none)
+  parsed items (0): []
+- id 20261029T124844444156-lead-26cb folder=read created=2026-10-29T12:48:44+00:00 answers(reply_to)=20261029T124626096325-root-750e status=done from=lead
+  raw 'Questions for the client' text: Questions for the client:
+- Lee's sign-off (C5): notes say 'probably by end of next week'. I set Due to none and listed it under Unclear because the date is hedged. Do you want a date (2026-10-30) there?
+- Dev's freeze (C5): the notes say Oct 24, which is a Saturday. I kept 2026-10-24 as written and flagged it under Unclear.
+  parsed items (2): ["Lee's sign-off (C5): notes say 'probably by end of next week'. I set Due to none and listed it under Unclear because the date is hedged. Do you want a date (2026-10-30) there?", "Dev's freeze (C5): the notes say Oct 24, which is a Saturday. I kept 2026-10-24 as written and flagged it under Unclear."]
+
+progress replies the assistant received that contain 'for the client: ask the user before you copy or deliver':
+- call #70 2026-10-29T12:48:45.072Z turn 11 hirearchy::progress: ['"Memo for the 19 October 2026 meeting" [service weekly-meeting-memo v2]: done. runs 4 of 12 (10 returned). last activity 0s ago. artifacts withheld (ask first). 2 questions for the client: ask the user before you copy or deliver. no feedback yet. (task 20261029T124626096325-root-750e)']
+count: 1

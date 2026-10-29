@@ -1,0 +1,17 @@
+prompt_sizes R1: owner lead (detected from root tasks), 9 runs
+
+prompt bytes: first 19553, max 30549, last 29212, last minus first 9659
+Reflect section words: min 497, max 497 (1 sections)
+reference E3: 20.2 KB -> 29.9 KB, 452-679 words
+
+  20261029T104232113703  bytes=19553  reflect=no  reflect_words=0
+  20261029T104334447841  bytes=23771  reflect=no  reflect_words=0
+  20261029T104537197281  bytes=20196  reflect=no  reflect_words=0
+  20261029T104635546597  bytes=23048  reflect=no  reflect_words=0
+  20261029T104828297280  bytes=20721  reflect=no  reflect_words=0
+  20261029T104930658411  bytes=24302  reflect=no  reflect_words=0
+  20261029T104942826101  bytes=24686  reflect=no  reflect_words=0
+  20261029T105351980348  bytes=30549  reflect=yes  reflect_words=497
+  20261029T105456419051  bytes=29212  reflect=no  reflect_words=0
+
+lead-prompt-sizes.txt: not present

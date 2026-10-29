@@ -1,0 +1,21 @@
+{
+ "counts": {
+  "ext_no": 0,
+  "unnominated": 0
+ },
+ "files": [
+  "rederived/p2/d8.json",
+  "retro/end.since-apply.json",
+  "p2/applies.json",
+  "p2/unnominated.json",
+  "org-files/retros.json",
+  "org-copy/"
+ ],
+ "reason": "every change labelled; A-P led to no item and no structural change",
+ "steps": [
+  "changes after T0: 5; inside the plan 0; charter labels by parent 0 (X3's)",
+  "memo 5's request at 2026-10-29T12:08:56.955260+00:00",
+  "step 3 (reported): unnominated extensions 0 []; EXT-NO lines 0"
+ ],
+ "verdict": "PASS"
+}

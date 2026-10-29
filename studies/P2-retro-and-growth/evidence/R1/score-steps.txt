@@ -1,0 +1,12 @@
+# score_stream.sh R1 started 2026-10-29T14:46:58Z
+exit 0: python3 -B /Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/harness/extract_p2.py /Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/R1 --checks -> score-extract_p2-checks.txt
+exit 0: zsh /Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/harness/watch_views.sh /Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/R1 -> score-watch_views.txt
+exit 0: python3 -B /Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/harness/score_p2.py /Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/R1 --out /Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/R1/measures --am-time 2026-10-29T13:10:53Z -> measures/score_p2-output.txt
+exit 0: python3 -B /Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/harness/gate_p1.py /Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/R1 -> score-gate_p1.txt
+# score_stream.sh R1 ended 2026-10-29T14:47:01Z; failed: 0
+# score_stream.sh R1 started 2026-10-29T15:34:56Z
+exit 0: python3 -B /Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/harness/extract_p2.py /Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/R1 --checks -> score-extract_p2-checks.txt
+exit 0: zsh /Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/harness/watch_views.sh /Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/R1 -> score-watch_views.txt
+exit 0: python3 -B /Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/harness/score_p2.py /Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/R1 --out /Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/R1/measures --am-time 2026-10-29T13:10:53Z -> measures/score_p2-output.txt
+exit 0: python3 -B /Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/harness/gate_p1.py /Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/R1 -> score-gate_p1.txt
+# score_stream.sh R1 ended 2026-10-29T15:34:58Z; failed: 0

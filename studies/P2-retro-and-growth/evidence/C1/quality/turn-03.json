@@ -1,0 +1,318 @@
+{
+  "moved_past": [],
+  "nested": [],
+  "notes": [],
+  "one_off": null,
+  "schema": 1,
+  "services": [
+    {
+      "alarms": {
+        "cost": {
+          "cases": [],
+          "compared": 1,
+          "judged": 0,
+          "skipped": [],
+          "state": "n/a"
+        },
+        "repeat": {
+          "fired": [],
+          "judged": 0,
+          "not_counted": {},
+          "state": "n/a",
+          "subjects": {},
+          "window": []
+        }
+      },
+      "budget": 12,
+      "cases": [
+        {
+          "assignee": "lead",
+          "budget": 12,
+          "credited": 1,
+          "cut": false,
+          "first": {
+            "outcome": "none",
+            "superseded_by": null,
+            "superseded_source": null,
+            "task": "20261029T133518543841-root-4955"
+          },
+          "id": "20261029T133518543841-root-4955",
+          "ratio": "0.25",
+          "relayed_runs": 0,
+          "runs": 3,
+          "runs_unknown": "",
+          "spend": 3,
+          "stalled": false,
+          "state": "done",
+          "tasks": 1,
+          "title": "Memo for the 5 October 2026 platform team weekly",
+          "top_ups": [],
+          "user_approved": 12,
+          "user_cost": 3
+        }
+      ],
+      "client": "root",
+      "client_kind": "human",
+      "contract": 1,
+      "deliveries": {
+        "judged": 0,
+        "legacy_verdicts": 0,
+        "neither": [],
+        "not_as_delivered": [],
+        "not_on_a_delivery": [],
+        "relayed_only": [],
+        "total": 1,
+        "unjudged_cases": [
+          "20261029T133518543841-root-4955"
+        ],
+        "unseen_relayed": []
+      },
+      "error": "",
+      "escapes": [],
+      "files_error": "",
+      "first_deliveries": {
+        "accepted": 0,
+        "neither": 0,
+        "never_delivered": 0,
+        "no_verdict": 1,
+        "rejected": 0,
+        "superseded": 0
+      },
+      "history": {
+        "known": true,
+        "skipped": 0,
+        "truncated": false
+      },
+      "owner": "lead",
+      "playbook": 1,
+      "service": "weekly-meeting-memo",
+      "stalled_error": "",
+      "timeline": [
+        {
+          "adds": [
+            "C1",
+            "C2",
+            "C3",
+            "C4",
+            "C5",
+            "C6",
+            "C7",
+            "C8"
+          ],
+          "answers": null,
+          "basis": "first",
+          "by": "root",
+          "confirmed": [],
+          "kind": "contract",
+          "not_confirmed": [],
+          "removes": [],
+          "version": 1,
+          "when": "2026-10-29T13:35:18Z"
+        },
+        {
+          "agent_written": true,
+          "basis": "client",
+          "beyond": null,
+          "by": "root",
+          "changed": 10,
+          "cited": [],
+          "evidence": [],
+          "evidence_other": 0,
+          "item": "",
+          "item_kind": "",
+          "kind": "playbook",
+          "lines": [
+            {
+              "own_words": false,
+              "text": "## Steps"
+            },
+            {
+              "own_words": false,
+              "text": "1. [P1] Read the request in your prompt: its inputs, every acceptance criterion and the deliverable. The criteria come from the contract and can only be met, never changed; copy the relevant ones verbatim into every task you delegate."
+            },
+            {
+              "own_words": false,
+              "text": "2. [P2] Delegate to `writer` (Writer) with `budget=3`: its part of the request, with the criteria it must meet."
+            },
+            {
+              "own_words": false,
+              "text": "3. [P3] Read the final artifact yourself and check it against EVERY criterion of the request, quoting counts from your own `read` output."
+            },
+            {
+              "own_words": false,
+              "text": "4. [P4] Report: `done` only if every criterion is met (else `blocked` with the deviation and a recommended decision). Name the deliverable's path (the assistant copies it to /private/tmp/hirearchy-p2/C1-1793280632/deliverables) and pass `lessons` as an after-action review: Expected / Happened / Caught at / Cause / Prevent (the system cause, not a person), or Near miss when nothing went wrong."
+            },
+            {
+              "own_words": false,
+              "text": "## Budget plan"
+            },
+            {
+              "own_words": false,
+              "text": "- [P5] Request budget: 12 runs (the contract's). Hand down no more than this up front, each with `budget=` set explicitly:"
+            },
+            {
+              "own_words": false,
+              "text": "- [P6] writer: 3 runs (2 work + 1 rework or re-check)"
+            },
+            {
+              "own_words": false,
+              "text": "- [P7] you (lead): keep 9 runs: your own 5 (plan, process each result, final check, report, one rework cycle) and 4 of slack."
+            },
+            {
+              "own_words": false,
+              "text": "Unspent runs return to your parent with your final report."
+            }
+          ],
+          "lines_more": 0,
+          "op": "first",
+          "own_words": null,
+          "removed": 0,
+          "restores": null,
+          "tagged": null,
+          "untagged": null,
+          "version": 1,
+          "when": "2026-10-29T13:35:18Z"
+        }
+      ],
+      "unit": "case",
+      "verifiers": [
+        {
+          "addr": "lead/writer",
+          "escapes": {
+            "counted": {},
+            "not_its": {}
+          },
+          "fails_error": "",
+          "judged": 0,
+          "pass_precision": [
+            0,
+            0
+          ],
+          "rechecks": 0,
+          "rework_runs": 0
+        }
+      ],
+      "watch": [
+        {
+          "carried": "",
+          "clean": 0,
+          "item": "P1",
+          "k": 0,
+          "kind": "step",
+          "pending": [],
+          "r": [
+            0,
+            0
+          ],
+          "related": [],
+          "since": null,
+          "state": "kept",
+          "waiting": 0
+        },
+        {
+          "carried": "",
+          "clean": 0,
+          "item": "P2",
+          "k": 0,
+          "kind": "step",
+          "pending": [],
+          "r": [
+            0,
+            0
+          ],
+          "related": [],
+          "since": null,
+          "state": "kept",
+          "waiting": 0
+        },
+        {
+          "carried": "",
+          "clean": 0,
+          "item": "P3",
+          "k": 0,
+          "kind": "step",
+          "pending": [],
+          "r": [
+            0,
+            0
+          ],
+          "related": [],
+          "since": null,
+          "state": "kept",
+          "waiting": 0
+        },
+        {
+          "carried": "",
+          "clean": 0,
+          "item": "P4",
+          "k": 0,
+          "kind": "step",
+          "pending": [],
+          "r": [
+            0,
+            0
+          ],
+          "related": [],
+          "since": null,
+          "state": "kept",
+          "waiting": 0
+        },
+        {
+          "carried": "",
+          "clean": 0,
+          "item": "P5",
+          "k": 0,
+          "kind": "step",
+          "pending": [],
+          "r": [
+            0,
+            0
+          ],
+          "related": [],
+          "since": null,
+          "state": "kept",
+          "waiting": 0
+        },
+        {
+          "carried": "",
+          "clean": 0,
+          "item": "P6",
+          "k": 0,
+          "kind": "step",
+          "pending": [],
+          "r": [
+            0,
+            0
+          ],
+          "related": [],
+          "since": null,
+          "state": "kept",
+          "waiting": 0
+        },
+        {
+          "carried": "",
+          "clean": 0,
+          "item": "P7",
+          "k": 0,
+          "kind": "step",
+          "pending": [],
+          "r": [
+            0,
+            0
+          ],
+          "related": [],
+          "since": null,
+          "state": "kept",
+          "waiting": 0
+        }
+      ]
+    }
+  ],
+  "thresholds": {
+    "cost_ratio": "1.25",
+    "min_judged": 3,
+    "repeat_failures": 2,
+    "repeat_window": 3,
+    "source": "defaults"
+  }
+}

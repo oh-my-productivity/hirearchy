@@ -1,0 +1,71 @@
+{
+ "item1": {
+  "R1": {
+   "credits": "116.82",
+   "over_250": false
+  },
+  "C1": {
+   "credits": "102.76",
+   "over_250": false
+  }
+ },
+ "item2": {
+  "brief": "B1",
+  "at": "2026-10-29T13:15:39.040747+00:00",
+  "items": [
+   "clarify",
+   "service"
+  ],
+  "service_due": true,
+  "checker_due": false,
+  "held_back (reported)": [
+   "clarify"
+  ],
+  "x2_not_reached (reported)": true,
+  "holds": false,
+  "which": []
+ },
+ "item3": [
+  "R1: gate_p1 empty-argument calls: NOT DETERMINED (FAIL-CLOSED: no total in empty-calls.txt)",
+  "R1: gate_p1 delivered versions (P2's form): NOT DETERMINED (FAIL-CLOSED: no delivered version was scored (0 of 0))",
+  "C1: gate_p1 empty-argument calls: NOT DETERMINED (FAIL-CLOSED: no total in empty-calls.txt)",
+  "C1: gate_p1 delivered versions (P2's form): NOT DETERMINED (FAIL-CLOSED: no delivered version was scored (0 of 0))"
+ ],
+ "item4": {
+  "R1": {
+   "valid": true,
+   "reason": "stream step's record (not a score): ended retro-2-done at turn 28; no H rule broken; turn 9 had an engine error (ClientNetworkError, no reply) handled by manager-decision-row-R1-t9.md (continue with L-WAIT); memories.db changed once, identified by the manager as the owner's unrelated session sess_e1ee9b77, memories block checked clean; the scoring step decides",
+   "arm_contrast": true,
+   "before_failure": {},
+   "ended_by_ruling": null,
+   "stopped": null,
+   "engine_error_turns": [
+    9
+   ]
+  },
+  "C1": {
+   "stopped": null,
+   "harness_failures": [
+    "empty-calls-and-settings-change.md",
+    "facilitator-slip-retro-ask-missing-at-L3-t22.md",
+    "memories-db-change-during-C1.md"
+   ]
+  }
+ },
+ "information": [
+  "R1: P2-E: MISMATCH (5 finding(s): PF-0 0, PF-1 0, new 5)",
+  "R1: gate_p1 G1(a): NOT DETERMINED (steps outside 8.1's paths to explain: [(('weekly-meeting-memo', 'P8'), 'kept', 'new')])",
+  "R1: gate_p1 G1(d): NOT DETERMINED (judged: measures/judged.json g1_d_judged; keyword hits none)",
+  "R1: gate_p1 injected lessons: NOT DETERMINED (judged: measures/judged.json g1_d_judged; keyword hits none)",
+  "R1: gate_p1 deliveries by copy: NOT DETERMINED (judged: measures/judged.json d8_presented_deliveries)",
+  "R1: 181 view mismatch line(s) in R1/watch/lead--ops-action-list/watch-mismatches.txt",
+  "R1: 41 view mismatch line(s) in R1/watch/lead--weekly-meeting-memo/watch-mismatches.txt",
+  "C1: gate_p1 G1(a): NOT DETERMINED (steps outside 8.1's paths to explain: [(('weekly-meeting-memo', 'P8'), 'kept', 'new')])",
+  "C1: gate_p1 G1(d): NOT DETERMINED (judged: measures/judged.json g1_d_judged; keyword hits none)",
+  "C1: gate_p1 injected lessons: NOT DETERMINED (judged: measures/judged.json g1_d_judged; keyword hits none)",
+  "C1: gate_p1 deliveries by copy: NOT DETERMINED (judged: measures/judged.json d8_presented_deliveries)",
+  "C1: 38 view mismatch line(s) in C1/watch/lead--weekly-meeting-memo/watch-mismatches.txt"
+ ],
+ "facts": [],
+ "stop": true
+}

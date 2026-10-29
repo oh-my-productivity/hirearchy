@@ -1,0 +1,1 @@
+session_start holds a <memories> block: yes; length 7117 chars (JSON-decoded), md5 ce74d5065ceb0dffa725a52e1a5ac197; read once at session start (one block in the session store); contamination check: none (memories-block-check.txt)

@@ -1,0 +1,8 @@
+memories-block check, C1, after turn 1, before Lena's turn-2 line, 2026-10-29T13:33Z (manager-decision-memories-before-R1.md rule, carried by condition (c) of manager-decision-row-R1-t9.md section 2)
+blocks found in the session store: 1 distinct: 1
+block 0: length 7117 chars (JSON-decoded), md5 ce74d5065ceb0dffa725a52e1a5ac197
+matched words: none
+words searched (case-insensitive except P2, ACT-REQ, Lena, K<n>, R1, C1, arms R/C): P2, study, Lena, facilitator, decision table, K<n>, answer key, harness, trap, ACT-REQ, retro 1/2, amendment, arms R/C, R1, C1, hirearchy-study, manager. Result: none.
+extra look (lines of the block with hirearchy / workflow / protocol / study / manager / P2): three unrelated user-preference titles (a narrated-video workflow, a katana video project, sub-agent delegation) and the repo name oh-my-productivity/hirearchy (2 memories): not about the study. Not a stop.
+Note: R1's block was 6903 chars (md5 2a977c30...); C1's is 7117 chars (md5 ce74d506...). The two blocks differ, because memories.db changed (owner's session sess_e1ee9b77, 12:31Z) after R1's session start. The assistant-layer contrast is read only for pairs whose blocks match (manager-decision-memories-before-R1.md); reported.
+memories.db md5 at C1's setup: 6e6d7471ecc08b81a051d7862de7f64f; after turn 1: 6e6d7471ecc08b81a051d7862de7f64f (turn-01-after ambient snapshot). The block's text is in the assistant session store (assistant-session-messages.jsonl), not copied here.

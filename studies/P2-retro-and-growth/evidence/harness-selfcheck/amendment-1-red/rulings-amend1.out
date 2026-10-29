@@ -1,0 +1,34 @@
+ok  (A) turn.sh: a first snapshot at 2020-01-01T00:00:00.000000+00:00, before the turn's end + boundary: STOP
+ok  (A) turn.sh: an unparseable snapshot time: STOP (fail closed)
+ok  (A) turn.sh: a first snapshot at 2099-01-01T00:00:00.000000+00:00, after the boundary: checked, with the comparison
+ok  (A) R1 v1's turn-3 record form (+00:00, 1.17 s after the boundary): checked, with the comparison
+ok  (A) a +00:00 snapshot 0.1 s before the boundary: STOP
+ok  (A) a Z time still parses: checked
+ok  (A) the snapshot's own `no org yet` record: checked (no snapshot taken: no org yet)
+ok  (A) no record of this turn's snapshot at all: STOP (fail closed)
+ok  (A) no quality/calls.txt: STOP (fail closed)
+ok  (A) an unparseable turn end in turn-times.txt: STOP (fail closed)
+ok  (B) finish_stream.sh names its extract command (EM_ARGV)
+ok  (B) an effort-stopped run's session with no messages.jsonl: the finish's extract exits 0 and writes cost.txt
+ok  (B) cost.txt counts the stop: 1 (boss-scribe's run -> sess_boss-scribe)
+ok  (B) cost_total.py's figure from that cost.txt: 3.50 (assistant 1.00 + org runs 2.50; the stop 0 credits, no estimate)
+ok  (B) the stopped run stays matched to its session (credits 0.000000), so no run counts as unmatched
+ok  (B) the same folder with no effort mark in its run log: fail closed (exit != 0, no cost.txt; the extract's file kept as cost.txt.unverified with a FAIL-CLOSED line naming the session)
+ok  (B) P1's extract_mechanical.py is byte-identical to its pin (73b27e25bd18ea9ec17ad5e64c7f6d1c)
+ok  (C) injection.sh writes S/injection/window.txt from the log, with no facilitator step: `2026-10-29T10:48:27 2026-10-29T10:50:27` (E7's form)
+ok  (C) a log with no window end: no window.txt, and a NOTE line
+ok  (C) `injection.sh --stop` writes no window.txt
+ok  (C) an existing different window.txt is kept, with a STOP line
+ok  (D) D1: no amendment file: the gate passes (protocol.md, the standing rules and MD5SUMS match)
+ok  (D) D1: both amendment files with matching .md5 files: the gate passes
+MISMATCH  (D) D1: protocol-amendment-1.md without its .md5: the gate fails, naming it
+      got: rc 0; 
+MISMATCH  (D) D1: standing-rules-streams-amendment-1.md with a different .md5: the gate fails, naming it
+      got: rc 0; 
+MISMATCH  (D) D1: standing-rules-streams-amendment-1.md without its .md5: the gate fails
+      got: rc 0; 
+MISMATCH  (D) D1: a later protocol-amendment-2.md without its .md5 is gated too (the glob): the gate fails
+      got: rc 0; 
+MISMATCH  (D) D1: protocol-amendment-1.md edited after its .md5 was written: the gate fails
+      got: rc 0; 
+amend1_cases: 23 of 28 ok

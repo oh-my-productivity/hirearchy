@@ -1,0 +1,24 @@
+{
+ "T12": "SAME",
+ "files": [
+  "rederived/p2/as-of-B*/signals.json",
+  "org-files/retros.json",
+  "p2/oneoffs.json",
+  "rederived/p2/ledger.json",
+  "retro/turn-*.json"
+ ],
+ "reason": "2 record(s)",
+ "rows": [
+  [
+   "B1",
+   "PASS",
+   "9 candidate(s)"
+  ],
+  [
+   "B2",
+   "PASS",
+   "6 candidate(s)"
+  ]
+ ],
+ "verdict": "PASS"
+}

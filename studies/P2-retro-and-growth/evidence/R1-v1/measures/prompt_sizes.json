@@ -1,0 +1,109 @@
+{
+  "bytes": {
+    "first": 19553,
+    "last": 29212,
+    "last_minus_first": 9659,
+    "max": 30549,
+    "runs": 9
+  },
+  "could_not_parse": [],
+  "label": "R1",
+  "lead_prompt_sizes_txt": {
+    "compared": 0,
+    "differences": [],
+    "present": false
+  },
+  "lead_runs": [
+    {
+      "bytes": 19553,
+      "file": "run-logs/lead/20261029T104232113703.log",
+      "reflect": false,
+      "reflect_words": 0,
+      "stamp": "20261029T104232113703"
+    },
+    {
+      "bytes": 23771,
+      "file": "run-logs/lead/20261029T104334447841.log",
+      "reflect": false,
+      "reflect_words": 0,
+      "stamp": "20261029T104334447841"
+    },
+    {
+      "bytes": 20196,
+      "file": "run-logs/lead/20261029T104537197281.log",
+      "reflect": false,
+      "reflect_words": 0,
+      "stamp": "20261029T104537197281"
+    },
+    {
+      "bytes": 23048,
+      "file": "run-logs/lead/20261029T104635546597.log",
+      "reflect": false,
+      "reflect_words": 0,
+      "stamp": "20261029T104635546597"
+    },
+    {
+      "bytes": 20721,
+      "file": "run-logs/lead/20261029T104828297280.log",
+      "reflect": false,
+      "reflect_words": 0,
+      "stamp": "20261029T104828297280"
+    },
+    {
+      "bytes": 24302,
+      "file": "run-logs/lead/20261029T104930658411.log",
+      "reflect": false,
+      "reflect_words": 0,
+      "stamp": "20261029T104930658411"
+    },
+    {
+      "bytes": 24686,
+      "file": "run-logs/lead/20261029T104942826101.log",
+      "reflect": false,
+      "reflect_words": 0,
+      "stamp": "20261029T104942826101"
+    },
+    {
+      "bytes": 30549,
+      "file": "run-logs/lead/20261029T105351980348.log",
+      "reflect": true,
+      "reflect_words": 497,
+      "stamp": "20261029T105351980348"
+    },
+    {
+      "bytes": 29212,
+      "file": "run-logs/lead/20261029T105456419051.log",
+      "reflect": false,
+      "reflect_words": 0,
+      "stamp": "20261029T105456419051"
+    }
+  ],
+  "owner": "lead",
+  "owner_detected_by": "root tasks",
+  "reference_E3": {
+    "first_kb": 20.2,
+    "peak_kb": 29.9,
+    "reflect_words_max": 679,
+    "reflect_words_min": 452
+  },
+  "reflect_words": {
+    "max": 497,
+    "min": 497,
+    "sections": 1
+  },
+  "script": {
+    "md5": "1faad9255523d37a86795838a006e6dc",
+    "name": "prompt_sizes.py"
+  },
+  "source_files": [
+    "run-logs/lead/20261029T104232113703.log",
+    "run-logs/lead/20261029T104334447841.log",
+    "run-logs/lead/20261029T104537197281.log",
+    "run-logs/lead/20261029T104635546597.log",
+    "run-logs/lead/20261029T104828297280.log",
+    "run-logs/lead/20261029T104930658411.log",
+    "run-logs/lead/20261029T104942826101.log",
+    "run-logs/lead/20261029T105351980348.log",
+    "run-logs/lead/20261029T105456419051.log"
+  ]
+}

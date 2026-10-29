@@ -1,0 +1,30 @@
+[
+ {
+  "case": null,
+  "change": "weekly-memo contract v2 adds C5",
+  "in_window": true,
+  "key": [
+   "contract",
+   "weekly-memo",
+   2
+  ],
+  "n": 7,
+  "outcome": "not recurred",
+  "rid": null,
+  "time": "2026-10-29T12:07:57.821199+00:00"
+ },
+ {
+  "case": "20261029T120757930373-root-b504",
+  "change": "weekly-memo contract v3 adds C6",
+  "in_window": true,
+  "key": [
+   "contract",
+   "weekly-memo",
+   3
+  ],
+  "n": null,
+  "outcome": "recurred",
+  "rid": "R3",
+  "time": "2026-10-29T12:07:57.874696+00:00"
+ }
+]

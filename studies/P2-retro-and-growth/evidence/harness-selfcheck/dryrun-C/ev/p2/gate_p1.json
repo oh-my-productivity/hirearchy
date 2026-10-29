@@ -1,0 +1,42 @@
+{
+ "measures": {
+  "G1": {
+   "f": "NOT DETERMINED (FAIL-CLOSED: unread: ['UNREAD turn-02 quality: no snapshot recorded in calls.txt (quality/calls.txt)', 'UNREAD turn-02 services: no snapshot recorded in calls.txt (services/calls.txt)', 'UNREAD turn-03 quality: no snapshot recorded in calls.txt (quality/calls.txt)'])",
+   "a": "PASS",
+   "b": "VACUOUS (no item reached `retire due`)",
+   "e": "PASS",
+   "c": "PASS",
+   "d": "NOT DETERMINED (judged: measures/judged.json g1_d_judged; keyword hits none)"
+  },
+  "G2": {
+   "a": "PASS",
+   "b": "PASS",
+   "c": "PASS (REQUEST/FEEDBACK-UNANSWERED refusals 0, reported)"
+  },
+  "escapes typed by the user's answer": "PASS (4 escapes)",
+  "relayed reworks sent by the assistant (the injection excepted)": "PASS (0 other relayed rework task(s); the injection's task 20261029T120921079765-root-966f)",
+  "hand edits": "NOT DETERMINED (FAIL-CLOSED: measures/assistant_facts.json missing)",
+  "injected lessons": "NOT DETERMINED (judged: measures/judged.json g1_d_judged; keyword hits none)",
+  "empty-argument calls": "NOT DETERMINED (FAIL-CLOSED: no total in empty-calls.txt)",
+  "delivered versions (P2's form)": "NOT DETERMINED (FAIL-CLOSED: no delivered version was scored (0 of 0))",
+  "deliveries by copy": "NOT DETERMINED (judged: measures/judged.json d8_presented_deliveries)"
+ },
+ "flat": {
+  "G1(f)": "NOT DETERMINED (FAIL-CLOSED: unread: ['UNREAD turn-02 quality: no snapshot recorded in calls.txt (quality/calls.txt)', 'UNREAD turn-02 services: no snapshot recorded in calls.txt (services/calls.txt)', 'UNREAD turn-03 quality: no snapshot recorded in calls.txt (quality/calls.txt)'])",
+  "G1(a)": "PASS",
+  "G1(b)": "VACUOUS (no item reached `retire due`)",
+  "G1(e)": "PASS",
+  "G1(c)": "PASS",
+  "G1(d)": "NOT DETERMINED (judged: measures/judged.json g1_d_judged; keyword hits none)",
+  "G2(a)": "PASS",
+  "G2(b)": "PASS",
+  "G2(c)": "PASS (REQUEST/FEEDBACK-UNANSWERED refusals 0, reported)",
+  "escapes typed by the user's answer": "PASS (4 escapes)",
+  "relayed reworks sent by the assistant (the injection excepted)": "PASS (0 other relayed rework task(s); the injection's task 20261029T120921079765-root-966f)",
+  "hand edits": "NOT DETERMINED (FAIL-CLOSED: measures/assistant_facts.json missing)",
+  "injected lessons": "NOT DETERMINED (judged: measures/judged.json g1_d_judged; keyword hits none)",
+  "empty-argument calls": "NOT DETERMINED (FAIL-CLOSED: no total in empty-calls.txt)",
+  "delivered versions (P2's form)": "NOT DETERMINED (FAIL-CLOSED: no delivered version was scored (0 of 0))",
+  "deliveries by copy": "NOT DETERMINED (judged: measures/judged.json d8_presented_deliveries)"
+ }
+}

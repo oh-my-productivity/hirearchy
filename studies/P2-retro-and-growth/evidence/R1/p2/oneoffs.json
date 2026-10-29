@@ -1,0 +1,93 @@
+{
+ "week": [
+  {
+   "from": "2026-10-29T13:19:52+00:00",
+   "one_off": [],
+   "service": [
+    "ops-action-list: 20261029T132116440288-root-b3ec"
+   ],
+   "tasks": [
+    "20261029T132116440288-root-b3ec"
+   ],
+   "to_turn": 26,
+   "turn": 24
+  }
+ ],
+ "windows": [
+  {
+   "criteria": [
+    [
+     "1. The deliverable is markdown, has at most 350 words as counted by read (this is the one-page limit), and a title line naming the 2026-10-05 meeting.",
+     "2. It contains one markdown table with exactly the columns Owner | Action | Due, and no other sections (no decisions, no summary).",
+     "3. Every action item in the notes file is a row, including those stated in prose: Priya, Dev, Sam, Marta, Lee (5 of 5), and no row that is not in the notes.",
+     "4. Each Due value is an ISO date (YYYY-MM-DD) or 'none': Dev 2026-10-08, Priya 2026-10-09, Sam 2026-10-09, Marta 2026-10-14, Lee none.",
+     "5. Each Owner value uses the name exactly as written in the notes.",
+     "6. Rows are ordered by Due ascending with 'none' last, ties in the order of the notes.",
+     "7. Every statement is traceable to 2026-10-05.md; nothing is invented.",
+     "8. The lead's report states that every table row was compared with the notes file, with the count verified (n of m, n = m)."
+    ]
+   ],
+   "from": "2026-10-29T12:25:05+00:00",
+   "memo": "2026-10-05",
+   "tasks": [
+    "20261029T122710588867-root-c1b8"
+   ],
+   "titles": [
+    "One-page ops action list for the 2026-10-05 meeting"
+   ],
+   "to": "2026-10-29T12:29:45+00:00",
+   "to_turn": 8,
+   "turn": 6
+  },
+  {
+   "criteria": [
+    [
+     "1. The deliverable is markdown, has at most 350 words as counted by read (this is the one-page limit), and a title line naming the 2026-10-12 meeting.",
+     "2. It contains one markdown table with exactly the columns Owner | Action | Due, and no other sections (no decisions, no summary).",
+     "3. Every action item in the notes file is a row, including those stated in prose: Dev, Marta, Priya, Sam, Lee (5 of 5), and no row that is not in the notes.",
+     "4. Each Due value is an ISO date (YYYY-MM-DD) or 'none': Dev 2026-10-14, Marta 2026-10-16, Priya 2026-10-20, Sam 2026-10-21, Lee none.",
+     "5. Each Owner value uses the name exactly as written in the notes.",
+     "6. Rows are ordered by Due ascending with 'none' last, ties in the order of the notes.",
+     "7. Every statement is traceable to 2026-10-12.md; nothing is invented.",
+     "8. The lead's report states that every table row was compared with the notes file, with the count verified (n of m, n = m)."
+    ]
+   ],
+   "from": "2026-10-29T12:34:30+00:00",
+   "memo": "2026-10-12",
+   "tasks": [
+    "20261029T123457206032-root-cabf"
+   ],
+   "titles": [
+    "One-page ops action list for the 2026-10-12 meeting"
+   ],
+   "to": "2026-10-29T12:45:59+00:00",
+   "to_turn": 11,
+   "turn": 9
+  },
+  {
+   "criteria": [
+    [
+     "1. The deliverable is markdown, has at most 350 words as counted by read (this is the one-page limit), and a title line naming the 2026-10-19 meeting.",
+     "2. It contains one markdown table with exactly the columns Owner | Action | Due, and no other sections (no decisions, no summary).",
+     "3. Every action item in the notes file is a row, including those stated in prose: Marta, Dev, Priya, Lee, Sam (5 of 5), and no row that is not an action item in the notes; 'Marta keeps the agenda as sent' gets no row.",
+     "4. Each Due value is an ISO date (YYYY-MM-DD) or 'none': Marta 2026-10-23, Dev 2026-10-24, Priya 2026-10-26, Lee 2026-10-30, Sam none.",
+     "5. Each Owner value uses the name exactly as written in the notes.",
+     "6. Rows are ordered by Due ascending with 'none' last, ties in the order of the notes.",
+     "7. Every statement is traceable to 2026-10-19.md; nothing is invented.",
+     "8. The lead's report states that every table row was compared with the notes file, with the count verified (n of m, n = m)."
+    ]
+   ],
+   "from": "2026-10-29T12:57:15+00:00",
+   "memo": "2026-10-19",
+   "tasks": [
+    "20261029T125747104778-root-4a85"
+   ],
+   "titles": [
+    "One-page ops action list for the 2026-10-19 meeting"
+   ],
+   "to": "2026-10-29T13:00:36+00:00",
+   "to_turn": 16,
+   "turn": 15
+  }
+ ]
+}

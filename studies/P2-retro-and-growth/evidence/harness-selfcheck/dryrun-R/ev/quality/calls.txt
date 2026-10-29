@@ -1,0 +1,4 @@
+turn-01 start 2026-10-29T12:08:50.951599+00:00 end 2026-10-29T12:08:51.232610+00:00 exit 0 bytes 18955 json ok product /Volumes/workspace/hirearchy
+  new cli-*.jsonl: 2026-10-29/cli-39328-1793275731192.jsonl  command: quality 
+end start 2026-10-29T12:08:58.949350+00:00 end 2026-10-29T12:08:59.414956+00:00 exit 0 bytes 28408 json ok product /Volumes/workspace/hirearchy
+  new cli-*.jsonl: 2026-10-29/cli-39592-1793275739373.jsonl  command: quality 

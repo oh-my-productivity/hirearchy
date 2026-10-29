@@ -1,0 +1,266 @@
+{
+ "checker": [
+  {
+   "candidates": [
+    {
+     "class": [
+      "C10"
+     ],
+     "estimate": null,
+     "evidence": [
+      "20261029T135831104369-root-5e7a"
+     ],
+     "fires": false,
+     "key": "checker-add|weekly-meeting-memo|C10",
+     "kind": "checker-add",
+     "reached_at": null,
+     "rung": 4,
+     "signers": {
+      "20261029T135831104369-root-5e7a": "lead/writer"
+     },
+     "via": "class",
+     "weight": 1
+    },
+    {
+     "class": [
+      "C9",
+      "C11"
+     ],
+     "estimate": null,
+     "evidence": [
+      "20261029T133518543841-root-4955",
+      "20261029T141835117946-root-723b"
+     ],
+     "fires": false,
+     "key": "checker-add|weekly-meeting-memo|C11",
+     "kind": "checker-add",
+     "reached_at": null,
+     "rung": 4,
+     "signers": {
+      "20261029T133518543841-root-4955": "lead/writer",
+      "20261029T141835117946-root-723b": "lead/writer"
+     },
+     "via": "class",
+     "weight": 2
+    },
+    {
+     "class": [
+      "C3"
+     ],
+     "estimate": null,
+     "evidence": [
+      "20261029T133518543841-root-4955"
+     ],
+     "fires": false,
+     "key": "checker-add|weekly-meeting-memo|C3",
+     "kind": "checker-add",
+     "reached_at": null,
+     "rung": 4,
+     "signers": {
+      "20261029T133518543841-root-4955": "lead/writer"
+     },
+     "via": "class",
+     "weight": 1
+    },
+    {
+     "class": [
+      "C4"
+     ],
+     "estimate": null,
+     "evidence": [
+      "20261029T135831104369-root-5e7a"
+     ],
+     "fires": false,
+     "key": "checker-add|weekly-meeting-memo|C4",
+     "kind": "checker-add",
+     "reached_at": null,
+     "rung": 4,
+     "signers": {
+      "20261029T135831104369-root-5e7a": "lead/writer"
+     },
+     "via": "class",
+     "weight": 1
+    },
+    {
+     "class": [
+      "C9"
+     ],
+     "estimate": null,
+     "evidence": [
+      "20261029T133518543841-root-4955",
+      "20261029T141835117946-root-723b"
+     ],
+     "fires": false,
+     "key": "checker-add|weekly-meeting-memo|C9",
+     "kind": "checker-add",
+     "reached_at": null,
+     "rung": 4,
+     "signers": {
+      "20261029T133518543841-root-4955": "lead/writer",
+      "20261029T141835117946-root-723b": "lead/writer"
+     },
+     "via": "class",
+     "weight": 2
+    }
+   ],
+   "owner": "lead",
+   "service": "weekly-meeting-memo",
+   "window": [
+    "20261029T133518543841-root-4955",
+    "20261029T135244730879-root-a163",
+    "20261029T135831104369-root-5e7a",
+    "20261029T141102711053-root-9df1",
+    "20261029T141346074674-root-4ec3",
+    "20261029T141835117946-root-723b"
+   ]
+  }
+ ],
+ "checker_due": false,
+ "clarify": [
+  {
+   "accepted": 4,
+   "added": [
+    "the",
+    "actions",
+    "table",
+    "leaves",
+    "out",
+    "any",
+    "line",
+    "where",
+    "nobody",
+    "has",
+    "to",
+    "do",
+    "anything",
+    "such",
+    "as",
+    "a",
+    "statement",
+    "that",
+    "something",
+    "stays",
+    "is"
+   ],
+   "criterion": "C10",
+   "evidence": [
+    "weekly-meeting-memo/C10"
+   ],
+   "exercised": 5,
+   "fires": true,
+   "fires_rule": true,
+   "key": "clarify|weekly-meeting-memo|C10|theactionstableleavesoutanylinewherenobo",
+   "kind": "clarify",
+   "reached_at": "2026-10-29T14:18:35.093604+00:00",
+   "rung": 1,
+   "source": "amendment",
+   "weight": 0
+  },
+  {
+   "accepted": 1,
+   "added": [
+    "the",
+    "memo",
+    "starts",
+    "with",
+    "a",
+    "one",
+    "-",
+    "line",
+    "summary",
+    "of",
+    "meeting",
+    "followed",
+    "by",
+    "actions",
+    "section",
+    "then",
+    "decisions",
+    "in",
+    "that",
+    "order"
+   ],
+   "criterion": "C11",
+   "evidence": [
+    "weekly-meeting-memo/C11"
+   ],
+   "exercised": 1,
+   "fires": false,
+   "fires_rule": false,
+   "key": "clarify|weekly-meeting-memo|C11|thememostartswithaonelinesummaryofthemee",
+   "kind": "clarify",
+   "reached_at": null,
+   "rung": 1,
+   "source": "amendment",
+   "weight": 0
+  }
+ ],
+ "service": [
+  {
+   "assignee_top_level": true,
+   "covered_by": [],
+   "d5": null,
+   "evidence": [
+    "20261029T135020907593-root-5d5e",
+    "20261029T135548333153-root-f836",
+    "20261029T140824580301-root-605b",
+    "20261029T143558022215-root-44d7"
+   ],
+   "fires": true,
+   "group": {
+    "assignee": "lead",
+    "criteria_key": [
+     "atmost#wordsascountedbyread",
+     "everyrowhasanowneranactionandaduedatedueisanisodateyyyymmddornonewhenthenotesgivenodatesamsoncallrotationitemis#leesssoauditlogcheckisnoneanamenotintheattendeelistjoismarkednotinattendeelist",
+     "hasashorttitlewiththemeetingdatethenonemarkdowntablewiththecolumnsowneractiondueandnothingelsenosummarynodecisionssection",
+     "nothingappearsthatisnotinthenotesfile",
+     "thetablehasonerowforeveryactioniteminthenotesincludinginformaloneswritteninprosenofmwithnmintheleadscheckagainstthenoteswordedasinthenotesithasnorowforalinewherenobodyhastodoanything",
+     "usesonlythemeetingin#md"
+    ],
+    "heads": [
+     "20261029T135020907593-root-5d5e",
+     "20261029T135548333153-root-f836",
+     "20261029T140824580301-root-605b",
+     "20261029T143558022215-root-44d7"
+    ],
+    "judged": [
+     "20261029T135020907593-root-5d5e",
+     "20261029T135548333153-root-f836",
+     "20261029T140824580301-root-605b",
+     "20261029T143558022215-root-44d7"
+    ],
+    "reached_at": "2026-10-29T14:11:02.592491+00:00",
+    "relations": [
+     "overlap",
+     "title"
+    ],
+    "titles": [
+     "One-page action list for the ops team from the 5 October 2026 notes",
+     "One-page action list for the ops team from the 12 October 2026 notes",
+     "One-page action list for the ops team from the 19 October 2026 notes",
+     "One-page action list for the ops team from the 9 November 2026 notes"
+    ]
+   },
+   "key": "service|lead|20261029T135020907593-root-5d5e",
+   "kind": "service",
+   "reached_at": "2026-10-29T14:11:02.592491+00:00",
+   "rung": 2,
+   "weight": 4
+  }
+ ],
+ "service_due": true,
+ "thresholds": {
+  "accepted_cases": 3,
+  "added_words": 3,
+  "after_verdicts": 3,
+  "carry": 3,
+  "criterion_cases": 3,
+  "escapes": 2,
+  "items": 3,
+  "saturation": 0.45,
+  "shape_cases": 3,
+  "shape_overlap": 0.6,
+  "window": 3,
+  "window_cases": 10
+ }
+}

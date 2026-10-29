@@ -1,0 +1,484 @@
+{
+  "answer_key": {
+    "md5": "2fb69bbef857c2bd4862cd5dd8be9da8",
+    "meetings": {
+      "2026-10-05": {
+        "actions": 5,
+        "decisions": 2,
+        "dues_match": true,
+        "owners_match": true
+      },
+      "2026-10-12": {
+        "actions": 5,
+        "decisions": 3,
+        "dues_match": true,
+        "owners_match": true
+      },
+      "2026-10-19": {
+        "actions": 5,
+        "decisions": 3,
+        "dues_match": true,
+        "owners_match": true
+      }
+    },
+    "ok": true,
+    "path": "/Volumes/workspace/hirearchy/studies/P1-itemized-playbook/evidence/answer-key.md"
+  },
+  "answer_key_p1": {
+    "md5": "d340ff638fa7efe1a7ece8808d9a6168",
+    "meetings": {
+      "2026-10-26": {
+        "actions": 5,
+        "decisions": 3,
+        "dues_match": true,
+        "owners_match": true
+      },
+      "2026-11-02": {
+        "actions": 5,
+        "decisions": 3,
+        "dues_match": true,
+        "owners_match": true
+      },
+      "2026-11-09": {
+        "actions": 5,
+        "decisions": 3,
+        "dues_match": true,
+        "owners_match": true
+      }
+    },
+    "ok": true,
+    "path": "/Volumes/workspace/hirearchy/studies/P1-itemized-playbook/evidence/answer-key-p1.md"
+  },
+  "copies": [
+    {
+      "call": 29,
+      "commit": "cea96d6",
+      "commit_time": "2026-10-29T13:40:00Z",
+      "memo": "2026-10-05",
+      "time": "2026-10-29T13:40:35.248Z",
+      "tool": "execute_bash",
+      "turn": 4
+    },
+    {
+      "call": 48,
+      "commit": "3f0dc1c",
+      "commit_time": "2026-10-29T13:46:40Z",
+      "memo": "2026-10-05",
+      "time": "2026-10-29T13:47:08.832Z",
+      "tool": "execute_bash",
+      "turn": 6
+    },
+    {
+      "call": 68,
+      "commit": "7f3ca0a",
+      "commit_time": "2026-10-29T13:53:55Z",
+      "memo": "2026-10-12",
+      "time": "2026-10-29T13:54:28.502Z",
+      "tool": "execute_bash",
+      "turn": 9
+    },
+    {
+      "call": 96,
+      "commit": "288c6a0",
+      "commit_time": "2026-10-29T14:02:24Z",
+      "memo": "2026-10-19",
+      "time": "2026-10-29T14:02:58.516Z",
+      "tool": "execute_bash",
+      "turn": 12
+    },
+    {
+      "call": 107,
+      "commit": "98fa57f",
+      "commit_time": "2026-10-29T14:06:32Z",
+      "memo": "2026-10-19",
+      "time": "2026-10-29T14:07:14.897Z",
+      "tool": "execute_bash",
+      "turn": 14
+    },
+    {
+      "call": 125,
+      "commit": "6f8e33d",
+      "commit_time": "2026-10-29T14:11:59Z",
+      "memo": "2026-10-26",
+      "time": "2026-10-29T14:12:35.646Z",
+      "tool": "execute_bash",
+      "turn": 16
+    },
+    {
+      "call": 137,
+      "commit": "e171d69",
+      "commit_time": "2026-10-29T14:15:07Z",
+      "memo": "2026-11-02",
+      "time": "2026-10-29T14:16:45.231Z",
+      "tool": "execute_bash",
+      "turn": 18
+    },
+    {
+      "call": 153,
+      "commit": "c9b7ee5",
+      "commit_time": "2026-10-29T14:20:00Z",
+      "memo": "2026-11-09",
+      "time": "2026-10-29T14:21:39.585Z",
+      "tool": "execute_bash",
+      "turn": 20
+    },
+    {
+      "call": 166,
+      "commit": "c09e50e",
+      "commit_time": "2026-10-29T14:24:52Z",
+      "memo": "2026-11-09",
+      "time": "2026-10-29T14:25:31.544Z",
+      "tool": "execute_bash",
+      "turn": 22
+    }
+  ],
+  "could_not_derive": [],
+  "delivered": {
+    "k": 0,
+    "n": 0
+  },
+  "final_totals": {
+    "actions": {
+      "k": 30,
+      "n": 15
+    },
+    "decisions": {
+      "k": 17,
+      "n": 8
+    },
+    "extra_rows": 0,
+    "memos": 6,
+    "summary": {
+      "k": 5,
+      "n": 6
+    },
+    "wrong_dates": 0
+  },
+  "finals": [
+    {
+      "actions": {
+        "k": 5,
+        "n": 5
+      },
+      "actions_found": [
+        "A1",
+        "A2",
+        "A4",
+        "A3",
+        "A5"
+      ],
+      "decisions": {
+        "k": 2,
+        "n": 2
+      },
+      "decisions_before_actions": true,
+      "decisions_found": [
+        "D1",
+        "D2"
+      ],
+      "extra_rows": [],
+      "file": "memos/memo-2026-10-05.md",
+      "is_version": null,
+      "md5": "ff62bea31a26b0f3c8ca5b884a130f11",
+      "memo": "2026-10-05",
+      "n_extra_rows": 0,
+      "n_wrong_dates": 0,
+      "owner_form": "N",
+      "owner_form_errors": [],
+      "summary_first": true,
+      "words": 146,
+      "wrong_date_text": [],
+      "wrong_dates": []
+    },
+    {
+      "actions": {
+        "k": 5,
+        "n": 5
+      },
+      "actions_found": [
+        "A1",
+        "A2",
+        "A3",
+        "A4",
+        "A5"
+      ],
+      "decisions": {
+        "k": 3,
+        "n": 3
+      },
+      "decisions_before_actions": true,
+      "decisions_found": [
+        "D1",
+        "D2",
+        "D3"
+      ],
+      "extra_rows": [],
+      "file": "memos/memo-2026-10-12.md",
+      "is_version": null,
+      "md5": "ee36a01feadf53de194c2c4b21fc596e",
+      "memo": "2026-10-12",
+      "n_extra_rows": 0,
+      "n_wrong_dates": 0,
+      "owner_form": "N",
+      "owner_form_errors": [],
+      "summary_first": true,
+      "words": 192,
+      "wrong_date_text": [],
+      "wrong_dates": []
+    },
+    {
+      "actions": {
+        "k": 5,
+        "n": 5
+      },
+      "actions_found": [
+        "A4",
+        "A1",
+        "A2",
+        "A3",
+        "A5"
+      ],
+      "decisions": {
+        "k": 3,
+        "n": 3
+      },
+      "decisions_before_actions": true,
+      "decisions_found": [
+        "D1",
+        "D2",
+        "D3"
+      ],
+      "extra_rows": [],
+      "file": "memos/memo-2026-10-19.md",
+      "is_version": null,
+      "md5": "632228cd1d6f3b141fe965c8caafb449",
+      "memo": "2026-10-19",
+      "n_extra_rows": 0,
+      "n_wrong_dates": 0,
+      "owner_form": "N",
+      "owner_form_errors": [],
+      "summary_first": true,
+      "words": 192,
+      "wrong_date_text": [],
+      "wrong_dates": []
+    },
+    {
+      "actions": {
+        "k": 5,
+        "n": 5
+      },
+      "actions_found": [
+        "A1",
+        "A2",
+        "A3",
+        "A4",
+        "A5"
+      ],
+      "decisions": {
+        "k": 3,
+        "n": 3
+      },
+      "decisions_before_actions": true,
+      "decisions_found": [
+        "D1",
+        "D2",
+        "D3"
+      ],
+      "extra_rows": [],
+      "file": "memos/memo-2026-10-26.md",
+      "is_version": null,
+      "md5": "4f4a26e18e131ffb86587ff3dbed0f6b",
+      "memo": "2026-10-26",
+      "n_extra_rows": 0,
+      "n_wrong_dates": 0,
+      "owner_form": "N",
+      "owner_form_errors": [],
+      "summary_first": true,
+      "words": 210,
+      "wrong_date_text": [],
+      "wrong_dates": []
+    },
+    {
+      "actions": {
+        "k": 5,
+        "n": 5
+      },
+      "actions_found": [
+        "A1",
+        "A2",
+        "A3",
+        "A4",
+        "A5"
+      ],
+      "decisions": {
+        "k": 3,
+        "n": 3
+      },
+      "decisions_before_actions": true,
+      "decisions_found": [
+        "D1",
+        "D2",
+        "D3"
+      ],
+      "extra_rows": [],
+      "file": "memos/memo-2026-11-02.md",
+      "is_version": null,
+      "md5": "2a4ad5052707485699548c72c46619c7",
+      "memo": "2026-11-02",
+      "n_extra_rows": 0,
+      "n_wrong_dates": 0,
+      "owner_form": "N",
+      "owner_form_errors": [
+        {
+          "action": "A3",
+          "cell": "JD (not in attendee list)",
+          "form": "N",
+          "owner": "JD"
+        }
+      ],
+      "summary_first": true,
+      "words": 176,
+      "wrong_date_text": [],
+      "wrong_dates": []
+    },
+    {
+      "actions": {
+        "k": 5,
+        "n": 5
+      },
+      "actions_found": [
+        "A1",
+        "A2",
+        "A3",
+        "A4",
+        "A5"
+      ],
+      "decisions": {
+        "k": 3,
+        "n": 3
+      },
+      "decisions_before_actions": false,
+      "decisions_found": [
+        "D1",
+        "D2",
+        "D3"
+      ],
+      "extra_rows": [],
+      "file": "memos/memo-2026-11-09.md",
+      "is_version": null,
+      "md5": "eba739fa86c2caa605bfaee2c3cd3af1",
+      "memo": "2026-11-09",
+      "n_extra_rows": 0,
+      "n_wrong_dates": 0,
+      "owner_form": "N",
+      "owner_form_errors": [],
+      "summary_first": true,
+      "words": 172,
+      "wrong_date_text": [],
+      "wrong_dates": []
+    }
+  ],
+  "label": "C1",
+  "p1_no_regression": {
+    "delivered_bad": [],
+    "delivered_versions": 0,
+    "mechanical_pass": true,
+    "per_memo": {
+      "2026-10-05": {
+        "final": "memos/memo-2026-10-05.md",
+        "pass": true,
+        "why": "ok"
+      },
+      "2026-10-12": {
+        "final": "memos/memo-2026-10-12.md",
+        "pass": true,
+        "why": "ok"
+      },
+      "2026-10-19": {
+        "final": "memos/memo-2026-10-19.md",
+        "pass": true,
+        "why": "ok"
+      },
+      "2026-10-26": {
+        "final": "memos/memo-2026-10-26.md",
+        "pass": true,
+        "why": "ok"
+      },
+      "2026-11-02": {
+        "final": "memos/memo-2026-11-02.md",
+        "pass": true,
+        "why": "ok"
+      },
+      "2026-11-09": {
+        "final": "memos/memo-2026-11-09.md",
+        "pass": true,
+        "why": "ok"
+      }
+    },
+    "reported": {
+      "2026-10-05": {
+        "final": "memos/memo-2026-10-05.md",
+        "ok": true,
+        "why": "ok"
+      },
+      "2026-10-12": {
+        "final": "memos/memo-2026-10-12.md",
+        "ok": true,
+        "why": "ok"
+      },
+      "2026-10-19": {
+        "final": "memos/memo-2026-10-19.md",
+        "ok": true,
+        "why": "ok"
+      },
+      "2026-10-26": {
+        "final": "memos/memo-2026-10-26.md",
+        "ok": true,
+        "why": "ok"
+      },
+      "2026-11-02": {
+        "final": "memos/memo-2026-11-02.md",
+        "ok": false,
+        "why": "1 owner-form errors"
+      },
+      "2026-11-09": {
+        "final": "memos/memo-2026-11-09.md",
+        "ok": false,
+        "why": "Summary first / order"
+      }
+    },
+    "reported_ok": false
+  },
+  "review_tasks": 0,
+  "review_unmapped": [],
+  "roles": {
+    "children": [
+      "lead/writer"
+    ],
+    "detected_by": null,
+    "owner": "lead",
+    "reviewer": null,
+    "reviewer_dir": null,
+    "roles": {
+      "lead/writer": "Writer"
+    }
+  },
+  "script": {
+    "md5": "4a63660bc6040f443b6fbf997e57b4e2",
+    "name": "score_memos.py"
+  },
+  "source_files": [
+    "/Volumes/workspace/hirearchy/studies/P1-itemized-playbook/evidence/answer-key.md",
+    "deliverables-log.txt",
+    "memos/memo-2026-10-05.md",
+    "memos/memo-2026-10-12.md",
+    "memos/memo-2026-10-19.md",
+    "memos/memo-2026-10-26.md",
+    "memos/memo-2026-11-02.md",
+    "memos/memo-2026-11-09.md",
+    "memos/versions/INDEX.txt",
+    "org-files/lead-writer-AGENT.md",
+    "org-git-log.txt"
+  ],
+  "versions": []
+}

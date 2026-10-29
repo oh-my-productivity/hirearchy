@@ -1,0 +1,29 @@
+turn 01: session-store empty-argument failed calls: 0 (tool_call 0, tool_load 0) so far (the session store); 'is not available' in turn-01.stderr.txt: 0
+turn 02: session-store empty-argument failed calls: 1 (tool_call 1, tool_load 0) so far (the session store); 'is not available' in turn-02.stderr.txt: 1
+turn 03: session-store empty-argument failed calls: 2 (tool_call 2, tool_load 0) so far (the session store); 'is not available' in turn-03.stderr.txt: 1
+turn 04: session-store empty-argument failed calls: 2 (tool_call 2, tool_load 0) so far (the session store); 'is not available' in turn-04.stderr.txt: 0
+turn 05: session-store empty-argument failed calls: 4 (tool_call 3, tool_load 1) so far (the session store); 'is not available' in turn-05.stderr.txt: 2
+turn 06: session-store empty-argument failed calls: 5 (tool_call 4, tool_load 1) so far (the session store); 'is not available' in turn-06.stderr.txt: 1
+turn 07: session-store empty-argument failed calls: 6 (tool_call 5, tool_load 1) so far (the session store); 'is not available' in turn-07.stderr.txt: 1
+turn 08: session-store empty-argument failed calls: 7 (tool_call 6, tool_load 1) so far (the session store); 'is not available' in turn-08.stderr.txt: 1
+turn 09: session-store empty-argument failed calls: 7 (tool_call 6, tool_load 1) so far (the session store); 'is not available' in turn-09.stderr.txt: 0
+turn 10: session-store empty-argument failed calls: 7 (tool_call 6, tool_load 1) so far (the session store); 'is not available' in turn-10.stderr.txt: 0
+turn 11: session-store empty-argument failed calls: 10 (tool_call 9, tool_load 1) so far (the session store); 'is not available' in turn-11.stderr.txt: 3
+turn 12: session-store empty-argument failed calls: 12 (tool_call 11, tool_load 1) so far (the session store); 'is not available' in turn-12.stderr.txt: 2
+turn 13: session-store empty-argument failed calls: 12 (tool_call 11, tool_load 1) so far (the session store); 'is not available' in turn-13.stderr.txt: 0
+turn 14: session-store empty-argument failed calls: 13 (tool_call 12, tool_load 1) so far (the session store); 'is not available' in turn-14.stderr.txt: 1
+turn 15: session-store empty-argument failed calls: 13 (tool_call 12, tool_load 1) so far (the session store); 'is not available' in turn-15.stderr.txt: 0
+turn 16: session-store empty-argument failed calls: 13 (tool_call 12, tool_load 1) so far (the session store); 'is not available' in turn-16.stderr.txt: 0
+turn 17: session-store empty-argument failed calls: 16 (tool_call 15, tool_load 1) so far (the session store); 'is not available' in turn-17.stderr.txt: 3
+turn 18: session-store empty-argument failed calls: 16 (tool_call 15, tool_load 1) so far (the session store); 'is not available' in turn-18.stderr.txt: 0
+turn 19: session-store empty-argument failed calls: 22 (tool_call 21, tool_load 1) so far (the session store); 'is not available' in turn-19.stderr.txt: 6
+turn 20: session-store empty-argument failed calls: 22 (tool_call 21, tool_load 1) so far (the session store); 'is not available' in turn-20.stderr.txt: 0
+turn 21: session-store empty-argument failed calls: 23 (tool_call 22, tool_load 1) so far (the session store); 'is not available' in turn-21.stderr.txt: 1
+turn 22: session-store empty-argument failed calls: 24 (tool_call 23, tool_load 1) so far (the session store); 'is not available' in turn-22.stderr.txt: 1
+turn 23: session-store empty-argument failed calls: 28 (tool_call 27, tool_load 1) so far (the session store); 'is not available' in turn-23.stderr.txt: 4
+turn 24: session-store empty-argument failed calls: 28 (tool_call 27, tool_load 1) so far (the session store); 'is not available' in turn-24.stderr.txt: 0
+turn 25: session-store empty-argument failed calls: 32 (tool_call 31, tool_load 1) so far (the session store); 'is not available' in turn-25.stderr.txt: 4
+turn 26: session-store empty-argument failed calls: 33 (tool_call 32, tool_load 1) so far (the session store); 'is not available' in turn-26.stderr.txt: 1
+turn 27: session-store empty-argument failed calls: 35 (tool_call 34, tool_load 1) so far (the session store); 'is not available' in turn-27.stderr.txt: 2
+total: session-store empty-argument failed calls: 35 (tool_call 34, tool_load 1)
+total 'is not available' in turn stderr: 35

@@ -1,0 +1,52 @@
+# propose_org call 3 at 2026-10-29T13:17:25.860Z; result at 2026-10-29T13:17:25.860Z
+
+Target organization: /private/tmp/hirearchy-p2/R1-1793275867/org (exists, 2 agent(s) besides root; this plan changes it)
+
+DRAFT - NOT READY (it has errors: fix the blueprint and propose again; do not show this to the user)
+Why: Retro item 1, the user said yes to making the one-page ops action list a standing service
+Your organization now: 2 agents, 1 service(s): weekly-meeting-memo.
+Adds:
+- service ops-action-list of lead: One one-page action list (table of owner, action, due date) for the ops team from one meeting notes file.
+  You provide: notes_file (required). Each request: up to 8 runs, sent only when you ask.
+  Checks:
+    1. The deliverable is markdown, has at most 350 words as counted by read (this is the one-page limit), and a title line naming the meeting date.
+       my wording, from the one-off tasks I sent for you (2026-10-29); you accepted those deliveries
+    2. It contains one markdown table with exactly the columns Owner | Action | Due, and no other sections (no decisions, no summary).
+       my wording, from the one-off tasks I sent for you (2026-10-29); you accepted those deliveries
+    3. Every action item in the named notes file is a row, including those stated in prose, and no row is added that is not an action item in the notes; a statement that something stays as it is, where nobody has to do anything, gets no row.
+       my wording, from the one-off tasks I sent for you (2026-10-29); you accepted those deliveries
+    4. Each Due value is an ISO date (YYYY-MM-DD) or 'none'. A relative deadline such as 'by Friday' is turned into a date only when the notes make the date clear; if the notes give no date, Due is 'none'.
+       my wording, from the one-off tasks I sent for you (2026-10-29); you accepted those deliveries
+    5. Each Owner value uses the name exactly as written in the notes.
+       my wording, from the one-off tasks I sent for you (2026-10-29); you accepted those deliveries
+    6. Rows are ordered by Due ascending with 'none' last, ties in the order of the notes.
+       my wording, from the one-off tasks I sent for you (2026-10-29); you accepted those deliveries
+    7. Every statement is traceable to the named notes file; nothing is invented.
+       my wording, from the one-off tasks I sent for you (2026-10-29); you accepted those deliveries
+    8. The lead's report states that every table row was compared with the notes file, with the count verified (n of m, n = m).
+       my wording, from the one-off tasks I sent for you (2026-10-29); you accepted those deliveries
+  Delivered to: /private/tmp/hirearchy-p2/R1-1793275867/deliverables (I copy each result there after checking it)
+Budget: ops-action-list of lead: up to 8 runs per request; nothing else changes what a request costs.
+Warnings (1):
+- 8 runs per request covers one pass and one internal rework (the estimate is 8), not a round of your questions or a rejection, which takes about 3 more (1, plus 2 for each agent below lead): 11 per request covers one such round
+Errors (4):
+- extend.add_services[0].acceptance[1]: criterion 1: its text is not a line of the acceptance criteria of 20261029T122710588867-root-c1b8, 20261029T123457206032-root-cabf, 20261029T125747104778-root-4a85: copy a line of one of those tasks exactly.
+- extend.add_services[0].acceptance[3]: criterion 3: its text is not a line of the acceptance criteria of 20261029T122710588867-root-c1b8, 20261029T123457206032-root-cabf, 20261029T125747104778-root-4a85: copy a line of one of those tasks exactly.
+- extend.add_services[0].acceptance[4]: criterion 4: its text is not a line of the acceptance criteria of 20261029T122710588867-root-c1b8, 20261029T123457206032-root-cabf, 20261029T125747104778-root-4a85: copy a line of one of those tasks exactly.
+- extend.add_services[0].acceptance[7]: criterion 7: its text is not a line of the acceptance criteria of 20261029T122710588867-root-c1b8, 20261029T123457206032-root-cabf, 20261029T125747104778-root-4a85: copy a line of one of those tasks exactly.
+Cannot apply yet.
+
+--- machine marker: the user block ends above; do not show this line or anything below it ---
+
+Details (the full plan, for you; the user need not read it):
+Extension: Retro item 1, the user said yes to making the one-page ops action list a standing service
+Plan id: (none: the extension has errors)
+Added service ops-action-list of lead: 8 runs per request; criteria 8
+warning: extend.add_services[0].deliverable.path: no agent can write to /private/tmp/hirearchy-p2/R1-1793275867/deliverables (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)
+warning: extend.add_services[0].budget: 8 runs per request covers one pass and one internal rework (the estimate is 8), not a round of your questions or a rejection, which takes about 3 more (1, plus 2 for each agent below lead): 11 per request covers one such round
+error: extend.add_services[0].acceptance[1]: criterion 1: its text is not a line of the acceptance criteria of 20261029T122710588867-root-c1b8, 20261029T123457206032-root-cabf, 20261029T125747104778-root-4a85: copy a line of one of those tasks exactly.
+error: extend.add_services[0].acceptance[3]: criterion 3: its text is not a line of the acceptance criteria of 20261029T122710588867-root-c1b8, 20261029T123457206032-root-cabf, 20261029T125747104778-root-4a85: copy a line of one of those tasks exactly.
+error: extend.add_services[0].acceptance[4]: criterion 4: its text is not a line of the acceptance criteria of 20261029T122710588867-root-c1b8, 20261029T123457206032-root-cabf, 20261029T125747104778-root-4a85: copy a line of one of those tasks exactly.
+error: extend.add_services[0].acceptance[7]: criterion 7: its text is not a line of the acceptance criteria of 20261029T122710588867-root-c1b8, 20261029T123457206032-root-cabf, 20261029T125747104778-root-4a85: copy a line of one of those tasks exactly.
+
+plan_id: none (the blueprint has errors). Fix them and call propose_org again; do not ask the user to approve this.

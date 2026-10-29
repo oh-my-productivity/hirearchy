@@ -1,0 +1,5 @@
+Before I send the memo back, I need one answer from you. A rework changes this memo only. A lasting rule changes every future memo, and only you can decide that.
+
+About C5: add "start the memo with a one-line 'Summary:' of the meeting, then the decisions, then the action items" as a lasting rule? Yes or no.
+
+Once you answer, I'll send this memo back for rework. The rework will set Sam's due date to 2026-10-09 and Marta's to 2026-10-14, and add the Summary line. It should take about 3 more runs, so the total for this memo stays under the approved 12.

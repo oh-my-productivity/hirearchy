@@ -1,0 +1,9 @@
+P2-X1: PASS
+P2-X2: PASS
+P2-X3: FAIL
+P2-L: PASS
+P2-B: PASS
+P2-W: PASS
+P2-E: PASS
+P2-S: PASS
+charter edits (harness): REPORTED

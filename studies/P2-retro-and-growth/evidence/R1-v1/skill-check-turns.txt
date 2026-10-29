@@ -1,0 +1,7 @@
+skill (arm R) after turn 1: global copy in place: ok
+skill (arm R) after turn 2: global copy in place: ok
+skill (arm R) after turn 3: global copy in place: ok
+skill (arm R) after turn 4: global copy in place: ok
+skill (arm R) after turn 5: global copy in place: ok
+skill (arm R) after turn 6: global copy in place: ok
+skill (arm R) after turn 7: global copy in place: ok

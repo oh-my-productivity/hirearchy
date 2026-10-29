@@ -1,0 +1,38 @@
+{
+ "asked": 5,
+ "records": [
+  {
+   "at": "2026-10-29T12:08:52.831016+00:00",
+   "cap_ok": true,
+   "id": "B1",
+   "items": 3,
+   "recorded_ok": true,
+   "verdicts_since_last": 11
+  },
+  {
+   "at": "2026-10-29T12:08:57.268382+00:00",
+   "cap_ok": true,
+   "id": "B2",
+   "items": 2,
+   "recorded_ok": true,
+   "verdicts_since_last": 2
+  }
+ ],
+ "rules": {
+  "cap": [],
+  "lapsed_counts": [],
+  "order": [],
+  "pairs": [
+   {
+    "from": "B1",
+    "items": {
+     "B1.1": "taken",
+     "B1.2": "taken",
+     "B1.3": "lapsed"
+    },
+    "to": "B2"
+   }
+  ],
+  "suppression": []
+ }
+}

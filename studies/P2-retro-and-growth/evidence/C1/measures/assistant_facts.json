@@ -1,0 +1,1252 @@
+{
+  "arm": "C",
+  "copies": {
+    "ask_first": {
+      "k": 3,
+      "n": 13
+    },
+    "count": 13,
+    "hand_edits": {
+      "k": 0,
+      "n": 13
+    },
+    "list": [
+      {
+        "ask_first_shown": false,
+        "call": 29,
+        "case": "2026-10-05",
+        "checked_version": null,
+        "command": "mkdir -p /private/tmp/hirearchy-p2/C1-1793280632/deliverables && cp /private/tmp/hirearchy-p2/C1-1793280632/org/lead/writer/work/memo-2026-10-05.md /private/tmp/hirearchy-p2/C1-1793280632/deliverables/memo-2026-10-05.md && cmp /private/tmp/hirearchy-p2/C1-1793280632/org/lead/writer/work/memo-2026-10-05.md /private/tmp/hirearchy-p2/C1-1793280632/deliverables/memo-2026-10-05.md && wc -w /private/tmp",
+        "hand_edit": null,
+        "human_feedback_after": [
+          {
+            "call": 34,
+            "task": "20261029T133841717115-root-6dfb",
+            "turn": 5,
+            "verdict": "reject"
+          },
+          {
+            "call": 50,
+            "task": "20261029T134535371982-root-e020",
+            "turn": 7,
+            "verdict": "accept"
+          },
+          {
+            "call": 61,
+            "task": "20261029T135020907593-root-5d5e",
+            "turn": 9,
+            "verdict": "accept"
+          }
+        ],
+        "latest_result": {
+          "created": "2026-10-29T13:40:27+00:00",
+          "id": "20261029T134027735786-lead-be31",
+          "reply_to": "20261029T133841717115-root-6dfb",
+          "status": "done"
+        },
+        "progress_call": 26,
+        "source_path": "lead/writer/work/memo-2026-10-05.md",
+        "source_version": null,
+        "tool": "execute_bash",
+        "ts": "2026-10-29T13:40:35.248Z",
+        "turn": 4
+      },
+      {
+        "ask_first_shown": false,
+        "call": 48,
+        "case": "2026-10-05",
+        "checked_version": null,
+        "command": "cd /private/tmp/hirearchy-p2/C1-1793280632 && cp org/lead/writer/work/memo-2026-10-05.md deliverables/memo-2026-10-05.md && cmp org/lead/writer/work/memo-2026-10-05.md deliverables/memo-2026-10-05.md && echo IDENTICAL && wc -w deliverables/memo-2026-10-05.md && head -1 deliverables/memo-2026-10-05.md | cut -c1-60",
+        "hand_edit": null,
+        "human_feedback_after": [
+          {
+            "call": 50,
+            "task": "20261029T134535371982-root-e020",
+            "turn": 7,
+            "verdict": "accept"
+          },
+          {
+            "call": 61,
+            "task": "20261029T135020907593-root-5d5e",
+            "turn": 9,
+            "verdict": "accept"
+          }
+        ],
+        "latest_result": {
+          "created": "2026-10-29T13:46:58+00:00",
+          "id": "20261029T134658299152-lead-57b2",
+          "reply_to": "20261029T134535371982-root-e020",
+          "status": "done"
+        },
+        "progress_call": 45,
+        "source_path": "lead/writer/work/memo-2026-10-05.md",
+        "source_version": null,
+        "tool": "execute_bash",
+        "ts": "2026-10-29T13:47:08.832Z",
+        "turn": 6
+      },
+      {
+        "ask_first_shown": false,
+        "call": 60,
+        "case": "2026-10-05",
+        "checked_version": null,
+        "command": "cd /private/tmp/hirearchy-p2/C1-1793280632 && cp org/lead/writer/work/action-list-2026-10-05.md deliverables/action-list-2026-10-05.md && cmp org/lead/writer/work/action-list-2026-10-05.md deliverables/action-list-2026-10-05.md && echo IDENTICAL && wc -w deliverables/action-list-2026-10-05.md && ls deliverables",
+        "hand_edit": null,
+        "human_feedback_after": [
+          {
+            "call": 61,
+            "task": "20261029T135020907593-root-5d5e",
+            "turn": 9,
+            "verdict": "accept"
+          }
+        ],
+        "latest_result": {
+          "created": "2026-10-29T13:51:27+00:00",
+          "id": "20261029T135127212575-lead-73af",
+          "reply_to": "20261029T135020907593-root-5d5e",
+          "status": "done"
+        },
+        "progress_call": 57,
+        "source_path": "lead/writer/work/action-list-2026-10-05.md",
+        "source_version": null,
+        "tool": "execute_bash",
+        "ts": "2026-10-29T13:51:35.166Z",
+        "turn": 8
+      },
+      {
+        "ask_first_shown": false,
+        "call": 68,
+        "case": "2026-10-12",
+        "checked_version": null,
+        "command": "cd /private/tmp/hirearchy-p2/C1-1793280632 && cp org/lead/writer/work/memo-2026-10-12.md deliverables/memo-2026-10-12.md && cmp org/lead/writer/work/memo-2026-10-12.md deliverables/memo-2026-10-12.md && echo IDENTICAL && wc -w deliverables/memo-2026-10-12.md && head -1 deliverables/memo-2026-10-12.md | cut -c1-40",
+        "hand_edit": null,
+        "human_feedback_after": [
+          {
+            "call": 69,
+            "task": "20261029T135244730879-root-a163",
+            "turn": 10,
+            "verdict": "accept"
+          },
+          {
+            "call": 83,
+            "task": "20261029T135548333153-root-f836",
+            "turn": 11,
+            "verdict": "accept"
+          }
+        ],
+        "latest_result": {
+          "created": "2026-10-29T13:54:18+00:00",
+          "id": "20261029T135418350510-lead-e355",
+          "reply_to": "20261029T135244730879-root-a163",
+          "status": "done"
+        },
+        "progress_call": 65,
+        "source_path": "lead/writer/work/memo-2026-10-12.md",
+        "source_version": null,
+        "tool": "execute_bash",
+        "ts": "2026-10-29T13:54:28.502Z",
+        "turn": 9
+      },
+      {
+        "ask_first_shown": false,
+        "call": 78,
+        "case": "2026-10-12",
+        "checked_version": null,
+        "command": "cd /private/tmp/hirearchy-p2/C1-1793280632 && cp org/lead/writer/work/action-list-2026-10-12.md deliverables/action-list-2026-10-12.md && cmp org/lead/writer/work/action-list-2026-10-12.md deliverables/action-list-2026-10-12.md && echo IDENTICAL && wc -w deliverables/action-list-2026-10-12.md",
+        "hand_edit": null,
+        "human_feedback_after": [
+          {
+            "call": 83,
+            "task": "20261029T135548333153-root-f836",
+            "turn": 11,
+            "verdict": "accept"
+          }
+        ],
+        "latest_result": {
+          "created": "2026-10-29T13:57:10+00:00",
+          "id": "20261029T135710645402-lead-218e",
+          "reply_to": "20261029T135548333153-root-f836",
+          "status": "done"
+        },
+        "progress_call": 74,
+        "source_path": "lead/writer/work/action-list-2026-10-12.md",
+        "source_version": null,
+        "tool": "execute_bash",
+        "ts": "2026-10-29T13:57:21.962Z",
+        "turn": 10
+      },
+      {
+        "ask_first_shown": false,
+        "call": 96,
+        "case": "2026-10-19",
+        "checked_version": null,
+        "command": "cd /private/tmp/hirearchy-p2/C1-1793280632 && cp org/lead/writer/work/memo-2026-10-19.md deliverables/memo-2026-10-19.md && cmp org/lead/writer/work/memo-2026-10-19.md deliverables/memo-2026-10-19.md && echo IDENTICAL && wc -w deliverables/memo-2026-10-19.md && ls deliverables",
+        "hand_edit": null,
+        "human_feedback_after": [
+          {
+            "call": 97,
+            "task": "20261029T140117776426-root-8d00",
+            "turn": 13,
+            "verdict": "reject"
+          },
+          {
+            "call": 108,
+            "task": "20261029T140519645983-root-ebbc",
+            "turn": 15,
+            "verdict": "accept"
+          },
+          {
+            "call": 118,
+            "task": "20261029T140824580301-root-605b",
+            "turn": 16,
+            "verdict": "accept"
+          }
+        ],
+        "latest_result": {
+          "created": "2026-10-29T14:02:50+00:00",
+          "id": "20261029T140250197794-lead-020d",
+          "reply_to": "20261029T140117776426-root-8d00",
+          "status": "done"
+        },
+        "progress_call": 93,
+        "source_path": "lead/writer/work/memo-2026-10-19.md",
+        "source_version": null,
+        "tool": "execute_bash",
+        "ts": "2026-10-29T14:02:58.516Z",
+        "turn": 12
+      },
+      {
+        "ask_first_shown": false,
+        "call": 107,
+        "case": "2026-10-19",
+        "checked_version": null,
+        "command": "cd /private/tmp/hirearchy-p2/C1-1793280632 && cp org/lead/writer/work/memo-2026-10-19.md deliverables/memo-2026-10-19.md && cmp org/lead/writer/work/memo-2026-10-19.md deliverables/memo-2026-10-19.md && echo IDENTICAL && wc -w deliverables/memo-2026-10-19.md",
+        "hand_edit": null,
+        "human_feedback_after": [
+          {
+            "call": 108,
+            "task": "20261029T140519645983-root-ebbc",
+            "turn": 15,
+            "verdict": "accept"
+          },
+          {
+            "call": 118,
+            "task": "20261029T140824580301-root-605b",
+            "turn": 16,
+            "verdict": "accept"
+          }
+        ],
+        "latest_result": {
+          "created": "2026-10-29T14:07:05+00:00",
+          "id": "20261029T140705692361-lead-76f4",
+          "reply_to": "20261029T140519645983-root-ebbc",
+          "status": "done"
+        },
+        "progress_call": 104,
+        "source_path": "lead/writer/work/memo-2026-10-19.md",
+        "source_version": null,
+        "tool": "execute_bash",
+        "ts": "2026-10-29T14:07:14.897Z",
+        "turn": 14
+      },
+      {
+        "ask_first_shown": false,
+        "call": 116,
+        "case": "2026-10-19",
+        "checked_version": null,
+        "command": "cd /private/tmp/hirearchy-p2/C1-1793280632 && cp org/lead/writer/work/action-list-2026-10-19.md deliverables/action-list-2026-10-19.md && cmp org/lead/writer/work/action-list-2026-10-19.md deliverables/action-list-2026-10-19.md && echo IDENTICAL && wc -w deliverables/action-list-2026-10-19.md",
+        "hand_edit": null,
+        "human_feedback_after": [
+          {
+            "call": 118,
+            "task": "20261029T140824580301-root-605b",
+            "turn": 16,
+            "verdict": "accept"
+          }
+        ],
+        "latest_result": {
+          "created": "2026-10-29T14:09:45+00:00",
+          "id": "20261029T140945047663-lead-0cf8",
+          "reply_to": "20261029T140824580301-root-605b",
+          "status": "done"
+        },
+        "progress_call": 113,
+        "source_path": "lead/writer/work/action-list-2026-10-19.md",
+        "source_version": null,
+        "tool": "execute_bash",
+        "ts": "2026-10-29T14:10:01.084Z",
+        "turn": 15
+      },
+      {
+        "ask_first_shown": false,
+        "call": 125,
+        "case": "2026-10-26",
+        "checked_version": null,
+        "command": "cd /private/tmp/hirearchy-p2/C1-1793280632 && cp org/lead/writer/work/memo-2026-10-26.md deliverables/memo-2026-10-26.md && cmp org/lead/writer/work/memo-2026-10-26.md deliverables/memo-2026-10-26.md && echo IDENTICAL && wc -w deliverables/memo-2026-10-26.md",
+        "hand_edit": null,
+        "human_feedback_after": [
+          {
+            "call": 129,
+            "task": "20261029T141102711053-root-9df1",
+            "turn": 17,
+            "verdict": "accept"
+          }
+        ],
+        "latest_result": {
+          "created": "2026-10-29T14:12:22+00:00",
+          "id": "20261029T141222053152-lead-d1c0",
+          "reply_to": "20261029T141102711053-root-9df1",
+          "status": "done"
+        },
+        "progress_call": 122,
+        "source_path": "lead/writer/work/memo-2026-10-26.md",
+        "source_version": null,
+        "tool": "execute_bash",
+        "ts": "2026-10-29T14:12:35.646Z",
+        "turn": 16
+      },
+      {
+        "ask_first_shown": true,
+        "call": 137,
+        "case": "2026-11-02",
+        "checked_version": null,
+        "command": "cd /private/tmp/hirearchy-p2/C1-1793280632 && cp org/lead/writer/work/memo-2026-11-02.md deliverables/memo-2026-11-02.md && cmp org/lead/writer/work/memo-2026-11-02.md deliverables/memo-2026-11-02.md && echo IDENTICAL && wc -w deliverables/memo-2026-11-02.md && head -1 deliverables/memo-2026-11-02.md | cut -c1-30",
+        "hand_edit": null,
+        "human_feedback_after": [
+          {
+            "call": 145,
+            "task": "20261029T141346074674-root-4ec3",
+            "turn": 19,
+            "verdict": "accept"
+          }
+        ],
+        "latest_result": {
+          "created": "2026-10-29T14:15:33+00:00",
+          "id": "20261029T141533260584-lead-0dec",
+          "reply_to": "20261029T141346074674-root-4ec3",
+          "status": "done"
+        },
+        "progress_call": 134,
+        "source_path": "lead/writer/work/memo-2026-11-02.md",
+        "source_version": null,
+        "tool": "execute_bash",
+        "ts": "2026-10-29T14:16:45.231Z",
+        "turn": 18
+      },
+      {
+        "ask_first_shown": true,
+        "call": 153,
+        "case": "2026-11-09",
+        "checked_version": null,
+        "command": "cd /private/tmp/hirearchy-p2/C1-1793280632 && cp org/lead/writer/work/memo-2026-11-09.md deliverables/memo-2026-11-09.md && cmp org/lead/writer/work/memo-2026-11-09.md deliverables/memo-2026-11-09.md && echo IDENTICAL && wc -w deliverables/memo-2026-11-09.md && ls deliverables",
+        "hand_edit": null,
+        "human_feedback_after": [
+          {
+            "call": 155,
+            "task": "20261029T141835117946-root-723b",
+            "turn": 21,
+            "verdict": "reject"
+          },
+          {
+            "call": 171,
+            "task": "20261029T142345130834-root-bce0",
+            "turn": 23,
+            "verdict": "accept"
+          },
+          {
+            "call": 191,
+            "task": "20261029T143558022215-root-44d7",
+            "turn": 26,
+            "verdict": "accept"
+          }
+        ],
+        "latest_result": {
+          "created": "2026-10-29T14:20:21+00:00",
+          "id": "20261029T142021765823-lead-9000",
+          "reply_to": "20261029T141835117946-root-723b",
+          "status": "done"
+        },
+        "progress_call": 150,
+        "source_path": "lead/writer/work/memo-2026-11-09.md",
+        "source_version": null,
+        "tool": "execute_bash",
+        "ts": "2026-10-29T14:21:39.585Z",
+        "turn": 20
+      },
+      {
+        "ask_first_shown": true,
+        "call": 166,
+        "case": "2026-11-09",
+        "checked_version": null,
+        "command": "cd /private/tmp/hirearchy-p2/C1-1793280632 && cp org/lead/writer/work/memo-2026-11-09.md deliverables/memo-2026-11-09.md && cmp org/lead/writer/work/memo-2026-11-09.md deliverables/memo-2026-11-09.md && echo IDENTICAL && wc -w deliverables/memo-2026-11-09.md && grep -n '^Summary\\|^## ' deliverables/memo-2026-11-09.md | cut -c1-30",
+        "hand_edit": null,
+        "human_feedback_after": [
+          {
+            "call": 171,
+            "task": "20261029T142345130834-root-bce0",
+            "turn": 23,
+            "verdict": "accept"
+          },
+          {
+            "call": 191,
+            "task": "20261029T143558022215-root-44d7",
+            "turn": 26,
+            "verdict": "accept"
+          }
+        ],
+        "latest_result": {
+          "created": "2026-10-29T14:25:13+00:00",
+          "id": "20261029T142513380533-lead-9b8e",
+          "reply_to": "20261029T142345130834-root-bce0",
+          "status": "done"
+        },
+        "progress_call": 163,
+        "source_path": "lead/writer/work/memo-2026-11-09.md",
+        "source_version": null,
+        "tool": "execute_bash",
+        "ts": "2026-10-29T14:25:31.544Z",
+        "turn": 22
+      },
+      {
+        "ask_first_shown": false,
+        "call": 189,
+        "case": "2026-11-09",
+        "checked_version": null,
+        "command": "cd /private/tmp/hirearchy-p2/C1-1793280632 && cp org/lead/writer/work/action-list-2026-11-09.md deliverables/action-list-2026-11-09.md && cmp org/lead/writer/work/action-list-2026-11-09.md deliverables/action-list-2026-11-09.md && echo IDENTICAL && wc -w deliverables/action-list-2026-11-09.md",
+        "hand_edit": null,
+        "human_feedback_after": [
+          {
+            "call": 191,
+            "task": "20261029T143558022215-root-44d7",
+            "turn": 26,
+            "verdict": "accept"
+          }
+        ],
+        "latest_result": {
+          "created": "2026-10-29T14:37:27+00:00",
+          "id": "20261029T143727530828-lead-f99d",
+          "reply_to": "20261029T143558022215-root-44d7",
+          "status": "done"
+        },
+        "progress_call": 186,
+        "source_path": "lead/writer/work/action-list-2026-11-09.md",
+        "source_version": null,
+        "tool": "execute_bash",
+        "ts": "2026-10-29T14:37:41.970Z",
+        "turn": 25
+      }
+    ]
+  },
+  "cost": {
+    "assistant_credits": 61.6864,
+    "assistant_seconds": 2153,
+    "org_credits": {
+      "outside": 38.7687,
+      "window": 2.3098
+    },
+    "org_runs": {
+      "outside": 49,
+      "outside_by_seat": {
+        "lead": 32,
+        "lead-writer": 17
+      },
+      "total": 52,
+      "window": 3,
+      "window_by_seat": {
+        "lead": 2,
+        "lead-writer": 1
+      }
+    },
+    "org_seconds": {
+      "outside": 1620,
+      "window": 98
+    },
+    "user_turns": 27,
+    "wall_seconds": 4153,
+    "wall_time": "69:13"
+  },
+  "flagged": {
+    "by_result": {
+      "20261029T133659621367-lead-6a10": {
+        "case": "2026-10-05",
+        "created": "2026-10-29T13:36:59+00:00",
+        "first_flag_call": 17,
+        "needs_d5": 0,
+        "never_copied": 0,
+        "notes": 0,
+        "questions": 2,
+        "reply_to": "20261029T133518543841-root-4955",
+        "status": "done",
+        "superseded": 2
+      },
+      "20261029T141533260584-lead-0dec": {
+        "case": "2026-11-02",
+        "created": "2026-10-29T14:15:33+00:00",
+        "first_flag_call": 134,
+        "needs_d5": 1,
+        "never_copied": 0,
+        "notes": 0,
+        "questions": 1,
+        "reply_to": "20261029T141346074674-root-4ec3",
+        "status": "done",
+        "superseded": 0
+      },
+      "20261029T142021765823-lead-9000": {
+        "case": "2026-11-09",
+        "created": "2026-10-29T14:20:21+00:00",
+        "first_flag_call": 150,
+        "needs_d5": 1,
+        "never_copied": 0,
+        "notes": 0,
+        "questions": 1,
+        "reply_to": "20261029T141835117946-root-723b",
+        "status": "done",
+        "superseded": 0
+      },
+      "20261029T142513380533-lead-9b8e": {
+        "case": "2026-11-09",
+        "created": "2026-10-29T14:25:13+00:00",
+        "first_flag_call": 163,
+        "needs_d5": 1,
+        "never_copied": 0,
+        "notes": 0,
+        "questions": 1,
+        "reply_to": "20261029T142345130834-root-bce0",
+        "status": "done",
+        "superseded": 0
+      }
+    },
+    "counts": {
+      "items": 5,
+      "needs_d5": 3,
+      "never_copied": 0,
+      "notes": 0,
+      "questions": 5,
+      "results_with_items": 4,
+      "superseded": 2
+    },
+    "items": [
+      {
+        "case": "2026-10-05",
+        "class": "superseded",
+        "copy": {
+          "call": 29,
+          "ts": "2026-10-29T13:40:35.248Z",
+          "turn": 4
+        },
+        "created": "2026-10-29T13:36:59+00:00",
+        "flagged_by": [
+          {
+            "call": 17,
+            "source": "assistant",
+            "ts": "2026-10-29T13:37:01.034Z",
+            "turn": 3
+          }
+        ],
+        "kind": "question",
+        "result": "20261029T133659621367-lead-6a10",
+        "reworks_between": [
+          "20261029T133841717115-root-6dfb"
+        ],
+        "text": "Marta's Due (C5): notes say \"book the on-call training room for Oct 14\". Oct 14 is the training date, not a booking deadline, so Due is \"none\". Say if you want 2026-10-14."
+      },
+      {
+        "case": "2026-10-05",
+        "class": "superseded",
+        "copy": {
+          "call": 29,
+          "ts": "2026-10-29T13:40:35.248Z",
+          "turn": 4
+        },
+        "created": "2026-10-29T13:36:59+00:00",
+        "flagged_by": [
+          {
+            "call": 17,
+            "source": "assistant",
+            "ts": "2026-10-29T13:37:01.034Z",
+            "turn": 3
+          }
+        ],
+        "kind": "question",
+        "result": "20261029T133659621367-lead-6a10",
+        "reworks_between": [
+          "20261029T133841717115-root-6dfb"
+        ],
+        "text": "Sam's Due (C5): \"before Friday\" (meeting Monday 5 Oct) is not a single clear date, so Due is \"none\"."
+      },
+      {
+        "case": "2026-11-02",
+        "class": "needs D5 judgement (copy at T)",
+        "copy": {
+          "call": 137,
+          "ts": "2026-10-29T14:16:45.231Z",
+          "turn": 18
+        },
+        "created": "2026-10-29T14:15:33+00:00",
+        "flagged_by": [
+          {
+            "call": 134,
+            "source": "assistant",
+            "ts": "2026-10-29T14:15:35.377Z",
+            "turn": 17
+          }
+        ],
+        "kind": "question",
+        "result": "20261029T141533260584-lead-0dec",
+        "reworks_between": [],
+        "text": "Lee's row: notes say \"Lee will check the SSO renewal invoice against the quote on Wednesday.\" Due is set to 2026-11-04 (the coming Wednesday after Monday 2 November). C5 allows a date only when the notes and meeting date make it clear. If you read it as not clear, Due should be \"none\"."
+      },
+      {
+        "case": "2026-11-09",
+        "class": "needs D5 judgement (copy at T)",
+        "copy": {
+          "call": 153,
+          "ts": "2026-10-29T14:21:39.585Z",
+          "turn": 20
+        },
+        "created": "2026-10-29T14:20:21+00:00",
+        "flagged_by": [
+          {
+            "call": 150,
+            "source": "assistant",
+            "ts": "2026-10-29T14:20:22.735Z",
+            "turn": 19
+          }
+        ],
+        "kind": "question",
+        "result": "20261029T142021765823-lead-9000",
+        "reworks_between": [],
+        "text": "Sam's \"by Friday\" (C5): the memo gives Due 2026-11-13 (Friday after Monday 9 Nov). The notes say only \"by Friday\"; the writer was unsure and \"none\" is the alternative. Which do you want?"
+      },
+      {
+        "case": "2026-11-09",
+        "class": "needs D5 judgement (copy at T)",
+        "copy": {
+          "call": 166,
+          "ts": "2026-10-29T14:25:31.544Z",
+          "turn": 22
+        },
+        "created": "2026-10-29T14:25:13+00:00",
+        "flagged_by": [
+          {
+            "call": 163,
+            "source": "assistant",
+            "ts": "2026-10-29T14:25:15.620Z",
+            "turn": 22
+          }
+        ],
+        "kind": "question",
+        "result": "20261029T142513380533-lead-9b8e",
+        "reworks_between": [],
+        "text": "Sam's \"by Friday\" is shown as Due 2026-11-13 (C5). The notes give the meeting date, Monday 9 Nov 2026, but no explicit date for that Friday. Please confirm."
+      }
+    ]
+  },
+  "grants": [],
+  "human_reworks": {
+    "count": 5,
+    "list": [
+      {
+        "budget_arg": 4,
+        "call": 24,
+        "held": false,
+        "reply_budget": 4,
+        "topup": false,
+        "turn": 4
+      },
+      {
+        "budget_arg": 5,
+        "call": 43,
+        "held": false,
+        "reply_budget": 5,
+        "topup": false,
+        "turn": 6
+      },
+      {
+        "budget_arg": 4,
+        "call": 91,
+        "held": false,
+        "reply_budget": 4,
+        "topup": false,
+        "turn": 12
+      },
+      {
+        "budget_arg": 5,
+        "call": 100,
+        "held": false,
+        "reply_budget": 5,
+        "topup": false,
+        "turn": 14
+      },
+      {
+        "budget_arg": 5,
+        "call": 158,
+        "held": false,
+        "reply_budget": 5,
+        "topup": false,
+        "turn": 22
+      }
+    ],
+    "without_budget": 0
+  },
+  "injected_task": "20261029T134137516157-root-2478",
+  "lasis": {
+    "accepted": {
+      "k": 0,
+      "n": 0
+    },
+    "accepted_turns": [],
+    "turns": [],
+    "uses": 0
+  },
+  "measures": {
+    "ask_first_copies": {
+      "k": 3,
+      "n": 13
+    },
+    "assistant_credits": 61.6864,
+    "assistant_seconds": 2153,
+    "boundary_failure_files": 0,
+    "copies": 13,
+    "d1_never_recorded": {
+      "k": 0,
+      "n": 2
+    },
+    "d23_about_differs": {
+      "k": 0,
+      "n": 3
+    },
+    "d23_without_reading": {
+      "k": 0,
+      "n": 3
+    },
+    "deliverable_notes": 0,
+    "delivered_without_verdict": {
+      "k": 0,
+      "n": 13
+    },
+    "facade_refusals": 0,
+    "flagged_items": 5,
+    "flagged_needs_d5": 3,
+    "flagged_never_copied": 0,
+    "flagged_notes": 0,
+    "flagged_questions": 5,
+    "flagged_results": 4,
+    "flagged_superseded": 2,
+    "grants": 0,
+    "hand_edits": {
+      "k": 0,
+      "n": 13
+    },
+    "held_replies": 0,
+    "human_rejects": 3,
+    "human_reworks": 5,
+    "human_reworks_without_budget": 0,
+    "inbox_calls": 25,
+    "lasis_accepted": {
+      "k": 0,
+      "n": 0
+    },
+    "lasis_uses": 0,
+    "lena_keep_l_budget_q": 0,
+    "lena_yes_h4": 0,
+    "m_c_8": {
+      "k": 27,
+      "n": 27
+    },
+    "memo1_turns": 5,
+    "memo2_turns": 2,
+    "memo3_turns": 5,
+    "org_credits_outside": 38.7687,
+    "org_credits_window": 2.3098,
+    "org_runs_outside": 49,
+    "org_runs_window": 3,
+    "org_seconds_outside": 1620,
+    "org_seconds_window": 98,
+    "other_refusals": 0,
+    "p2_refusals": 1,
+    "p2_unrated": 1,
+    "p4_refusals": 0,
+    "plans": 1,
+    "plans_with_budget_line": {
+      "k": 0,
+      "n": 1
+    },
+    "relayed_reworks_by_assistant": 0,
+    "root_unread_at_end": 0,
+    "run_end_killed": 0,
+    "run_orphan": 0,
+    "scheduler_signals": 0,
+    "schedulers_assistant": 10,
+    "schedulers_running_at_turn_end": {
+      "k": 0,
+      "n": 10
+    },
+    "schedulers_script": 1,
+    "schedulers_total": 16,
+    "schedulers_with_exit": {
+      "k": 16,
+      "n": 16
+    },
+    "shell_commands": 29,
+    "shell_reads": 0,
+    "skill_stratum": "A",
+    "sleep_entries": 27,
+    "survival_pairs": {
+      "k": 0,
+      "n": 0
+    },
+    "topup_replies": 0,
+    "turns_showing_budget_line": 0,
+    "unexplained_signals": {
+      "k": 0,
+      "n": 0
+    },
+    "user_turns": 27,
+    "wall_seconds": 4153,
+    "wall_time": "69:13"
+  },
+  "memo_turns": [
+    {
+      "accept_call": 50,
+      "accept_turn": 7,
+      "case": "2026-10-05",
+      "copies": [
+        4,
+        6,
+        8
+      ],
+      "request_call": 15,
+      "request_turn": 3,
+      "turns": 5
+    },
+    {
+      "accept_call": 69,
+      "accept_turn": 10,
+      "case": "2026-10-12",
+      "copies": [
+        9,
+        10
+      ],
+      "request_call": 63,
+      "request_turn": 9,
+      "turns": 2
+    },
+    {
+      "accept_call": 108,
+      "accept_turn": 15,
+      "case": "2026-10-19",
+      "copies": [
+        12,
+        14,
+        15
+      ],
+      "request_call": 84,
+      "request_turn": 11,
+      "turns": 5
+    },
+    {
+      "accept_call": 129,
+      "accept_turn": 17,
+      "case": "2026-10-26",
+      "copies": [
+        16
+      ],
+      "request_call": 119,
+      "request_turn": 16,
+      "turns": 2
+    },
+    {
+      "accept_call": 145,
+      "accept_turn": 19,
+      "case": "2026-11-02",
+      "copies": [
+        18
+      ],
+      "request_call": 130,
+      "request_turn": 17,
+      "turns": 3
+    },
+    {
+      "accept_call": 171,
+      "accept_turn": 23,
+      "case": "2026-11-09",
+      "copies": [
+        20,
+        22,
+        25
+      ],
+      "request_call": 146,
+      "request_turn": 19,
+      "turns": 5
+    }
+  ],
+  "owner": "lead",
+  "plan": {
+    "lena_keep_l_budget_q": 0,
+    "lena_yes_h4": 0,
+    "list": [
+      {
+        "call": 12,
+        "has_budget_line": false,
+        "lines": [],
+        "shown_verbatim_in_turn": false,
+        "turn": 2
+      }
+    ],
+    "plans": 1,
+    "plans_with_budget_line": {
+      "k": 0,
+      "n": 1
+    },
+    "turns_showing_line": 0
+  },
+  "reads": {
+    "inbox_calls": 25,
+    "read_calls": 0,
+    "root_unread_at_end": 0,
+    "shell_reads": 0
+  },
+  "refusals": {
+    "by_kind": {
+      "P2-UNRATED": 1
+    },
+    "facade_total": 0,
+    "list": [
+      {
+        "call": 36,
+        "kind": "P2-UNRATED",
+        "text": "MCP tool error: Error executing tool define_service: refused: 1 delivered request(s) of `weekly-meeting-memo` have no verdict yet: 20261029T134137516157-root-2478. Record a verdict on each with feedback first: on a delivery the user saw, the user's own, a rejection then its one question (CLI: hirear",
+        "tool": "define_service",
+        "turn": 6
+      }
+    ],
+    "other_total": 0,
+    "p2_total": 1,
+    "p4_total": 0
+  },
+  "rejects": {
+    "about_differs_from_reading": {
+      "k": 0,
+      "n": 3
+    },
+    "d1_candidate_turns": [
+      5,
+      13
+    ],
+    "d1_never_recorded": [],
+    "human_rejects": [
+      {
+        "call": 34,
+        "criterion": [
+          "C3"
+        ],
+        "defines_after": [
+          {
+            "about": "C3",
+            "answers": "20261029T134407036146-root-f53e",
+            "call": 36,
+            "refusal": "P2-UNRATED",
+            "status": "refused",
+            "ts": "2026-10-29T13:45:02.153Z",
+            "turn": 6
+          },
+          {
+            "about": "C3",
+            "answers": "20261029T134407036146-root-f53e",
+            "call": 42,
+            "refusal": null,
+            "status": "admitted",
+            "ts": "2026-10-29T13:45:27.397Z",
+            "turn": 6
+          }
+        ],
+        "task": "20261029T133841717115-root-6dfb",
+        "ts": "2026-10-29T13:44:07.041Z",
+        "turn": 5,
+        "turn_files_between": [
+          "turn-05.txt"
+        ],
+        "window_end": {
+          "call": 42,
+          "kind": "define_service",
+          "turn": 6
+        }
+      },
+      {
+        "call": 97,
+        "criterion": [
+          "C4"
+        ],
+        "defines_after": [
+          {
+            "about": "C4",
+            "answers": "20261029T140412342725-root-28e3",
+            "call": 99,
+            "refusal": null,
+            "status": "admitted",
+            "ts": "2026-10-29T14:05:15.169Z",
+            "turn": 14
+          }
+        ],
+        "task": "20261029T140117776426-root-8d00",
+        "ts": "2026-10-29T14:04:12.359Z",
+        "turn": 13,
+        "turn_files_between": [
+          "turn-13.txt"
+        ],
+        "window_end": {
+          "call": 99,
+          "kind": "define_service",
+          "turn": 14
+        }
+      },
+      {
+        "call": 155,
+        "criterion": [
+          "C9"
+        ],
+        "defines_after": [
+          {
+            "about": "C9",
+            "answers": "20261029T142246216862-root-4d83",
+            "call": 157,
+            "refusal": null,
+            "status": "admitted",
+            "ts": "2026-10-29T14:23:41.263Z",
+            "turn": 22
+          }
+        ],
+        "task": "20261029T141835117946-root-723b",
+        "ts": "2026-10-29T14:22:46.254Z",
+        "turn": 21,
+        "turn_files_between": [
+          "turn-21.txt"
+        ],
+        "window_end": {
+          "call": 157,
+          "kind": "define_service",
+          "turn": 22
+        }
+      }
+    ],
+    "without_reading": {
+      "k": 0,
+      "n": 3
+    }
+  },
+  "relayed_reworks": {
+    "injected": "20261029T134137516157-root-2478",
+    "sent": []
+  },
+  "schedulers": {
+    "assistant_started": 10,
+    "boundary_failure_files": [],
+    "m_c_1": {
+      "k": 0,
+      "n": 10
+    },
+    "m_c_2_pairs": {
+      "k": 0,
+      "n": 0
+    },
+    "m_c_2_runs": {
+      "k": 0,
+      "n": 0
+    },
+    "m_c_4": {
+      "k": 16,
+      "n": 16
+    },
+    "m_c_6": {
+      "k": 0,
+      "n": 0
+    },
+    "m_c_7": {
+      "k": 0,
+      "n": 0
+    },
+    "m_c_8": {
+      "k": 27,
+      "n": 27
+    },
+    "per_scheduler": [
+      {
+        "began_in_turn": 3,
+        "classes": [],
+        "exit_reason": "finished: no open tasks",
+        "pid": 81000,
+        "starter": "assistant"
+      },
+      {
+        "began_in_turn": 4,
+        "classes": [],
+        "exit_reason": "finished: no open tasks",
+        "pid": 81917,
+        "starter": "assistant"
+      },
+      {
+        "began_in_turn": null,
+        "classes": [],
+        "exit_reason": "finished: no open tasks",
+        "pid": 82641,
+        "starter": "script"
+      },
+      {
+        "began_in_turn": 6,
+        "classes": [],
+        "exit_reason": "finished: no open tasks",
+        "pid": 84036,
+        "starter": "assistant"
+      },
+      {
+        "began_in_turn": 8,
+        "classes": [],
+        "exit_reason": "finished: no open tasks",
+        "pid": 85852,
+        "starter": "assistant"
+      },
+      {
+        "began_in_turn": 9,
+        "classes": [],
+        "exit_reason": "finished: no open tasks",
+        "pid": 87039,
+        "starter": "assistant"
+      },
+      {
+        "began_in_turn": 10,
+        "classes": [],
+        "exit_reason": "finished: no open tasks",
+        "pid": 88111,
+        "starter": "unknown"
+      },
+      {
+        "began_in_turn": 11,
+        "classes": [],
+        "exit_reason": "finished: no open tasks",
+        "pid": 89235,
+        "starter": "assistant"
+      },
+      {
+        "began_in_turn": 12,
+        "classes": [],
+        "exit_reason": "finished: no open tasks",
+        "pid": 90297,
+        "starter": "unknown"
+      },
+      {
+        "began_in_turn": 14,
+        "classes": [],
+        "exit_reason": "finished: no open tasks",
+        "pid": 92409,
+        "starter": "unknown"
+      },
+      {
+        "began_in_turn": 15,
+        "classes": [],
+        "exit_reason": "finished: no open tasks",
+        "pid": 93868,
+        "starter": "assistant"
+      },
+      {
+        "began_in_turn": 16,
+        "classes": [],
+        "exit_reason": "finished: no open tasks",
+        "pid": 95023,
+        "starter": "assistant"
+      },
+      {
+        "began_in_turn": 17,
+        "classes": [],
+        "exit_reason": "finished: no open tasks",
+        "pid": 96317,
+        "starter": "unknown"
+      },
+      {
+        "began_in_turn": 19,
+        "classes": [],
+        "exit_reason": "finished: no open tasks",
+        "pid": 98677,
+        "starter": "assistant"
+      },
+      {
+        "began_in_turn": 22,
+        "classes": [],
+        "exit_reason": "finished: no open tasks",
+        "pid": 2604,
+        "starter": "unknown"
+      },
+      {
+        "began_in_turn": 25,
+        "classes": [],
+        "exit_reason": "finished: no open tasks",
+        "pid": 7235,
+        "starter": "assistant"
+      }
+    ],
+    "reasons": [
+      "finished: no open tasks"
+    ],
+    "run_end_killed": 0,
+    "run_orphan": 0,
+    "script_started": 1,
+    "signals": [],
+    "sleep_entries": 27,
+    "stop_calls": 0,
+    "total": 16,
+    "unknown_starter": 5
+  },
+  "script": {
+    "md5": "61f51c012dfff9305836990bef47cf4d",
+    "name": "assistant_facts.py"
+  },
+  "seat": "lead-writer",
+  "service": "weekly-meeting-memo",
+  "skill": {
+    "disclose_calls": 1,
+    "first_disclose": {
+      "call": 1,
+      "ts": "2026-10-29T13:31:26.119Z",
+      "turn": 1,
+      "uri": "file:///private/tmp/hirearchy-p2/C1-1793280632/.kiro/skills/hirearchy/SKILL.md"
+    },
+    "first_feedback": {
+      "call": 34,
+      "ts": "2026-10-29T13:44:07.041Z",
+      "turn": 5,
+      "uri": null
+    },
+    "first_propose_org": {
+      "call": 10,
+      "ts": "2026-10-29T13:33:57.637Z",
+      "turn": 2,
+      "uri": null
+    },
+    "installed_skill_notes": 0,
+    "skill_md5": null,
+    "stratum": "A"
+  },
+  "source_files": [
+    "assistant-session-messages.jsonl",
+    "client-questions.txt",
+    "events/",
+    "lena-lines.txt",
+    "memos/versions/INDEX.txt",
+    "msgs/",
+    "session-turn-times-utc.txt",
+    "skill-check.txt",
+    "turn-times.txt"
+  ],
+  "stream": "C1",
+  "topup_held": {
+    "held": [],
+    "topup": []
+  },
+  "verdicts": {
+    "delivered_versions": 13,
+    "delivered_without_verdict": {
+      "k": 0,
+      "n": 13
+    }
+  }
+}

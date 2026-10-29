@@ -1,0 +1,66 @@
+1c1
+< label: R1 before
+---
+> label: R1 after
+4c4
+< MD5 (/Users/aminalizadeh/.kiro/settings/cli.json) = 8d75907973b5f3720d5bd4de5eaff7d8
+---
+> MD5 (/Users/aminalizadeh/.kiro/settings/cli.json) = f21924126253d2f829fd25ad189e4825
+6c6
+< MD5 (/Users/aminalizadeh/.kiro/settings/mcp.json) = 767d7d34ab140172ef643ffcc7ca39e1
+---
+> MD5 (/Users/aminalizadeh/.kiro/settings/mcp.json) = 9ca5275ee24dfa57e57c763e717e2387
+16c16
+< MD5 (/Users/aminalizadeh/.kiro/memories/memories.db) = 78502051db9553346ff820af169bd21a
+---
+> MD5 (/Users/aminalizadeh/.kiro/memories/memories.db) = 6e6d7471ecc08b81a051d7862de7f64f
+18c18
+< drwx------@  3 aminalizadeh  staff      96 Oct 29 12:04 .
+---
+> drwx------@  3 aminalizadeh  staff      96 Oct 29 13:14 .
+20c20
+< -rw-------@  1 aminalizadeh  staff  155648 Oct 29 11:46 memories.db
+---
+> -rw-------@  1 aminalizadeh  staff  159744 Oct 29 12:31 memories.db
+23c23
+< drwx------@  9 aminalizadeh  staff   288 Oct 29 11:03 .
+---
+> drwx------@  9 aminalizadeh  staff   288 Oct 29 13:27 .
+72c72
+< drwxr-x---+ 146 aminalizadeh  staff  4672 Oct 29 06:42 ..
+---
+> drwxr-x---+ 146 aminalizadeh  staff  4672 Oct 29 12:37 ..
+197a198
+> R1-1793275867
+207a209,239
+> r1b-finish.console.txt
+> r1b-injection.console.txt
+> r1b-memblock.txt
+> r1b-turn-01.console.txt
+> r1b-turn-02.console.txt
+> r1b-turn-03.console.txt
+> r1b-turn-04.console.txt
+> r1b-turn-05.console.txt
+> r1b-turn-06.console.txt
+> r1b-turn-07.console.txt
+> r1b-turn-08.console.txt
+> r1b-turn-09.console.txt
+> r1b-turn-10.console.txt
+> r1b-turn-11.console.txt
+> r1b-turn-12.console.txt
+> r1b-turn-13.console.txt
+> r1b-turn-14.console.txt
+> r1b-turn-15.console.txt
+> r1b-turn-16.console.txt
+> r1b-turn-17.console.txt
+> r1b-turn-18.console.txt
+> r1b-turn-19.console.txt
+> r1b-turn-20.console.txt
+> r1b-turn-21.console.txt
+> r1b-turn-22.console.txt
+> r1b-turn-23.console.txt
+> r1b-turn-24.console.txt
+> r1b-turn-25.console.txt
+> r1b-turn-26.console.txt
+> r1b-turn-27.console.txt
+> r1b-turn-28.console.txt

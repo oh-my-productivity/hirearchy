@@ -1,0 +1,48 @@
+######## TURN 2  start 12:14:41  end 12:15:35  elapsed 54s  (local, 2026-10-29; UTC wall-clock start 2026-10-29T12:14:41Z end 2026-10-29T12:15:35Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Thanks! Yes, if someone said they'd do something, it counts. Yes, turn vague deadlines into a date when the notes make it clear. The file name each time is fine. Format: a markdown memo, at most 400 words, with the action items as a table with columns Owner | Action | Due (ISO dates, 'none' if there's no date). The rest of your defaults are fine, the deliverables folder too. Please keep it cheap, but I need it right - about 12 runs per memo. No separate reviewer: the lead checks. No, keep it as it is. For the Owner column: Use the words from the notes. No, the first memo should be this week's: 2026-10-05.md, not 2026-11-09.md.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-02.stderr.txt):
+Here is the plan. I put the plan in the block below. The one warning is that the agents can't write into `deliverables/` themselves, so I copy each checked memo there and verify it.
+
+PLAN FOR YOU
+Goal: Every week, after the team meeting, write a short memo from the user's meeting notes: what the team decided and who does what. Written for the user (the meeting owner) to send to the team.
+What I understood you need:
+- Scope: One memo per request, from one meeting notes file: the decisions made and the action items (who does what, by when). Nothing else: no attendee list, no next-meeting date.
+- Your files (read-only): /tmp/hirearchy-p2/R1-1793275867/notes
+- Quality bar: Every statement comes from the notes file; where the notes are unclear, the memo says so instead of guessing.
+- Sources: Only the files in the notes folder; no web.
+- Workspace: none (nothing writes files or runs commands)
+- Models: claude-sonnet-5.5 (high effort) for every agent
+Team (2 agents):
+- lead (Manager, model claude-sonnet-5.5): directs the team; does not produce the work itself; can read /private/tmp/hirearchy-p2/R1-1793275867/notes through the organization's read tool; cannot change your files
+  - writer (Writer, model claude-sonnet-5.5): can read /private/tmp/hirearchy-p2/R1-1793275867/notes through the organization's read tool; cannot change your files
+Budget: up to 12 runs per request (one run = one working session of one agent), your cap per request is 12; the minimum for one review and rework is 8, and a round of your questions or a rejection takes about 3 more (11 in all). Unspent runs come back to you.
+  lead starts with 12, hands down writer 3 and keeps 9 for planning, checking and rework.
+If a check still fails after one rework, I'll come back to you with options before spending the reserve; nothing beyond a request's budget is spent without your OK.
+Checking: no independent reviewer (you did not ask for one). I still re-check the final result against every service check below.
+Services (kept ready, requested whenever you want):
+- weekly-meeting-memo: One markdown memo with the decisions and the action items table for one meeting notes file.
+  You provide: notes_file (required)
+  Each request: up to 12 runs
+  Checks:
+    1. The memo is markdown and has at most 400 words as counted by read.
+       from your words "a markdown memo, at most 400 words" (my question: "Format and length?"); words I added: the, is, has, as, counted, by, read
+    2. The memo has a Decisions section listing every decision made in the named notes file, and nothing from other files.
+       from your words "what we decided" (my question: "Memo contents?"); words I added: the, has, a, decisions, section, listing, every, decision, +10 more
+    3. The action items are a markdown table with exactly the columns Owner | Action | Due.
+       from your words "the action items as a table with columns Owner | Action | Due" (my question: "Format and length?"); words I added: are, markdown, exactly
+    4. Every commitment in the notes is a row of the table, both those labelled ACTION and those stated in prose, such as someone saying they would do something.
+       from your words "if someone said they'd do something, it counts" (my question: "Do informal or unlabelled commitments count?"); words I added: every, commitment, in, the, notes, is, a, row, +13 more
+    5. Each Due value is an ISO date (YYYY-MM-DD). A relative deadline such as 'by Friday' is turned into a date only when the notes make the date clear; if the notes give no date, Due is 'none'.
+       from your words "turn vague deadlines into a date when the notes make it clear" (my question: "How to treat relative or vague dates?"); words I added: each, due, value, is, an, iso, yyyy, -, +13 more
+    6. Each Owner value uses the name exactly as written in the notes.
+       from your words "For the Owner column: Use the words from the notes." (my question: "How should the Owner column read?"); words I added: each, value, uses, name, exactly, as, written, in
+    7. Every statement in the memo is traceable to the notes file, and anything unclear (no owner, an unconfirmed decision) is listed under a final heading 'Unclear' instead of being guessed.
+       my default: you did not say this
+    8. The lead's check report states that every decision and every table row was compared with the notes file, with the count verified (n of m, n = m).
+       from your words "No separate reviewer: the lead checks." (my question: "Review by another agent?"); words I added: s, check, report, states, that, every, decision, and, +13 more
+  Delivered to: /private/tmp/hirearchy-p2/R1-1793275867/deliverables (I copy each result there after checking it)
+After each request the lead records lessons; before the next one it reviews them with your feedback and may improve how the team works (its playbook). It cannot change these checks: only you can, through me.
+First request, started on approval: weekly-meeting-memo (notes_file: 2026-10-05.md).
+Checkpoints: approval - Plan first; ask before any spend beyond the budget; progress - One line when I ask; any spend beyond the budget needs your OK.
+Nothing is created or started until you approve. Reply 'approve', or tell me what to change.

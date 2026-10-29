@@ -1,0 +1,16 @@
+org: /private/tmp/hirearchy-p2/preflight-R-1793268869/org
+initialized organization at /private/tmp/hirearchy-p2/preflight-R-1793268869/org
+edit /private/tmp/hirearchy-p2/preflight-R-1793268869/org/ORG.md to set the mission and limits
+init exit 0
+org: /private/tmp/hirearchy-p2/preflight-R-1793268869/org
+hired lead
+hire exit 0
+org: /private/tmp/hirearchy-p2/preflight-R-1793268869/org
+task 20261029T101430060116-root-b1ed -> lead (budget 2)
+task exit 0
+org: /private/tmp/hirearchy-p2/preflight-R-1793268869/org
+lead: started run (1 message(s))
+lead: run finished in 22s
+scheduler exiting: finished: no open tasks
+run exit 0
+# cmd: /Volumes/workspace/hirearchy/.venv/bin/python3 -I -S /Volumes/workspace/hirearchy/src/hirearchy/kiro/_launch.py --start-deadline 60 -- kiro-cli chat --no-interactive --agent hirearchy-preflight-r-1793268869-o-49bd88 --model claude-sonnet-5.5 --effort high --v3 --require-mcp-startup --output-format stream-json <prompt on stdin>

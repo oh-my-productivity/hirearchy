@@ -1,0 +1,3 @@
+Memo 1's first delivered version (D8): turn 4's reply copied memo-2026-10-05.md into deliverables/ ("I copied it from the team's output and the two files are identical") and presented it ("Keep it, or what should change?"). Turn 3's reply showed a draft (not copied): not a delivery.
+It is the result of root's rework task 20261029T133841717115-root-6dfb (revises 20261029T133518543841-root-4955; the two Due dates Lena answered in turn 4), result message lead-0e69/lead.writer-621b chain, last lead result read in turn 4.
+--revises argument: 20261029T133518543841-root-4955 (the memo-1 service request, the root of the chain; the rework 6dfb revises it and shares its trace). No scheduler running (no .runtime/scheduler.pid; no process naming the sandbox: ps found 0).

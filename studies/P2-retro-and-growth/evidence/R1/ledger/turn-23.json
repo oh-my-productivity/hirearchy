@@ -1,0 +1,65 @@
+{
+  "briefs": [
+    {
+      "id": "B1",
+      "at": "2026-10-29T13:15:39.040747+00:00",
+      "since": "2026-10-29T12:16:20+00:00",
+      "by": "mcp",
+      "items": [
+        {
+          "n": 1,
+          "kind": "service",
+          "key": "service|lead|20261029T122710588867-root-c1b8",
+          "evidence": [
+            "20261029T122710588867-root-c1b8",
+            "20261029T123457206032-root-cabf",
+            "20261029T125747104778-root-4a85"
+          ],
+          "effect": {
+            "service": "lead/one-page-ops"
+          },
+          "lapsed": 0
+        },
+        {
+          "n": 2,
+          "kind": "clarify",
+          "key": "clarify|weekly-meeting-memo|C1|thememoismarkdownandhasatmost400wordsasc",
+          "evidence": [
+            "weekly-meeting-memo/C1"
+          ],
+          "effect": {
+            "service": "weekly-meeting-memo",
+            "criterion": "C1"
+          },
+          "lapsed": 0
+        },
+        {
+          "n": 3,
+          "kind": "clarify",
+          "key": "clarify|weekly-meeting-memo|C10|astatementthatsomethingstaysasitiswheren",
+          "evidence": [
+            "weekly-meeting-memo/C10"
+          ],
+          "effect": {
+            "service": "weekly-meeting-memo",
+            "criterion": "C10"
+          },
+          "lapsed": 0
+        }
+      ],
+      "held_back": [
+        "clarify|weekly-meeting-memo|C2|thememohasadecisionssectionlistingeveryd",
+        "clarify|weekly-meeting-memo|C3|theactionitemsareamarkdowntablewithexact",
+        "clarify|weekly-meeting-memo|C4|everycommitmentinthenotesisarowofthetabl",
+        "clarify|weekly-meeting-memo|C5|eachduevalueisanisodateyyyymmddarelative",
+        "clarify|weekly-meeting-memo|C6|eachownervalueusesthenameexactlyaswritte",
+        "clarify|weekly-meeting-memo|C8|theleadscheckreportstatesthateverydecisi"
+      ]
+    }
+  ],
+  "asked": [
+    "service|lead|20261029T122710588867-root-c1b8",
+    "clarify|weekly-meeting-memo|C1|thememoismarkdownandhasatmost400wordsasc",
+    "clarify|weekly-meeting-memo|C10|astatementthatsomethingstaysasitiswheren"
+  ]
+}

@@ -1,0 +1,18 @@
+Your accept is recorded. I also noted that the stray rework was not your request. It stays flagged as my spend, and I still can't see where it came from.
+
+I can't use the weekly memo service for the action list. Its contract requires a Summary, Decisions and a table, which is a different document. I'd set it up as a separate one-off task on the same team, using `2026-10-05.md` only. Here is what I need, with defaults:
+
+1. **One-off or weekly?** *Default: one-off. If you want one every week, say so and I'll set it up as a second service.*
+2. **Content.** One table of Owner | Action | Due, with a short title and the meeting date. No decisions and no summary. *Default: the same rules as the memo, so informal commitments count, wording comes from the notes, and dates are ISO. That gives Sam 2026-10-09, Marta 2026-10-14 and Lee "none", as you confirmed. Each of those would be a fixed rule here, not a new question each time.*
+3. **Ops team.** Should the list keep all five actions, or only the ones that involve ops? The notes don't say who is on ops. *Default: all five, with nothing added or guessed about ops.*
+4. **"At most one page."** I can't measure pages, so I'd use at most 250 words as the checkable limit. *Default: 250 words.*
+5. **Where.** `deliverables/action-list-2026-10-05.md`, as markdown. *Default: that path.*
+6. **Checks.** *Default:*
+   - Every commitment in the notes is listed (n of m, n = m).
+   - Each row has an owner, an action and a due date.
+   - Nothing appears that isn't in the notes.
+   - It is at most 250 words.
+   - The lead checks it, with no separate reviewer, as before.
+7. **Budget.** I'll show it in the plan. A short list like this should need far fewer than 12 runs.
+
+Reply "defaults", or tell me what to change, and I'll show you the plan to approve.

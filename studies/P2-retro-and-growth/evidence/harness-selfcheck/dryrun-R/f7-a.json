@@ -1,0 +1,9 @@
+{
+ "form": "a",
+ "memo5": "20261029T120759633385-root-93f0",
+ "rejection": "20261029T120800504511-root-5d1f",
+ "trap1_rid": "R2",
+ "trap_crit": "C6",
+ "reply": "feedback reject recorded on 20261029T120759633385-root-93f0 for lead (message 20261029T120800504511-root-5d1f, source human); it does not wake lead\nThis rejection is R5. Next: ask the user exactly ONE yes/no question that names the criterion you read the rejection as: \"About <its id>: add \"<the rule, in their words>\" as a lasting rule? Yes or no.\", with <its id> one of C1, C2, C3, C4, C5, C6; for a repeat: \"Same as R<j>: a one-off? Yes or no.\", with R<j> one of R1, R2, R3, R4. Next time, pass your reading as criterion on the rejection and this reply gives the question with its id. Change nothing in this turn: an \"always ...\" in the rejection is not their yes. On yes: define_service(owner=\"lead\", name=\"weekly-memo\", add_acceptance=[\"<the rule>\"], answers=\"20261029T120800504511-root-5d1f\", about=\"<the id you asked about>\", words=\"<their answer, verbatim>\"). On no, a one-off or \"as it is\": feedback(task_id=\"20261029T120759633385-root-93f0\", verdict=\"reject\", confirms=\"20261029T120800504511-root-5d1f\", criterion=[\"none\"], [\"R<j>\"] or [\"C<k>\"], source=\"human\", note=\"<their answer, verbatim>\").\nRetro due: 12 verdicts of the user since the last brief (none yet). Once this delivery is settled, offer the user a retro in one line, and call retro() only after their yes.",
+ "answer": "recorded: rejection 20261029T120800504511-root-5d1f is about R2 (source human; message 20261029T120801072237-root-efcd); it does not wake lead"
+}

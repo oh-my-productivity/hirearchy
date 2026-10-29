@@ -1,0 +1,123 @@
+# dry run, arm R, product /Volumes/workspace/hirearchy, org /tmp/hirearchy-p2/selfcheck-R-1793275673/org, 2026-10-29T12:07:53Z
+help checks: 27 OK, 0 MISMATCH (help-check.txt)
+ok  dryrun_build setup exit (0)
+ok  mcp_catalog (list_tools over MCP) (0)
+ok  F7 form a: the rejection recorded over MCP and answered by its row (0)
+ok  F7 form a: memo 5's case lies in [trap-crit]'s firing class (4 cases) (yes)
+form a question: This rejection is R5. Next: ask the user exactly ONE yes/no question that names the criterion you read the rejection as: "About <its id>: add "<the rule, in their words>" as a lasting rule? Yes or no.", with <its id> one of C1, C2, C3, C4, C5, C6; for a repeat: "Same as R<j>: a one-off? Yes or no.", with R<j> one of R1, R2, R3, R4. Next time, pass your reading as criterion on the rejection and thi
+ok  F7 form b: the rejection recorded over MCP and answered by its row (0)
+ok  F7 form b: memo 5's case lies in [trap-crit]'s firing class (4 cases) (yes)
+form b question: The criterion on the rejection itself (C6) is recorded as not confirmed. This rejection is R5. Next: ask the user exactly ONE yes/no question, in these words: "About C6: add "<the rule, in their words>" as a lasting rule? Yes or no." Change nothing in this turn: an "always ..." in the rejection is not their yes. On yes: define_service(owner="lead", name="weekly-memo", add_acceptance=["<the rule>"]
+ok  F7 form c: the rejection recorded over MCP and answered by its row (0)
+ok  F7 form c: memo 5's case lies in [trap-crit]'s firing class (4 cases) (yes)
+form c question: The criterion on the rejection itself (C2) is recorded as not confirmed. This rejection is R5. Next: ask the user exactly ONE yes/no question, in these words: "About C2: add "<the rule, in their words>" as a lasting rule? Yes or no." Change nothing in this turn: an "always ..." in the rejection is not their yes. On yes: define_service(owner="lead", name="weekly-memo", add_acceptance=["<the rule>"]
+ok  label coverage: the changes made (0)
+both: [('agent added', 'lead', 'plan', None, None), ('agent added', 'lead/writer', 'plan', None, None), ('agent added', 'ops-keeper', 'by root, outside a plan', None, None), ('agent retired', 'ops-helper', 'change', '44cd783d7997', None), ('charter changed', 'lead/writer', 'by parent', 'lead', None), ('service added', 'lead/weekly-memo', 'plan', None, None), ('service retired', 'lead/extra-svc', 'by root, outside a plan', None, None)]
+harness only: [('agent added', 'ops-helper', 'by root, outside a plan', None, None), ('service added', 'lead/extra-svc', 'by root, outside a plan', None, None)]
+product only: []
+ok  label coverage: every product D8 line equals the re-derivation's (by lead, from your change, by root outside a plan, retires) (product only: [])
+ok  label coverage: the re-derivation's only extra lines are the creations of the retired agent and service (SELFCHECK.md: product finding PF-1) (harness only: [('agent added', 'ops-helper', 'by root, outside a plan', None, None), ('service added', 'lead/extra-svc', 'by root, outside a plan', None, None)])
+ok  12.6: the classifier over the label-coverage org reads PF-1 for both missing creations, nothing new (PF-0 0 PF-1 2 new 0)
+try same 1 (built as same): first record 2026-10-29T12:08:43.276466+00:00 | older commit t1 2026-10-29T12:08:43+00:00 | product: - charter of lead/writer changed: body (2026-10-29): by lead, or outside the tools (the event log does not reach back)
+try earlier 1 (built as earlier): first record 2026-10-29T12:08:45.621325+00:00 | older commit t1 2026-10-29T12:08:46+00:00 | product: - charter of lead/writer changed: body (2026-10-29): outside the tools (a hand edit or the terminal)
+- agent lead added (2026-10-29): from the plan you approved (2026-10-29)
+- agent lead/writer added (2026-10-29): from the plan you approved (2026-10-29)
+- service lead/weekly-memo added (2026-10-29): from the plan you approved (2026-10-29)
+- charter of lead/writer changed: body (2026-10-29): by lead, or outside the tools (the event log does not reach back)
+- Unprompted charter edits since 2026-09-30: 1
+ok  PF-0 (same second): the product gives the horizon label (yes)
+ok  12.6: the classifier over the same-second terminal-only org reads the product's horizon label as PF-0, nothing new (PF-0 1 PF-1 0 new 0)
+- agent lead added (2026-10-29): from the plan you approved (2026-10-29)
+- agent lead/writer added (2026-10-29): from the plan you approved (2026-10-29)
+- service lead/weekly-memo added (2026-10-29): from the plan you approved (2026-10-29)
+- charter of lead/writer changed: body (2026-10-29): outside the tools (a hand edit or the terminal)
+- Unprompted charter edits since 2026-09-30: 1
+ok  PF-0 (an earlier second): the product gives the design's label (yes)
+ok  12.6: the classifier over the earlier-second org finds no difference (PF-0 0 PF-1 0 new 0)
+pf0 timing verdict: PASS: 1 'same second' build(s) read PF-0 1; 1 'earlier second' build(s) read no difference
+ok  PF-0: every timing reached is classified correctly, a PF-0 is reproduced, a timing not reached is recorded (PASS)
+quality turn-01: exit 0 (/Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/harness-selfcheck/dryrun-R/ev/quality/turn-01.json)
+services turn-01: exit 0 (/Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/harness-selfcheck/dryrun-R/ev/services/turn-01.txt)
+ok  quality turn-01 read (exit 0 json ok)
+ok  services turn-01 read (0)
+retro turn-01: done (ledger absent)
+ok  the retro snapshot left the stream ledger as it was (absent) (absent absent)
+kinds ['checker-add', 'clarify', 'service']
+question Add a checker to weekly-memo for C6 ("A deadline the notes give in words is turned into its ISO date, counted from th…")? You rejected 3 deliveries on it (2026-10-29). It costs about 2 more runs per request; about 2.0 more runs per request than the rework it saves.
+notes ['net -2.0 = 0.8 × 3 − 2 − 0.8 × 3, from 3 of 4 cases', "lead holds no read, so the checker can check only what the team's reports quote to it"]
+ok  the scratch brief holds service and checker-add (yes)
+ok  17.3's numbers: net -2.0 = 0.8 x 3 - 2 - 0.8 x 3, from 3 of 4 cases (yes)
+ok  the question's words (yes)
+ok  a second call shows B1 again (B1 True)
+ok  plan ext-1-service.json (0)
+ok  apply ext-1-service.json (0)
+ok  plan ext-2-checker-add.json (0)
+ok  apply ext-2-checker-add.json (0)
+ok  dryrun_build after exit (0)
+ok  B2 shows both items taken (2)
+ok  injection --dry-run (0)
+ok  injection --selftest (0)
+quality end: exit 0 (/Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/harness-selfcheck/dryrun-R/ev/quality/end.json)
+services end: exit 0 (/Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/harness-selfcheck/dryrun-R/ev/services/end.txt)
+ok  copy_org_evidence (0)
+retro end: done (ledger 07161cb489866456c71cb6506a8fe46f)
+ok  score_stream.sh exit (0)
+ok  score_stream.sh: score-steps.txt lists four steps, each exit 0 (4 of 4)
+ok  score_stream.sh: --am-time left out (the constructed lena-lines.txt holds no A-M line) (left out)
+ok  score_stream.sh: --am-time passed as the A-M line's turn start (scratch copy with an A-M line) (--am-time 2026-10-29T12:08:52.833016+00:00)
+P2-X1: PASS
+P2-X2: PASS
+P2-X3: FAIL (edits: harness 1 ['lead/writer/AGENT.md'], product 1; 1 `outside the tools` label(s) (step 5))
+P2-L: PASS
+P2-B: PASS
+P2-W: PASS
+P2-E: PASS
+P2-S: PASS
+charter edits (harness): REPORTED ({"edits": 1, "changes": [{"date": "2026-10-29", "id": "e5fff0b87338", "item": "B1.2", "kind": "agent added", "label": "change", "subject": "lead/c6-checker"}, {"date": "2026-10-29", "id": "bc5deaa8032b", "item": "B1.1", "kind": "service added", "label": "change", "subject": "lead/action-list-for"}, {"date": "2026-10-29", "id": null, "item": null, "kind": "service added", "label": "plan", "subject": "lead/weekly-memo"}, {"date": "2026-10-29", "id": "e5fff0b87338", "item": null, "kind": "charter changed", "label": "change", "subject": "lead", "t1": "2026-10-29T12:07:57+00:00", "t2": "2026-10-29T12:08:55+00:00"}, {"date": "2026-10-29", "id": null, "item": null, "kind": "charter changed", "label": "outside the tools", "subject": "lead/writer", "t1": "2026-10-29T12:07:57+00:00", "t2": "2026-10-29T12:08:57+00:00"}], "week": []})
+P2-W(0): PASS (3 applied plan(s))
+P2-W(a): PASS (every criterion has one source)
+P2-W(b): PASS (every quote is in the recorded words)
+P2-W(c): PASS (2 source line(s) as derived)
+P2-W(d): REPORTED ([["Decisions and actions use the notes' own words.", "Owners: initials or full names?", ["decisions", "and", "actions", "own"]]])
+P2-W(e): HELD BACK (B1)/PASS ([["PASS", "clarify|weekly-memo|C4|decisionsandactionsusethenotesownwords"], ["HELD BACK (B1)", "clarify|weekly-memo|C5|thememostartswithaonelinesummarythenthed"], ["HELD BACK (B1)", "clarify|weekly-me)
+P2-S T12: SAME
+P2-E product findings: PF-0 0, PF-1 0, new 0
+ok  P2-X1 on the dry run (PASS)
+ok  P2-X2 on the dry run (PASS)
+ok  P2-X3 on the dry run (one hand edit: harness 1, product 1) (FAIL)
+ok  the harness's and the product's counts agree (yes)
+ok  P2-E on the dry run (B1 and B2 against the re-derivation) (PASS)
+ok  P2-S on the dry run (PASS)
+ok  P2-B on the dry run (every change labelled; no fact-checker) (PASS)
+ok  P2-L on the dry run (B1 then B2: taken and lapsed lines) (PASS)
+ok  P2-W(c) on the dry run (the full plan's source lines) (PASS)
+watch lead--action-list-for: exit 0 (7 mismatches (7 on pinned keys, 0 on unpinned keys); 0 services mismatches; 0 services lines unread; 0 lower-margin race matches (reported); 20 snapshots unread)
+watch lead--weekly-memo: exit 0 (0 mismatches (0 on pinned keys, 0 on unpinned keys); 0 services mismatches; 0 services lines unread; 0 lower-margin race matches (reported); 20 snapshots unread)
+G1(f): FAIL (['MISMATCH turn-01 P1 item pinned: item missing from the re-derivation', 'MISMATCH turn-01 P2 item pinned: item missing from the re-derivation', 'MISMATCH turn-01 P3 item pinned: item missing from the re-derivation'])
+G1(a): PASS
+G1(b): VACUOUS (no item reached `retire due`)
+G1(e): PASS
+G1(c): PASS
+G1(d): NOT DETERMINED (judged: measures/judged.json g1_d_judged; keyword hits none)
+G2(a): PASS
+G2(b): PASS
+G2(c): PASS (REQUEST/FEEDBACK-UNANSWERED refusals 0, reported)
+escapes typed by the user's answer: PASS (4 escapes)
+relayed reworks sent by the assistant (the injection excepted): PASS (0 other relayed rework task(s); the injection's task 20261029T120757809981-root-3d85)
+hand edits: NOT DETERMINED (FAIL-CLOSED: measures/assistant_facts.json missing)
+injected lessons: NOT DETERMINED (judged: measures/judged.json g1_d_judged; keyword hits none)
+empty-argument calls: NOT DETERMINED (FAIL-CLOSED: no total in empty-calls.txt)
+delivered versions (P2's form): NOT DETERMINED (FAIL-CLOSED: no delivered version was scored (0 of 0))
+deliveries by copy: NOT DETERMINED (judged: measures/judged.json d8_presented_deliveries)
+ok  gate_p1 on the dry run: G1(a) (PASS)
+ok  gate_p1 on the dry run: G1(c) (PASS)
+ok  gate_p1 on the dry run: G1(e) (PASS)
+ok  gate_p1 on the dry run: G2(a) (PASS)
+ok  gate_p1 on the dry run: G2(b) (PASS)
+ok  gate_p1 on the dry run: escapes typed by the user's answer (PASS)
+ok  gate_p1 on the dry run: relayed reworks sent by the assistant (the injection excepted) (PASS)
+ok  gate_p1 on the dry run: G1(b) (no item reached retire due) (VACUOUS)
+ok  gate_p1 on the dry run: hand edits fail closed without a session (NOT)
+ok  F31: the finish's extract_mechanical argv passes the arm's product (--product-src /Volumes/workspace/hirearchy/src) (yes)
+ok  F31: client_questions imported from the arm's product (/Volumes/workspace/hirearchy/src/hirearchy/kernel/_text.py)
+dry run arm R: 0 mismatch(es)

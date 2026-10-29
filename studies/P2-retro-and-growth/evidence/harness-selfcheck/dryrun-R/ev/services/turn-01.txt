@@ -1,0 +1,18 @@
+Services you can request (from your direct reports):
+- weekly-memo (offered by lead; contract v3, playbook v1): One memo of decisions and action items from one meeting's notes file.
+  inputs: notes_file* (the notes file name, e.g. 2026-10-05.md)   (* required)
+  each request: 12 runs; acceptance criteria (lead/services/weekly-memo/SERVICE.md):
+    C1: One memo per notes file, at most 400 words.
+    C2: The memo lists every decision and every commitment in the notes, informal ones included.
+    C3: The action items are a table Owner | Action | Due, with ISO dates and 'none' if there's no date.
+    C4: Decisions and actions use the notes' own words.
+    C5: The memo starts with a one-line 'Summary:', then the decisions, then the action items.
+    C6: A deadline the notes give in words is turned into its ISO date, counted from the meeting's day.
+  record: 4 request(s): 4 done, 0 failed, 0 open; 4 reworked; avg 6.8 runs; feedback 4 accept (4 after a reject), 0 reject
+  regression list (the client's rejections):
+    R1 (case 20261029T120757800056-root-9524, about C5): "No, not right yet. Always start the memo with a one-line 'Summary:' of the meeting, then the decisions, then the action items."
+    R2 (case 20261029T120757860113-root-c9cb, about C6): "Not right yet: Sam's due should be 2026-10-21. Always turn a deadline the notes give in words into its date, counted from the meeting's day."
+    R3 (case 20261029T120757930373-root-b504, about C6): "Not right yet: Lee's due should be 2026-10-30."
+    R4 (case 20261029T120758262825-root-f703, about C6): "Not right yet: Sam's due should be 2026-10-30."
+  playbook v1 (2026-10-29): "initial playbook"; 7 items (0 rules), none watched
+Retro due: 11 verdicts of the user since the last brief (none yet); offer the user a retro, and call retro() only after their yes.

@@ -1,0 +1,686 @@
+{
+ "checker": [
+  {
+   "candidates": [],
+   "owner": "lead",
+   "service": "ops-action-list",
+   "window": []
+  },
+  {
+   "candidates": [
+    {
+     "class": [
+      "C10"
+     ],
+     "estimate": null,
+     "evidence": [
+      "20261029T124626096325-root-750e"
+     ],
+     "fires": false,
+     "key": "checker-add|weekly-meeting-memo|C10",
+     "kind": "checker-add",
+     "reached_at": null,
+     "rung": 4,
+     "signers": {
+      "20261029T124626096325-root-750e": "lead/writer"
+     },
+     "via": "class",
+     "weight": 1
+    },
+    {
+     "class": [
+      "C9",
+      "C11"
+     ],
+     "estimate": null,
+     "evidence": [
+      "20261029T121630346755-root-d28e",
+      "20261029T130759453335-root-5699"
+     ],
+     "fires": false,
+     "key": "checker-add|weekly-meeting-memo|C11",
+     "kind": "checker-add",
+     "reached_at": null,
+     "rung": 4,
+     "signers": {
+      "20261029T121630346755-root-d28e": "lead/writer",
+      "20261029T130759453335-root-5699": "lead/writer"
+     },
+     "via": "class",
+     "weight": 2
+    },
+    {
+     "class": [
+      "C4"
+     ],
+     "estimate": null,
+     "evidence": [
+      "20261029T124626096325-root-750e"
+     ],
+     "fires": false,
+     "key": "checker-add|weekly-meeting-memo|C4",
+     "kind": "checker-add",
+     "reached_at": null,
+     "rung": 4,
+     "signers": {
+      "20261029T124626096325-root-750e": "lead/writer"
+     },
+     "via": "class",
+     "weight": 1
+    },
+    {
+     "class": [
+      "C5"
+     ],
+     "estimate": null,
+     "evidence": [
+      "20261029T121630346755-root-d28e"
+     ],
+     "fires": false,
+     "key": "checker-add|weekly-meeting-memo|C5",
+     "kind": "checker-add",
+     "reached_at": null,
+     "rung": 4,
+     "signers": {
+      "20261029T121630346755-root-d28e": "lead/writer"
+     },
+     "via": "class",
+     "weight": 1
+    },
+    {
+     "class": [
+      "C9"
+     ],
+     "estimate": null,
+     "evidence": [
+      "20261029T121630346755-root-d28e",
+      "20261029T130759453335-root-5699"
+     ],
+     "fires": false,
+     "key": "checker-add|weekly-meeting-memo|C9",
+     "kind": "checker-add",
+     "reached_at": null,
+     "rung": 4,
+     "signers": {
+      "20261029T121630346755-root-d28e": "lead/writer",
+      "20261029T130759453335-root-5699": "lead/writer"
+     },
+     "via": "class",
+     "weight": 2
+    }
+   ],
+   "owner": "lead",
+   "service": "weekly-meeting-memo",
+   "window": [
+    "20261029T121630346755-root-d28e",
+    "20261029T123006918979-root-a9da",
+    "20261029T124626096325-root-750e",
+    "20261029T130102202128-root-c11b",
+    "20261029T130435793673-root-f5c0",
+    "20261029T130759453335-root-5699"
+   ]
+  }
+ ],
+ "checker_due": false,
+ "clarify": [
+  {
+   "accepted": 0,
+   "added": [
+    "the",
+    "deliverable",
+    "is",
+    "markdown",
+    "has",
+    "350",
+    "words",
+    "as",
+    "counted",
+    "by",
+    "read",
+    "this",
+    "-",
+    "limit",
+    "and",
+    "a",
+    "title",
+    "line",
+    "naming",
+    "meeting",
+    "date"
+   ],
+   "criterion": "C1",
+   "evidence": [
+    "ops-action-list/C1"
+   ],
+   "exercised": 0,
+   "fires": false,
+   "fires_rule": false,
+   "key": "clarify|ops-action-list|C1|thedeliverableismarkdownhasatmost350word",
+   "kind": "clarify",
+   "reached_at": null,
+   "rung": 1,
+   "source": "user",
+   "weight": 0
+  },
+  {
+   "accepted": 0,
+   "added": [],
+   "criterion": "C2",
+   "evidence": [
+    "ops-action-list/C2"
+   ],
+   "exercised": 0,
+   "fires": false,
+   "fires_rule": false,
+   "key": "clarify|ops-action-list|C2|itcontainsonemarkdowntablewithexactlythe",
+   "kind": "clarify",
+   "reached_at": null,
+   "rung": 1,
+   "source": "tasks",
+   "weight": 0
+  },
+  {
+   "accepted": 0,
+   "added": [
+    "named",
+    "file",
+    "is",
+    "a",
+    "row",
+    "including",
+    "stated",
+    "prose",
+    "and",
+    "no",
+    "added",
+    "that",
+    "not",
+    "an",
+    "statement",
+    "something",
+    "stays",
+    "as",
+    "it",
+    "where",
+    "nobody",
+    "has",
+    "to",
+    "do",
+    "anything",
+    "gets"
+   ],
+   "criterion": "C3",
+   "evidence": [
+    "ops-action-list/C3"
+   ],
+   "exercised": 0,
+   "fires": false,
+   "fires_rule": false,
+   "key": "clarify|ops-action-list|C3|everyactioniteminthenamednotesfileisarow",
+   "kind": "clarify",
+   "reached_at": null,
+   "rung": 1,
+   "source": "user",
+   "weight": 0
+  },
+  {
+   "accepted": 0,
+   "added": [
+    "each",
+    "due",
+    "value",
+    "is",
+    "an",
+    "iso",
+    "yyyy",
+    "-",
+    "mm",
+    "dd",
+    "none",
+    "deadline",
+    "such",
+    "as",
+    "by",
+    "friday",
+    "turned",
+    "only",
+    "if",
+    "give",
+    "no"
+   ],
+   "criterion": "C4",
+   "evidence": [
+    "ops-action-list/C4"
+   ],
+   "exercised": 0,
+   "fires": false,
+   "fires_rule": false,
+   "key": "clarify|ops-action-list|C4|eachduevalueisanisodateyyyymmddornoneare",
+   "kind": "clarify",
+   "reached_at": null,
+   "rung": 1,
+   "source": "user",
+   "weight": 0
+  },
+  {
+   "accepted": 0,
+   "added": [],
+   "criterion": "C5",
+   "evidence": [
+    "ops-action-list/C5"
+   ],
+   "exercised": 0,
+   "fires": false,
+   "fires_rule": false,
+   "key": "clarify|ops-action-list|C5|eachownervalueusesthenameexactlyaswritte",
+   "kind": "clarify",
+   "reached_at": null,
+   "rung": 1,
+   "source": "tasks",
+   "weight": 0
+  },
+  {
+   "accepted": 0,
+   "added": [],
+   "criterion": "C6",
+   "evidence": [
+    "ops-action-list/C6"
+   ],
+   "exercised": 0,
+   "fires": false,
+   "fires_rule": false,
+   "key": "clarify|ops-action-list|C6|rowsareorderedbydueascendingwithnonelast",
+   "kind": "clarify",
+   "reached_at": null,
+   "rung": 1,
+   "source": "tasks",
+   "weight": 0
+  },
+  {
+   "accepted": 0,
+   "added": [],
+   "criterion": "C8",
+   "evidence": [
+    "ops-action-list/C8"
+   ],
+   "exercised": 0,
+   "fires": false,
+   "fires_rule": false,
+   "key": "clarify|ops-action-list|C8|theleadsreportstatesthateverytablerowwas",
+   "kind": "clarify",
+   "reached_at": null,
+   "rung": 1,
+   "source": "tasks",
+   "weight": 0
+  },
+  {
+   "accepted": 6,
+   "added": [
+    "the",
+    "is",
+    "has",
+    "as",
+    "counted",
+    "by",
+    "read"
+   ],
+   "criterion": "C1",
+   "evidence": [
+    "weekly-meeting-memo/C1"
+   ],
+   "exercised": 9,
+   "fires": true,
+   "fires_rule": true,
+   "key": "clarify|weekly-meeting-memo|C1|thememoismarkdownandhasatmost400wordsasc",
+   "kind": "clarify",
+   "reached_at": "2026-10-29T12:57:41.910050+00:00",
+   "rung": 1,
+   "source": "user",
+   "weight": 0
+  },
+  {
+   "accepted": 6,
+   "added": [
+    "the",
+    "has",
+    "a",
+    "decisions",
+    "section",
+    "listing",
+    "every",
+    "decision",
+    "made",
+    "in",
+    "named",
+    "notes",
+    "file",
+    "and",
+    "nothing",
+    "from",
+    "other",
+    "files"
+   ],
+   "criterion": "C2",
+   "evidence": [
+    "weekly-meeting-memo/C2"
+   ],
+   "exercised": 9,
+   "fires": true,
+   "fires_rule": true,
+   "key": "clarify|weekly-meeting-memo|C2|thememohasadecisionssectionlistingeveryd",
+   "kind": "clarify",
+   "reached_at": "2026-10-29T12:57:41.910050+00:00",
+   "rung": 1,
+   "source": "user",
+   "weight": 0
+  },
+  {
+   "accepted": 6,
+   "added": [
+    "are",
+    "markdown",
+    "exactly"
+   ],
+   "criterion": "C3",
+   "evidence": [
+    "weekly-meeting-memo/C3"
+   ],
+   "exercised": 9,
+   "fires": true,
+   "fires_rule": true,
+   "key": "clarify|weekly-meeting-memo|C3|theactionitemsareamarkdowntablewithexact",
+   "kind": "clarify",
+   "reached_at": "2026-10-29T12:57:41.910050+00:00",
+   "rung": 1,
+   "source": "user",
+   "weight": 0
+  },
+  {
+   "accepted": 6,
+   "added": [
+    "every",
+    "commitment",
+    "in",
+    "the",
+    "notes",
+    "is",
+    "a",
+    "row",
+    "of",
+    "table",
+    "both",
+    "those",
+    "labelled",
+    "action",
+    "and",
+    "stated",
+    "prose",
+    "such",
+    "as",
+    "saying",
+    "would"
+   ],
+   "criterion": "C4",
+   "evidence": [
+    "weekly-meeting-memo/C4"
+   ],
+   "exercised": 9,
+   "fires": true,
+   "fires_rule": true,
+   "key": "clarify|weekly-meeting-memo|C4|everycommitmentinthenotesisarowofthetabl",
+   "kind": "clarify",
+   "reached_at": "2026-10-29T12:57:41.910050+00:00",
+   "rung": 1,
+   "source": "user",
+   "weight": 0
+  },
+  {
+   "accepted": 6,
+   "added": [
+    "each",
+    "due",
+    "value",
+    "is",
+    "an",
+    "iso",
+    "yyyy",
+    "-",
+    "mm",
+    "dd",
+    "deadline",
+    "such",
+    "as",
+    "by",
+    "friday",
+    "turned",
+    "only",
+    "if",
+    "give",
+    "no",
+    "none"
+   ],
+   "criterion": "C5",
+   "evidence": [
+    "weekly-meeting-memo/C5"
+   ],
+   "exercised": 9,
+   "fires": true,
+   "fires_rule": true,
+   "key": "clarify|weekly-meeting-memo|C5|eachduevalueisanisodateyyyymmddarelative",
+   "kind": "clarify",
+   "reached_at": "2026-10-29T12:57:41.910050+00:00",
+   "rung": 1,
+   "source": "user",
+   "weight": 0
+  },
+  {
+   "accepted": 6,
+   "added": [
+    "each",
+    "value",
+    "uses",
+    "name",
+    "exactly",
+    "as",
+    "written",
+    "in"
+   ],
+   "criterion": "C6",
+   "evidence": [
+    "weekly-meeting-memo/C6"
+   ],
+   "exercised": 9,
+   "fires": true,
+   "fires_rule": true,
+   "key": "clarify|weekly-meeting-memo|C6|eachownervalueusesthenameexactlyaswritte",
+   "kind": "clarify",
+   "reached_at": "2026-10-29T12:57:41.910050+00:00",
+   "rung": 1,
+   "source": "user",
+   "weight": 0
+  },
+  {
+   "accepted": 6,
+   "added": [
+    "s",
+    "check",
+    "report",
+    "states",
+    "that",
+    "every",
+    "decision",
+    "and",
+    "table",
+    "row",
+    "was",
+    "compared",
+    "with",
+    "notes",
+    "file",
+    "count",
+    "verified",
+    "n",
+    "of",
+    "m",
+    "="
+   ],
+   "criterion": "C8",
+   "evidence": [
+    "weekly-meeting-memo/C8"
+   ],
+   "exercised": 9,
+   "fires": true,
+   "fires_rule": true,
+   "key": "clarify|weekly-meeting-memo|C8|theleadscheckreportstatesthateverydecisi",
+   "kind": "clarify",
+   "reached_at": "2026-10-29T12:57:41.910050+00:00",
+   "rung": 1,
+   "source": "user",
+   "weight": 0
+  },
+  {
+   "accepted": 4,
+   "added": [
+    "a",
+    "statement",
+    "that",
+    "something",
+    "stays",
+    "as",
+    "is",
+    "where",
+    "nobody",
+    "has",
+    "to",
+    "do",
+    "anything",
+    "not",
+    "an",
+    "action",
+    "item",
+    "and",
+    "gets",
+    "no",
+    "row",
+    "in",
+    "the",
+    "table"
+   ],
+   "criterion": "C10",
+   "evidence": [
+    "weekly-meeting-memo/C10"
+   ],
+   "exercised": 5,
+   "fires": true,
+   "fires_rule": true,
+   "key": "clarify|weekly-meeting-memo|C10|astatementthatsomethingstaysasitiswheren",
+   "kind": "clarify",
+   "reached_at": "2026-10-29T13:07:58.740828+00:00",
+   "rung": 1,
+   "source": "amendment",
+   "weight": 0
+  },
+  {
+   "accepted": 1,
+   "added": [
+    "the",
+    "memo",
+    "starts",
+    "with",
+    "a",
+    "one",
+    "-",
+    "line",
+    "summary",
+    "of",
+    "meeting",
+    "followed",
+    "by",
+    "action",
+    "items",
+    "table",
+    "then",
+    "decisions",
+    "section"
+   ],
+   "criterion": "C11",
+   "evidence": [
+    "weekly-meeting-memo/C11"
+   ],
+   "exercised": 1,
+   "fires": false,
+   "fires_rule": false,
+   "key": "clarify|weekly-meeting-memo|C11|thememostartswithaonelinesummaryofthemee",
+   "kind": "clarify",
+   "reached_at": null,
+   "rung": 1,
+   "source": "amendment",
+   "weight": 0
+  }
+ ],
+ "service": [
+  {
+   "assignee_top_level": true,
+   "covered_by": [],
+   "d5": null,
+   "evidence": [
+    "20261029T122710588867-root-c1b8",
+    "20261029T123457206032-root-cabf",
+    "20261029T125747104778-root-4a85"
+   ],
+   "fires": true,
+   "group": {
+    "assignee": "lead",
+    "criteria_key": [
+     "eachduevalueisanisodateyyyymmddornonemarta#dev#priya#lee#samnone",
+     "eachownervalueusesthenameexactlyaswritteninthenotes",
+     "everyactioniteminthenotesfileisarowincludingthosestatedinprosemartadevpriyaleesam#of#andnorowthatisnotanactioniteminthenotesmartakeepstheagendaassentgetsnorow",
+     "everystatementistraceableto#mdnothingisinvented",
+     "itcontainsonemarkdowntablewithexactlythecolumnsowneractiondueandnoothersectionsnodecisionsnosummary",
+     "rowsareorderedbydueascendingwithnonelasttiesintheorderofthenotes",
+     "thedeliverableismarkdownhasatmost#wordsascountedbyreadthisistheonepagelimitandatitlelinenamingthe#meeting",
+     "theleadsreportstatesthateverytablerowwascomparedwiththenotesfilewiththecountverifiednofmnm"
+    ],
+    "heads": [
+     "20261029T122710588867-root-c1b8",
+     "20261029T123457206032-root-cabf",
+     "20261029T125747104778-root-4a85"
+    ],
+    "judged": [
+     "20261029T122710588867-root-c1b8",
+     "20261029T123457206032-root-cabf",
+     "20261029T125747104778-root-4a85"
+    ],
+    "reached_at": "2026-10-29T13:01:01.594702+00:00",
+    "relations": [
+     "title"
+    ],
+    "titles": [
+     "One-page ops action list for the 2026-10-05 meeting",
+     "One-page ops action list for the 2026-10-12 meeting",
+     "One-page ops action list for the 2026-10-19 meeting"
+    ]
+   },
+   "key": "service|lead|20261029T122710588867-root-c1b8",
+   "kind": "service",
+   "reached_at": "2026-10-29T13:01:01.594702+00:00",
+   "rung": 2,
+   "weight": 3
+  }
+ ],
+ "service_due": true,
+ "thresholds": {
+  "accepted_cases": 3,
+  "added_words": 3,
+  "after_verdicts": 3,
+  "carry": 3,
+  "criterion_cases": 3,
+  "escapes": 2,
+  "items": 3,
+  "saturation": 0.45,
+  "shape_cases": 3,
+  "shape_overlap": 0.6,
+  "window": 3,
+  "window_cases": 10
+ }
+}

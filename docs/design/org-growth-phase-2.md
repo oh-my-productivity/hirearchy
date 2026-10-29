@@ -2148,6 +2148,7 @@ YOU, `services()` and `progress()`; `end_schedule` and `hirearchy end-schedule`;
 figures in the quality view and the brief; the worker item; the `hire`, `retire`, `report`, `send` and `request` docstrings.
 
 ### 18.6 Open questions for the owner
+Resolved under the owner's delegation on 2026-10-28: questions 1-17 as recommended, and the study approved in two stages (the manager's record: `docs/research/org-growth/phase-2/owner-decisions-2026-10-28.md`).
 
 Each is decided here within the brief's latitude, with the design's recommendation; none changes what the user pays beyond what the brief
 sanctions, so none paused the design. Items 9-15 are new in revision 2 (they answer the review's findings).

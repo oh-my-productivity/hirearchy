@@ -1,0 +1,18 @@
+Services you can request (from your direct reports):
+- weekly-meeting-memo (offered by lead; contract v2, playbook v2): One markdown memo with the decisions and the action items table for one meeting notes file.
+  inputs: notes_file* (File name of the meeting notes in the notes folder, for example 2026-10-05.md)   (* required)
+  each request: 12 runs; acceptance criteria (lead/services/weekly-meeting-memo/SERVICE.md):
+    C1: The memo is markdown and has at most 400 words as counted by read.
+    C2: The memo has a Decisions section listing every decision made in the named notes file, and nothing from other files.
+    C3: The action items are a markdown table with exactly the columns Owner | Action | Due.
+    C4: Every commitment in the notes is a row of the table, both those labelled ACTION and those stated in prose, such as someone saying they would do something.
+    C5: Each Due value is an ISO date (YYYY-MM-DD). A relative deadline such as 'by Friday' is turned into a date only when the notes make the date clear; if the notes give no date, Due is 'none'.
+    C6: Each Owner value uses the name exactly as written in the notes.
+    C7: Every statement in the memo is traceable to the notes file, and anything unclear (no owner, an unconfirmed decision) is listed under a final heading 'Unclear' instead of being guessed.
+    C8: The lead's check report states that every decision and every table row was compared with the notes file, with the count verified (n of m, n = m).
+    C9: The memo starts with a one-line 'Summary:' of the meeting, followed by the Decisions section, then the action items table.
+  record: 3 request(s): 3 done, 0 failed, 0 open; 2 reworked; avg 6.3 runs; feedback 2 accept (1 after a reject), 0 reject
+  regression list (the client's rejections):
+    R1 (case 20261029T121630346755-root-d28e, about C9): "No, not right yet. Sam's CI item says 'before Friday', so that has a date, 2026-10-09, not 'none'. And Marta's room is for the training on the 14th, so I want…" (items citing it: P8)
+  playbook v2 (2026-10-29): "C9 is client-confirmed (R1, link note 20261029T122220427214-root-44f1); item is the own words of C9."; 8 items (0 rules); watched: P8 new (1 of 3 clean cases, k 3; waiting for the client's verdict on 1 case)
+Retro due: 5 verdicts of the user since the last brief (none yet); offer the user a retro, and call retro() only after their yes.

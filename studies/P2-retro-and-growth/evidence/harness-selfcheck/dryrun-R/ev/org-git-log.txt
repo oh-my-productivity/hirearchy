@@ -1,0 +1,199 @@
+commit e31555531c7f284d6faeeb53f2f9545603474d89
+Author: Amin Alizadeh <64799918+achieveramin@users.noreply.github.com>
+Date:   2026-10-29 12:08:57 +0000
+
+    hand edit (study self-check)
+
+ inbox/20261029T120856980096-lead-ed86.md           | 18 +++++++++++++
+ inbox/20261029T120857006455-lead-8ea5.md           | 18 +++++++++++++
+ lead/inbox/20261029T120857012003-root-8fa8.md      | 17 ++++++++++++
+ .../20261029T120758600649-root-707f.md             |  0
+ .../20261029T120855560054-runtime-1854.md          |  0
+ .../20261029T120855560478-runtime-52e5.md          |  0
+ lead/read/20261029T120856955260-root-7618.md       | 30 ++++++++++++++++++++++
+ .../read/20261029T120856969864-lead.writer-4977.md | 15 +++++++++++
+ lead/read/20261029T120856993599-root-849d.md       | 17 ++++++++++++
+ lead/read/20261029T120856995786-root-daa2.md       | 25 ++++++++++++++++++
+ lead/sent/20261029T120856963720-lead-046c.md       | 16 ++++++++++++
+ lead/sent/20261029T120856980096-lead-ed86.md       | 18 +++++++++++++
+ lead/sent/20261029T120857006455-lead-8ea5.md       | 18 +++++++++++++
+ lead/writer/AGENT.md                               |  2 ++
+ .../writer/read/20261029T120856963720-lead-046c.md | 16 ++++++++++++
+ .../sent/20261029T120856969864-lead.writer-4977.md | 15 +++++++++++
+ sent/20261029T120856955260-root-7618.md            | 30 ++++++++++++++++++++++
+ sent/20261029T120856993599-root-849d.md            | 17 ++++++++++++
+ sent/20261029T120856995786-root-daa2.md            | 25 ++++++++++++++++++
+ sent/20261029T120857012003-root-8fa8.md            | 17 ++++++++++++
+ 20 files changed, 314 insertions(+)
+
+commit c638a3045112b8a06d4f64f1c5e653ed8aa806ab
+Author: hirearchy <hirearchy@localhost>
+Date:   2026-10-29 12:08:55 +0000
+
+    root: applied extension e5fff0b87338 (B1.2: 3 cases failed C6): +1 agents, +0 services, 1 lines, 1 limits, -0 agents
+
+ lead/AGENT.md                                    |  6 ++-
+ lead/c6-checker/AGENT.md                         | 49 ++++++++++++++++++++++++
+ lead/c6-checker/MEMORY.md                        |  0
+ lead/inbox/20261029T120855560054-runtime-1854.md | 21 ++++++++++
+ lead/inbox/20261029T120855560478-runtime-52e5.md | 12 ++++++
+ lead/services/weekly-memo/SERVICE.md             |  9 ++---
+ lead/services/weekly-memo/history/SERVICE.v3.md  | 32 ++++++++++++++++
+ 7 files changed, 122 insertions(+), 7 deletions(-)
+
+commit e2c3fc7b50318776cd1784eadbf6d521393e5cef
+Author: hirearchy <hirearchy@localhost>
+Date:   2026-10-29 12:08:55 +0000
+
+    root: applied extension bc5deaa8032b (B1.1: 3 one-off tasks of one shape): +0 agents, +1 services, 0 lines, 0 limits, -0 agents
+
+ .runtime/retros.json                               | 62 ++++++++++++++++++++++
+ inbox/20261029T120757808210-lead-eaf8.md           | 18 +++++++
+ inbox/20261029T120757817762-lead-d83c.md           | 18 +++++++
+ inbox/20261029T120757846063-lead-5181.md           | 18 +++++++
+ inbox/20261029T120757854682-lead-1341.md           | 15 ++++++
+ inbox/20261029T120757871890-lead-a94e.md           | 18 +++++++
+ inbox/20261029T120757910406-lead-c800.md           | 18 +++++++
+ inbox/20261029T120757922866-lead-d3c6.md           | 15 ++++++
+ inbox/20261029T120757945384-lead-ae71.md           | 18 +++++++
+ inbox/20261029T120758237332-lead-288a.md           | 18 +++++++
+ inbox/20261029T120758253228-lead-eb9b.md           | 15 ++++++
+ inbox/20261029T120758281091-lead-7773.md           | 18 +++++++
+ inbox/20261029T120758590117-lead-6cfd.md           | 18 +++++++
+ lead/inbox/20261029T120758600649-root-707f.md      | 17 ++++++
+ lead/read/20261029T120757800056-root-9524.md       | 28 ++++++++++
+ .../read/20261029T120757805748-lead.writer-f4bb.md | 15 ++++++
+ lead/read/20261029T120757809981-root-3d85.md       | 33 ++++++++++++
+ .../read/20261029T120757814747-lead.writer-2a5a.md | 15 ++++++
+ lead/read/20261029T120757819034-root-6032.md       | 17 ++++++
+ lead/read/20261029T120757820070-root-54d3.md       | 17 ++++++
+ lead/read/20261029T120757828588-root-f6ba.md       | 17 ++++++
+ lead/read/20261029T120757829213-runtime-8a42.md    | 21 ++++++++
+ lead/read/20261029T120757835305-root-ff3b.md       | 31 +++++++++++
+ .../read/20261029T120757841885-lead.writer-77c6.md | 15 ++++++
+ lead/read/20261029T120757849511-root-8640.md       | 17 ++++++
+ lead/read/20261029T120757850378-root-ed57.md       | 16 ++++++
+ lead/read/20261029T120757856129-root-5cb6.md       | 17 ++++++
+ lead/read/20261029T120757860113-root-c9cb.md       | 29 ++++++++++
+ .../read/20261029T120757866927-lead.writer-572a.md | 15 ++++++
+ lead/read/20261029T120757873298-root-5509.md       | 17 ++++++
+ lead/read/20261029T120757885795-root-a7a5.md       | 17 ++++++
+ lead/read/20261029T120757886385-runtime-5913.md    | 22 ++++++++
+ lead/read/20261029T120757896274-root-27f7.md       | 32 +++++++++++
+ .../read/20261029T120757904299-lead.writer-7d04.md | 15 ++++++
+ lead/read/20261029T120757915838-root-7756.md       | 17 ++++++
+ lead/read/20261029T120757916711-root-8082.md       | 16 ++++++
+ lead/read/20261029T120757924428-root-4afb.md       | 17 ++++++
+ lead/read/20261029T120757930373-root-b504.md       | 30 +++++++++++
+ .../read/20261029T120757938551-lead.writer-9901.md | 15 ++++++
+ lead/read/20261029T120758193773-root-cd6d.md       | 17 ++++++
+ lead/read/20261029T120758205441-root-7a60.md       | 17 ++++++
+ lead/read/20261029T120758220195-root-002f.md       | 32 +++++++++++
+ .../read/20261029T120758229836-lead.writer-1006.md | 15 ++++++
+ lead/read/20261029T120758244793-root-5a90.md       | 17 ++++++
+ lead/read/20261029T120758245555-root-635c.md       | 16 ++++++
+ lead/read/20261029T120758254903-root-c0e6.md       | 17 ++++++
+ lead/read/20261029T120758262825-root-f703.md       | 30 +++++++++++
+ .../read/20261029T120758272756-lead.writer-085d.md | 15 ++++++
+ lead/read/20261029T120758532205-root-84cd.md       | 17 ++++++
+ lead/read/20261029T120758547132-root-297b.md       | 17 ++++++
+ lead/read/20261029T120758568650-root-b3f3.md       | 32 +++++++++++
+ .../read/20261029T120758580614-lead.writer-e53b.md | 15 ++++++
+ lead/sent/20261029T120757803431-lead-b098.md       | 16 ++++++
+ lead/sent/20261029T120757808210-lead-eaf8.md       | 18 +++++++
+ lead/sent/20261029T120757812105-lead-130e.md       | 17 ++++++
+ lead/sent/20261029T120757817762-lead-d83c.md       | 18 +++++++
+ lead/sent/20261029T120757838671-lead-0d9f.md       | 17 ++++++
+ lead/sent/20261029T120757846063-lead-5181.md       | 18 +++++++
+ lead/sent/20261029T120757854682-lead-1341.md       | 15 ++++++
+ lead/sent/20261029T120757863508-lead-a0e4.md       | 16 ++++++
+ lead/sent/20261029T120757871890-lead-a94e.md       | 18 +++++++
+ lead/sent/20261029T120757900422-lead-8555.md       | 17 ++++++
+ lead/sent/20261029T120757910406-lead-c800.md       | 18 +++++++
+ lead/sent/20261029T120757922866-lead-d3c6.md       | 15 ++++++
+ lead/sent/20261029T120757934552-lead-48d6.md       | 16 ++++++
+ lead/sent/20261029T120757945384-lead-ae71.md       | 18 +++++++
+ lead/sent/20261029T120758225343-lead-d733.md       | 17 ++++++
+ lead/sent/20261029T120758237332-lead-288a.md       | 18 +++++++
+ lead/sent/20261029T120758253228-lead-eb9b.md       | 15 ++++++
+ lead/sent/20261029T120758268001-lead-1a73.md       | 16 ++++++
+ lead/sent/20261029T120758281091-lead-7773.md       | 18 +++++++
+ lead/sent/20261029T120758575131-lead-bea0.md       | 17 ++++++
+ lead/sent/20261029T120758590117-lead-6cfd.md       | 18 +++++++
+ lead/services/action-list-for/PLAYBOOK.md          | 22 ++++++++
+ lead/services/action-list-for/SERVICE.md           | 28 ++++++++++
+ lead/services/weekly-memo/SERVICE.md               | 24 ++++-----
+ lead/services/weekly-memo/history/SERVICE.v1.md    | 38 +++++++++++++
+ lead/services/weekly-memo/history/SERVICE.v2.md    | 30 +++++++++++
+ .../writer/read/20261029T120757803431-lead-b098.md | 16 ++++++
+ .../writer/read/20261029T120757812105-lead-130e.md | 17 ++++++
+ .../writer/read/20261029T120757838671-lead-0d9f.md | 17 ++++++
+ .../writer/read/20261029T120757863508-lead-a0e4.md | 16 ++++++
+ .../writer/read/20261029T120757900422-lead-8555.md | 17 ++++++
+ .../writer/read/20261029T120757934552-lead-48d6.md | 16 ++++++
+ .../writer/read/20261029T120758225343-lead-d733.md | 17 ++++++
+ .../writer/read/20261029T120758268001-lead-1a73.md | 16 ++++++
+ .../writer/read/20261029T120758575131-lead-bea0.md | 17 ++++++
+ .../sent/20261029T120757805748-lead.writer-f4bb.md | 15 ++++++
+ .../sent/20261029T120757814747-lead.writer-2a5a.md | 15 ++++++
+ .../sent/20261029T120757841885-lead.writer-77c6.md | 15 ++++++
+ .../sent/20261029T120757866927-lead.writer-572a.md | 15 ++++++
+ .../sent/20261029T120757904299-lead.writer-7d04.md | 15 ++++++
+ .../sent/20261029T120757938551-lead.writer-9901.md | 15 ++++++
+ .../sent/20261029T120758229836-lead.writer-1006.md | 15 ++++++
+ .../sent/20261029T120758272756-lead.writer-085d.md | 15 ++++++
+ .../sent/20261029T120758580614-lead.writer-e53b.md | 15 ++++++
+ sent/20261029T120757800056-root-9524.md            | 28 ++++++++++
+ sent/20261029T120757809981-root-3d85.md            | 33 ++++++++++++
+ sent/20261029T120757819034-root-6032.md            | 17 ++++++
+ sent/20261029T120757820070-root-54d3.md            | 17 ++++++
+ sent/20261029T120757828588-root-f6ba.md            | 17 ++++++
+ sent/20261029T120757835305-root-ff3b.md            | 31 +++++++++++
+ sent/20261029T120757849511-root-8640.md            | 17 ++++++
+ sent/20261029T120757850378-root-ed57.md            | 16 ++++++
+ sent/20261029T120757856129-root-5cb6.md            | 17 ++++++
+ sent/20261029T120757860113-root-c9cb.md            | 29 ++++++++++
+ sent/20261029T120757873298-root-5509.md            | 17 ++++++
+ sent/20261029T120757885795-root-a7a5.md            | 17 ++++++
+ sent/20261029T120757896274-root-27f7.md            | 32 +++++++++++
+ sent/20261029T120757915838-root-7756.md            | 17 ++++++
+ sent/20261029T120757916711-root-8082.md            | 16 ++++++
+ sent/20261029T120757924428-root-4afb.md            | 17 ++++++
+ sent/20261029T120757930373-root-b504.md            | 30 +++++++++++
+ sent/20261029T120758193773-root-cd6d.md            | 17 ++++++
+ sent/20261029T120758205441-root-7a60.md            | 17 ++++++
+ sent/20261029T120758220195-root-002f.md            | 32 +++++++++++
+ sent/20261029T120758244793-root-5a90.md            | 17 ++++++
+ sent/20261029T120758245555-root-635c.md            | 16 ++++++
+ sent/20261029T120758254903-root-c0e6.md            | 17 ++++++
+ sent/20261029T120758262825-root-f703.md            | 30 +++++++++++
+ sent/20261029T120758532205-root-84cd.md            | 17 ++++++
+ sent/20261029T120758547132-root-297b.md            | 17 ++++++
+ sent/20261029T120758568650-root-b3f3.md            | 32 +++++++++++
+ sent/20261029T120758600649-root-707f.md            | 17 ++++++
+ 124 files changed, 2408 insertions(+), 15 deletions(-)
+
+commit 177287015fb8ab379905d1e076ddc479e6de2043
+Author: hirearchy <hirearchy@localhost>
+Date:   2026-10-29 12:07:57 +0000
+
+    root: applied blueprint (2 agents), no task, services: weekly-memo
+
+ .gitignore                            |  3 ++
+ lead/AGENT.md                         | 65 +++++++++++++++++++++++++++++++++++
+ lead/MEMORY.md                        |  0
+ lead/services/weekly-memo/PLAYBOOK.md | 22 ++++++++++++
+ lead/services/weekly-memo/SERVICE.md  | 38 ++++++++++++++++++++
+ lead/writer/AGENT.md                  | 44 ++++++++++++++++++++++++
+ lead/writer/MEMORY.md                 |  0
+ 7 files changed, 172 insertions(+)
+
+commit 2f2da2fdea865e4f176bedebb27b01ac50b3a34e
+Author: hirearchy <hirearchy@localhost>
+Date:   2026-10-29 12:07:56 +0000
+
+    init organization
+
+ .gitignore |  5 +++++
+ ORG.md     | 74 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 79 insertions(+)

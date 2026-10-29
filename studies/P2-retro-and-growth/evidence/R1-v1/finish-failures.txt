@@ -1,0 +1,2 @@
+extract_mechanical exit 1: python3 -B /Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/harness/extract_mechanical.py /Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/R1 /tmp/hirearchy-p2/R1-1793270268 --product-src /Volumes/workspace/hirearchy/src
+injection_files exit 2: python3 -B /Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/harness/injection_files.py /Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/R1 /tmp/hirearchy-p2/R1-1793270268

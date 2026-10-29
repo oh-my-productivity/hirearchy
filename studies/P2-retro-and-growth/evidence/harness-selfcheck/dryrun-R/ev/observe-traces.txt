@@ -1,0 +1,683 @@
+######## hirearchy --root /tmp/hirearchy-p2/selfcheck-R-1793275673/org obs trace 20261029T120757800056-root-9524
+trace 20261029T120757800056-root-9524 "weekly-memo: 2026-10-05.md" -> lead: done  [partial]
+     +0s  root -> lead task "weekly-memo: 2026-10-05.md" +12 run(s)
+     +0s    run 20261029T120757802469 unknown
+     +0s    lead -> lead/writer task "Draft" +2 run(s)
+     +0s      run 20261029T120757804494 unknown
+     +0s      lead/writer -> lead result (done) "Draft" +1 run(s)
+     +0s    run 20261029T120757806685 unknown
+     +0s    lead -> root result (done) "weekly-memo: 2026-10-05.md" +9 run(s)
+     +0s  root -> lead task "weekly-memo: 2026-10-05.md" +12 run(s)
+     +0s    run 20261029T120757810874 unknown
+     +0s    lead -> lead/writer task "Draft" +2 run(s)
+     +0s      run 20261029T120757813190 unknown
+     +0s      lead/writer -> lead result (done) "Draft" +1 run(s)
+     +0s    run 20261029T120757815679 unknown
+     +0s    lead -> root result (done) "weekly-memo: 2026-10-05.md" +9 run(s)
+     +0s  root -> lead note "feedback on "weekly-memo: 2026-10-05.md": reject"
+     +0s  root -> lead note "feedback on "weekly-memo: 2026-10-05.md": reject"
+     +0s  root -> lead note "criterion link on "weekly-memo: 2026-10-05.md": C5"
+     +0s  root -> lead task "weekly-memo: 2026-10-05.md" +9 run(s)
+     +0s    run 20261029T120757836754 unknown
+     +0s    lead -> lead/writer task "Draft" +2 run(s)
+     +0s      run 20261029T120757840120 unknown
+     +0s      lead/writer -> lead result (done) "Draft" +1 run(s)
+     +0s    run 20261029T120757842767 unknown
+     +0s    lead -> root result (done) "weekly-memo: 2026-10-05.md" +6 run(s)
+     +0s  root -> lead note "feedback on "weekly-memo: 2026-10-05.md": accept"
+tasks: 20261029T120757800056-root-9524 "weekly-memo: 2026-10-05.md" done 3 run(s) | 20261029T120757809981-root-3d85 "weekly-memo: 2026-10-05.md" done 3 run(s) | 20261029T120757835305-root-ff3b "weekly-memo: 2026-10-05.md" done 3 run(s)
+totals: wall 46ms | runs 9 (budget given 33, returned 24) | run time 0s | queue 0s | waiting on you 0s | tool calls 0 (0 refused)
+note: partial: no run events for this request (queue waits, tool calls and refusals unknown); runs and durations come from the run logs
+
+######## hirearchy --root /tmp/hirearchy-p2/selfcheck-R-1793275673/org obs trace 20261029T120757809981-root-3d85
+trace 20261029T120757800056-root-9524 "weekly-memo: 2026-10-05.md" -> lead: done  [partial]
+     +0s  root -> lead task "weekly-memo: 2026-10-05.md" +12 run(s)
+     +0s    run 20261029T120757802469 unknown
+     +0s    lead -> lead/writer task "Draft" +2 run(s)
+     +0s      run 20261029T120757804494 unknown
+     +0s      lead/writer -> lead result (done) "Draft" +1 run(s)
+     +0s    run 20261029T120757806685 unknown
+     +0s    lead -> root result (done) "weekly-memo: 2026-10-05.md" +9 run(s)
+     +0s  root -> lead task "weekly-memo: 2026-10-05.md" +12 run(s)
+     +0s    run 20261029T120757810874 unknown
+     +0s    lead -> lead/writer task "Draft" +2 run(s)
+     +0s      run 20261029T120757813190 unknown
+     +0s      lead/writer -> lead result (done) "Draft" +1 run(s)
+     +0s    run 20261029T120757815679 unknown
+     +0s    lead -> root result (done) "weekly-memo: 2026-10-05.md" +9 run(s)
+     +0s  root -> lead note "feedback on "weekly-memo: 2026-10-05.md": reject"
+     +0s  root -> lead note "feedback on "weekly-memo: 2026-10-05.md": reject"
+     +0s  root -> lead note "criterion link on "weekly-memo: 2026-10-05.md": C5"
+     +0s  root -> lead task "weekly-memo: 2026-10-05.md" +9 run(s)
+     +0s    run 20261029T120757836754 unknown
+     +0s    lead -> lead/writer task "Draft" +2 run(s)
+     +0s      run 20261029T120757840120 unknown
+     +0s      lead/writer -> lead result (done) "Draft" +1 run(s)
+     +0s    run 20261029T120757842767 unknown
+     +0s    lead -> root result (done) "weekly-memo: 2026-10-05.md" +6 run(s)
+     +0s  root -> lead note "feedback on "weekly-memo: 2026-10-05.md": accept"
+tasks: 20261029T120757800056-root-9524 "weekly-memo: 2026-10-05.md" done 3 run(s) | 20261029T120757809981-root-3d85 "weekly-memo: 2026-10-05.md" done 3 run(s) | 20261029T120757835305-root-ff3b "weekly-memo: 2026-10-05.md" done 3 run(s)
+totals: wall 46ms | runs 9 (budget given 33, returned 24) | run time 0s | queue 0s | waiting on you 0s | tool calls 0 (0 refused)
+note: 20261029T120757809981-root-3d85 belongs to the request 20261029T120757800056-root-9524; showing that
+note: partial: no run events for this request (queue waits, tool calls and refusals unknown); runs and durations come from the run logs
+
+######## hirearchy --root /tmp/hirearchy-p2/selfcheck-R-1793275673/org obs trace 20261029T120757819034-root-6032
+trace 20261029T120757800056-root-9524 "weekly-memo: 2026-10-05.md" -> lead: done  [partial]
+     +0s  root -> lead task "weekly-memo: 2026-10-05.md" +12 run(s)
+     +0s    run 20261029T120757802469 unknown
+     +0s    lead -> lead/writer task "Draft" +2 run(s)
+     +0s      run 20261029T120757804494 unknown
+     +0s      lead/writer -> lead result (done) "Draft" +1 run(s)
+     +0s    run 20261029T120757806685 unknown
+     +0s    lead -> root result (done) "weekly-memo: 2026-10-05.md" +9 run(s)
+     +0s  root -> lead task "weekly-memo: 2026-10-05.md" +12 run(s)
+     +0s    run 20261029T120757810874 unknown
+     +0s    lead -> lead/writer task "Draft" +2 run(s)
+     +0s      run 20261029T120757813190 unknown
+     +0s      lead/writer -> lead result (done) "Draft" +1 run(s)
+     +0s    run 20261029T120757815679 unknown
+     +0s    lead -> root result (done) "weekly-memo: 2026-10-05.md" +9 run(s)
+     +0s  root -> lead note "feedback on "weekly-memo: 2026-10-05.md": reject"
+     +0s  root -> lead note "feedback on "weekly-memo: 2026-10-05.md": reject"
+     +0s  root -> lead note "criterion link on "weekly-memo: 2026-10-05.md": C5"
+     +0s  root -> lead task "weekly-memo: 2026-10-05.md" +9 run(s)
+     +0s    run 20261029T120757836754 unknown
+     +0s    lead -> lead/writer task "Draft" +2 run(s)
+     +0s      run 20261029T120757840120 unknown
+     +0s      lead/writer -> lead result (done) "Draft" +1 run(s)
+     +0s    run 20261029T120757842767 unknown
+     +0s    lead -> root result (done) "weekly-memo: 2026-10-05.md" +6 run(s)
+     +0s  root -> lead note "feedback on "weekly-memo: 2026-10-05.md": accept"
+tasks: 20261029T120757800056-root-9524 "weekly-memo: 2026-10-05.md" done 3 run(s) | 20261029T120757809981-root-3d85 "weekly-memo: 2026-10-05.md" done 3 run(s) | 20261029T120757835305-root-ff3b "weekly-memo: 2026-10-05.md" done 3 run(s)
+totals: wall 46ms | runs 9 (budget given 33, returned 24) | run time 0s | queue 0s | waiting on you 0s | tool calls 0 (0 refused)
+note: 20261029T120757819034-root-6032 belongs to the request 20261029T120757800056-root-9524; showing that
+note: partial: no run events for this request (queue waits, tool calls and refusals unknown); runs and durations come from the run logs
+
+######## hirearchy --root /tmp/hirearchy-p2/selfcheck-R-1793275673/org obs trace 20261029T120757820070-root-54d3
+trace 20261029T120757800056-root-9524 "weekly-memo: 2026-10-05.md" -> lead: done  [partial]
+     +0s  root -> lead task "weekly-memo: 2026-10-05.md" +12 run(s)
+     +0s    run 20261029T120757802469 unknown
+     +0s    lead -> lead/writer task "Draft" +2 run(s)
+     +0s      run 20261029T120757804494 unknown
+     +0s      lead/writer -> lead result (done) "Draft" +1 run(s)
+     +0s    run 20261029T120757806685 unknown
+     +0s    lead -> root result (done) "weekly-memo: 2026-10-05.md" +9 run(s)
+     +0s  root -> lead task "weekly-memo: 2026-10-05.md" +12 run(s)
+     +0s    run 20261029T120757810874 unknown
+     +0s    lead -> lead/writer task "Draft" +2 run(s)
+     +0s      run 20261029T120757813190 unknown
+     +0s      lead/writer -> lead result (done) "Draft" +1 run(s)
+     +0s    run 20261029T120757815679 unknown
+     +0s    lead -> root result (done) "weekly-memo: 2026-10-05.md" +9 run(s)
+     +0s  root -> lead note "feedback on "weekly-memo: 2026-10-05.md": reject"
+     +0s  root -> lead note "feedback on "weekly-memo: 2026-10-05.md": reject"
+     +0s  root -> lead note "criterion link on "weekly-memo: 2026-10-05.md": C5"
+     +0s  root -> lead task "weekly-memo: 2026-10-05.md" +9 run(s)
+     +0s    run 20261029T120757836754 unknown
+     +0s    lead -> lead/writer task "Draft" +2 run(s)
+     +0s      run 20261029T120757840120 unknown
+     +0s      lead/writer -> lead result (done) "Draft" +1 run(s)
+     +0s    run 20261029T120757842767 unknown
+     +0s    lead -> root result (done) "weekly-memo: 2026-10-05.md" +6 run(s)
+     +0s  root -> lead note "feedback on "weekly-memo: 2026-10-05.md": accept"
+tasks: 20261029T120757800056-root-9524 "weekly-memo: 2026-10-05.md" done 3 run(s) | 20261029T120757809981-root-3d85 "weekly-memo: 2026-10-05.md" done 3 run(s) | 20261029T120757835305-root-ff3b "weekly-memo: 2026-10-05.md" done 3 run(s)
+totals: wall 46ms | runs 9 (budget given 33, returned 24) | run time 0s | queue 0s | waiting on you 0s | tool calls 0 (0 refused)
+note: 20261029T120757820070-root-54d3 belongs to the request 20261029T120757800056-root-9524; showing that
+note: partial: no run events for this request (queue waits, tool calls and refusals unknown); runs and durations come from the run logs
+
+######## hirearchy --root /tmp/hirearchy-p2/selfcheck-R-1793275673/org obs trace 20261029T120757828588-root-f6ba
+trace 20261029T120757800056-root-9524 "weekly-memo: 2026-10-05.md" -> lead: done  [partial]
+     +0s  root -> lead task "weekly-memo: 2026-10-05.md" +12 run(s)
+     +0s    run 20261029T120757802469 unknown
+     +0s    lead -> lead/writer task "Draft" +2 run(s)
+     +0s      run 20261029T120757804494 unknown
+     +0s      lead/writer -> lead result (done) "Draft" +1 run(s)
+     +0s    run 20261029T120757806685 unknown
+     +0s    lead -> root result (done) "weekly-memo: 2026-10-05.md" +9 run(s)
+     +0s  root -> lead task "weekly-memo: 2026-10-05.md" +12 run(s)
+     +0s    run 20261029T120757810874 unknown
+     +0s    lead -> lead/writer task "Draft" +2 run(s)
+     +0s      run 20261029T120757813190 unknown
+     +0s      lead/writer -> lead result (done) "Draft" +1 run(s)
+     +0s    run 20261029T120757815679 unknown
+     +0s    lead -> root result (done) "weekly-memo: 2026-10-05.md" +9 run(s)
+     +0s  root -> lead note "feedback on "weekly-memo: 2026-10-05.md": reject"
+     +0s  root -> lead note "feedback on "weekly-memo: 2026-10-05.md": reject"
+     +0s  root -> lead note "criterion link on "weekly-memo: 2026-10-05.md": C5"
+     +0s  root -> lead task "weekly-memo: 2026-10-05.md" +9 run(s)
+     +0s    run 20261029T120757836754 unknown
+     +0s    lead -> lead/writer task "Draft" +2 run(s)
+     +0s      run 20261029T120757840120 unknown
+     +0s      lead/writer -> lead result (done) "Draft" +1 run(s)
+     +0s    run 20261029T120757842767 unknown
+     +0s    lead -> root result (done) "weekly-memo: 2026-10-05.md" +6 run(s)
+     +0s  root -> lead note "feedback on "weekly-memo: 2026-10-05.md": accept"
+tasks: 20261029T120757800056-root-9524 "weekly-memo: 2026-10-05.md" done 3 run(s) | 20261029T120757809981-root-3d85 "weekly-memo: 2026-10-05.md" done 3 run(s) | 20261029T120757835305-root-ff3b "weekly-memo: 2026-10-05.md" done 3 run(s)
+totals: wall 46ms | runs 9 (budget given 33, returned 24) | run time 0s | queue 0s | waiting on you 0s | tool calls 0 (0 refused)
+note: 20261029T120757828588-root-f6ba belongs to the request 20261029T120757800056-root-9524; showing that
+note: partial: no run events for this request (queue waits, tool calls and refusals unknown); runs and durations come from the run logs
+
+######## hirearchy --root /tmp/hirearchy-p2/selfcheck-R-1793275673/org obs trace 20261029T120757835305-root-ff3b
+trace 20261029T120757800056-root-9524 "weekly-memo: 2026-10-05.md" -> lead: done  [partial]
+     +0s  root -> lead task "weekly-memo: 2026-10-05.md" +12 run(s)
+     +0s    run 20261029T120757802469 unknown
+     +0s    lead -> lead/writer task "Draft" +2 run(s)
+     +0s      run 20261029T120757804494 unknown
+     +0s      lead/writer -> lead result (done) "Draft" +1 run(s)
+     +0s    run 20261029T120757806685 unknown
+     +0s    lead -> root result (done) "weekly-memo: 2026-10-05.md" +9 run(s)
+     +0s  root -> lead task "weekly-memo: 2026-10-05.md" +12 run(s)
+     +0s    run 20261029T120757810874 unknown
+     +0s    lead -> lead/writer task "Draft" +2 run(s)
+     +0s      run 20261029T120757813190 unknown
+     +0s      lead/writer -> lead result (done) "Draft" +1 run(s)
+     +0s    run 20261029T120757815679 unknown
+     +0s    lead -> root result (done) "weekly-memo: 2026-10-05.md" +9 run(s)
+     +0s  root -> lead note "feedback on "weekly-memo: 2026-10-05.md": reject"
+     +0s  root -> lead note "feedback on "weekly-memo: 2026-10-05.md": reject"
+     +0s  root -> lead note "criterion link on "weekly-memo: 2026-10-05.md": C5"
+     +0s  root -> lead task "weekly-memo: 2026-10-05.md" +9 run(s)
+     +0s    run 20261029T120757836754 unknown
+     +0s    lead -> lead/writer task "Draft" +2 run(s)
+     +0s      run 20261029T120757840120 unknown
+     +0s      lead/writer -> lead result (done) "Draft" +1 run(s)
+     +0s    run 20261029T120757842767 unknown
+     +0s    lead -> root result (done) "weekly-memo: 2026-10-05.md" +6 run(s)
+     +0s  root -> lead note "feedback on "weekly-memo: 2026-10-05.md": accept"
+tasks: 20261029T120757800056-root-9524 "weekly-memo: 2026-10-05.md" done 3 run(s) | 20261029T120757809981-root-3d85 "weekly-memo: 2026-10-05.md" done 3 run(s) | 20261029T120757835305-root-ff3b "weekly-memo: 2026-10-05.md" done 3 run(s)
+totals: wall 46ms | runs 9 (budget given 33, returned 24) | run time 0s | queue 0s | waiting on you 0s | tool calls 0 (0 refused)
+note: 20261029T120757835305-root-ff3b belongs to the request 20261029T120757800056-root-9524; showing that
+note: partial: no run events for this request (queue waits, tool calls and refusals unknown); runs and durations come from the run logs
+
+######## hirearchy --root /tmp/hirearchy-p2/selfcheck-R-1793275673/org obs trace 20261029T120757849511-root-8640
+trace 20261029T120757800056-root-9524 "weekly-memo: 2026-10-05.md" -> lead: done  [partial]
+     +0s  root -> lead task "weekly-memo: 2026-10-05.md" +12 run(s)
+     +0s    run 20261029T120757802469 unknown
+     +0s    lead -> lead/writer task "Draft" +2 run(s)
+     +0s      run 20261029T120757804494 unknown
+     +0s      lead/writer -> lead result (done) "Draft" +1 run(s)
+     +0s    run 20261029T120757806685 unknown
+     +0s    lead -> root result (done) "weekly-memo: 2026-10-05.md" +9 run(s)
+     +0s  root -> lead task "weekly-memo: 2026-10-05.md" +12 run(s)
+     +0s    run 20261029T120757810874 unknown
+     +0s    lead -> lead/writer task "Draft" +2 run(s)
+     +0s      run 20261029T120757813190 unknown
+     +0s      lead/writer -> lead result (done) "Draft" +1 run(s)
+     +0s    run 20261029T120757815679 unknown
+     +0s    lead -> root result (done) "weekly-memo: 2026-10-05.md" +9 run(s)
+     +0s  root -> lead note "feedback on "weekly-memo: 2026-10-05.md": reject"
+     +0s  root -> lead note "feedback on "weekly-memo: 2026-10-05.md": reject"
+     +0s  root -> lead note "criterion link on "weekly-memo: 2026-10-05.md": C5"
+     +0s  root -> lead task "weekly-memo: 2026-10-05.md" +9 run(s)
+     +0s    run 20261029T120757836754 unknown
+     +0s    lead -> lead/writer task "Draft" +2 run(s)
+     +0s      run 20261029T120757840120 unknown
+     +0s      lead/writer -> lead result (done) "Draft" +1 run(s)
+     +0s    run 20261029T120757842767 unknown
+     +0s    lead -> root result (done) "weekly-memo: 2026-10-05.md" +6 run(s)
+     +0s  root -> lead note "feedback on "weekly-memo: 2026-10-05.md": accept"
+tasks: 20261029T120757800056-root-9524 "weekly-memo: 2026-10-05.md" done 3 run(s) | 20261029T120757809981-root-3d85 "weekly-memo: 2026-10-05.md" done 3 run(s) | 20261029T120757835305-root-ff3b "weekly-memo: 2026-10-05.md" done 3 run(s)
+totals: wall 46ms | runs 9 (budget given 33, returned 24) | run time 0s | queue 0s | waiting on you 0s | tool calls 0 (0 refused)
+note: 20261029T120757849511-root-8640 belongs to the request 20261029T120757800056-root-9524; showing that
+note: partial: no run events for this request (queue waits, tool calls and refusals unknown); runs and durations come from the run logs
+
+######## hirearchy --root /tmp/hirearchy-p2/selfcheck-R-1793275673/org obs trace 20261029T120757850378-root-ed57
+trace 20261029T120757850378-root-ed57 "Action list for the ops team (2026-10-05)" -> lead: done  [partial]
+     +0s  root -> lead task "Action list for the ops team (2026-10-05)" +4 run(s)
+     +0s    run 20261029T120757851188 unknown
+     +0s    lead -> root result (done) "Action list for the ops team (2026-10-05)" +3 run(s)
+     +0s  root -> lead note "feedback on "Action list for the ops team (2026-10-05)": ac…"
+totals: wall 4ms | runs 1 (budget given 4, returned 3) | run time 0s | queue 0s | waiting on you 0s | tool calls 0 (0 refused)
+note: partial: no run events for this request (queue waits, tool calls and refusals unknown); runs and durations come from the run logs
+
+######## hirearchy --root /tmp/hirearchy-p2/selfcheck-R-1793275673/org obs trace 20261029T120757856129-root-5cb6
+trace 20261029T120757850378-root-ed57 "Action list for the ops team (2026-10-05)" -> lead: done  [partial]
+     +0s  root -> lead task "Action list for the ops team (2026-10-05)" +4 run(s)
+     +0s    run 20261029T120757851188 unknown
+     +0s    lead -> root result (done) "Action list for the ops team (2026-10-05)" +3 run(s)
+     +0s  root -> lead note "feedback on "Action list for the ops team (2026-10-05)": ac…"
+totals: wall 4ms | runs 1 (budget given 4, returned 3) | run time 0s | queue 0s | waiting on you 0s | tool calls 0 (0 refused)
+note: 20261029T120757856129-root-5cb6 belongs to the request 20261029T120757850378-root-ed57; showing that
+note: partial: no run events for this request (queue waits, tool calls and refusals unknown); runs and durations come from the run logs
+
+######## hirearchy --root /tmp/hirearchy-p2/selfcheck-R-1793275673/org obs trace 20261029T120757860113-root-c9cb
+trace 20261029T120757860113-root-c9cb "weekly-memo: 2026-10-12.md" -> lead: done  [partial]
+     +0s  root -> lead task "weekly-memo: 2026-10-12.md" +12 run(s)
+     +0s    run 20261029T120757861096 unknown
+     +0s    lead -> lead/writer task "Draft" +2 run(s)
+     +0s      run 20261029T120757864892 unknown
+     +0s      lead/writer -> lead result (done) "Draft" +1 run(s)
+     +0s    run 20261029T120757867788 unknown
+     +0s    lead -> root result (done) "weekly-memo: 2026-10-12.md" +9 run(s)
+     +0s  root -> lead note "feedback on "weekly-memo: 2026-10-12.md": reject"
+     +0s  root -> lead note "criterion link on "weekly-memo: 2026-10-12.md": C6"
+     +0s  root -> lead task "weekly-memo: 2026-10-12.md" +9 run(s)
+     +0s    run 20261029T120757897517 unknown
+     +0s    lead -> lead/writer task "Draft" +2 run(s)
+     +0s      run 20261029T120757901995 unknown
+     +0s      lead/writer -> lead result (done) "Draft" +1 run(s)
+     +0s    run 20261029T120757905252 unknown
+     +0s    lead -> root result (done) "weekly-memo: 2026-10-12.md" +6 run(s)
+     +0s  root -> lead note "feedback on "weekly-memo: 2026-10-12.md": accept"
+tasks: 20261029T120757860113-root-c9cb "weekly-memo: 2026-10-12.md" done 3 run(s) | 20261029T120757896274-root-27f7 "weekly-memo: 2026-10-12.md" done 3 run(s)
+totals: wall 50ms | runs 6 (budget given 21, returned 15) | run time 0s | queue 0s | waiting on you 0s | tool calls 0 (0 refused)
+note: partial: no run events for this request (queue waits, tool calls and refusals unknown); runs and durations come from the run logs
+
+######## hirearchy --root /tmp/hirearchy-p2/selfcheck-R-1793275673/org obs trace 20261029T120757873298-root-5509
+trace 20261029T120757860113-root-c9cb "weekly-memo: 2026-10-12.md" -> lead: done  [partial]
+     +0s  root -> lead task "weekly-memo: 2026-10-12.md" +12 run(s)
+     +0s    run 20261029T120757861096 unknown
+     +0s    lead -> lead/writer task "Draft" +2 run(s)
+     +0s      run 20261029T120757864892 unknown
+     +0s      lead/writer -> lead result (done) "Draft" +1 run(s)
+     +0s    run 20261029T120757867788 unknown
+     +0s    lead -> root result (done) "weekly-memo: 2026-10-12.md" +9 run(s)
+     +0s  root -> lead note "feedback on "weekly-memo: 2026-10-12.md": reject"
+     +0s  root -> lead note "criterion link on "weekly-memo: 2026-10-12.md": C6"
+     +0s  root -> lead task "weekly-memo: 2026-10-12.md" +9 run(s)
+     +0s    run 20261029T120757897517 unknown
+     +0s    lead -> lead/writer task "Draft" +2 run(s)
+     +0s      run 20261029T120757901995 unknown
+     +0s      lead/writer -> lead result (done) "Draft" +1 run(s)
+     +0s    run 20261029T120757905252 unknown
+     +0s    lead -> root result (done) "weekly-memo: 2026-10-12.md" +6 run(s)
+     +0s  root -> lead note "feedback on "weekly-memo: 2026-10-12.md": accept"
+tasks: 20261029T120757860113-root-c9cb "weekly-memo: 2026-10-12.md" done 3 run(s) | 20261029T120757896274-root-27f7 "weekly-memo: 2026-10-12.md" done 3 run(s)
+totals: wall 50ms | runs 6 (budget given 21, returned 15) | run time 0s | queue 0s | waiting on you 0s | tool calls 0 (0 refused)
+note: 20261029T120757873298-root-5509 belongs to the request 20261029T120757860113-root-c9cb; showing that
+note: partial: no run events for this request (queue waits, tool calls and refusals unknown); runs and durations come from the run logs
+
+######## hirearchy --root /tmp/hirearchy-p2/selfcheck-R-1793275673/org obs trace 20261029T120757885795-root-a7a5
+trace 20261029T120757860113-root-c9cb "weekly-memo: 2026-10-12.md" -> lead: done  [partial]
+     +0s  root -> lead task "weekly-memo: 2026-10-12.md" +12 run(s)
+     +0s    run 20261029T120757861096 unknown
+     +0s    lead -> lead/writer task "Draft" +2 run(s)
+     +0s      run 20261029T120757864892 unknown
+     +0s      lead/writer -> lead result (done) "Draft" +1 run(s)
+     +0s    run 20261029T120757867788 unknown
+     +0s    lead -> root result (done) "weekly-memo: 2026-10-12.md" +9 run(s)
+     +0s  root -> lead note "feedback on "weekly-memo: 2026-10-12.md": reject"
+     +0s  root -> lead note "criterion link on "weekly-memo: 2026-10-12.md": C6"
+     +0s  root -> lead task "weekly-memo: 2026-10-12.md" +9 run(s)
+     +0s    run 20261029T120757897517 unknown
+     +0s    lead -> lead/writer task "Draft" +2 run(s)
+     +0s      run 20261029T120757901995 unknown
+     +0s      lead/writer -> lead result (done) "Draft" +1 run(s)
+     +0s    run 20261029T120757905252 unknown
+     +0s    lead -> root result (done) "weekly-memo: 2026-10-12.md" +6 run(s)
+     +0s  root -> lead note "feedback on "weekly-memo: 2026-10-12.md": accept"
+tasks: 20261029T120757860113-root-c9cb "weekly-memo: 2026-10-12.md" done 3 run(s) | 20261029T120757896274-root-27f7 "weekly-memo: 2026-10-12.md" done 3 run(s)
+totals: wall 50ms | runs 6 (budget given 21, returned 15) | run time 0s | queue 0s | waiting on you 0s | tool calls 0 (0 refused)
+note: 20261029T120757885795-root-a7a5 belongs to the request 20261029T120757860113-root-c9cb; showing that
+note: partial: no run events for this request (queue waits, tool calls and refusals unknown); runs and durations come from the run logs
+
+######## hirearchy --root /tmp/hirearchy-p2/selfcheck-R-1793275673/org obs trace 20261029T120757896274-root-27f7
+trace 20261029T120757860113-root-c9cb "weekly-memo: 2026-10-12.md" -> lead: done  [partial]
+     +0s  root -> lead task "weekly-memo: 2026-10-12.md" +12 run(s)
+     +0s    run 20261029T120757861096 unknown
+     +0s    lead -> lead/writer task "Draft" +2 run(s)
+     +0s      run 20261029T120757864892 unknown
+     +0s      lead/writer -> lead result (done) "Draft" +1 run(s)
+     +0s    run 20261029T120757867788 unknown
+     +0s    lead -> root result (done) "weekly-memo: 2026-10-12.md" +9 run(s)
+     +0s  root -> lead note "feedback on "weekly-memo: 2026-10-12.md": reject"
+     +0s  root -> lead note "criterion link on "weekly-memo: 2026-10-12.md": C6"
+     +0s  root -> lead task "weekly-memo: 2026-10-12.md" +9 run(s)
+     +0s    run 20261029T120757897517 unknown
+     +0s    lead -> lead/writer task "Draft" +2 run(s)
+     +0s      run 20261029T120757901995 unknown
+     +0s      lead/writer -> lead result (done) "Draft" +1 run(s)
+     +0s    run 20261029T120757905252 unknown
+     +0s    lead -> root result (done) "weekly-memo: 2026-10-12.md" +6 run(s)
+     +0s  root -> lead note "feedback on "weekly-memo: 2026-10-12.md": accept"
+tasks: 20261029T120757860113-root-c9cb "weekly-memo: 2026-10-12.md" done 3 run(s) | 20261029T120757896274-root-27f7 "weekly-memo: 2026-10-12.md" done 3 run(s)
+totals: wall 50ms | runs 6 (budget given 21, returned 15) | run time 0s | queue 0s | waiting on you 0s | tool calls 0 (0 refused)
+note: 20261029T120757896274-root-27f7 belongs to the request 20261029T120757860113-root-c9cb; showing that
+note: partial: no run events for this request (queue waits, tool calls and refusals unknown); runs and durations come from the run logs
+
+######## hirearchy --root /tmp/hirearchy-p2/selfcheck-R-1793275673/org obs trace 20261029T120757915838-root-7756
+trace 20261029T120757860113-root-c9cb "weekly-memo: 2026-10-12.md" -> lead: done  [partial]
+     +0s  root -> lead task "weekly-memo: 2026-10-12.md" +12 run(s)
+     +0s    run 20261029T120757861096 unknown
+     +0s    lead -> lead/writer task "Draft" +2 run(s)
+     +0s      run 20261029T120757864892 unknown
+     +0s      lead/writer -> lead result (done) "Draft" +1 run(s)
+     +0s    run 20261029T120757867788 unknown
+     +0s    lead -> root result (done) "weekly-memo: 2026-10-12.md" +9 run(s)
+     +0s  root -> lead note "feedback on "weekly-memo: 2026-10-12.md": reject"
+     +0s  root -> lead note "criterion link on "weekly-memo: 2026-10-12.md": C6"
+     +0s  root -> lead task "weekly-memo: 2026-10-12.md" +9 run(s)
+     +0s    run 20261029T120757897517 unknown
+     +0s    lead -> lead/writer task "Draft" +2 run(s)
+     +0s      run 20261029T120757901995 unknown
+     +0s      lead/writer -> lead result (done) "Draft" +1 run(s)
+     +0s    run 20261029T120757905252 unknown
+     +0s    lead -> root result (done) "weekly-memo: 2026-10-12.md" +6 run(s)
+     +0s  root -> lead note "feedback on "weekly-memo: 2026-10-12.md": accept"
+tasks: 20261029T120757860113-root-c9cb "weekly-memo: 2026-10-12.md" done 3 run(s) | 20261029T120757896274-root-27f7 "weekly-memo: 2026-10-12.md" done 3 run(s)
+totals: wall 50ms | runs 6 (budget given 21, returned 15) | run time 0s | queue 0s | waiting on you 0s | tool calls 0 (0 refused)
+note: 20261029T120757915838-root-7756 belongs to the request 20261029T120757860113-root-c9cb; showing that
+note: partial: no run events for this request (queue waits, tool calls and refusals unknown); runs and durations come from the run logs
+
+######## hirearchy --root /tmp/hirearchy-p2/selfcheck-R-1793275673/org obs trace 20261029T120757916711-root-8082
+trace 20261029T120757916711-root-8082 "Action list for the ops team (2026-10-12)" -> lead: done  [partial]
+     +0s  root -> lead task "Action list for the ops team (2026-10-12)" +4 run(s)
+     +0s    run 20261029T120757917504 unknown
+     +0s    lead -> root result (done) "Action list for the ops team (2026-10-12)" +3 run(s)
+     +0s  root -> lead note "feedback on "Action list for the ops team (2026-10-12)": ac…"
+totals: wall 6ms | runs 1 (budget given 4, returned 3) | run time 0s | queue 0s | waiting on you 0s | tool calls 0 (0 refused)
+note: partial: no run events for this request (queue waits, tool calls and refusals unknown); runs and durations come from the run logs
+
+######## hirearchy --root /tmp/hirearchy-p2/selfcheck-R-1793275673/org obs trace 20261029T120757924428-root-4afb
+trace 20261029T120757916711-root-8082 "Action list for the ops team (2026-10-12)" -> lead: done  [partial]
+     +0s  root -> lead task "Action list for the ops team (2026-10-12)" +4 run(s)
+     +0s    run 20261029T120757917504 unknown
+     +0s    lead -> root result (done) "Action list for the ops team (2026-10-12)" +3 run(s)
+     +0s  root -> lead note "feedback on "Action list for the ops team (2026-10-12)": ac…"
+totals: wall 6ms | runs 1 (budget given 4, returned 3) | run time 0s | queue 0s | waiting on you 0s | tool calls 0 (0 refused)
+note: 20261029T120757924428-root-4afb belongs to the request 20261029T120757916711-root-8082; showing that
+note: partial: no run events for this request (queue waits, tool calls and refusals unknown); runs and durations come from the run logs
+
+######## hirearchy --root /tmp/hirearchy-p2/selfcheck-R-1793275673/org obs trace 20261029T120757930373-root-b504
+trace 20261029T120757930373-root-b504 "weekly-memo: 2026-10-19.md" -> lead: done  [partial]
+     +0s  root -> lead task "weekly-memo: 2026-10-19.md" +12 run(s)
+     +0s    run 20261029T120757931164 unknown
+     +0s    lead -> lead/writer task "Draft" +2 run(s)
+     +0s      run 20261029T120757936059 unknown
+     +0s      lead/writer -> lead result (done) "Draft" +1 run(s)
+     +0s    run 20261029T120757939326 unknown
+     +0s    lead -> root result (done) "weekly-memo: 2026-10-19.md" +9 run(s)
+     +0s  root -> lead note "feedback on "weekly-memo: 2026-10-19.md": reject"
+     +0s  root -> lead note "criterion link on "weekly-memo: 2026-10-19.md": R2"
+     +0s  root -> lead task "weekly-memo: 2026-10-19.md" +9 run(s)
+     +0s    run 20261029T120758221383 unknown
+     +0s    lead -> lead/writer task "Draft" +2 run(s)
+     +0s      run 20261029T120758227084 unknown
+     +0s      lead/writer -> lead result (done) "Draft" +1 run(s)
+     +0s    run 20261029T120758230625 unknown
+     +0s    lead -> root result (done) "weekly-memo: 2026-10-19.md" +6 run(s)
+     +0s  root -> lead note "feedback on "weekly-memo: 2026-10-19.md": accept"
+tasks: 20261029T120757930373-root-b504 "weekly-memo: 2026-10-19.md" done 3 run(s) | 20261029T120758220195-root-002f "weekly-memo: 2026-10-19.md" done 3 run(s)
+totals: wall 307ms | runs 6 (budget given 21, returned 15) | run time 0s | queue 0s | waiting on you 0s | tool calls 0 (0 refused)
+note: partial: no run events for this request (queue waits, tool calls and refusals unknown); runs and durations come from the run logs
+
+######## hirearchy --root /tmp/hirearchy-p2/selfcheck-R-1793275673/org obs trace 20261029T120758193773-root-cd6d
+trace 20261029T120757930373-root-b504 "weekly-memo: 2026-10-19.md" -> lead: done  [partial]
+     +0s  root -> lead task "weekly-memo: 2026-10-19.md" +12 run(s)
+     +0s    run 20261029T120757931164 unknown
+     +0s    lead -> lead/writer task "Draft" +2 run(s)
+     +0s      run 20261029T120757936059 unknown
+     +0s      lead/writer -> lead result (done) "Draft" +1 run(s)
+     +0s    run 20261029T120757939326 unknown
+     +0s    lead -> root result (done) "weekly-memo: 2026-10-19.md" +9 run(s)
+     +0s  root -> lead note "feedback on "weekly-memo: 2026-10-19.md": reject"
+     +0s  root -> lead note "criterion link on "weekly-memo: 2026-10-19.md": R2"
+     +0s  root -> lead task "weekly-memo: 2026-10-19.md" +9 run(s)
+     +0s    run 20261029T120758221383 unknown
+     +0s    lead -> lead/writer task "Draft" +2 run(s)
+     +0s      run 20261029T120758227084 unknown
+     +0s      lead/writer -> lead result (done) "Draft" +1 run(s)
+     +0s    run 20261029T120758230625 unknown
+     +0s    lead -> root result (done) "weekly-memo: 2026-10-19.md" +6 run(s)
+     +0s  root -> lead note "feedback on "weekly-memo: 2026-10-19.md": accept"
+tasks: 20261029T120757930373-root-b504 "weekly-memo: 2026-10-19.md" done 3 run(s) | 20261029T120758220195-root-002f "weekly-memo: 2026-10-19.md" done 3 run(s)
+totals: wall 307ms | runs 6 (budget given 21, returned 15) | run time 0s | queue 0s | waiting on you 0s | tool calls 0 (0 refused)
+note: 20261029T120758193773-root-cd6d belongs to the request 20261029T120757930373-root-b504; showing that
+note: partial: no run events for this request (queue waits, tool calls and refusals unknown); runs and durations come from the run logs
+
+######## hirearchy --root /tmp/hirearchy-p2/selfcheck-R-1793275673/org obs trace 20261029T120758205441-root-7a60
+trace 20261029T120757930373-root-b504 "weekly-memo: 2026-10-19.md" -> lead: done  [partial]
+     +0s  root -> lead task "weekly-memo: 2026-10-19.md" +12 run(s)
+     +0s    run 20261029T120757931164 unknown
+     +0s    lead -> lead/writer task "Draft" +2 run(s)
+     +0s      run 20261029T120757936059 unknown
+     +0s      lead/writer -> lead result (done) "Draft" +1 run(s)
+     +0s    run 20261029T120757939326 unknown
+     +0s    lead -> root result (done) "weekly-memo: 2026-10-19.md" +9 run(s)
+     +0s  root -> lead note "feedback on "weekly-memo: 2026-10-19.md": reject"
+     +0s  root -> lead note "criterion link on "weekly-memo: 2026-10-19.md": R2"
+     +0s  root -> lead task "weekly-memo: 2026-10-19.md" +9 run(s)
+     +0s    run 20261029T120758221383 unknown
+     +0s    lead -> lead/writer task "Draft" +2 run(s)
+     +0s      run 20261029T120758227084 unknown
+     +0s      lead/writer -> lead result (done) "Draft" +1 run(s)
+     +0s    run 20261029T120758230625 unknown
+     +0s    lead -> root result (done) "weekly-memo: 2026-10-19.md" +6 run(s)
+     +0s  root -> lead note "feedback on "weekly-memo: 2026-10-19.md": accept"
+tasks: 20261029T120757930373-root-b504 "weekly-memo: 2026-10-19.md" done 3 run(s) | 20261029T120758220195-root-002f "weekly-memo: 2026-10-19.md" done 3 run(s)
+totals: wall 307ms | runs 6 (budget given 21, returned 15) | run time 0s | queue 0s | waiting on you 0s | tool calls 0 (0 refused)
+note: 20261029T120758205441-root-7a60 belongs to the request 20261029T120757930373-root-b504; showing that
+note: partial: no run events for this request (queue waits, tool calls and refusals unknown); runs and durations come from the run logs
+
+######## hirearchy --root /tmp/hirearchy-p2/selfcheck-R-1793275673/org obs trace 20261029T120758220195-root-002f
+trace 20261029T120757930373-root-b504 "weekly-memo: 2026-10-19.md" -> lead: done  [partial]
+     +0s  root -> lead task "weekly-memo: 2026-10-19.md" +12 run(s)
+     +0s    run 20261029T120757931164 unknown
+     +0s    lead -> lead/writer task "Draft" +2 run(s)
+     +0s      run 20261029T120757936059 unknown
+     +0s      lead/writer -> lead result (done) "Draft" +1 run(s)
+     +0s    run 20261029T120757939326 unknown
+     +0s    lead -> root result (done) "weekly-memo: 2026-10-19.md" +9 run(s)
+     +0s  root -> lead note "feedback on "weekly-memo: 2026-10-19.md": reject"
+     +0s  root -> lead note "criterion link on "weekly-memo: 2026-10-19.md": R2"
+     +0s  root -> lead task "weekly-memo: 2026-10-19.md" +9 run(s)
+     +0s    run 20261029T120758221383 unknown
+     +0s    lead -> lead/writer task "Draft" +2 run(s)
+     +0s      run 20261029T120758227084 unknown
+     +0s      lead/writer -> lead result (done) "Draft" +1 run(s)
+     +0s    run 20261029T120758230625 unknown
+     +0s    lead -> root result (done) "weekly-memo: 2026-10-19.md" +6 run(s)
+     +0s  root -> lead note "feedback on "weekly-memo: 2026-10-19.md": accept"
+tasks: 20261029T120757930373-root-b504 "weekly-memo: 2026-10-19.md" done 3 run(s) | 20261029T120758220195-root-002f "weekly-memo: 2026-10-19.md" done 3 run(s)
+totals: wall 307ms | runs 6 (budget given 21, returned 15) | run time 0s | queue 0s | waiting on you 0s | tool calls 0 (0 refused)
+note: 20261029T120758220195-root-002f belongs to the request 20261029T120757930373-root-b504; showing that
+note: partial: no run events for this request (queue waits, tool calls and refusals unknown); runs and durations come from the run logs
+
+######## hirearchy --root /tmp/hirearchy-p2/selfcheck-R-1793275673/org obs trace 20261029T120758244793-root-5a90
+trace 20261029T120757930373-root-b504 "weekly-memo: 2026-10-19.md" -> lead: done  [partial]
+     +0s  root -> lead task "weekly-memo: 2026-10-19.md" +12 run(s)
+     +0s    run 20261029T120757931164 unknown
+     +0s    lead -> lead/writer task "Draft" +2 run(s)
+     +0s      run 20261029T120757936059 unknown
+     +0s      lead/writer -> lead result (done) "Draft" +1 run(s)
+     +0s    run 20261029T120757939326 unknown
+     +0s    lead -> root result (done) "weekly-memo: 2026-10-19.md" +9 run(s)
+     +0s  root -> lead note "feedback on "weekly-memo: 2026-10-19.md": reject"
+     +0s  root -> lead note "criterion link on "weekly-memo: 2026-10-19.md": R2"
+     +0s  root -> lead task "weekly-memo: 2026-10-19.md" +9 run(s)
+     +0s    run 20261029T120758221383 unknown
+     +0s    lead -> lead/writer task "Draft" +2 run(s)
+     +0s      run 20261029T120758227084 unknown
+     +0s      lead/writer -> lead result (done) "Draft" +1 run(s)
+     +0s    run 20261029T120758230625 unknown
+     +0s    lead -> root result (done) "weekly-memo: 2026-10-19.md" +6 run(s)
+     +0s  root -> lead note "feedback on "weekly-memo: 2026-10-19.md": accept"
+tasks: 20261029T120757930373-root-b504 "weekly-memo: 2026-10-19.md" done 3 run(s) | 20261029T120758220195-root-002f "weekly-memo: 2026-10-19.md" done 3 run(s)
+totals: wall 307ms | runs 6 (budget given 21, returned 15) | run time 0s | queue 0s | waiting on you 0s | tool calls 0 (0 refused)
+note: 20261029T120758244793-root-5a90 belongs to the request 20261029T120757930373-root-b504; showing that
+note: partial: no run events for this request (queue waits, tool calls and refusals unknown); runs and durations come from the run logs
+
+######## hirearchy --root /tmp/hirearchy-p2/selfcheck-R-1793275673/org obs trace 20261029T120758245555-root-635c
+trace 20261029T120758245555-root-635c "Action list for the ops team (2026-10-19)" -> lead: done  [partial]
+     +0s  root -> lead task "Action list for the ops team (2026-10-19)" +4 run(s)
+     +0s    run 20261029T120758246293 unknown
+     +0s    lead -> root result (done) "Action list for the ops team (2026-10-19)" +3 run(s)
+     +0s  root -> lead note "feedback on "Action list for the ops team (2026-10-19)": ac…"
+totals: wall 8ms | runs 1 (budget given 4, returned 3) | run time 0s | queue 0s | waiting on you 0s | tool calls 0 (0 refused)
+note: partial: no run events for this request (queue waits, tool calls and refusals unknown); runs and durations come from the run logs
+
+######## hirearchy --root /tmp/hirearchy-p2/selfcheck-R-1793275673/org obs trace 20261029T120758254903-root-c0e6
+trace 20261029T120758245555-root-635c "Action list for the ops team (2026-10-19)" -> lead: done  [partial]
+     +0s  root -> lead task "Action list for the ops team (2026-10-19)" +4 run(s)
+     +0s    run 20261029T120758246293 unknown
+     +0s    lead -> root result (done) "Action list for the ops team (2026-10-19)" +3 run(s)
+     +0s  root -> lead note "feedback on "Action list for the ops team (2026-10-19)": ac…"
+totals: wall 8ms | runs 1 (budget given 4, returned 3) | run time 0s | queue 0s | waiting on you 0s | tool calls 0 (0 refused)
+note: 20261029T120758254903-root-c0e6 belongs to the request 20261029T120758245555-root-635c; showing that
+note: partial: no run events for this request (queue waits, tool calls and refusals unknown); runs and durations come from the run logs
+
+######## hirearchy --root /tmp/hirearchy-p2/selfcheck-R-1793275673/org obs trace 20261029T120758262825-root-f703
+trace 20261029T120758262825-root-f703 "weekly-memo: 2026-10-26.md" -> lead: done  [partial]
+     +0s  root -> lead task "weekly-memo: 2026-10-26.md" +12 run(s)
+     +0s    run 20261029T120758263625 unknown
+     +0s    lead -> lead/writer task "Draft" +2 run(s)
+     +0s      run 20261029T120758269795 unknown
+     +0s      lead/writer -> lead result (done) "Draft" +1 run(s)
+     +0s    run 20261029T120758273536 unknown
+     +0s    lead -> root result (done) "weekly-memo: 2026-10-26.md" +9 run(s)
+     +0s  root -> lead note "feedback on "weekly-memo: 2026-10-26.md": reject"
+     +0s  root -> lead note "criterion link on "weekly-memo: 2026-10-26.md": R2"
+     +0s  root -> lead task "weekly-memo: 2026-10-26.md" +9 run(s)
+     +0s    run 20261029T120758569961 unknown
+     +0s    lead -> lead/writer task "Draft" +2 run(s)
+     +0s      run 20261029T120758577245 unknown
+     +0s      lead/writer -> lead result (done) "Draft" +1 run(s)
+     +0s    run 20261029T120758581433 unknown
+     +0s    lead -> root result (done) "weekly-memo: 2026-10-26.md" +6 run(s)
+     +0s  root -> lead note "feedback on "weekly-memo: 2026-10-26.md": accept"
+tasks: 20261029T120758262825-root-f703 "weekly-memo: 2026-10-26.md" done 3 run(s) | 20261029T120758568650-root-b3f3 "weekly-memo: 2026-10-26.md" done 3 run(s)
+totals: wall 327ms | runs 6 (budget given 21, returned 15) | run time 0s | queue 0s | waiting on you 0s | tool calls 0 (0 refused)
+note: partial: no run events for this request (queue waits, tool calls and refusals unknown); runs and durations come from the run logs
+
+######## hirearchy --root /tmp/hirearchy-p2/selfcheck-R-1793275673/org obs trace 20261029T120758532205-root-84cd
+trace 20261029T120758262825-root-f703 "weekly-memo: 2026-10-26.md" -> lead: done  [partial]
+     +0s  root -> lead task "weekly-memo: 2026-10-26.md" +12 run(s)
+     +0s    run 20261029T120758263625 unknown
+     +0s    lead -> lead/writer task "Draft" +2 run(s)
+     +0s      run 20261029T120758269795 unknown
+     +0s      lead/writer -> lead result (done) "Draft" +1 run(s)
+     +0s    run 20261029T120758273536 unknown
+     +0s    lead -> root result (done) "weekly-memo: 2026-10-26.md" +9 run(s)
+     +0s  root -> lead note "feedback on "weekly-memo: 2026-10-26.md": reject"
+     +0s  root -> lead note "criterion link on "weekly-memo: 2026-10-26.md": R2"
+     +0s  root -> lead task "weekly-memo: 2026-10-26.md" +9 run(s)
+     +0s    run 20261029T120758569961 unknown
+     +0s    lead -> lead/writer task "Draft" +2 run(s)
+     +0s      run 20261029T120758577245 unknown
+     +0s      lead/writer -> lead result (done) "Draft" +1 run(s)
+     +0s    run 20261029T120758581433 unknown
+     +0s    lead -> root result (done) "weekly-memo: 2026-10-26.md" +6 run(s)
+     +0s  root -> lead note "feedback on "weekly-memo: 2026-10-26.md": accept"
+tasks: 20261029T120758262825-root-f703 "weekly-memo: 2026-10-26.md" done 3 run(s) | 20261029T120758568650-root-b3f3 "weekly-memo: 2026-10-26.md" done 3 run(s)
+totals: wall 327ms | runs 6 (budget given 21, returned 15) | run time 0s | queue 0s | waiting on you 0s | tool calls 0 (0 refused)
+note: 20261029T120758532205-root-84cd belongs to the request 20261029T120758262825-root-f703; showing that
+note: partial: no run events for this request (queue waits, tool calls and refusals unknown); runs and durations come from the run logs
+
+######## hirearchy --root /tmp/hirearchy-p2/selfcheck-R-1793275673/org obs trace 20261029T120758547132-root-297b
+trace 20261029T120758262825-root-f703 "weekly-memo: 2026-10-26.md" -> lead: done  [partial]
+     +0s  root -> lead task "weekly-memo: 2026-10-26.md" +12 run(s)
+     +0s    run 20261029T120758263625 unknown
+     +0s    lead -> lead/writer task "Draft" +2 run(s)
+     +0s      run 20261029T120758269795 unknown
+     +0s      lead/writer -> lead result (done) "Draft" +1 run(s)
+     +0s    run 20261029T120758273536 unknown
+     +0s    lead -> root result (done) "weekly-memo: 2026-10-26.md" +9 run(s)
+     +0s  root -> lead note "feedback on "weekly-memo: 2026-10-26.md": reject"
+     +0s  root -> lead note "criterion link on "weekly-memo: 2026-10-26.md": R2"
+     +0s  root -> lead task "weekly-memo: 2026-10-26.md" +9 run(s)
+     +0s    run 20261029T120758569961 unknown
+     +0s    lead -> lead/writer task "Draft" +2 run(s)
+     +0s      run 20261029T120758577245 unknown
+     +0s      lead/writer -> lead result (done) "Draft" +1 run(s)
+     +0s    run 20261029T120758581433 unknown
+     +0s    lead -> root result (done) "weekly-memo: 2026-10-26.md" +6 run(s)
+     +0s  root -> lead note "feedback on "weekly-memo: 2026-10-26.md": accept"
+tasks: 20261029T120758262825-root-f703 "weekly-memo: 2026-10-26.md" done 3 run(s) | 20261029T120758568650-root-b3f3 "weekly-memo: 2026-10-26.md" done 3 run(s)
+totals: wall 327ms | runs 6 (budget given 21, returned 15) | run time 0s | queue 0s | waiting on you 0s | tool calls 0 (0 refused)
+note: 20261029T120758547132-root-297b belongs to the request 20261029T120758262825-root-f703; showing that
+note: partial: no run events for this request (queue waits, tool calls and refusals unknown); runs and durations come from the run logs
+
+######## hirearchy --root /tmp/hirearchy-p2/selfcheck-R-1793275673/org obs trace 20261029T120758568650-root-b3f3
+trace 20261029T120758262825-root-f703 "weekly-memo: 2026-10-26.md" -> lead: done  [partial]
+     +0s  root -> lead task "weekly-memo: 2026-10-26.md" +12 run(s)
+     +0s    run 20261029T120758263625 unknown
+     +0s    lead -> lead/writer task "Draft" +2 run(s)
+     +0s      run 20261029T120758269795 unknown
+     +0s      lead/writer -> lead result (done) "Draft" +1 run(s)
+     +0s    run 20261029T120758273536 unknown
+     +0s    lead -> root result (done) "weekly-memo: 2026-10-26.md" +9 run(s)
+     +0s  root -> lead note "feedback on "weekly-memo: 2026-10-26.md": reject"
+     +0s  root -> lead note "criterion link on "weekly-memo: 2026-10-26.md": R2"
+     +0s  root -> lead task "weekly-memo: 2026-10-26.md" +9 run(s)
+     +0s    run 20261029T120758569961 unknown
+     +0s    lead -> lead/writer task "Draft" +2 run(s)
+     +0s      run 20261029T120758577245 unknown
+     +0s      lead/writer -> lead result (done) "Draft" +1 run(s)
+     +0s    run 20261029T120758581433 unknown
+     +0s    lead -> root result (done) "weekly-memo: 2026-10-26.md" +6 run(s)
+     +0s  root -> lead note "feedback on "weekly-memo: 2026-10-26.md": accept"
+tasks: 20261029T120758262825-root-f703 "weekly-memo: 2026-10-26.md" done 3 run(s) | 20261029T120758568650-root-b3f3 "weekly-memo: 2026-10-26.md" done 3 run(s)
+totals: wall 327ms | runs 6 (budget given 21, returned 15) | run time 0s | queue 0s | waiting on you 0s | tool calls 0 (0 refused)
+note: 20261029T120758568650-root-b3f3 belongs to the request 20261029T120758262825-root-f703; showing that
+note: partial: no run events for this request (queue waits, tool calls and refusals unknown); runs and durations come from the run logs
+
+######## hirearchy --root /tmp/hirearchy-p2/selfcheck-R-1793275673/org obs trace 20261029T120758600649-root-707f
+trace 20261029T120758262825-root-f703 "weekly-memo: 2026-10-26.md" -> lead: done  [partial]
+     +0s  root -> lead task "weekly-memo: 2026-10-26.md" +12 run(s)
+     +0s    run 20261029T120758263625 unknown
+     +0s    lead -> lead/writer task "Draft" +2 run(s)
+     +0s      run 20261029T120758269795 unknown
+     +0s      lead/writer -> lead result (done) "Draft" +1 run(s)
+     +0s    run 20261029T120758273536 unknown
+     +0s    lead -> root result (done) "weekly-memo: 2026-10-26.md" +9 run(s)
+     +0s  root -> lead note "feedback on "weekly-memo: 2026-10-26.md": reject"
+     +0s  root -> lead note "criterion link on "weekly-memo: 2026-10-26.md": R2"
+     +0s  root -> lead task "weekly-memo: 2026-10-26.md" +9 run(s)
+     +0s    run 20261029T120758569961 unknown
+     +0s    lead -> lead/writer task "Draft" +2 run(s)
+     +0s      run 20261029T120758577245 unknown
+     +0s      lead/writer -> lead result (done) "Draft" +1 run(s)
+     +0s    run 20261029T120758581433 unknown
+     +0s    lead -> root result (done) "weekly-memo: 2026-10-26.md" +6 run(s)
+     +0s  root -> lead note "feedback on "weekly-memo: 2026-10-26.md": accept"
+tasks: 20261029T120758262825-root-f703 "weekly-memo: 2026-10-26.md" done 3 run(s) | 20261029T120758568650-root-b3f3 "weekly-memo: 2026-10-26.md" done 3 run(s)
+totals: wall 327ms | runs 6 (budget given 21, returned 15) | run time 0s | queue 0s | waiting on you 0s | tool calls 0 (0 refused)
+note: 20261029T120758600649-root-707f belongs to the request 20261029T120758262825-root-f703; showing that
+note: partial: no run events for this request (queue waits, tool calls and refusals unknown); runs and durations come from the run logs
+
+######## hirearchy --root /tmp/hirearchy-p2/selfcheck-R-1793275673/org obs trace 20261029T120856955260-root-7618
+trace 20261029T120856955260-root-7618 "weekly-memo: 2026-11-02.md" -> lead: done  [partial]
+     +0s  root -> lead task "weekly-memo: 2026-11-02.md" +14 run(s)
+     +0s    run 20261029T120856957225 unknown
+     +0s    lead -> lead/writer task "Draft" +2 run(s)
+     +0s      run 20261029T120856965987 unknown
+     +0s      lead/writer -> lead result (done) "Draft" +1 run(s)
+     +0s    run 20261029T120856970688 unknown
+     +0s    lead -> root result (done) "weekly-memo: 2026-11-02.md" +11 run(s)
+     +0s  root -> lead note "feedback on "weekly-memo: 2026-11-02.md": accept"
+totals: wall 25ms | runs 3 (budget given 14, returned 11) | run time 0s | queue 0s | waiting on you 0s | tool calls 0 (0 refused)
+note: partial: no run events for this request (queue waits, tool calls and refusals unknown); runs and durations come from the run logs
+
+######## hirearchy --root /tmp/hirearchy-p2/selfcheck-R-1793275673/org obs trace 20261029T120856993599-root-849d
+trace 20261029T120856955260-root-7618 "weekly-memo: 2026-11-02.md" -> lead: done  [partial]
+     +0s  root -> lead task "weekly-memo: 2026-11-02.md" +14 run(s)
+     +0s    run 20261029T120856957225 unknown
+     +0s    lead -> lead/writer task "Draft" +2 run(s)
+     +0s      run 20261029T120856965987 unknown
+     +0s      lead/writer -> lead result (done) "Draft" +1 run(s)
+     +0s    run 20261029T120856970688 unknown
+     +0s    lead -> root result (done) "weekly-memo: 2026-11-02.md" +11 run(s)
+     +0s  root -> lead note "feedback on "weekly-memo: 2026-11-02.md": accept"
+totals: wall 25ms | runs 3 (budget given 14, returned 11) | run time 0s | queue 0s | waiting on you 0s | tool calls 0 (0 refused)
+note: 20261029T120856993599-root-849d belongs to the request 20261029T120856955260-root-7618; showing that
+note: partial: no run events for this request (queue waits, tool calls and refusals unknown); runs and durations come from the run logs
+
+######## hirearchy --root /tmp/hirearchy-p2/selfcheck-R-1793275673/org obs trace 20261029T120856995786-root-daa2
+trace 20261029T120856995786-root-daa2 "action-list-for: the action list of 2026-11-02" -> lead: done  [partial]
+     +0s  root -> lead task "action-list-for: the action list of 2026-11-02" +11 run(s)
+     +0s    run 20261029T120856996626 unknown
+     +0s    lead -> root result (done) "action-list-for: the action list of 2026-11-02" +10 run(s)
+     +0s  root -> lead note "feedback on "action-list-for: the action list of 2026-11-02…"
+totals: wall 11ms | runs 1 (budget given 11, returned 10) | run time 0s | queue 0s | waiting on you 0s | tool calls 0 (0 refused)
+note: partial: no run events for this request (queue waits, tool calls and refusals unknown); runs and durations come from the run logs
+
+######## hirearchy --root /tmp/hirearchy-p2/selfcheck-R-1793275673/org obs trace 20261029T120857012003-root-8fa8
+trace 20261029T120856995786-root-daa2 "action-list-for: the action list of 2026-11-02" -> lead: done  [partial]
+     +0s  root -> lead task "action-list-for: the action list of 2026-11-02" +11 run(s)
+     +0s    run 20261029T120856996626 unknown
+     +0s    lead -> root result (done) "action-list-for: the action list of 2026-11-02" +10 run(s)
+     +0s  root -> lead note "feedback on "action-list-for: the action list of 2026-11-02…"
+totals: wall 11ms | runs 1 (budget given 11, returned 10) | run time 0s | queue 0s | waiting on you 0s | tool calls 0 (0 refused)
+note: 20261029T120857012003-root-8fa8 belongs to the request 20261029T120856995786-root-daa2; showing that
+note: partial: no run events for this request (queue waits, tool calls and refusals unknown); runs and durations come from the run logs
+

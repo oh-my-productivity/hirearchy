@@ -1,0 +1,1 @@
+extract_p2 facts: {'calls': 82, 'replies': 2, 'plans': 4, 'applies': 2, 't0': '2026-10-29T12:16:30.396Z'}

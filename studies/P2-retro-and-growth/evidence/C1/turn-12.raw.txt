@@ -1,0 +1,15 @@
+The memo for 19 October is at `/private/tmp/hirearchy-p2/C1-1793280632/deliverables/memo-2026-10-19.md`. I copied it from the team's output and the two files are identical.
+
+- **C1 (only that meeting):** met.
+- **C2 (400 words or fewer):** met, 203 by `wc`.
+- **C3 (Decisions section):** met, 3 of 3.
+- **C4 (Actions table):** met, 6 of 6, including the informal ones.
+- **C5 (ISO dates, "none" if no date):** met. Lee is 2026-10-30 as you said, and Sam's pairing with Jo stays "none".
+- **C6 (names not on the attendee list):** met. Jo is marked "(not in attendee list)".
+- **C7 (nothing beyond the notes):** met.
+- **C8 (lead's coverage check):** met, 9 of 9.
+- **C9 (Summary line first):** met.
+
+The case used 6 runs of the 12 planned per memo (3 for the draft, 3 for the date change).
+
+The earlier stray rework is still unexplained and still logged as mine, not yours. I did not record a verdict for this memo. Keep it, or what should change? If you also want the ops action list for 19 October, say so.

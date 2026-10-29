@@ -1,0 +1,3 @@
+{"v":1,"ts":"2026-10-29T13:19:00.514325+00:00","seq":1,"proc":"mcp","pid":69976,"kind":"service.define","actor":"root","run":null,"trace":null,"owner":"lead","service":"ops-action-list","version":1,"by":"root","amendment":false}
+{"v":1,"ts":"2026-10-29T13:19:00.515143+00:00","seq":2,"proc":"mcp","pid":69976,"kind":"service.revise","actor":"root","run":null,"trace":null,"owner":"lead","service":"ops-action-list","version":1,"by":"root","admitted":"client"}
+{"v":1,"ts":"2026-10-29T13:19:00.569165+00:00","seq":3,"proc":"mcp","pid":69976,"kind":"tool.call","actor":"root","run":null,"trace":null,"tool":"apply_org","ok":true,"ms":69.38,"error":null,"error_type":null,"args":{"blueprint_chars":3425,"approved":true,"plan_id":"fa962d655366"}}

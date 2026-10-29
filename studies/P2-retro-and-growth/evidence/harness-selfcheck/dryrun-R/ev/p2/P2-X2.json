@@ -1,0 +1,16 @@
+{
+ "files": [
+  "p2/lena.json",
+  "rederived/p2/signals.json",
+  "org-files/retros.json",
+  "p2/applies.json",
+  "org-copy/",
+  "end.txt"
+ ],
+ "reason": "B1.2 taken in B2",
+ "steps": [
+  "memos that passed the trap: []; not reached: ['2026-11-02']",
+  "1: checker-add|weekly-memo|C6 class ['C6'] cases ['20261029T120757860113-root-c9cb', '20261029T120757930373-root-b504', '20261029T120758262825-root-f703'] at 2026-10-29T12:07:58.547132+00:00"
+ ],
+ "verdict": "PASS"
+}

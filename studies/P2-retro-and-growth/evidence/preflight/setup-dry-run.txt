@@ -1,0 +1,22 @@
+=== setup_stream.sh R1 --dry-run
+gate: md5 gate (protocol 0): OK
+gate: both freezes (protocol 2.2): OK (R 3d6b28aa17a70a3f95854c73c2f479b6361a71de, C aac6af1b47b721515106f03f1dd6eb6758da6e55 clean)
+gate: KIRO_HOME unset: OK
+gate: product skills: OK
+gate: global skill in place: OK
+gate: no unrestored skill move: OK
+gate: claude-sonnet-5.5 listed: (not checked in --dry-run)
+memories gate: no previous stream before R1: nothing to compare (memories.db ba97f447639184d1fb7da9eccf2b2e8c)
+DRY-RUN setup_stream.sh R1: arm R, product /Volumes/workspace/hirearchy, S=/tmp/hirearchy-p2/R1-1793269619, profile hirearchy-study-p2-R1-assistant; arm C would move the global skill aside first
+rc=0
+=== setup_stream.sh C1 --dry-run
+gate: md5 gate (protocol 0): OK
+gate: both freezes (protocol 2.2): OK (R 3d6b28aa17a70a3f95854c73c2f479b6361a71de, C aac6af1b47b721515106f03f1dd6eb6758da6e55 clean)
+gate: KIRO_HOME unset: OK
+gate: product skills: OK
+gate: global skill in place: OK
+gate: no unrestored skill move: OK
+gate: claude-sonnet-5.5 listed: (not checked in --dry-run)
+memories gate: no previous stream before C1: nothing to compare (memories.db ba97f447639184d1fb7da9eccf2b2e8c)
+DRY-RUN setup_stream.sh C1: arm C, product /Volumes/workspace/hirearchy/.worktrees/p2-arm-c, S=/tmp/hirearchy-p2/C1-1793269620, profile hirearchy-study-p2-C1-assistant; arm C would move the global skill aside first
+rc=0

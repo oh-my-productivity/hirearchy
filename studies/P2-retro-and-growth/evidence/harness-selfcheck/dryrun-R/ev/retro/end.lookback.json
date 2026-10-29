@@ -1,0 +1,243 @@
+{
+  "id": "look-back",
+  "at": "2026-10-29T12:09:10.200647+00:00",
+  "since": "2026-10-29T12:07:56+00:00",
+  "since_words": "since 2026-10-29 (a look-back; not recorded)",
+  "verdicts": 13,
+  "cases": 9,
+  "recorded": false,
+  "shown_again": null,
+  "notes": [],
+  "sections": {
+    "d1": {
+      "heading": "What you said",
+      "block": [
+        "- weekly-memo R1: \"No, not right yet. Always start the memo with a one-line 'Summary:' of the meeting, then the decisions, then the action\u2026\" (C5 added (v2))",
+        "- weekly-memo R2: \"Not right yet: Sam's due should be 2026-10-21. Always turn a deadline the notes give in words into its date, counted fr\u2026\" (C6 added (v3))",
+        "- weekly-memo R3: \"Not right yet: Lee's due should be 2026-10-30.\" (same as R2)",
+        "- weekly-memo R4: \"Not right yet: Sam's due should be 2026-10-30.\" (same as R2)",
+        "- and 9 accepts"
+      ],
+      "details": [
+        "- weekly-memo R1 (case 20261029T120757800056-root-9524, 2026-10-29): \"No, not right yet. Always start the memo with a one-line 'Summary:' of the meeting, then the decisions, then the action items.\" (C5 added (v2))",
+        "- weekly-memo R2 (case 20261029T120757860113-root-c9cb, 2026-10-29): \"Not right yet: Sam's due should be 2026-10-21. Always turn a deadline the notes give in words into its date, counted from the meeting's day.\" (C6 added (v3))",
+        "- weekly-memo R3 (case 20261029T120757930373-root-b504, 2026-10-29): \"Not right yet: Lee's due should be 2026-10-30.\" (same as R2)",
+        "- weekly-memo R4 (case 20261029T120758262825-root-f703, 2026-10-29): \"Not right yet: Sam's due should be 2026-10-30.\" (same as R2)",
+        "- and 9 accepts"
+      ],
+      "counts": {
+        "rejections": 4,
+        "accepts": 9
+      },
+      "error": ""
+    },
+    "d2": {
+      "heading": "What got past a check",
+      "block": [
+        "- weekly-memo: lead/writer delivered 20261029T120757800056-root-9524 (no check of the team signed it); you rejected it (R1, C5)",
+        "- weekly-memo: lead/writer delivered 20261029T120757860113-root-c9cb (no check of the team signed it); you rejected it (R2, C6)",
+        "- weekly-memo: lead/writer delivered 20261029T120757930373-root-b504 (no check of the team signed it); you rejected it (R3, C6)",
+        "- weekly-memo: lead/writer delivered 20261029T120758262825-root-f703 (no check of the team signed it); you rejected it (R4, C6)"
+      ],
+      "details": [
+        "- weekly-memo: lead/writer delivered 20261029T120757800056-root-9524 (no check of the team signed it); you rejected it (R1, C5); cause contract-gap",
+        "- weekly-memo: lead/writer delivered 20261029T120757860113-root-c9cb (no check of the team signed it); you rejected it (R2, C6); cause contract-gap",
+        "- weekly-memo: lead/writer delivered 20261029T120757930373-root-b504 (no check of the team signed it); you rejected it (R3, C6); cause reviewer-miss",
+        "- weekly-memo: lead/writer delivered 20261029T120758262825-root-f703 (no check of the team signed it); you rejected it (R4, C6); cause reviewer-miss"
+      ],
+      "counts": {
+        "escapes": 4,
+        "passed_by_a_check": 0,
+        "no_check_signed": 4
+      },
+      "error": ""
+    },
+    "d3": {
+      "heading": "Rejections with no criterion yet",
+      "block": [],
+      "details": [
+        "- none"
+      ],
+      "counts": {
+        "without_a_criterion": 0
+      },
+      "error": ""
+    },
+    "d4": {
+      "heading": "Alarms and causes to settle",
+      "block": [],
+      "details": [
+        "- action-list-for: repeat alarm n/a (1 judged cases); cost alarm n/a (1 judged cases)",
+        "- weekly-memo: repeat alarm fires: R2 in 2 of 3 judged cases; C6 in 2 of 3 judged cases"
+      ],
+      "counts": {
+        "alarms_firing": 1,
+        "untyped_causes": 0,
+        "disputed_causes": 0
+      },
+      "error": ""
+    },
+    "d5": {
+      "heading": "Work you ask for again and again",
+      "block": [],
+      "details": [
+        "- lead: \"Action list for the ops team (2026-10-05)\" and 2 more (20261029T120757850378-root-ed57, 20261029T120757916711-root-8082, 20261029T120758245555-root-635c), joined by their titles: 3 of 3 with your verdict"
+      ],
+      "counts": {
+        "shape_groups": 1,
+        "largest_group_judged": 3
+      },
+      "error": ""
+    },
+    "d6": {
+      "heading": "Idle or stranded agents",
+      "block": [],
+      "details": [
+        "- none"
+      ],
+      "counts": {
+        "flagged": 0
+      },
+      "error": ""
+    },
+    "d7": {
+      "heading": "Did past changes hold",
+      "block": [
+        "- weekly-memo contract v2 adds C5: not recurred in 8 cases where it was exercised",
+        "- weekly-memo contract v3 adds C6: recurred in case 20261029T120757930373-root-b504 (R3)",
+        "- agent lead/c6-checker added (2026-10-29), item B1.2: INCONCLUSIVE (1 of 3 exercised cases)",
+        "- charter of lead changed: max_children, added section (2026-10-29), item B1.2: INCONCLUSIVE (1 of 3 exercised cases)",
+        "- service lead/action-list-for added (2026-10-29), item B1.1: INCONCLUSIVE (1 of 3 exercised cases)",
+        "- and 1 more (Details)"
+      ],
+      "details": [
+        "- weekly-memo contract v2 adds C5: not recurred in 8 cases where it was exercised",
+        "- weekly-memo contract v3 adds C6: recurred in case 20261029T120757930373-root-b504 (R3)",
+        "- agent lead/c6-checker added (2026-10-29), item B1.2: INCONCLUSIVE (1 of 3 exercised cases)",
+        "- charter of lead changed: max_children, added section (2026-10-29), item B1.2: INCONCLUSIVE (1 of 3 exercised cases)",
+        "- service lead/action-list-for added (2026-10-29), item B1.1: INCONCLUSIVE (1 of 3 exercised cases)",
+        "- charter of lead/writer changed: body (2026-10-29): no target recorded: not evaluated"
+      ],
+      "counts": {
+        "changes": 6,
+        "recurred": 1,
+        "not_evaluated": 1
+      },
+      "error": ""
+    },
+    "d8": {
+      "heading": "Changes to your organization",
+      "block": [
+        "- agent lead added (2026-10-29): from the plan you approved (2026-10-29)",
+        "- agent lead/writer added (2026-10-29): from the plan you approved (2026-10-29)",
+        "- service lead/weekly-memo added (2026-10-29): from the plan you approved (2026-10-29)",
+        "- charter of lead changed: max_children, added section (2026-10-29): from your change e5fff0b87338",
+        "- agent lead/c6-checker added (2026-10-29): from your change e5fff0b87338, item B1.2",
+        "- and 2 more (Details)",
+        "- Unprompted charter edits: 1"
+      ],
+      "details": [
+        "- agent lead added (2026-10-29): from the plan you approved (2026-10-29)",
+        "- agent lead/writer added (2026-10-29): from the plan you approved (2026-10-29)",
+        "- service lead/weekly-memo added (2026-10-29): from the plan you approved (2026-10-29)",
+        "- charter of lead changed: max_children, added section (2026-10-29): from your change e5fff0b87338",
+        "- agent lead/c6-checker added (2026-10-29): from your change e5fff0b87338, item B1.2",
+        "- service lead/action-list-for added (2026-10-29): from your change bc5deaa8032b, item B1.1",
+        "- charter of lead/writer changed: body (2026-10-29): outside the tools (a hand edit or the terminal)",
+        "- Unprompted charter edits since 2026-10-29: 1"
+      ],
+      "counts": {
+        "changes": 7,
+        "unprompted_charter_edits": 1
+      },
+      "error": ""
+    },
+    "d9": {
+      "heading": "Criteria and your words",
+      "block": [],
+      "details": [
+        "- action-list-for C1 \"Each action with its owner and due date; at most one page.\": my wording, from the one-off tasks I sent for you (2026-10-29, 2026-10-29, 2026-10-29); you accepted those deliveries; exercised in 1 judged cases, 1 accepted",
+        "- weekly-memo C1 \"One memo per notes file, at most 400 words.\": my default: you did not say this; exercised in 9 judged cases, 5 accepted",
+        "- weekly-memo C2 \"The memo lists every decision and every commitment in the notes, informal ones\u2026\": my default: you did not say this; exercised in 9 judged cases, 5 accepted",
+        "- weekly-memo C3 \"The action items are a table Owner | Action | Due, with ISO dates and 'none' if\u2026\": from your words \"with the action items as a table with columns Owner | Action | Due (ISO dates, 'none' if there's no date)\"; words I added: are, and; exercised in 9 judged cases, 5 accepted",
+        "- weekly-memo C4 \"Decisions and actions use the notes' own words.\": from your words \"Use the words from the notes.\" (my question: \"Owners: initials or full names?\"); words I added: decisions, and, actions, own; exercised in 9 judged cases, 5 accepted",
+        "- weekly-memo C5 \"The memo starts with a one-line 'Summary:', then the decisions, then the action\u2026\": from your words \"Yes, add it.\" (your answer about C1); words I added: the, memo, starts, with, a, one, -, line, +5 more; exercised in 8 judged cases, 5 accepted",
+        "- weekly-memo C6 \"A deadline the notes give in words is turned into its ISO date, counted from th\u2026\": from your words \"Yes, add it.\" (your answer about C3); words I added: a, deadline, the, notes, give, in, words, is, +10 more; exercised in 6 judged cases, 4 accepted"
+      ],
+      "counts": {
+        "sourced": 7,
+        "unknown_source": 0
+      },
+      "error": ""
+    },
+    "d10": {
+      "heading": "Your team's own proposals",
+      "block": [
+        "- none"
+      ],
+      "details": [
+        "- Refusals since 2026-10-29: 0",
+        "- events before 2026-10-29 have expired (events_keep_days)"
+      ],
+      "counts": {
+        "proposals_refused": 0,
+        "refusals": 0
+      },
+      "error": ""
+    },
+    "d11": {
+      "heading": "Playbooks",
+      "block": [],
+      "details": [
+        "- action-list-for: 212 of 1000 words; items: 7 kept",
+        "- weekly-memo: 212 of 1000 words; items: 7 kept"
+      ],
+      "counts": {
+        "playbooks": 2,
+        "watch_retires": 0
+      },
+      "error": ""
+    },
+    "d12": {
+      "heading": "Spend",
+      "block": [],
+      "details": [
+        "- approved = root's hand-downs (the user's own approvals are not recorded; F-P1-10)",
+        "- action-list-for: 1 cases, 1 runs used against 11 approved per request; 0 cases above it",
+        "- weekly-memo: 5 cases, 30 runs used against 14 approved per request; 0 cases above it"
+      ],
+      "counts": {
+        "cases": 6,
+        "cases_above_approval": 0
+      },
+      "error": ""
+    },
+    "d13": {
+      "heading": "The last brief",
+      "block": [],
+      "details": [
+        "- B2.1 clarify: open",
+        "- B2.2 clarify: open"
+      ],
+      "counts": {
+        "items": 2,
+        "taken": 0,
+        "lapsed": 0
+      },
+      "error": ""
+    },
+    "d14": {
+      "heading": "Held back",
+      "block": [],
+      "details": [
+        "- none"
+      ],
+      "counts": {
+        "held_back": 0
+      },
+      "error": ""
+    }
+  },
+  "items": [],
+  "held_back": []
+}

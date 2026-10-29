@@ -1,0 +1,17 @@
+{
+ "counts": {
+  "PF-0": 0,
+  "PF-1": 0,
+  "new": 0
+ },
+ "files": [
+  "org-files/retros.json",
+  "p2/retro-replies/",
+  "rederived/p2/as-of-B*/",
+  "events/",
+  "charter-history.txt"
+ ],
+ "reason": "2 briefs, 13 lines",
+ "steps": [],
+ "verdict": "PASS"
+}

@@ -1,0 +1,18 @@
+######## TURN 2  start 10:29:15  end 10:29:36  elapsed 21s  (local, 2026-10-29; UTC wall-clock start 2026-10-29T10:29:15Z end 2026-10-29T10:29:36Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Now run the hirearchy services tool and show me its reply.
+
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-02.stderr.txt):
+`services` returned this:
+
+```
+Services you can request (from your direct reports):
+- probe-memo (offered by lead; contract v1, playbook v0): One short memo from one notes file
+  inputs: notes_file* (the notes file)   (* required)
+  each request: 12 runs; acceptance criteria (lead/services/probe-memo/SERVICE.md):
+    C1: At most 400 words.
+  record: no requests yet
+  playbook: none yet
+```
+
+I again called the tool in the same batch as its load call, and it ran. To request `probe-memo`, I'd need the path to a notes file. Each request has a budget of 12 runs.

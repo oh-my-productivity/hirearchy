@@ -1,0 +1,1 @@
+watch lead--weekly-memo: exit 0 (0 mismatches (0 on pinned keys, 0 on unpinned keys); 0 services mismatches; 0 services lines unread; 0 lower-margin race matches (reported); 16 snapshots unread)

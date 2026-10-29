@@ -1,0 +1,3 @@
+both: [('agent added', 'lead', 'plan', None, None), ('agent added', 'lead/writer', 'plan', None, None), ('agent added', 'ops-keeper', 'by root, outside a plan', None, None), ('agent retired', 'ops-helper', 'change', '44cd783d7997', None), ('charter changed', 'lead/writer', 'by parent', 'lead', None), ('service added', 'lead/weekly-memo', 'plan', None, None), ('service retired', 'lead/extra-svc', 'by root, outside a plan', None, None)]
+harness only: [('agent added', 'ops-helper', 'by root, outside a plan', None, None), ('service added', 'lead/extra-svc', 'by root, outside a plan', None, None)]
+product only: []

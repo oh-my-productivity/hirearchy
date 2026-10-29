@@ -1,0 +1,28 @@
+{
+ "asked": 6,
+ "records": [
+  {
+   "at": "2026-10-29T13:15:39.040747+00:00",
+   "cap_ok": true,
+   "id": "B1",
+   "items": 3,
+   "recorded_ok": true,
+   "verdicts_since_last": 12
+  },
+  {
+   "at": "2026-10-29T13:25:38.901350+00:00",
+   "cap_ok": true,
+   "id": "B2",
+   "items": 3,
+   "recorded_ok": true,
+   "verdicts_since_last": 1
+  }
+ ],
+ "rules": {
+  "cap": [],
+  "lapsed_counts": [],
+  "order": [],
+  "pairs": [],
+  "suppression": []
+ }
+}

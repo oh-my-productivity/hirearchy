@@ -1,0 +1,5 @@
+[10/29/26 12:07:57] INFO     Processing request of type            server.py:733
+                             ListToolsRequest                                   
+                    INFO     Processing request of type            server.py:733
+                             CallToolRequest                                    
+{"arm": "R", "rejections": ["20261029T120757820070-root-54d3", "20261029T120757873298-root-5509", "20261029T120758193773-root-cd6d", "20261029T120758532205-root-84cd"], "trap_rejections": ["20261029T120757873298-root-5509", "20261029T120758193773-root-cd6d", "20261029T120758532205-root-84cd"], "one_offs": ["20261029T120757850378-root-ed57", "20261029T120757916711-root-8082", "20261029T120758245555-root-635c"], "memos": {"1": ["20261029T120757800056-root-9524", "20261029T120757835305-root-ff3b"], "2": ["20261029T120757860113-root-c9cb", "20261029T120757896274-root-27f7"], "3": ["20261029T120757930373-root-b504", "20261029T120758220195-root-002f"], "4": ["20261029T120758262825-root-f703", "20261029T120758568650-root-b3f3"]}, "relayed": ["20261029T120757809981-root-3d85"]}

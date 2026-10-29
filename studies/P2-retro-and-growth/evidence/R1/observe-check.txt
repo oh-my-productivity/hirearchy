@@ -1,0 +1,14 @@
+(a) PASS messages intact: files parse, ids unique, sender and recipient copies match
+      94 message(s) checked
+(b) PASS budget conserved: handed down = held + used + returned (+ dropped at retirement)
+      handed down 130 + 10 credited = held 0 + used 59 live + 0 retired + returned 81 + dropped 0
+(c) PASS nothing inflight without a live run
+      no agent has an unfinished batch without a run
+(d) PASS runs accounted for: run.start has run.end or a live process; run logs have run.start
+      59 run.start event(s) checked
+(e) PASS event files have no seq gaps
+      189 event file(s) checked
+(f) PASS scheduler pid file matches a live scheduler
+      no pid file: no scheduler claims to run
+all checks passed
+exit code: 0

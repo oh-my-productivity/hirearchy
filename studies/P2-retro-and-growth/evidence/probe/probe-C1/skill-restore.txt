@@ -1,0 +1,2 @@
+skill restore: /Volumes/workspace/hirearchy/studies/P2-retro-and-growth/skill-aside/probe-C1-1793269627/hirearchy -> /Users/aminalizadeh/.kiro/skills/hirearchy (md5 443e1bc4911aa4d6aaa6457e78f673c1; recorded)
+after probe-C1: global skill: in place, md5 443e1bc4911aa4d6aaa6457e78f673c1

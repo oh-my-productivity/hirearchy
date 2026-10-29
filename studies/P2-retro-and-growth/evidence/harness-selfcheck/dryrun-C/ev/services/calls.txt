@@ -1,0 +1,4 @@
+turn-01 start 2026-10-29T12:09:22.962768+00:00 end 2026-10-29T12:09:23.163365+00:00 exit 0 bytes 1701 product /Volumes/workspace/hirearchy/.worktrees/p2-arm-c
+  new cli-*.jsonl: 2026-10-29/cli-40516-1793275763132.jsonl  command: services 
+end start 2026-10-29T12:09:24.546795+00:00 end 2026-10-29T12:09:24.759030+00:00 exit 0 bytes 1701 product /Volumes/workspace/hirearchy/.worktrees/p2-arm-c
+  new cli-*.jsonl: 2026-10-29/cli-40615-1793275764724.jsonl  command: services 

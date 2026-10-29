@@ -1,0 +1,13 @@
+title md5 849fe21b104be883af9b3c06367d4445 ok; note len 866 md5 4cdbcb9b682f2f25dcb31c83d3743fec ok
+{
+  "service": "weekly-memo",
+  "inputs": {
+    "notes_file": "2026-10-05.md"
+  },
+  "title": "Rework memo 2026-10-05: unclear due dates",
+  "note": "<866 chars>",
+  "budget": 6,
+  "revises": "20261029T120757800056-root-9524",
+  "source": "relayed"
+}
+task file: /tmp/hirearchy-p2/selfcheck-R-1793275673/org/sent/20261029T120757800056-root-9524.md

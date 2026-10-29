@@ -1,0 +1,84 @@
+[
+ {
+  "case": null,
+  "change": "weekly-memo contract v2 adds C5",
+  "in_window": true,
+  "key": [
+   "contract",
+   "weekly-memo",
+   2
+  ],
+  "n": 8,
+  "outcome": "not recurred",
+  "rid": null,
+  "time": "2026-10-29T12:07:57.821199+00:00"
+ },
+ {
+  "case": "20261029T120757930373-root-b504",
+  "change": "weekly-memo contract v3 adds C6",
+  "in_window": true,
+  "key": [
+   "contract",
+   "weekly-memo",
+   3
+  ],
+  "n": null,
+  "outcome": "recurred",
+  "rid": "R3",
+  "time": "2026-10-29T12:07:57.874696+00:00"
+ },
+ {
+  "case": null,
+  "in_window": true,
+  "item": "B1.2",
+  "key": [
+   "agent",
+   "lead/c6-checker"
+  ],
+  "n": 1,
+  "outcome": "INCONCLUSIVE",
+  "rid": null,
+  "time": "2026-10-29T12:08:55+00:00"
+ },
+ {
+  "case": null,
+  "in_window": true,
+  "item": "B1.1",
+  "key": [
+   "service",
+   "lead/action-list-for"
+  ],
+  "n": 1,
+  "outcome": "INCONCLUSIVE",
+  "rid": null,
+  "time": "2026-10-29T12:08:55.035411+00:00"
+ },
+ {
+  "case": null,
+  "in_window": true,
+  "item": "B1.2",
+  "key": [
+   "charter",
+   "lead",
+   "2026-10-29"
+  ],
+  "n": 1,
+  "outcome": "INCONCLUSIVE",
+  "rid": null,
+  "time": "2026-10-29T12:08:55+00:00"
+ },
+ {
+  "case": null,
+  "in_window": true,
+  "item": null,
+  "key": [
+   "charter",
+   "lead/writer",
+   "2026-10-29"
+  ],
+  "n": null,
+  "outcome": "no target",
+  "rid": null,
+  "time": "2026-10-29T12:08:57+00:00"
+ }
+]

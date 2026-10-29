@@ -1,0 +1,2 @@
+runs 52, sessions 52, matched 52, unmatched runs 0, revise_playbook events 5, flags 4, calls 196
+effort stops read as empty sessions (no messages.jsonl; '# kiro: effort not set' in the run log; relaunched uncharged, 0 credits): 4 (lead/writer@20261029T133549207363 -> sess_26a250dc-ec7d-4307-8a44-495875508f24, lead@20261029T140628783814 -> sess_48b761ec-f515-45ea-bcbb-1b5a02e32522, lead@20261029T141837889844 -> sess_74cfdc1d-323c-4a14-9437-0bfb0e4f5d8b, lead/writer@20261029T141422712537 -> sess_94295d1e-0a81-42a0-a329-e527935f1836)

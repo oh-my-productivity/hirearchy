@@ -1,0 +1,10 @@
+playbook_attempts C1: 5 attempts: 2 refused (0 P1-REFUSED, 2 other), 0 errors, 3 admitted; 0 in the injection window (2026-10-29T13:41:37Z to 2026-10-29T13:43:01Z)
+
+  2026-10-29T13:45:53.281605Z lead lead@20261029T134535648827: admitted, v2 admitted: c
+  2026-10-29T14:05:42.466332Z lead lead@20261029T140520362606: refused (other refusal)
+      refused: C10 is confirmed by the client, so an item citing it may be only its own words: this item is not. Write it as a step with text "The Actions table leaves out any line where nobody has to do an
+  2026-10-29T14:05:45.317693Z lead lead@20261029T140520362606: admitted, v3 admitted: c
+  2026-10-29T14:24:10.411233Z lead lead@20261029T142345748642: refused (other refusal)
+      refused: C11 is confirmed by the client, so an item citing it may be only its own words: this item is not. Write it as a step with text "The memo starts with a one-line "Summary:" of the meeting, foll
+  2026-10-29T14:24:15.373787Z lead lead@20261029T142345748642: admitted, v4 admitted: c
+owner attempted revise_playbook: yes

@@ -1,0 +1,23 @@
+# window runs (protocol 5.4): runs that started in the injection window 2026-10-29T12:19:13Z .. 2026-10-29T12:20:07Z; injected task 20261029T121913557638-root-5ea7; revised (memo 1) task 20261029T121630346755-root-d28e
+
+## run lead@20261029T121913839265 agent=lead model=claude-sonnet-5.5 start=2026-10-29T12:19:13.850967+00:00 end=2026-10-29T12:19:58.063941+00:00 exit=0 secs=44 session=sess_75ce1805-e313-411a-ad0f-347d93c216a3
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 5
+  lead message 20261029T121950652283-lead-10eb to=root type=result status=done created=2026-10-29T12:19:50+00:00
+  ## Lessons: Near miss: the rework note described Due values (Sam 2026-10-09, Marta 2026-10-14) that were not in the writer's current file, which already had none for both. The delivered copy may have differed from the source file. Prevent: when reworking, diff the described values against the current file first, and re-copy deliverables after each report.
+  org-git commit 5980793 MEMORY.md diff:
+    commit 598079368be46cb0d1befd109d45358e0068d47f
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Thu Oct 29 12:19:58 2026 +0000
+    
+        lead: run ok, 1 message(s) [lead/runs/20261029T121913839265.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index f1deced..e1e3e19 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,2 +1,2 @@
+     # Memory
+    -Task 20261029T121630346755-root-d28e (weekly-meeting-memo, notes 2026-10-05.md): writer delivered lead/writer/work/2026-10-05-memo.md (252 words); I verified C1-C8 against the notes and reported done. Nothing outstanding. If woken again, check inbox only (possible client feedback; no action needed).
+    +Task ...d28e (memo 2026-10-05) done. Rework task ...5ea7 (Sam/Marta Due values) reported done: the writer's file lead/writer/work/2026-10-05-memo.md (252 words) already had Due none for both, so no delegation. Nothing outstanding. If woken again, check inbox only. Note: C7 requires heading 'Unclear' (requester said 'Open questions').
+

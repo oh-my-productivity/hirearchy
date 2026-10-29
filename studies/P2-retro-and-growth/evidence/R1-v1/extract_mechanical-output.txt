@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "/Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/harness/extract_mechanical.py", line 667, in <module>
+    sys.exit(main(sys.argv[1:]))
+             ^^^^^^^^^^^^^^^^^^
+  File "/Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/harness/extract_mechanical.py", line 653, in main
+    res = run_extract(D, S, Path(out) if out else D, product_src or PRODUCT_SRC)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/harness/extract_mechanical.py", line 358, in run_extract
+    for line in open(s["dir"] / "messages.jsonl"):
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/R1/org-kiro-sessions/27ac61937b144865/sess_f04502e1-4ad1-4466-87b6-479021f78e8b/messages.jsonl'

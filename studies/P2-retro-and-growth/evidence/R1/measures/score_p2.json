@@ -1,0 +1,156 @@
+{
+ "view": {
+  "memos": {
+   "2026-10-05": "/Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/R1/memos/2026-10-05-memo.md",
+   "2026-10-12": "/Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/R1/memos/2026-10-12-memo.md",
+   "2026-10-19": "/Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/R1/memos/2026-10-19-memo.md",
+   "2026-10-26": "/Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/R1/memos/2026-10-26-memo.md",
+   "2026-11-02": "/Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/R1/memos/2026-11-02-memo.md",
+   "2026-11-09": "/Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/R1/memos/2026-11-09-memo.md"
+  },
+  "not_determined": {},
+  "others": [
+   "/Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/R1/memos/2026-10-05-ops-actions.md",
+   "/Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/R1/memos/2026-10-12-ops-actions.md",
+   "/Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/R1/memos/2026-10-19-ops-actions.md",
+   "/Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/R1/memos/2026-11-09-ops-actions.md"
+  ]
+ },
+ "versions": [],
+ "finals": [
+  {
+   "memo": "2026-10-05",
+   "file": "memos/memo-2026-10-05.md",
+   "trap": null,
+   "decisions": {
+    "k": 2,
+    "n": 2
+   },
+   "actions": {
+    "k": 5,
+    "n": 5
+   },
+   "wrong_dates": [],
+   "extra_rows": [],
+   "summary_first": true
+  },
+  {
+   "memo": "2026-10-12",
+   "file": "memos/memo-2026-10-12.md",
+   "trap": "passes",
+   "decisions": {
+    "k": 3,
+    "n": 3
+   },
+   "actions": {
+    "k": 5,
+    "n": 5
+   },
+   "wrong_dates": [],
+   "extra_rows": [],
+   "summary_first": true
+  },
+  {
+   "memo": "2026-10-19",
+   "file": "memos/memo-2026-10-19.md",
+   "trap": "passes",
+   "decisions": {
+    "k": 3,
+    "n": 3
+   },
+   "actions": {
+    "k": 5,
+    "n": 5
+   },
+   "wrong_dates": [],
+   "extra_rows": [],
+   "summary_first": true
+  },
+  {
+   "memo": "2026-10-26",
+   "file": "memos/memo-2026-10-26.md",
+   "trap": "passes",
+   "decisions": {
+    "k": 3,
+    "n": 3
+   },
+   "actions": {
+    "k": 5,
+    "n": 5
+   },
+   "wrong_dates": [],
+   "extra_rows": [],
+   "summary_first": true
+  },
+  {
+   "memo": "2026-11-02",
+   "file": "memos/memo-2026-11-02.md",
+   "trap": "passes",
+   "decisions": {
+    "k": 3,
+    "n": 3
+   },
+   "actions": {
+    "k": 5,
+    "n": 5
+   },
+   "wrong_dates": [],
+   "extra_rows": [],
+   "summary_first": true
+  },
+  {
+   "memo": "2026-11-09",
+   "file": "memos/memo-2026-11-09.md",
+   "trap": null,
+   "decisions": {
+    "k": 3,
+    "n": 3
+   },
+   "actions": {
+    "k": 5,
+    "n": 5
+   },
+   "wrong_dates": [],
+   "extra_rows": [],
+   "summary_first": true
+  }
+ ],
+ "lists": [
+  {
+   "file": "/Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/R1/memos/2026-10-05-ops-actions.md",
+   "rows": 5
+  },
+  {
+   "file": "/Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/R1/memos/2026-10-12-ops-actions.md",
+   "rows": 5
+  },
+  {
+   "file": "/Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/R1/memos/2026-10-19-ops-actions.md",
+   "rows": 5
+  },
+  {
+   "file": "/Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/R1/memos/2026-11-09-ops-actions.md",
+   "rows": 5
+  }
+ ],
+ "p2_delivered_versions": {
+  "ok": false,
+  "versions": 0,
+  "bad": [],
+  "exempt_rejected": [],
+  "not_determined": [],
+  "verdict": "PASS",
+  "end": {
+   "known": true,
+   "cut": false,
+   "turn": 28,
+   "reason": "retro-2-done"
+  }
+ },
+ "traps": {
+  "2026-10-12": [],
+  "2026-10-19": [],
+  "2026-10-26": [],
+  "2026-11-02": []
+ }
+}

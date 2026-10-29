@@ -1,0 +1,55 @@
+[10/29/26 10:15:56] INFO     Processing request of type            server.py:733
+                             CallToolRequest                                    
+  + Exception Group Traceback (most recent call last):
+  |   File "/Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/harness/inject_root_rework_armc.py", line 323, in <module>
+  |     sys.exit(main())
+  |              ^^^^^^
+  |   File "/Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/harness/inject_root_rework_armc.py", line 316, in main
+  |     return anyio.run(run, a)
+  |            ^^^^^^^^^^^^^^^^^
+  |   File "/Volumes/workspace/hirearchy/.worktrees/p2-arm-c/.venv/lib/python3.11/site-packages/anyio/_core/_eventloop.py", line 83, in run
+  |     return async_backend.run(func, args, {}, backend_options)
+  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |   File "/Volumes/workspace/hirearchy/.worktrees/p2-arm-c/.venv/lib/python3.11/site-packages/anyio/_backends/_asyncio.py", line 2548, in run
+  |     return runner.run(wrapper())
+  |            ^^^^^^^^^^^^^^^^^^^^^
+  |   File "/Users/aminalizadeh/.local/share/uv/python/cpython-3.11.6-macos-aarch64-none/lib/python3.11/asyncio/runners.py", line 118, in run
+  |     return self._loop.run_until_complete(task)
+  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |   File "/Users/aminalizadeh/.local/share/uv/python/cpython-3.11.6-macos-aarch64-none/lib/python3.11/asyncio/base_events.py", line 653, in run_until_complete
+  |     return future.result()
+  |            ^^^^^^^^^^^^^^^
+  |   File "/Volumes/workspace/hirearchy/.worktrees/p2-arm-c/.venv/lib/python3.11/site-packages/anyio/_backends/_asyncio.py", line 2531, in wrapper
+  |     return await func(*args)
+  |            ^^^^^^^^^^^^^^^^^
+  |   File "/Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/harness/inject_root_rework_armc.py", line 221, in run
+  |     async with stdio_client(server_params(org)) as (r, w), ClientSession(r, w) as s:
+  |   File "/Users/aminalizadeh/.local/share/uv/python/cpython-3.11.6-macos-aarch64-none/lib/python3.11/contextlib.py", line 222, in __aexit__
+  |     await self.gen.athrow(typ, value, traceback)
+  |   File "/Volumes/workspace/hirearchy/.worktrees/p2-arm-c/.venv/lib/python3.11/site-packages/mcp/client/stdio/__init__.py", line 182, in stdio_client
+  |     async with (
+  |   File "/Volumes/workspace/hirearchy/.worktrees/p2-arm-c/.venv/lib/python3.11/site-packages/anyio/_backends/_asyncio.py", line 847, in __aexit__
+  |     raise BaseExceptionGroup(
+  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Exception Group Traceback (most recent call last):
+    |   File "/Volumes/workspace/hirearchy/.worktrees/p2-arm-c/.venv/lib/python3.11/site-packages/mcp/client/stdio/__init__.py", line 189, in stdio_client
+    |     yield read_stream, write_stream
+    |   File "/Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/harness/inject_root_rework_armc.py", line 221, in run
+    |     async with stdio_client(server_params(org)) as (r, w), ClientSession(r, w) as s:
+    |   File "/Volumes/workspace/hirearchy/.worktrees/p2-arm-c/.venv/lib/python3.11/site-packages/anyio/_backends/_asyncio.py", line 847, in __aexit__
+    |     raise BaseExceptionGroup(
+    | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+    +-+---------------- 1 ----------------
+      | Traceback (most recent call last):
+      |   File "/Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/harness/inject_root_rework_armc.py", line 223, in run
+      |     stats = await poll_until_settled(lambda a, t: call(s, plog, "progress", a, timeout=t), args.task, time.monotonic(), plog,
+      |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      |   File "/Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/harness/inject_root_rework_armc.py", line 177, in poll_until_settled
+      |     reply = await progress({"task_id": task_id, "wait_seconds": wait}, wait + 180)
+      |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      |   File "/Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/harness/inject_root_rework_armc.py", line 141, in call
+      |     raise RuntimeError(f"{name} returned an error: {reply}")
+      | RuntimeError: progress returned an error: Error executing tool progress: no task 20261029T101457986640-root-96c6
+exit given by root. Tasks: 20261029T101457986640-root-96c6
+      +------------------------------------

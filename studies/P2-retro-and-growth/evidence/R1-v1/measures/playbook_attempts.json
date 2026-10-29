@@ -1,0 +1,81 @@
+{
+  "attempts": [
+    {
+      "actor": "lead",
+      "admitted_letter": "c",
+      "admitted_version": 2,
+      "error_first_line": null,
+      "error_type": null,
+      "in_window": false,
+      "ok": true,
+      "outcome": "admitted",
+      "refusal_kind": null,
+      "run": "lead@20261029T105351980348",
+      "time": "2026-10-29T10:54:11.825619Z",
+      "trace": "20261029T104227032002-root-b870"
+    }
+  ],
+  "bad_event_lines": 0,
+  "counts": {
+    "admitted": 1,
+    "attempts": 1,
+    "errors": 0,
+    "in_window": 0,
+    "other_refused": 0,
+    "p1_refused": 0,
+    "refused": 0
+  },
+  "label": "R1",
+  "notes": [
+    "no injection/window.txt: in_window is false for every attempt"
+  ],
+  "owner_attempted": true,
+  "revise_playbook_attempts_txt": {
+    "agrees": null,
+    "events_listed": null,
+    "present": false
+  },
+  "script": {
+    "md5": "6aa21eb5c9ffb11bb0aed9cd420fcd26",
+    "name": "playbook_attempts.py"
+  },
+  "source_files": [
+    "events/2026-10-29/cli-2943-1793270664810.jsonl",
+    "events/2026-10-29/cli-3538-1793270693449.jsonl",
+    "events/2026-10-29/cli-3571-1793270693752.jsonl",
+    "events/2026-10-29/cli-3980-1793270839862.jsonl",
+    "events/2026-10-29/cli-4689-1793270869932.jsonl",
+    "events/2026-10-29/cli-4725-1793270870308.jsonl",
+    "events/2026-10-29/cli-4881-1793271019100.jsonl",
+    "events/2026-10-29/cli-5936-1793271118512.jsonl",
+    "events/2026-10-29/cli-5978-1793271118929.jsonl",
+    "events/2026-10-29/cli-6423-1793271332703.jsonl",
+    "events/2026-10-29/cli-7091-1793271361951.jsonl",
+    "events/2026-10-29/cli-7133-1793271362386.jsonl",
+    "events/2026-10-29/cli-7856-1793271473739.jsonl",
+    "events/2026-10-29/cli-7893-1793271474119.jsonl",
+    "events/2026-10-29/mcp-2865-1793270533600.jsonl",
+    "events/2026-10-29/mcp-3055-1793270581640.jsonl",
+    "events/2026-10-29/mcp-3185-1793270601556.jsonl",
+    "events/2026-10-29/mcp-3339-1793270641137.jsonl",
+    "events/2026-10-29/mcp-3926-1793270733935.jsonl",
+    "events/2026-10-29/mcp-4092-1793270759718.jsonl",
+    "events/2026-10-29/mcp-4244-1793270791168.jsonl",
+    "events/2026-10-29/mcp-4393-1793270820443.jsonl",
+    "events/2026-10-29/mcp-4876-1793270907985.jsonl",
+    "events/2026-10-29/mcp-5000-1793270927206.jsonl",
+    "events/2026-10-29/mcp-5103-1793270963078.jsonl",
+    "events/2026-10-29/mcp-5332-1793271003451.jsonl",
+    "events/2026-10-29/mcp-5706-1793271083215.jsonl",
+    "events/2026-10-29/mcp-6366-1793271196328.jsonl",
+    "events/2026-10-29/mcp-6529-1793271251500.jsonl",
+    "events/2026-10-29/mcp-6656-1793271292559.jsonl",
+    "events/2026-10-29/mcp-6797-1793271313072.jsonl",
+    "events/2026-10-29/mcp-7559-1793271426289.jsonl",
+    "events/2026-10-29/scheduler-2943-1793270552111.jsonl",
+    "events/2026-10-29/scheduler-3980-1793270737194.jsonl",
+    "events/2026-10-29/scheduler-4881-1793270908293.jsonl",
+    "events/2026-10-29/scheduler-6423-1793271231975.jsonl"
+  ],
+  "window": null
+}

@@ -1,0 +1,23 @@
+{
+ "counts": {
+  "PF-0": 0,
+  "PF-1": 0,
+  "new": 5
+ },
+ "files": [
+  "org-files/retros.json",
+  "p2/retro-replies/",
+  "rederived/p2/as-of-B*/",
+  "events/",
+  "charter-history.txt"
+ ],
+ "reason": "5 finding(s): PF-0 0, PF-1 0, new 5",
+ "steps": [
+  "MISMATCH B1 D7 [new] ('contract', 'weekly-meeting-memo', 2): product ('not recurred', 8, None) | harness ('recurred', None, 'R3')",
+  "MISMATCH B1 D7 [new] ('other', 'weekly-meeting-memo P9 (v3)'): product ('not recurred', 3, None) | harness -",
+  "MISMATCH B1 D7 [new] ('other', 'weekly-meeting-memo P8 (v4)'): product ('INCONCLUSIVE', 0, None) | harness -",
+  "MISMATCH B2 D7 [new] ('contract', 'weekly-meeting-memo', 4): product ('INCONCLUSIVE', 1, None) | harness -",
+  "MISMATCH B2 D7 [new] ('other', 'weekly-meeting-memo P8 (v4)'): product ('INCONCLUSIVE', 0, None) | harness -"
+ ],
+ "verdict": "MISMATCH"
+}

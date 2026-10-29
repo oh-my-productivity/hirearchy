@@ -1,0 +1,19 @@
+I can set this up as a standing weekly service. After each meeting you ask for a memo, give it that meeting's notes file, and the team writes it from your notes only (no web). I read the latest notes (6 Nov), and a few questions come out of how you write them. Please reply "defaults" to accept everything I've proposed, or change any item.
+
+1. **Input each week:** the notes file for that meeting, such as `notes/2026-11-16.md`. Everything else stays fixed.
+2. **Memo contents:** (a) decisions made, (b) who does what, with an owner and a date for each item.
+3. **Informal items:** your notes have commitments that aren't labelled ACTION, such as "Sam said he would add Jo to the on-call rotation by Friday." *Proposed:* include them as action items too.
+4. **Vague or missing dates:**
+   - "By Friday" or "next week": *proposed:* turn it into a calendar date from the meeting date, so "by Friday" in the 9 Nov meeting becomes 13 Nov.
+   - No date given, as with Lee's SSO audit log check: *proposed:* list the item with "no date set". The team won't invent one.
+5. **Open items:** a commitment with no clear owner, or a decision nobody confirmed. *Proposed:* list these under a short "Unclear" heading rather than guessing.
+6. **Format and length:** markdown, at most 300 words. *Proposed:* put each memo in a new `deliverables/` folder here, named by meeting date (for example `deliverables/2026-11-09-memo.md`).
+7. **Review:** *proposed:* a second agent checks every decision and action item in the memo against the notes. It also confirms nothing in the memo is missing from the notes or invented.
+8. **Budget:** each request is a few agent runs. *Proposed:* the plan will show an estimate plus 25%. All agents use claude-sonnet-5.5 at high effort, which is the only model available.
+9. **Approval:** *proposed:* you approve the plan before anything is built. After that, nothing runs until you ask for a memo.
+
+Two optional questions:
+- Should I run a first memo right away, for the 9 Nov meeting, as a test? *Proposed:* yes.
+- Should the memo name attendees or the next meeting date? *Proposed:* no, only decisions and who does what.
+
+I can't schedule this to run on its own. Each week, ask me for the memo and I'll start it.

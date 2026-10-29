@@ -1,0 +1,15 @@
+{
+ "files": [
+  "org-files/retros.json",
+  "p2/retro-replies/",
+  "ledger/",
+  "msgs/",
+  "rederived/p2/ledger.json"
+ ],
+ "findings": [],
+ "reason": "every check held",
+ "steps": [
+  "records 2; every waking runtime message to root (step 4): []"
+ ],
+ "verdict": "PASS"
+}

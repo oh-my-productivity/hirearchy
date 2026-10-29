@@ -1,0 +1,51 @@
+{
+  "schemaVersion": "1.0.0",
+  "dataModelVersion": 1,
+  "id": "sess_eaf55dd7-60cc-4c11-ac1b-76fd5dc8d5d3",
+  "title": "Load Hierarchy Skill and Run Whoami Tool",
+  "agentMode": "hirearchy-study-p2-probe-R2-assistant",
+  "workspacePaths": [
+    "/private/tmp/hirearchy-p2/probe-R2-1793269796"
+  ],
+  "rootPaths": [
+    "/private/tmp/hirearchy-p2/probe-R2-1793269796"
+  ],
+  "createdAt": "2026-10-29T10:30:08.336Z",
+  "lastModifiedAt": "2026-10-29T10:31:04.073Z",
+  "modelId": "claude-sonnet-5.5",
+  "autopilot": true,
+  "effortLevel": "high",
+  "contextSnapshotModelDisplay": {
+    "modelId": "claude-sonnet-5.5",
+    "display": "Claude Sonnet 5.5"
+  },
+  "semanticReviewEnabled": true,
+  "disableAutoCompaction": false,
+  "ftaEnabled": false,
+  "workflowsEnabled": false,
+  "specPlanEnabled": false,
+  "specWorkflow": "quick",
+  "specSkipClarificationEnabled": true,
+  "memoryConfig": {
+    "mode": "read_write",
+    "reflection": true
+  },
+  "memoryConfigSource": "explicit",
+  "status": "idle",
+  "_meta": {
+    "kiro": {
+      "settings": {
+        "memory": {
+          "mode": "read_write",
+          "reflection": true
+        },
+        "workflows": {
+          "enabled": false
+        },
+        "goal": {
+          "enabled": false
+        }
+      }
+    }
+  }
+}

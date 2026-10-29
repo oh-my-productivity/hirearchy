@@ -1,0 +1,4 @@
+turn.sh R1 27: run_turn start 2026-10-29T13:25:13.6NZ
+run_turn end 2026-10-29T13:26:07Z exit 0
+after_turn end 2026-10-29T13:26:14Z exit 0
+after_turn sequential: checked (turn end 2026-10-29T13:25:47+00:00 + 20 s <= first snapshot 2026-10-29T13:26:08.446088+00:00)

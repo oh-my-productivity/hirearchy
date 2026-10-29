@@ -1,0 +1,121 @@
+[
+ {
+  "approved": true,
+  "blueprint": {
+   "agents": [
+    {
+     "children": [
+      {
+       "model": "cheap",
+       "name": "writer",
+       "template": "writer",
+       "tools": [
+        "read"
+       ]
+      }
+     ],
+     "model": "strong",
+     "name": "lead",
+     "template": "manager"
+    }
+   ],
+   "mission": "Write a short memo after each weekly team meeting from the user's meeting notes: what was decided and who does what. Recurring: the user names one notes file per meeting and gets one memo back.\n",
+   "needs": {
+    "approval": "Plan first; ask before any spend beyond the budget.",
+    "budget_runs": 12,
+    "elicitation": "User, first message: After each of our weekly team meetings I want a short memo from my notes: what we decided and who does what. My notes are in /tmp/hirearchy-p2/R1-1793270268/notes (one file per meeting). Can you set up a team that does this for me every week?\nUser, answers: Yes, if someone said they'd do something, it counts. Yes, turn vague deadlines into a date when the notes make it clear. The file name each time is fine. Format: a markdown memo, at most 400 words, with the action items as a table with columns Owner | Action | Due (ISO dates, 'none' if there's no date). The rest of your defaults are fine, the deliverables folder too. Please keep it cheap, but I need it right - about 12 runs per memo. No separate reviewer: the lead checks. For the Owner column: Use the words from the notes. No, the first memo should be this week's: 2026-10-05.md, not 2026-11-09.md.\n",
+    "inputs": [
+     "/tmp/hirearchy-p2/R1-1793270268/notes"
+    ],
+    "kind": "writing",
+    "model_policy": "one model for all",
+    "models": {
+     "cheap": "claude-sonnet-5.5",
+     "strong": "claude-sonnet-5.5"
+    },
+    "progress": "One line when I ask.",
+    "quality_bar": "Every statement comes from the notes file; nothing is added that the notes do not say.",
+    "review": false,
+    "scope": "One memo per request, from the one meeting-notes file the user names: the decisions made and the action items (who does what, by when). Nothing else from the meeting.",
+    "sources": "Only the files in needs.inputs; no web."
+   },
+   "services": [
+    {
+     "acceptance": [
+      {
+       "asked": "What should the memo cover?",
+       "from": "what we decided and who does what",
+       "text": "The memo covers only the decisions and the action items of the requested notes file, with a Decisions section and an Actions section."
+      },
+      {
+       "asked": "Format and length?",
+       "from": "at most 400 words",
+       "text": "The memo is at most 400 words as counted by read."
+      },
+      {
+       "default": true,
+       "text": "Every decision in the notes file is listed in the Decisions section, and nothing is listed there that the notes do not state as decided or agreed."
+      },
+      {
+       "asked": "Do informal or unlabelled commitments count?",
+       "from": "if someone said they'd do something, it counts",
+       "text": "Every commitment in the notes file is a row in the Actions table, including informal ones in prose (for example 'Sam said he'd look into ...'), and no row is an invented commitment."
+      },
+      {
+       "asked": "Format and length?",
+       "from": "the action items as a table with columns Owner | Action | Due",
+       "text": "The Actions section is a table with exactly the columns Owner | Action | Due."
+      },
+      {
+       "asked": "Owner column wording?",
+       "from": "For the Owner column: Use the words from the notes",
+       "text": "The Owner cell uses the words the notes use for that person or group."
+      },
+      {
+       "asked": "How to treat relative or vague dates?",
+       "from": "turn vague deadlines into a date when the notes make it clear",
+       "text": "The Due cell is an ISO date (YYYY-MM-DD). A vague deadline (for example 'before Friday') is turned into a date, using the meeting date in the notes, only when the notes make that date clear; otherwise the cell is 'none'."
+      },
+      {
+       "asked": "Review by another agent?",
+       "from": "No separate reviewer: the lead checks",
+       "text": "The lead's check report matches every decision and every action row of the memo against the notes file (n of m, n = m), and every commitment in the notes file has a row."
+      }
+     ],
+     "budget": 12,
+     "deliverable": {
+      "description": "One markdown memo per meeting, named memo-<notes file date>.md",
+      "format": "markdown",
+      "max_words": 400,
+      "path": "/private/tmp/hirearchy-p2/R1-1793270268/deliverables"
+     },
+     "description": "One markdown memo with the decisions and the action-item table from one weekly meeting-notes file.",
+     "inputs": [
+      {
+       "description": "File name of the meeting notes in the notes folder, e.g. 2026-10-05.md",
+       "name": "notes_file",
+       "required": true
+      }
+     ],
+     "locked": false,
+     "name": "weekly-meeting-memo",
+     "owner": "lead"
+    }
+   ],
+   "task": {
+    "inputs": {
+     "notes_file": "2026-10-05.md"
+    },
+    "service": "weekly-meeting-memo",
+    "title": "Memo for the 2026-10-05 weekly"
+   }
+  },
+  "change": null,
+  "extend": false,
+  "ok": true,
+  "plan_id": "23d677cd0174",
+  "proposal": "Target organization: /private/tmp/hirearchy-p2/R1-1793270268/org (none yet: create_org(mission=...) comes first, then apply_org)\n\nShow the block below to the user exactly as written, from its first line up to (not including) the marker line; one plain-words intro line before it is fine.\n\nPLAN FOR YOU\nGoal: Write a short memo after each weekly team meeting from the user's meeting notes: what was decided and who does what. Recurring: the user names one notes file per meeting and gets one memo back.\nWhat I understood you need:\n- Scope: One memo per request, from the one meeting-notes file the user names: the decisions made and the action items (who does what, by when). Nothing else from the meeting.\n- Your files (read-only): /tmp/hirearchy-p2/R1-1793270268/notes\n- Quality bar: Every statement comes from the notes file; nothing is added that the notes do not say.\n- Sources: Only the files in needs.inputs; no web.\n- Workspace: none (nothing writes files or runs commands)\n- Models: claude-sonnet-5.5 (high effort) for every agent\nTeam (2 agents):\n- lead (Manager, model claude-sonnet-5.5): directs the team; does not produce the work itself; can read files only in /private/tmp/hirearchy-p2/R1-1793270268/notes and the organization's own files; cannot change your files\n  - writer (Writer, model claude-sonnet-5.5): can read files only in /private/tmp/hirearchy-p2/R1-1793270268/notes and the organization's own files; cannot change your files\nBudget: up to 12 runs per request (one run = one working session of one agent), your cap per request is 12; the minimum for one review and rework is 8, and a round of your questions or a rejection takes about 3 more (11 in all). Unspent runs come back to you.\n  lead starts with 12, hands down writer 3 and keeps 9 for planning, checking and rework.\nIf a check still fails after one rework, I'll come back to you with options before spending the reserve; nothing beyond a request's budget is spent without your OK.\nChecking: no independent reviewer (you did not ask for one). I still re-check the final result against every service check below.\nServices (kept ready, requested whenever you want):\n- weekly-meeting-memo: One markdown memo with the decisions and the action-item table from one weekly meeting-notes file.\n  You provide: notes_file (required)\n  Each request: up to 12 runs\n  Checks:\n    1. The memo covers only the decisions and the action items of the requested notes file, with a Decisions section and an Actions section.\n       from your words \"what we decided and who does what\" (my question: \"What should the memo cover?\"); words I added: covers, only, decisions, action, items, of, requested, notes, +6 more\n    2. The memo is at most 400 words as counted by read.\n       from your words \"at most 400 words\" (my question: \"Format and length?\"); words I added: the, memo, is, as, counted, by, read\n    3. Every decision in the notes file is listed in the Decisions section, and nothing is listed there that the notes do not state as decided or agreed.\n       my default: you did not say this\n    4. Every commitment in the notes file is a row in the Actions table, including informal ones in prose (for example 'Sam said he'd look into ...'), and no row is an invented commitment.\n       from your words \"if someone said they'd do something, it counts\" (my question: \"Do informal or unlabelled commitments count?\"); words I added: every, commitment, in, the, notes, file, is, a, +16 more\n    5. The Actions section is a table with exactly the columns Owner | Action | Due.\n       from your words \"the action items as a table with columns Owner | Action | Due\" (my question: \"Format and length?\"); words I added: actions, section, is, exactly\n    6. The Owner cell uses the words the notes use for that person or group.\n       from your words \"For the Owner column: Use the words from the notes\" (my question: \"Owner column wording?\"); words I added: cell, uses, that, person, or, group\n    7. The Due cell is an ISO date (YYYY-MM-DD). A vague deadline (for example 'before Friday') is turned into a date, using the meeting date in the notes, only when the notes make that date clear; otherwise the cell is 'none'.\n       from your words \"turn vague deadlines into a date when the notes make it clear\" (my question: \"How to treat relative or vague dates?\"); words I added: due, cell, is, an, iso, yyyy, -, mm, +14 more\n    8. The lead's check report matches every decision and every action row of the memo against the notes file (n of m, n = m), and every commitment in the notes file has a row.\n       from your words \"No separate reviewer: the lead checks\" (my question: \"Review by another agent?\"); words I added: s, check, report, matches, every, decision, and, action, +13 more\n  Delivered to: /private/tmp/hirearchy-p2/R1-1793270268/deliverables (I copy each result there after checking it)\nAfter each request the lead records lessons; before the next one it reviews them with your feedback and may improve how the team works (its playbook). It cannot change these checks: only you can, through me.\nFirst request, started on approval: weekly-meeting-memo (notes_file: 2026-10-05.md).\nCheckpoints: approval - Plan first; ask before any spend beyond the budget; progress - One line when I ask; any spend beyond the budget needs your OK.\nNothing is created or started until you approve. Reply 'approve', or tell me what to change.\n\n--- machine marker: the user block ends above; do not show this line or anything below it ---\n\nDetails (the full plan, for you; the user need not read it):\n# Plan for approval\n\nGoal: Write a short memo after each weekly team meeting from the user's meeting notes: what was decided and who does what. Recurring: the user names one notes file per meeting and gets one memo back.\n\nNeeds as understood:\n- Scope: One memo per request, from the one meeting-notes file the user names: the decisions made and the action items (who does what, by when). Nothing else from the meeting.\n- Deliverable: per service (see Services below)\n- Quality bar: Every statement comes from the notes file; nothing is added that the notes do not say.\n- Sources / tools: Only the files in needs.inputs; no web.\n- Workspace: none (no agent writes files or runs commands)\n- Model policy: one model for all\n- Review: not required\n\nOrganization (2 agents):\n- lead [manager] Manager: model=claude-sonnet-5.5, tools=read\n  Access: kiro read only in /private/tmp/hirearchy-p2/R1-1793270268/notes and in the organization's own files (read-only)\n  - writer [writer] Writer: model=claude-sonnet-5.5, tools=read\n    Access: kiro read only in /private/tmp/hirearchy-p2/R1-1793270268/notes and in the organization's own files (read-only)\n\nBudget per request (your cap: 12), estimate 8 for one pass + one review/rework cycle, 11 with one round of your questions or a rejection:\n  A ceiling: runs the team does not spend come back automatically with the final report of each request.\n  service weekly-meeting-memo: 12 runs per request\n    lead: starts with 12, hands down writer 3 (each includes its rework/re-check run), keeps 9 (own 5 + slack 4)\n    lead/writer: 3 runs (2 work + 1 rework)\n\nReview / verification:\n- no independent reviewer (review not requested)\n- the assistant re-checks the final deliverable against every acceptance criterion before telling you it is done\n\nDeliverable:\n- per service (see Services below)\n\nServices (1), offered by lead and defined by root (the contract: only root can change it):\n- weekly-meeting-memo: One markdown memo with the decisions and the action-item table from one weekly meeting-notes file.\n  inputs: notes_file (required)\n  budget: 12 runs per request\n  deliverable: One markdown memo per meeting, named memo-<notes file date>.md [markdown, max 400 words]; delivered to: /private/tmp/hirearchy-p2/R1-1793270268/deliverables (I copy each result there after checking it)\n  acceptance (the contract, travels with every request):\n    1. The memo covers only the decisions and the action items of the requested notes file, with a Decisions section and an Actions section.\n       from your words \"what we decided and who does what\" (my question: \"What should the memo cover?\"); words I added: covers, only, decisions, action, items, of, requested, notes, +6 more\n    2. The memo is at most 400 words as counted by read.\n       from your words \"at most 400 words\" (my question: \"Format and length?\"); words I added: the, memo, is, as, counted, by, read\n    3. Every decision in the notes file is listed in the Decisions section, and nothing is listed there that the notes do not state as decided or agreed.\n       my default: you did not say this\n    4. Every commitment in the notes file is a row in the Actions table, including informal ones in prose (for example 'Sam said he'd look into ...'), and no row is an invented commitment.\n       from your words \"if someone said they'd do something, it counts\" (my question: \"Do informal or unlabelled commitments count?\"); words I added: every, commitment, in, the, notes, file, is, a, +16 more\n    5. The Actions section is a table with exactly the columns Owner | Action | Due.\n       from your words \"the action items as a table with columns Owner | Action | Due\" (my question: \"Format and length?\"); words I added: actions, section, is, exactly\n    6. The Owner cell uses the words the notes use for that person or group.\n       from your words \"For the Owner column: Use the words from the notes\" (my question: \"Owner column wording?\"); words I added: cell, uses, that, person, or, group\n    7. The Due cell is an ISO date (YYYY-MM-DD). A vague deadline (for example 'before Friday') is turned into a date, using the meeting date in the notes, only when the notes make that date clear; otherwise the cell is 'none'.\n       from your words \"turn vague deadlines into a date when the notes make it clear\" (my question: \"How to treat relative or vague dates?\"); words I added: due, cell, is, an, iso, yyyy, -, mm, +14 more\n    8. The lead's check report matches every decision and every action row of the memo against the notes file (n of m, n = m), and every commitment in the notes file has a row.\n       from your words \"No separate reviewer: the lead checks\" (my question: \"Review by another agent?\"); words I added: s, check, report, matches, every, decision, and, action, +13 more\n  playbook v1: generated from the team (steps, budget plan):\n    ## Steps\n    1. Read the request in your prompt: its inputs, every acceptance criterion and the deliverable. The criteria come from the contract and can only be met, never changed; copy the relevant ones verbatim into every task you delegate.\n    2. Delegate to `writer` (Writer) with `budget=3`: its part of the request, with the criteria it must meet.\n    3. Read the final artifact yourself and check it against EVERY criterion of the request, quoting counts from your own `read` output.\n    4. Report: `done` only if every criterion is met (else `blocked` with the deviation and a recommended decision). Name the deliverable's path (the assistant copies it to /private/tmp/hirearchy-p2/R1-1793270268/deliverables) and pass `lessons` as an after-action review: Expected / Happened / Caught at / Cause / Prevent (the system cause, not a person), or Near miss when nothing went wrong.\n    \n    ## Budget plan\n    Request budget: 12 runs (the contract's). Hand down no more than this up front, each with `budget=` set explicitly:\n    - writer: 3 runs (2 work + 1 rework or re-check)\n    - you (lead): keep 9 runs: your own 5 (plan, process each result, final check, report, one rework cycle) and 4 of slack.\n    Unspent runs return to your parent with your final report.\nAfter each request the lead records lessons; before the next one it reviews them with your feedback and may improve how the team works (its playbook). It cannot change these checks: only you can, through me.\nFirst request: service weekly-meeting-memo: notes_file: 2026-10-05.md; title: Memo for the 2026-10-05 weekly\n\nCheckpoints:\n- Approval: Plan first; ask before any spend beyond the budget.\n- Progress: One line when I ask.\n- Any spend beyond the budget needs your OK.\n\nWarnings (1):\n- services[weekly-meeting-memo].deliverable.path: no agent can write to /private/tmp/hirearchy-p2/R1-1793270268/deliverables (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)\n\nReply 'approve' or tell me what to change.\n\nplan_id: 23d677cd0174\nNext: show the PLAN FOR YOU block above to the user exactly as written (a plain-words intro line before it is fine) and wait for their explicit approval. Then apply_org(blueprint=<this exact YAML>, approved=True, plan_id=\"23d677cd0174\"). If you change the blueprint, call propose_org again: the plan_id changes.",
+  "result": "applied the blueprint to /private/tmp/hirearchy-p2/R1-1793270268/org\ncreated 2 agents: lead, lead/writer\ndefined 1 service(s) of lead: weekly-meeting-memo (contract and playbook v1)\nfirst request: service weekly-meeting-memo, task 20261029T104227032002-root-b870 -> lead (budget 12)\nwarning: services[weekly-meeting-memo].deliverable.path: no agent can write to /private/tmp/hirearchy-p2/R1-1793270268/deliverables (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)\nNext step: call start() to run the scheduler, then answer status questions with progress().",
+  "t": "2026-10-29T10:42:27.082Z"
+ }
+]

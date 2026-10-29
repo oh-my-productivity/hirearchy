@@ -1,0 +1,26 @@
+# P2 freeze (attempt 3: protocol amendment 1 and its harness; attempt 2's files are in freeze-attempt-2/ with NOTE.md, attempt 1's in freeze-attempt-1/)
+freeze time (UTC): 2026-10-29T12:06:54Z
+basis: /Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/manager-decision-row-R1-t7.md (sections 'Decision: protocol amendment 1, before any further stream, and R1 run again', 'Amendment 1's review: rulings (2026-10-29)' and 'Closing rulings on the rulings pass's two flags (2026-10-29)') and /Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/amendment-1-review.md (+ .json). amendment-1-review.json stays CHANGES_REQUESTED (the review's own record, unedited); the freeze rests on the manager's rulings on it (A1-A12, D1, D2) and their closing rulings, as applied and checked by the passes the decision names, not on an APPROVED verdict.
+what changed since attempt 2 (protocol-amendment-1.md section 9; harness/CHANGES.md): new EV/protocol-amendment-1.md and EV/standing-rules-streams-amendment-1.md (each with its .md5); harness changed: arm.sh, turn.sh, injection.sh, finish_stream.sh, selfcheck.sh, lena_lines.py, selfcheck_cases.py, CHANGES.md; harness new: amend1_cases.py, turn_seqcheck.py, extract_mechanical_p2.py, injection_window.py. protocol.md and standing-rules-streams.md are NOT changed (frozen as in attempt 2). harness/extract_mechanical.py unchanged (73b27e25bd18ea9ec17ad5e64c7f6d1c). 68 of attempt 2's 76 harness files unchanged.
+arm R product sha (git -C /Volumes/workspace/hirearchy rev-parse HEAD): 3d6b28aa17a70a3f95854c73c2f479b6361a71de
+arm C product sha (git -C /Volumes/workspace/hirearchy/.worktrees/p2-arm-c rev-parse HEAD): aac6af1b47b721515106f03f1dd6eb6758da6e55
+check 1: git -C /Volumes/workspace/hirearchy diff --stat 3d6b28aa HEAD -- src skills pyproject.toml uv.lock: EMPTY
+check 2: arm-C worktree /Volumes/workspace/hirearchy/.worktrees/p2-arm-c HEAD aac6af1b (expected aac6af1b), tree CLEAN (status --porcelain empty)
+global skill md5 before the self-check: 443e1bc4911aa4d6aaa6457e78f673c1 (expected 443e1bc4911aa4d6aaa6457e78f673c1)
+check 3 (before anything new was written): md5 -q protocol.md = 31bc856cad06efbdefc04d582142eac2 = protocol.md5 first field; md5 -q standing-rules-streams.md = 909fbb79c838b69a2d620089545c3ae6 = standing-rules-streams.md5 first field = the value attempt 2's freeze.txt records = protocol.md5 line 2 (so preflight's written standing-rules-streams.md5 equals the frozen value; EV/preflight/freeze-gap-standing-rules-md5.md)
+check 4: md5s written: protocol-amendment-1.md5 and standing-rules-streams-amendment-1.md5 (below); harness/MD5SUMS rewritten (80 files of harness/, harness/selfcheck/, harness/keys/; excludes MD5SUMS itself, __pycache__ and *.pyc; same relative-path form and C-locale sort as attempt 2)
+--- protocol.md5 (unchanged)
+31bc856cad06efbdefc04d582142eac2  protocol.md
+909fbb79c838b69a2d620089545c3ae6  standing-rules-streams.md
+--- standing-rules-streams.md5 (unchanged)
+909fbb79c838b69a2d620089545c3ae6  standing-rules-streams.md
+--- protocol-amendment-1.md5
+a456ee77d0e9cecd8935827ef4681c10  protocol-amendment-1.md
+--- standing-rules-streams-amendment-1.md5
+b40abd1743f5d004dba2602474321a52  standing-rules-streams-amendment-1.md
+md5 of harness/MD5SUMS: 69c65487f101b5fc5bd52a202e737165
+md5 gate (source harness/arm.sh R1 in zsh with EV and H as arm.sh sets them; md5gate_ok at about 2026-10-29T12:07Z, before the self-check): exit 0, no output
+--- self-check on the frozen files (run after the md5s were written; harness/MD5SUMS and the amendment md5s re-verified afterwards)
+result: SELFCHECK: 20 of 20 parts passed (harness-selfcheck/selfcheck-summary.txt; zsh harness/selfcheck.sh, exit 0; parts include 'amendment 1: sequence check, effort-stop cost, window.txt (amend1_cases: 28 of 28 ok)', selfcheck_cases 168 of 168, lena_lines 43 of 43, dry run arm R and arm C 0 mismatches). Re-verified afterwards: all 80 harness/MD5SUMS lines, md5 of harness/MD5SUMS, protocol.md, standing-rules-streams.md and both amendment md5s match; no frozen file changed; md5gate_ok exit 0 again.
+global skill md5 after: 443e1bc4911aa4d6aaa6457e78f673c1 (expected 443e1bc4911aa4d6aaa6457e78f673c1)
+state: R1 v1 is withdrawn (decision: not scored, not a valid stream of either version, does not use arm R's replacement). Its evidence is still at EV/R1 and was not moved or edited by this freeze; the stream step moves it to EV/R1-v1 before the restarted R1's setup (amendment 1 section 9). No other stream (R2, R3, C1, C2, C3) has run (no R2/R3/C1/C2/C3 directory under EV). Profile and skill-move facts of R1 v1 are in EV/R1 and were not examined by this freeze; this freeze created no profile and made no skill move. No commit, no push.

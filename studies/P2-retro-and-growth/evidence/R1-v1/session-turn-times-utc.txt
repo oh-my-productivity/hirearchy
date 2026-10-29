@@ -1,0 +1,8 @@
+turn 1: user_ts 2026-10-29T10:38:44.103Z turn_start 2026-10-29T10:38:44.428Z turn_end 2026-10-29T10:39:09.305Z stop end_turn status success elapsed_ms 24876 credits 1.2388
+turn 2: user_ts 2026-10-29T10:40:17.165Z turn_start 2026-10-29T10:40:17.461Z turn_end 2026-10-29T10:41:20.463Z stop end_turn status success elapsed_ms 63002 credits 2.6072
+turn 3: user_ts 2026-10-29T10:42:08.955Z turn_start 2026-10-29T10:42:09.339Z turn_end 2026-10-29T10:44:31.944Z stop end_turn status success elapsed_ms 142604 credits 2.2987
+turn 4: user_ts 2026-10-29T10:45:19.937Z turn_start 2026-10-29T10:45:20.529Z turn_end 2026-10-29T10:47:28.346Z stop end_turn status success elapsed_ms 127817 credits 2.2415
+turn 5: user_ts 2026-10-29T10:51:06.749Z turn_start 2026-10-29T10:51:07.111Z turn_end 2026-10-29T10:51:36.737Z stop end_turn status success elapsed_ms 29626 credits 1.5440
+turn 6: user_ts 2026-10-29T10:53:01.571Z turn_start 2026-10-29T10:53:02.006Z turn_end 2026-10-29T10:55:40.209Z stop end_turn status success elapsed_ms 158202 credits 3.5214
+turn 7: user_ts 2026-10-29T10:56:55.854Z turn_start 2026-10-29T10:56:56.171Z turn_end 2026-10-29T10:57:32.071Z stop end_turn status success elapsed_ms 35899 credits 2.0241
+total assistant credits: 15.4757

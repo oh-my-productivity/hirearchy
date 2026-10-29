@@ -1,0 +1,99 @@
+{
+  "briefs": [
+    {
+      "id": "B1",
+      "at": "2026-10-29T12:08:52.831016+00:00",
+      "since": "2026-10-29T12:07:56+00:00",
+      "by": "cli",
+      "items": [
+        {
+          "n": 1,
+          "kind": "service",
+          "key": "service|lead|20261029T120757850378-root-ed57",
+          "evidence": [
+            "20261029T120757850378-root-ed57",
+            "20261029T120757916711-root-8082",
+            "20261029T120758245555-root-635c"
+          ],
+          "effect": {
+            "service": "lead/action-list-for"
+          },
+          "lapsed": 0
+        },
+        {
+          "n": 2,
+          "kind": "checker-add",
+          "key": "checker-add|weekly-memo|C6",
+          "evidence": [
+            "20261029T120757860113-root-c9cb",
+            "20261029T120757930373-root-b504",
+            "20261029T120758262825-root-f703"
+          ],
+          "effect": {
+            "owner": "lead"
+          },
+          "lapsed": 0
+        },
+        {
+          "n": 3,
+          "kind": "clarify",
+          "key": "clarify|weekly-memo|C4|decisionsandactionsusethenotesownwords",
+          "evidence": [
+            "weekly-memo/C4"
+          ],
+          "effect": {
+            "service": "weekly-memo",
+            "criterion": "C4"
+          },
+          "lapsed": 0
+        }
+      ],
+      "held_back": [
+        "clarify|weekly-memo|C5|thememostartswithaonelinesummarythenthed",
+        "clarify|weekly-memo|C6|adeadlinethenotesgiveinwordsisturnedinto"
+      ]
+    },
+    {
+      "id": "B2",
+      "at": "2026-10-29T12:08:57.268382+00:00",
+      "since": "2026-10-29T12:08:52.831016+00:00",
+      "by": "cli",
+      "items": [
+        {
+          "n": 1,
+          "kind": "clarify",
+          "key": "clarify|weekly-memo|C5|thememostartswithaonelinesummarythenthed",
+          "evidence": [
+            "weekly-memo/C5"
+          ],
+          "effect": {
+            "service": "weekly-memo",
+            "criterion": "C5"
+          },
+          "lapsed": 0
+        },
+        {
+          "n": 2,
+          "kind": "clarify",
+          "key": "clarify|weekly-memo|C6|adeadlinethenotesgiveinwordsisturnedinto",
+          "evidence": [
+            "weekly-memo/C6"
+          ],
+          "effect": {
+            "service": "weekly-memo",
+            "criterion": "C6"
+          },
+          "lapsed": 0
+        }
+      ],
+      "held_back": []
+    }
+  ],
+  "asked": [
+    "service|lead|20261029T120757850378-root-ed57",
+    "checker-add|weekly-memo|C6",
+    "clarify|weekly-memo|C4|decisionsandactionsusethenotesownwords",
+    "clarify|weekly-memo|C5|thememostartswithaonelinesummarythenthed",
+    "clarify|weekly-memo|C6|adeadlinethenotesgiveinwordsisturnedinto"
+  ]
+}

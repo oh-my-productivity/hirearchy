@@ -1,0 +1,30 @@
+I recorded your OK on the 9 November memo, which is now final. Here is the retrospective you said yes to.
+
+RETRO BRIEF B1 (since the organization started, 2026-10-29: 12 verdicts of yours on 9 cases)
+What you said:
+- weekly-meeting-memo R1: "No, not right yet. Sam's CI item says 'before Friday', so that has a date, 2026-10-09, not 'none'. And Marta's room is…" (C9 added (v2))
+- weekly-meeting-memo R2: "Almost, but not right yet: 'Marta keeps the agenda as sent' isn't an action item, nobody has to do anything there. Take…" (C10 added (v3))
+- weekly-meeting-memo R3: "No: I've changed my mind - always put the action items before the decisions now, right after the one-line Summary." (removed C9 (replaced by C11))
+- and 9 accepts
+What got past a check:
+- weekly-meeting-memo: lead/writer delivered 20261029T121630346755-root-d28e (no check of the team signed it); you rejected it (R1, C9)
+- weekly-meeting-memo: lead/writer delivered 20261029T124626096325-root-750e (no check of the team signed it); you rejected it (R2, C10)
+- weekly-meeting-memo: lead/writer delivered 20261029T130759453335-root-5699 (no check of the team signed it); you rejected it (R3, C11)
+Did past changes hold:
+- weekly-meeting-memo contract v2 adds C9: not recurred in 8 cases where it was exercised
+- weekly-meeting-memo contract v3 adds C10: not recurred in 5 cases where it was exercised
+- weekly-meeting-memo P9 (v3): not recurred in 3 cases where it was exercised
+- weekly-meeting-memo contract v4 adds C11: INCONCLUSIVE (1 of 3 exercised cases)
+- weekly-meeting-memo P8 (v4): INCONCLUSIVE (0 of 3 exercised cases)
+Changes to your organization:
+- agent lead added (2026-10-29): from the plan you approved (2026-10-29)
+- agent lead/writer added (2026-10-29): from the plan you approved (2026-10-29)
+- service lead/weekly-meeting-memo added (2026-10-29): from the plan you approved (2026-10-29)
+- Unprompted charter edits: 0
+Questions (one short answer each; any you leave lapse with no change at the next brief):
+1. Make the repeated task "one - page ops action list for the meeting" a standing service of lead? You asked for it 3 times (2026-10-29). It costs nothing to set up; each request uses up to 8 runs, and is sent only when you ask.
+2. C1 of weekly-meeting-memo reads "The memo is markdown and has at most 40…". It rests on your words "a markdown memo, at most 400 words", your answer to "Format and length?"; the words the, is, has, as, counted, by, read are mine. Does it say what you meant?
+3. C10 of weekly-meeting-memo reads "A statement that something stays as it…". It rests on your words "Yes, add it."; the words a, statement, that, something, stays, as, is, where, +16 more are mine. Does it say what you meant?
+RETRO BRIEF END
+
+Answer yes or no to each of the three questions. Any you leave lapse with no change.

@@ -1,0 +1,24 @@
+{
+  "name": "hirearchy-study-p2-probe-R2-assistant",
+  "description": "internal: hirearchy usability study P2 stream probe-R2 assistant; deleted after the stream",
+  "mcpServers": {
+    "hirearchy": {
+      "command": "uv",
+      "args": ["--directory", "/Volumes/workspace/hirearchy", "run", "hirearchy", "mcp"],
+      "env": { "ORG_ROOT": "/tmp/hirearchy-p2/probe-R2-1793269796/org" }
+    }
+  },
+  "tools": ["*"],
+  "permissions": {
+    "rules": [
+      { "capability": "all", "effect": "allow" }
+    ]
+  },
+  "resources": [
+    "skill:///Volumes/workspace/hirearchy/skills/hirearchy/SKILL.md",
+    "skill://.kiro/skills/*/SKILL.md"
+  ],
+  "hooks": [],
+  "includeMcpJson": false,
+  "model": "claude-sonnet-5.5"
+}

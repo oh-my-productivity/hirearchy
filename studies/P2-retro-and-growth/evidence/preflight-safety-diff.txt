@@ -1,0 +1,31 @@
+1,3c1,3
+< label: preflight-before
+< date: Thu Oct 29 10:13:50 WET 2026
+< date_utc: 2026-10-29T10:13:50Z  epoch: 1793268830
+---
+> label: preflight-after
+> date: Thu Oct 29 10:34:25 WET 2026
+> date_utc: 2026-10-29T10:34:25Z  epoch: 1793270065
+20c20
+< drwx------@  3 aminalizadeh  staff      96 Oct 29 10:13 .
+---
+> drwx------@  3 aminalizadeh  staff      96 Oct 29 10:31 .
+25c25
+< drwx------@  9 aminalizadeh  staff   288 Oct 28 04:39 .
+---
+> drwx------@  9 aminalizadeh  staff   288 Oct 29 10:32 .
+114a115,120
+> preflight-C-1793268897
+> preflight-R-1793268869
+> preflight-sched-C-1793269282
+> preflight-sched-C-1793269583
+> preflight-sched-R-1793269133
+> preflight-sched-R-1793269552
+126a133
+> probe-C1-1793269625
+138a146
+> probe-C2-1793269884
+150a159
+> probe-R1-1793269712
+162a172
+> probe-R2-1793269796

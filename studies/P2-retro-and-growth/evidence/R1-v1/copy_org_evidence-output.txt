@@ -1,0 +1,3 @@
+/Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/harness/copy_org_evidence.sh:20: no matches found: /tmp/hirearchy-p2/R1-1793270268/org/inbox/*
+/Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/harness/copy_org_evidence.sh:23: no matches found: /tmp/hirearchy-p2/R1-1793270268/org/lead/writer/inbox/*
+copied; services lead--weekly-meeting-memo ; charter commits 1

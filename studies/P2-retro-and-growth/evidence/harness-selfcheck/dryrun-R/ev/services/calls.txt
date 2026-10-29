@@ -1,0 +1,4 @@
+turn-01 start 2026-10-29T12:08:51.300457+00:00 end 2026-10-29T12:08:51.572296+00:00 exit 0 bytes 1832 product /Volumes/workspace/hirearchy
+  new cli-*.jsonl: 2026-10-29/cli-39360-1793275731532.jsonl  command: services 
+end start 2026-10-29T12:08:59.489489+00:00 end 2026-10-29T12:08:59.952059+00:00 exit 0 bytes 2238 product /Volumes/workspace/hirearchy
+  new cli-*.jsonl: 2026-10-29/cli-39634-1793275739917.jsonl  command: services 

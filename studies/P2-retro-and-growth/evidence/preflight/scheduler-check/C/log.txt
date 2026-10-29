@@ -1,0 +1,22 @@
+start call 2026-10-29T10:26:24Z
+[10/29/26 10:26:24] INFO     Processing request of type            server.py:733
+                             CallToolRequest                                    
+[10/29/26 10:26:25] INFO     Processing request of type            server.py:733
+                             ListToolsRequest                                   
+scheduler started (pid 94853; it runs until stop()); log: /private/tmp/hirearchy-p2/preflight-sched-C-1793269583/org/.runtime/scheduler.log
+start exit 0 at 2026-10-29T10:26:25Z (client exited)
+scheduler pid 94853
++5s: 2026-10-29T10:26:30Z 94853     1 Ss   /Volumes/workspace/hirearchy/.worktrees/p2-arm-c/.venv/bin/python /Volumes/workspace/hirearch
++25s: 2026-10-29T10:26:50Z 94853     1 Ss   /Volumes/workspace/hirearchy/.worktrees/p2-arm-c/.venv/bin/python /Volumes/workspace/hirearch
+{"v":1,"ts":"2026-10-29T10:26:45.335938+00:00","seq":4,"proc":"scheduler","pid":94853,"kind":"run.end","actor":"runtime","run":"lead@20261029T102625236157","trace":"20261029T102624259454-root-b76b","agent":"lead","ok":true,"exit_code":0,"duration_ms":20093,"timed_out":false,"killed":false,"budget_after":0,"error":null}
+[10/29/26 10:26:51] INFO     Processing request of type            server.py:733
+                             CallToolRequest                                    
+                    INFO     Processing request of type            server.py:733
+                             ListToolsRequest                                   
+scheduler stopped (pid 94853)
+stop exit 0 at 2026-10-29T10:26:51Z
+{"v":1,"ts":"2026-10-29T10:26:25.234084+00:00","seq":1,"proc":"scheduler","pid":94853,"kind":"scheduler.start","actor":"runtime","run":null,"trace":null,"mode":"daemon","max_runs":null,"max_parallel":3,"version":"0.1.0"}
+{"v":1,"ts":"2026-10-29T10:26:51.059589+00:00","seq":5,"proc":"scheduler","pid":94853,"kind":"scheduler.signal","actor":"runtime","run":null,"trace":null,"signal":"SIGTERM","action":"stop","ppid":1,"running":[]}
+{"v":1,"ts":"2026-10-29T10:26:51.403055+00:00","seq":6,"proc":"scheduler","pid":94853,"kind":"scheduler.exit","actor":"runtime","run":null,"trace":null,"reason":"stopped by SIGTERM","runs_started":1}
+process after stop: 
+RESULT: preflight-C-sched org: OK (2026-10-29T10:26:54Z)

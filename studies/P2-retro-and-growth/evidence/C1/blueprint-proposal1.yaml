@@ -1,0 +1,53 @@
+mission: >
+  Every week, turn the notes of one platform-team meeting into a short memo that says what was decided and who does what by when.
+needs:
+  kind: writing
+  scope: "For one meeting file per request: the decisions made and the action items (who does what, by when). Anything someone said they would do counts, including informal commitments written in prose. Nothing outside that meeting's file."
+  inputs:
+    - /tmp/hirearchy-p2/C1-1793280632/notes
+  quality_bar: Every statement comes from the meeting file, in the notes' own words; where the file is silent (for example no date), the memo says none.
+  sources: Only the files in needs.inputs; no web.
+  budget_runs: 12
+  models: {cheap: claude-sonnet-5.5, strong: claude-sonnet-5.5}
+  model_policy: one model for all
+  review: false
+  approval: Plan first; ask before any spend beyond the budget.
+  progress: One line when I ask.
+agents:
+  - name: lead
+    template: manager
+    model: strong
+    children:
+      - name: writer
+        template: writer
+        model: cheap
+        tools: [read]
+services:
+  - name: weekly-meeting-memo
+    owner: lead
+    description: One short markdown memo from one meeting's notes with the decisions and a table of action items.
+    inputs:
+      - name: notes_file
+        description: File name of the meeting notes inside the notes folder, for example 2026-10-05.md
+        required: true
+    acceptance:
+      - Covers only the meeting in the file named in the request and nothing else.
+      - At most 400 words as counted by read.
+      - The memo has a section titled "Decisions" that lists every decision in the notes, worded as in the notes.
+      - The memo has a section titled "Actions" with a markdown table with the columns Owner | Action | Due, with one row for every commitment in the notes, including informal ones written in prose ("X said he would ..."), worded as in the notes.
+      - Due is an ISO date (YYYY-MM-DD). A relative deadline such as "before Friday" becomes a date only when the notes and the meeting date make it clear; otherwise, and when the notes give no date, Due is "none".
+      - A name that is not in the attendee list is used as written in the notes and marked "(not in attendee list)".
+      - Nothing appears in the memo that is not in the notes file.
+      - "The lead's check against the notes shows every decision and every commitment covered (n of m with n = m)."
+    deliverable:
+      description: One markdown memo for the meeting
+      format: markdown
+      max_words: 400
+      path: /private/tmp/hirearchy-p2/C1-1793280632/deliverables
+    budget: 12
+    locked: false
+task:
+  service: weekly-meeting-memo
+  inputs:
+    notes_file: 2026-10-05.md
+  title: Memo for the 5 October 2026 platform team weekly

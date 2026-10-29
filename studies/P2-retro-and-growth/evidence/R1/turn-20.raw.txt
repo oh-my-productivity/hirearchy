@@ -1,0 +1,18 @@
+The reordered 9 November memo is at `/private/tmp/hirearchy-p2/R1-1793275867/deliverables/2026-11-09-memo.md`. The copy is identical to the team's file.
+
+The new order is now a standing check (C11) on every future memo. It replaced the old order in C9, so the two never conflict.
+
+I checked the memo against the notes myself:
+- **Order:** met. It opens with "Summary:", then Action items, then Decisions, and "Unclear" is last.
+- **Content:** unchanged and met.
+  - It has 5 of 5 rows with the columns Owner | Action | Due: Marta 2026-11-11, Dev 2026-11-20, Priya 2026-11-16, Sam 2026-11-13, Lee none.
+  - It has 3 of 3 decisions.
+  - There is one "Unclear" bullet: Lee's audit log check has no date.
+- **Length:** met. 164 words by `wc` (the lead counted 132), under 400.
+- **Lead's check:** met, 3 of 3 decisions and 5 of 5 rows verified.
+
+Runs: 6 of the 12 approved for this memo. That is 3 for the first draft and 3 for the reorder.
+
+Memos for the earlier meetings still have the old order. Tell me if you want any of them reworked to the new one.
+
+Keep it, or what should change? Once you've settled this memo I'll run the retrospective you said yes to. It looks at how the team worked across all the memos, so I'm holding it until this one is final.

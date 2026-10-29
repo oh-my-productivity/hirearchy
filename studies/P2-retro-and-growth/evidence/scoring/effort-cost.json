@@ -1,0 +1,149 @@
+{
+ "R1": {
+  "stops": 10,
+  "run_logs": 59,
+  "rows": [
+   {
+    "log": "lead/20261029T121732681065.log",
+    "stopped_after_s": 8,
+    "relaunch_start_after_s": 8.1,
+    "relaunch": "lead/20261029T121740820681.log",
+    "turn": 3
+   },
+   {
+    "log": "lead/20261029T123457510569.log",
+    "stopped_after_s": 12,
+    "relaunch_start_after_s": 12.1,
+    "relaunch": "lead/20261029T123509659762.log",
+    "turn": 9
+   },
+   {
+    "log": "lead/20261029T124807315526.log",
+    "stopped_after_s": 10,
+    "relaunch_start_after_s": 10.1,
+    "relaunch": "lead/20261029T124817425895.log",
+    "turn": 11
+   },
+   {
+    "log": "lead/20261029T125120707170.log",
+    "stopped_after_s": 8,
+    "relaunch_start_after_s": 8.2,
+    "relaunch": "lead/20261029T125128869515.log",
+    "turn": 12
+   },
+   {
+    "log": "lead/20261029T125752135027.log",
+    "stopped_after_s": 14,
+    "relaunch_start_after_s": 14.2,
+    "relaunch": "lead/20261029T125806296092.log",
+    "turn": 15
+   },
+   {
+    "log": "lead/20261029T130438015968.log",
+    "stopped_after_s": 10,
+    "relaunch_start_after_s": 10.2,
+    "relaunch": "lead/20261029T130448235042.log",
+    "turn": 17
+   },
+   {
+    "log": "lead/20261029T130852274944.log",
+    "stopped_after_s": 10,
+    "relaunch_start_after_s": 10.3,
+    "relaunch": "lead/20261029T130902526992.log",
+    "turn": 18
+   },
+   {
+    "log": "lead/20261029T132119169311.log",
+    "stopped_after_s": 14,
+    "relaunch_start_after_s": 14.2,
+    "relaunch": "lead/20261029T132133362652.log",
+    "turn": 25
+   },
+   {
+    "log": "lead/20261029T132239896150.log",
+    "stopped_after_s": 10,
+    "relaunch_start_after_s": 10.2,
+    "relaunch": "lead/20261029T132250104995.log",
+    "turn": 25
+   },
+   {
+    "log": "lead-writer/20261029T122737045127.log",
+    "stopped_after_s": 12,
+    "relaunch_start_after_s": 12.2,
+    "relaunch": "lead-writer/20261029T122749207947.log",
+    "turn": 7
+   }
+  ],
+  "seconds_to_relaunch_total": 109.8,
+  "turns_with_a_stop": [
+   3,
+   7,
+   9,
+   11,
+   12,
+   15,
+   17,
+   18,
+   25
+  ],
+  "stream_wall_s": 4433
+ },
+ "C1": {
+  "stops": 4,
+  "run_logs": 52,
+  "rows": [
+   {
+    "log": "lead/20261029T140628783814.log",
+    "stopped_after_s": 10,
+    "relaunch_start_after_s": 10.2,
+    "relaunch": "lead/20261029T140638967905.log",
+    "turn": 14
+   },
+   {
+    "log": "lead/20261029T141837889844.log",
+    "stopped_after_s": 12,
+    "relaunch_start_after_s": 12.3,
+    "relaunch": "lead/20261029T141850150150.log",
+    "turn": 19
+   },
+   {
+    "log": "lead-writer/20261029T133549207363.log",
+    "stopped_after_s": 12,
+    "relaunch_start_after_s": 12.2,
+    "relaunch": "lead-writer/20261029T133601374577.log",
+    "turn": 3
+   },
+   {
+    "log": "lead-writer/20261029T141422712537.log",
+    "stopped_after_s": 12,
+    "relaunch_start_after_s": 12.2,
+    "relaunch": "lead-writer/20261029T141434904361.log",
+    "turn": 17
+   }
+  ],
+  "seconds_to_relaunch_total": 46.9,
+  "turns_with_a_stop": [
+   3,
+   14,
+   17,
+   19
+  ],
+  "stream_wall_s": 4163
+ },
+ "R1-v1": {
+  "stops": 1,
+  "run_logs": 13,
+  "rows": [
+   {
+    "log": "lead/20261029T104930658411.log",
+    "stopped_after_s": 12,
+    "relaunch_start_after_s": 12.2,
+    "relaunch": "lead/20261029T104942826101.log",
+    "turn": null
+   }
+  ],
+  "seconds_to_relaunch_total": 12.2,
+  "turns_with_a_stop": [],
+  "stream_wall_s": 1140
+ }
+}

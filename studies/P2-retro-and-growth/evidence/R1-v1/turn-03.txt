@@ -1,0 +1,27 @@
+######## TURN 3  start 10:41:57  end 10:44:32  elapsed 155s  (local, 2026-10-29; UTC wall-clock start 2026-10-29T10:41:57Z end 2026-10-29T10:44:32Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Great, approve. I'll wait.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-03.stderr.txt):
+The team is running (up to 12 runs planned). Waiting for the result now.The first memo is written and checked, but I haven't copied it to `deliverables` yet. Two Due dates are judgment calls, and I'd like your answers first.
+
+Current draft:
+
+```
+Decisions
+- Push the API gateway migration to the week of 26 October.
+- Adopt Renovate with a weekly Monday batch of dependency PRs, starting with the three core repos.
+
+| Owner  | Action                                                     | Due        |
+| Priya  | Draft the RFC for the new per-key rate limiter             | 2026-10-09 |
+| Dev    | Enable Renovate on the three core repos                    | 2026-10-08 |
+| Sam    | Look into the flaky CI                                     | none       |
+| Marta  | Book the on-call training room for 2026-10-14              | none       |
+| Lee    | Ping the vendor about the SSO certificate renewal and report back | none |
+```
+
+1. **Sam, flaky CI.** The notes say "before Friday". The meeting was Monday 5 October, so that could be 2026-10-08 (the day before Friday) or 2026-10-09 (Friday itself). Should I put a date there, and which one? If you'd rather keep "none", say so.
+2. **Marta, training room.** Oct 14 is the date of the training. The notes don't say when the booking must be done. Should Due stay "none", or should it be 2026-10-14?
+
+Lee's row stays "none". The notes say "this week" but explicitly add "no hard date attached".
+
+Reply with your answers, or "keep as is" for both. If either answer changes a row, I'll send the memo back to the team for a rework before delivering.

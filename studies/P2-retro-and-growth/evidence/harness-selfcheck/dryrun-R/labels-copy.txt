@@ -1,0 +1,11 @@
+/Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/harness/copy_org_evidence.sh:20: no matches found: /tmp/hirearchy-p2/selfcheck-R-1793275673/f7-a/org/read/*
+/Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/harness/copy_org_evidence.sh:23: no matches found: /tmp/hirearchy-p2/selfcheck-R-1793275673/f7-a/org/ops-keeper/inbox/*
+/Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/harness/copy_org_evidence.sh:23: no matches found: /tmp/hirearchy-p2/selfcheck-R-1793275673/f7-a/org/ops-keeper/read/*
+/Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/harness/copy_org_evidence.sh:23: no matches found: /tmp/hirearchy-p2/selfcheck-R-1793275673/f7-a/org/ops-keeper/sent/*
+/Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/harness/copy_org_evidence.sh:23: no matches found: /tmp/hirearchy-p2/selfcheck-R-1793275673/f7-a/org/.retired/ops-helper-20261029T120832/inbox/*
+/Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/harness/copy_org_evidence.sh:23: no matches found: /tmp/hirearchy-p2/selfcheck-R-1793275673/f7-a/org/.retired/ops-helper-20261029T120832/read/*
+/Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/harness/copy_org_evidence.sh:23: no matches found: /tmp/hirearchy-p2/selfcheck-R-1793275673/f7-a/org/.retired/ops-helper-20261029T120832/sent/*
+/Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/harness/copy_org_evidence.sh:23: no matches found: /tmp/hirearchy-p2/selfcheck-R-1793275673/f7-a/org/lead/writer/inbox/*
+/Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/harness/copy_org_evidence.sh:26: no matches found: /tmp/hirearchy-p2/selfcheck-R-1793275673/f7-a/org/ops-keeper/runs/*.log
+/Volumes/workspace/hirearchy/studies/P2-retro-and-growth/evidence/harness/copy_org_evidence.sh:26: no matches found: /tmp/hirearchy-p2/selfcheck-R-1793275673/f7-a/org/.retired/ops-helper-20261029T120832/runs/*.log
+copied; services lead--.retired--extra-svc-20261029T120832617070 lead--weekly-memo ; charter commits 5

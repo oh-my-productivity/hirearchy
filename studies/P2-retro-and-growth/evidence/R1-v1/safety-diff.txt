@@ -1,0 +1,24 @@
+1c1
+< label: R1 before
+---
+> label: R1 after
+18c18
+< drwx------@  3 aminalizadeh  staff      96 Oct 29 10:35 .
+---
+> drwx------@  3 aminalizadeh  staff      96 Oct 29 10:39 .
+23c23
+< drwx------@  9 aminalizadeh  staff   288 Oct 29 10:32 .
+---
+> drwx------@  9 aminalizadeh  staff   288 Oct 29 11:03 .
+170a171,181
+> R1-1793270268
+> r1-finish.console.txt
+> r1-injection.console.txt
+> r1-t7-assistant.txt
+> r1-turn-01.console.txt
+> r1-turn-02.console.txt
+> r1-turn-03.console.txt
+> r1-turn-04.console.txt
+> r1-turn-05.console.txt
+> r1-turn-06.console.txt
+> r1-turn-07.console.txt

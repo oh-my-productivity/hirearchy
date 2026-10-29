@@ -1,0 +1,7 @@
+# apply_org at 2026-10-29T13:19:00.572Z; args: {"approved": true, "plan_id": "fa962d655366"}
+
+applied the change fa962d655366 to /private/tmp/hirearchy-p2/R1-1793275867/org
+defined 1 service(s): ops-action-list of lead (contract and playbook)
+warning: extend.add_services[0].deliverable.path: no agent can write to /private/tmp/hirearchy-p2/R1-1793275867/deliverables (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)
+warning: extend.add_services[0].budget: 8 runs per request covers one pass and one internal rework (the estimate is 8), not a round of your questions or a rejection, which takes about 3 more (1, plus 2 for each agent below lead): 11 per request covers one such round
+Nothing runs yet: the services are ready. When the user asks for one, call request(service, inputs) (see services()), then start() if the scheduler is not running.

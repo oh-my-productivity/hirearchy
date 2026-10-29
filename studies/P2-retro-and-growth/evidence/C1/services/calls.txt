@@ -1,0 +1,54 @@
+turn-01 2026-10-29T13:32:09Z: no org yet, services not run
+turn-02 2026-10-29T13:34:34Z: no org yet, services not run
+turn-03 start 2026-10-29T13:37:48.454091+00:00 end 2026-10-29T13:37:48.637066+00:00 exit 0 bytes 1600 product /Volumes/workspace/hirearchy/.worktrees/p2-arm-c
+  new cli-*.jsonl: 2026-10-29/cli-81622-1793281068606.jsonl  command: services 
+turn-04 start 2026-10-29T13:41:02.400228+00:00 end 2026-10-29T13:41:02.582373+00:00 exit 0 bytes 1600 product /Volumes/workspace/hirearchy/.worktrees/p2-arm-c
+  new cli-*.jsonl: 2026-10-29/cli-82510-1793281262552.jsonl  command: services 
+turn-05 start 2026-10-29T13:44:32.722693+00:00 end 2026-10-29T13:44:32.921659+00:00 exit 0 bytes 1863 product /Volumes/workspace/hirearchy/.worktrees/p2-arm-c
+  new cli-*.jsonl: 2026-10-29/cli-83575-1793281472887.jsonl  command: services 
+turn-06 start 2026-10-29T13:47:35.495672+00:00 end 2026-10-29T13:47:35.681234+00:00 exit 0 bytes 2104 product /Volumes/workspace/hirearchy/.worktrees/p2-arm-c
+  new cli-*.jsonl: 2026-10-29/cli-84751-1793281655650.jsonl  command: services 
+turn-07 start 2026-10-29T13:48:54.779475+00:00 end 2026-10-29T13:48:54.965181+00:00 exit 0 bytes 2123 product /Volumes/workspace/hirearchy/.worktrees/p2-arm-c
+  new cli-*.jsonl: 2026-10-29/cli-85464-1793281734935.jsonl  command: services 
+turn-08 start 2026-10-29T13:52:01.415286+00:00 end 2026-10-29T13:52:01.618422+00:00 exit 0 bytes 2123 product /Volumes/workspace/hirearchy/.worktrees/p2-arm-c
+  new cli-*.jsonl: 2026-10-29/cli-86669-1793281921587.jsonl  command: services 
+turn-09 start 2026-10-29T13:54:55.221672+00:00 end 2026-10-29T13:54:55.412107+00:00 exit 0 bytes 2168 product /Volumes/workspace/hirearchy/.worktrees/p2-arm-c
+  new cli-*.jsonl: 2026-10-29/cli-87769-1793282095382.jsonl  command: services 
+turn-10 start 2026-10-29T13:57:48.703831+00:00 end 2026-10-29T13:57:48.895899+00:00 exit 0 bytes 2124 product /Volumes/workspace/hirearchy/.worktrees/p2-arm-c
+  new cli-*.jsonl: 2026-10-29/cli-88907-1793282268860.jsonl  command: services 
+turn-11 start 2026-10-29T14:00:34.433262+00:00 end 2026-10-29T14:00:34.639331+00:00 exit 0 bytes 2166 product /Volumes/workspace/hirearchy/.worktrees/p2-arm-c
+  new cli-*.jsonl: 2026-10-29/cli-89992-1793282434609.jsonl  command: services 
+turn-12 start 2026-10-29T14:03:26.046207+00:00 end 2026-10-29T14:03:26.273811+00:00 exit 0 bytes 2166 product /Volumes/workspace/hirearchy/.worktrees/p2-arm-c
+  new cli-*.jsonl: 2026-10-29/cli-91209-1793282606236.jsonl  command: services 
+turn-13 start 2026-10-29T14:04:43.521038+00:00 end 2026-10-29T14:04:43.732160+00:00 exit 0 bytes 2386 product /Volumes/workspace/hirearchy/.worktrees/p2-arm-c
+  new cli-*.jsonl: 2026-10-29/cli-92042-1793282683695.jsonl  command: services 
+turn-14 start 2026-10-29T14:07:41.930633+00:00 end 2026-10-29T14:07:42.134395+00:00 exit 0 bytes 2498 product /Volumes/workspace/hirearchy/.worktrees/p2-arm-c
+  new cli-*.jsonl: 2026-10-29/cli-93534-1793282862103.jsonl  command: services 
+turn-15 start 2026-10-29T14:10:30.295221+00:00 end 2026-10-29T14:10:30.511849+00:00 exit 0 bytes 2498 product /Volumes/workspace/hirearchy/.worktrees/p2-arm-c
+  new cli-*.jsonl: 2026-10-29/cli-94716-1793283030475.jsonl  command: services 
+turn-16 start 2026-10-29T14:13:02.432303+00:00 end 2026-10-29T14:13:02.650355+00:00 exit 0 bytes 2588 product /Volumes/workspace/hirearchy/.worktrees/p2-arm-c
+  new cli-*.jsonl: 2026-10-29/cli-96019-1793283182620.jsonl  command: services 
+turn-17 start 2026-10-29T14:16:13.380491+00:00 end 2026-10-29T14:16:13.597414+00:00 exit 0 bytes 2508 product /Volumes/workspace/hirearchy/.worktrees/p2-arm-c
+  new cli-*.jsonl: 2026-10-29/cli-97441-1793283373563.jsonl  command: services 
+turn-18 start 2026-10-29T14:17:12.440197+00:00 end 2026-10-29T14:17:12.680276+00:00 exit 0 bytes 2508 product /Volumes/workspace/hirearchy/.worktrees/p2-arm-c
+  new cli-*.jsonl: 2026-10-29/cli-98291-1793283432642.jsonl  command: services 
+turn-19 start 2026-10-29T14:21:02.732253+00:00 end 2026-10-29T14:21:02.986842+00:00 exit 0 bytes 2510 product /Volumes/workspace/hirearchy/.worktrees/p2-arm-c
+  new cli-*.jsonl: 2026-10-29/cli-99940-1793283662944.jsonl  command: services 
+turn-20 start 2026-10-29T14:22:08.441560+00:00 end 2026-10-29T14:22:08.726505+00:00 exit 0 bytes 2510 product /Volumes/workspace/hirearchy/.worktrees/p2-arm-c
+  new cli-*.jsonl: 2026-10-29/cli-1273-1793283728676.jsonl  command: services 
+turn-21 start 2026-10-29T14:23:12.595960+00:00 end 2026-10-29T14:23:12.837121+00:00 exit 0 bytes 2693 product /Volumes/workspace/hirearchy/.worktrees/p2-arm-c
+  new cli-*.jsonl: 2026-10-29/cli-2307-1793283792800.jsonl  command: services 
+turn-22 start 2026-10-29T14:26:00.687952+00:00 end 2026-10-29T14:26:00.946443+00:00 exit 0 bytes 2683 product /Volumes/workspace/hirearchy/.worktrees/p2-arm-c
+  new cli-*.jsonl: 2026-10-29/cli-3892-1793283960896.jsonl  command: services 
+turn-23 start 2026-10-29T14:33:03.381071+00:00 end 2026-10-29T14:33:03.606372+00:00 exit 0 bytes 2683 product /Volumes/workspace/hirearchy/.worktrees/p2-arm-c
+  new cli-*.jsonl: 2026-10-29/cli-5747-1793284383574.jsonl  command: services 
+turn-24 start 2026-10-29T14:34:47.394333+00:00 end 2026-10-29T14:34:47.630125+00:00 exit 0 bytes 2683 product /Volumes/workspace/hirearchy/.worktrees/p2-arm-c
+  new cli-*.jsonl: 2026-10-29/cli-6848-1793284487599.jsonl  command: services 
+turn-25 start 2026-10-29T14:38:12.812160+00:00 end 2026-10-29T14:38:13.083935+00:00 exit 0 bytes 2683 product /Volumes/workspace/hirearchy/.worktrees/p2-arm-c
+  new cli-*.jsonl: 2026-10-29/cli-8566-1793284693041.jsonl  command: services 
+turn-26 start 2026-10-29T14:39:37.626866+00:00 end 2026-10-29T14:39:37.867871+00:00 exit 0 bytes 2683 product /Volumes/workspace/hirearchy/.worktrees/p2-arm-c
+  new cli-*.jsonl: 2026-10-29/cli-9565-1793284777830.jsonl  command: services 
+turn-27 start 2026-10-29T14:40:57.422598+00:00 end 2026-10-29T14:40:57.668567+00:00 exit 0 bytes 2683 product /Volumes/workspace/hirearchy/.worktrees/p2-arm-c
+  new cli-*.jsonl: 2026-10-29/cli-10666-1793284857633.jsonl  command: services 
+end start 2026-10-29T14:41:23.880717+00:00 end 2026-10-29T14:41:24.154945+00:00 exit 0 bytes 2683 product /Volumes/workspace/hirearchy/.worktrees/p2-arm-c
+  new cli-*.jsonl: 2026-10-29/cli-11118-1793284884110.jsonl  command: services 

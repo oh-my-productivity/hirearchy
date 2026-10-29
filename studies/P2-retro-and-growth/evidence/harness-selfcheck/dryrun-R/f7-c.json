@@ -1,0 +1,9 @@
+{
+ "form": "c",
+ "memo5": "20261029T120819722001-root-7c41",
+ "rejection": "20261029T120820608026-root-9cbe",
+ "trap1_rid": "R2",
+ "trap_crit": "C6",
+ "reply": "feedback reject recorded on 20261029T120819722001-root-7c41 for lead (message 20261029T120820608026-root-9cbe, source human, about C2 (not confirmed)); it does not wake lead\nThe criterion on the rejection itself (C2) is recorded as not confirmed. This rejection is R5. Next: ask the user exactly ONE yes/no question, in these words: \"About C2: add \"<the rule, in their words>\" as a lasting rule? Yes or no.\" Change nothing in this turn: an \"always ...\" in the rejection is not their yes. On yes: define_service(owner=\"lead\", name=\"weekly-memo\", add_acceptance=[\"<the rule>\"], answers=\"20261029T120820608026-root-9cbe\", about=\"C2\", words=\"<their answer, verbatim>\"). On no, a one-off or \"as it is\": feedback(task_id=\"20261029T120819722001-root-7c41\", verdict=\"reject\", confirms=\"20261029T120820608026-root-9cbe\", criterion=[\"none\"] or [\"C2\"], source=\"human\", note=\"<their answer, verbatim>\").\nRetro due: 12 verdicts of the user since the last brief (none yet). Once this delivery is settled, offer the user a retro in one line, and call retro() only after their yes.",
+ "answer": "recorded: rejection 20261029T120820608026-root-9cbe is about C6 (source human; message 20261029T120821162133-root-549c); it does not wake lead"
+}

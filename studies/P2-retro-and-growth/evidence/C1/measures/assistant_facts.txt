@@ -1,0 +1,75 @@
+# assistant facts: C1 (arm C; facts only, judged measures are not here)
+
+ask_first_copies: 3 of 13
+assistant_credits: 61.6864
+assistant_seconds: 2153
+boundary_failure_files: 0
+copies: 13
+d1_never_recorded: 0 of 2
+d23_about_differs: 0 of 3
+d23_without_reading: 0 of 3
+deliverable_notes: 0
+delivered_without_verdict: 0 of 13
+facade_refusals: 0
+flagged_items: 5
+flagged_needs_d5: 3
+flagged_never_copied: 0
+flagged_notes: 0
+flagged_questions: 5
+flagged_results: 4
+flagged_superseded: 2
+grants: 0
+hand_edits: 0 of 13
+held_replies: 0
+human_rejects: 3
+human_reworks: 5
+human_reworks_without_budget: 0
+inbox_calls: 25
+lasis_accepted: n/a (0 of 0)
+lasis_uses: 0
+lena_keep_l_budget_q: 0
+lena_yes_h4: 0
+m_c_8: 27 of 27
+memo1_turns: 5
+memo2_turns: 2
+memo3_turns: 5
+org_credits_outside: 38.7687
+org_credits_window: 2.3098
+org_runs_outside: 49
+org_runs_window: 3
+org_seconds_outside: 1620
+org_seconds_window: 98
+other_refusals: 0
+p2_refusals: 1
+p2_unrated: 1
+p4_refusals: 0
+plans: 1
+plans_with_budget_line: 0 of 1
+relayed_reworks_by_assistant: 0
+root_unread_at_end: 0
+run_end_killed: 0
+run_orphan: 0
+scheduler_signals: 0
+schedulers_assistant: 10
+schedulers_running_at_turn_end: 0 of 10
+schedulers_script: 1
+schedulers_total: 16
+schedulers_with_exit: 16 of 16
+shell_commands: 29
+shell_reads: 0
+skill_stratum: A
+sleep_entries: 27
+survival_pairs: n/a (0 of 0)
+topup_replies: 0
+turns_showing_budget_line: 0
+unexplained_signals: n/a (0 of 0)
+user_turns: 27
+wall_seconds: 4153
+wall_time: 69:13
+
+flagged items (class by D7; the D5 judgement is the scorer's):
+- 20261029T133659621367-lead-6a10 [question] case 2026-10-05: superseded (copy #29 turn 4): Marta's Due (C5): notes say "book the on-call training room for Oct 14". Oct 14 is the training date, not a booking dead
+- 20261029T133659621367-lead-6a10 [question] case 2026-10-05: superseded (copy #29 turn 4): Sam's Due (C5): "before Friday" (meeting Monday 5 Oct) is not a single clear date, so Due is "none".
+- 20261029T141533260584-lead-0dec [question] case 2026-11-02: needs D5 judgement (copy at T) (copy #137 turn 18): Lee's row: notes say "Lee will check the SSO renewal invoice against the quote on Wednesday." Due is set to 2026-11-04 (
+- 20261029T142021765823-lead-9000 [question] case 2026-11-09: needs D5 judgement (copy at T) (copy #153 turn 20): Sam's "by Friday" (C5): the memo gives Due 2026-11-13 (Friday after Monday 9 Nov). The notes say only "by Friday"; the w
+- 20261029T142513380533-lead-9b8e [question] case 2026-11-09: needs D5 judgement (copy at T) (copy #166 turn 22): Sam's "by Friday" is shown as Due 2026-11-13 (C5). The notes give the meeting date, Monday 9 Nov 2026, but no explicit d

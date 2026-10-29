@@ -1,0 +1,44 @@
+{
+ "extensions": [
+  {
+   "nominated": true,
+   "open_items": [
+    "B1.1"
+   ],
+   "plan_id": null,
+   "reason": "Retro item 1, user's answer: Yes, make it a service.",
+   "t": "2026-10-29T13:17:15.504Z"
+  },
+  {
+   "nominated": true,
+   "open_items": [
+    "B1.1"
+   ],
+   "plan_id": null,
+   "reason": "Retro item 1, the user said yes to making the one-page ops action list a standing service",
+   "t": "2026-10-29T13:17:25.860Z"
+  },
+  {
+   "nominated": true,
+   "open_items": [
+    "B1.1"
+   ],
+   "plan_id": "fa962d655366",
+   "reason": "Retro item 1, the user said yes to making the one-page ops action list a standing service",
+   "t": "2026-10-29T13:17:40.147Z"
+  }
+ ],
+ "items": {
+  "B1.1": {
+   "kind": "service",
+   "owner": "lead",
+   "taken_at": "2026-10-29T13:19:00.572000+00:00",
+   "yes_at": "2026-10-29T13:16:29+00:00"
+  }
+ },
+ "memo5_request": "2026-10-29T13:04:35.793673+00:00",
+ "unnominated": [],
+ "yes_items": {
+  "B1.1": "service"
+ }
+}

@@ -1,0 +1,14 @@
+ok  memo 4 right: trap passes
+ok  memo 4 Sam none: trap fails
+ok  memo 4 without Sam's row: trap fails
+ok  memo 1: no trap
+ok  actions-first layout read
+ok  memo 5: JD's row found under form N
+ok  F26: a version Lena rejected with a wrong date outside the trap row is exempt
+ok  F26: a version she accepted with a wrong date fails
+ok  F26: a final memo with an extra row fails; a final memo's wrong trap row under L-ASIS does not (a retro-2-done stream)
+ok  C1: a cut stream whose memo-4 final is the TRAP-N-rejected version: NOT DETERMINED (cut), not FAIL
+ok  C1: a cut stream whose last version was never judged and has a slip: NOT DETERMINED (cut), not FAIL
+ok  C1: a retro-2-done stream whose accepted final has an extra row: FAIL
+ok  C1: the same TRAP-N-rejected final with no end.txt: NOT DETERMINED (FAIL-CLOSED: the stream's end is not recorded)
+score_p2 selfcheck: 13 of 13 ok

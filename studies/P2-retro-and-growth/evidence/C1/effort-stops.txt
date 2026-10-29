@@ -1,0 +1,28 @@
+turn 1: effort stops 0 of 0 run logs (none); cmd without --effort high 0; 'failed to set effort' 0
+turn 2: effort stops 0 of 0 run logs (none); cmd without --effort high 0; 'failed to set effort' 0
+turn 3: effort stops 1 of 4 run logs (lead/writer/runs/20261029T133549207363.log); cmd without --effort high 0; 'failed to set effort' 1
+turn 4: effort stops 1 of 7 run logs (lead/writer/runs/20261029T133549207363.log); cmd without --effort high 0; 'failed to set effort' 1
+turn 5: effort stops 1 of 10 run logs (lead/writer/runs/20261029T133549207363.log); cmd without --effort high 0; 'failed to set effort' 1
+turn 6: effort stops 1 of 13 run logs (lead/writer/runs/20261029T133549207363.log); cmd without --effort high 0; 'failed to set effort' 1
+turn 7: effort stops 1 of 13 run logs (lead/writer/runs/20261029T133549207363.log); cmd without --effort high 0; 'failed to set effort' 1
+turn 8: effort stops 1 of 16 run logs (lead/writer/runs/20261029T133549207363.log); cmd without --effort high 0; 'failed to set effort' 1
+turn 9: effort stops 1 of 19 run logs (lead/writer/runs/20261029T133549207363.log); cmd without --effort high 0; 'failed to set effort' 1
+turn 10: effort stops 1 of 22 run logs (lead/writer/runs/20261029T133549207363.log); cmd without --effort high 0; 'failed to set effort' 1
+turn 11: effort stops 1 of 25 run logs (lead/writer/runs/20261029T133549207363.log); cmd without --effort high 0; 'failed to set effort' 1
+turn 12: effort stops 1 of 28 run logs (lead/writer/runs/20261029T133549207363.log); cmd without --effort high 0; 'failed to set effort' 1
+turn 13: effort stops 1 of 28 run logs (lead/writer/runs/20261029T133549207363.log); cmd without --effort high 0; 'failed to set effort' 1
+turn 14: effort stops 2 of 32 run logs (lead/runs/20261029T140628783814.log, lead/writer/runs/20261029T133549207363.log); cmd without --effort high 0; 'failed to set effort' 2
+turn 15: effort stops 2 of 35 run logs (lead/runs/20261029T140628783814.log, lead/writer/runs/20261029T133549207363.log); cmd without --effort high 0; 'failed to set effort' 2
+turn 16: effort stops 2 of 38 run logs (lead/runs/20261029T140628783814.log, lead/writer/runs/20261029T133549207363.log); cmd without --effort high 0; 'failed to set effort' 2
+turn 17: effort stops 3 of 42 run logs (lead/runs/20261029T140628783814.log, lead/writer/runs/20261029T133549207363.log, lead/writer/runs/20261029T141422712537.log); cmd without --effort high 0; 'failed to set effort' 3
+turn 18: effort stops 3 of 42 run logs (lead/runs/20261029T140628783814.log, lead/writer/runs/20261029T133549207363.log, lead/writer/runs/20261029T141422712537.log); cmd without --effort high 0; 'failed to set effort' 3
+turn 19: effort stops 4 of 46 run logs (lead/runs/20261029T140628783814.log, lead/runs/20261029T141837889844.log, lead/writer/runs/20261029T133549207363.log, lead/writer/runs/20261029T141422712537.log); cmd without --effort high 0; 'failed to set effort' 4
+turn 20: effort stops 4 of 46 run logs (lead/runs/20261029T140628783814.log, lead/runs/20261029T141837889844.log, lead/writer/runs/20261029T133549207363.log, lead/writer/runs/20261029T141422712537.log); cmd without --effort high 0; 'failed to set effort' 4
+turn 21: effort stops 4 of 46 run logs (lead/runs/20261029T140628783814.log, lead/runs/20261029T141837889844.log, lead/writer/runs/20261029T133549207363.log, lead/writer/runs/20261029T141422712537.log); cmd without --effort high 0; 'failed to set effort' 4
+turn 22: effort stops 4 of 49 run logs (lead/runs/20261029T140628783814.log, lead/runs/20261029T141837889844.log, lead/writer/runs/20261029T133549207363.log, lead/writer/runs/20261029T141422712537.log); cmd without --effort high 0; 'failed to set effort' 4
+turn 23: effort stops 4 of 49 run logs (lead/runs/20261029T140628783814.log, lead/runs/20261029T141837889844.log, lead/writer/runs/20261029T133549207363.log, lead/writer/runs/20261029T141422712537.log); cmd without --effort high 0; 'failed to set effort' 4
+turn 24: effort stops 4 of 49 run logs (lead/runs/20261029T140628783814.log, lead/runs/20261029T141837889844.log, lead/writer/runs/20261029T133549207363.log, lead/writer/runs/20261029T141422712537.log); cmd without --effort high 0; 'failed to set effort' 4
+turn 25: effort stops 4 of 52 run logs (lead/runs/20261029T140628783814.log, lead/runs/20261029T141837889844.log, lead/writer/runs/20261029T133549207363.log, lead/writer/runs/20261029T141422712537.log); cmd without --effort high 0; 'failed to set effort' 4
+turn 26: effort stops 4 of 52 run logs (lead/runs/20261029T140628783814.log, lead/runs/20261029T141837889844.log, lead/writer/runs/20261029T133549207363.log, lead/writer/runs/20261029T141422712537.log); cmd without --effort high 0; 'failed to set effort' 4
+turn 27: effort stops 4 of 52 run logs (lead/runs/20261029T140628783814.log, lead/runs/20261029T141837889844.log, lead/writer/runs/20261029T133549207363.log, lead/writer/runs/20261029T141422712537.log); cmd without --effort high 0; 'failed to set effort' 4
+turn end: effort stops 4 of 52 run logs (lead/runs/20261029T140628783814.log, lead/runs/20261029T141837889844.log, lead/writer/runs/20261029T133549207363.log, lead/writer/runs/20261029T141422712537.log); cmd without --effort high 0; 'failed to set effort' 4

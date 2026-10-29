@@ -1,0 +1,7 @@
+# roles (protocol 4.1), recorded by the stream step as they appear
+[A-crit] = C9 (added by the answer to R1 at turn 6: "Every memo starts with a one-line 'Summary:' of the meeting, then the Decisions, then the Actions; the Summary line is the one thing allowed besides decisions and actions."; contract v2). C1 ("covers only ...") stays in force. Source: services/turn-06.txt.
+[trap-crit] = (not yet)
+[widened] = (not yet)
+[order-new] = (not yet)
+[study service] = weekly-meeting-memo (lead)
+[list service] = (not yet)

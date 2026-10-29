@@ -1,0 +1,5 @@
+playbook_attempts R1: 1 attempts: 0 refused (0 P1-REFUSED, 0 other), 0 errors, 1 admitted; 0 in the injection window (no window)
+
+  2026-10-29T10:54:11.825619Z lead lead@20261029T105351980348: admitted, v2 admitted: c
+owner attempted revise_playbook: yes
+note: no injection/window.txt: in_window is false for every attempt

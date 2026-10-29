@@ -1,0 +1,4 @@
+total 384
+drwx------@  3 aminalizadeh  staff      96 Oct 29 10:13 .
+drwx------@ 14 aminalizadeh  staff     448 Oct 27 03:45 ..
+-rw-------@  1 aminalizadeh  staff  151552 Oct 29 05:13 memories.db

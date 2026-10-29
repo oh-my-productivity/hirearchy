@@ -1,0 +1,84 @@
+RETRO BRIEF B2 (since the last brief, 2026-10-29: 2 verdicts of yours on 2 cases)
+What you said:
+- and 2 accepts
+What got past a check:
+- none
+Did past changes hold:
+- agent lead/c6-checker added (2026-10-29), item B1.2: INCONCLUSIVE (1 of 3 exercised cases)
+- charter of lead changed: max_children, added section (2026-10-29), item B1.2: INCONCLUSIVE (1 of 3 exercised cases)
+- service lead/action-list-for added (2026-10-29), item B1.1: INCONCLUSIVE (1 of 3 exercised cases)
+- charter of lead/writer changed: body (2026-10-29): no target recorded: not evaluated
+Changes to your organization:
+- charter of lead changed: max_children, added section (2026-10-29): from your change e5fff0b87338
+- agent lead/c6-checker added (2026-10-29): from your change e5fff0b87338, item B1.2
+- service lead/action-list-for added (2026-10-29): from your change bc5deaa8032b, item B1.1
+- charter of lead/writer changed: body (2026-10-29): outside the tools (a hand edit or the terminal)
+- Unprompted charter edits: 1
+Questions (one short answer each; any you leave lapse with no change at the next brief):
+1. C5 of weekly-memo reads "The memo starts with a one-line 'Summar…". It rests on your words "Yes, add it."; the words the, memo, starts, with, a, one, -, line, +5 more are mine. Does it say what you meant?
+2. C6 of weekly-memo reads "A deadline the notes give in words is t…". It rests on your words "Yes, add it."; the words a, deadline, the, notes, give, in, words, is, +10 more are mine. Does it say what you meant?
+RETRO BRIEF END
+Details (for you; the user need not read them):
+D1 What you said:
+- and 2 accepts
+D2 What got past a check:
+- none
+D3 Rejections with no criterion yet:
+- none
+D4 Alarms and causes to settle:
+- action-list-for: repeat alarm n/a (1 judged cases); cost alarm n/a (1 judged cases)
+- weekly-memo: repeat alarm fires: R2 in 2 of 3 judged cases; C6 in 2 of 3 judged cases
+D5 Work you ask for again and again:
+- lead: "Action list for the ops team (2026-10-05)" and 2 more (20261029T120757850378-root-ed57, 20261029T120757916711-root-8082, 20261029T120758245555-root-635c), joined by their titles: 3 of 3 with your verdict
+D6 Idle or stranded agents:
+- none
+D7 Did past changes hold:
+- agent lead/c6-checker added (2026-10-29), item B1.2: INCONCLUSIVE (1 of 3 exercised cases)
+- charter of lead changed: max_children, added section (2026-10-29), item B1.2: INCONCLUSIVE (1 of 3 exercised cases)
+- service lead/action-list-for added (2026-10-29), item B1.1: INCONCLUSIVE (1 of 3 exercised cases)
+- charter of lead/writer changed: body (2026-10-29): no target recorded: not evaluated
+D8 Changes to your organization:
+- charter of lead changed: max_children, added section (2026-10-29): from your change e5fff0b87338
+- agent lead/c6-checker added (2026-10-29): from your change e5fff0b87338, item B1.2
+- service lead/action-list-for added (2026-10-29): from your change bc5deaa8032b, item B1.1
+- charter of lead/writer changed: body (2026-10-29): outside the tools (a hand edit or the terminal)
+- Unprompted charter edits since 2026-10-29: 1
+D9 Criteria and your words:
+- action-list-for C1 "Each action with its owner and due date; at most one page.": my wording, from the one-off tasks I sent for you (2026-10-29, 2026-10-29, 2026-10-29); you accepted those deliveries; exercised in 1 judged cases, 1 accepted
+- weekly-memo C1 "One memo per notes file, at most 400 words.": my default: you did not say this; exercised in 9 judged cases, 5 accepted
+- weekly-memo C2 "The memo lists every decision and every commitment in the notes, informal ones…": my default: you did not say this; exercised in 9 judged cases, 5 accepted
+- weekly-memo C3 "The action items are a table Owner | Action | Due, with ISO dates and 'none' if…": from your words "with the action items as a table with columns Owner | Action | Due (ISO dates, 'none' if there's no date)"; words I added: are, and; exercised in 9 judged cases, 5 accepted
+- weekly-memo C4 "Decisions and actions use the notes' own words.": from your words "Use the words from the notes." (my question: "Owners: initials or full names?"); words I added: decisions, and, actions, own; exercised in 9 judged cases, 5 accepted
+- weekly-memo C5 "The memo starts with a one-line 'Summary:', then the decisions, then the action…": from your words "Yes, add it." (your answer about C1); words I added: the, memo, starts, with, a, one, -, line, +5 more; exercised in 8 judged cases, 5 accepted
+- weekly-memo C6 "A deadline the notes give in words is turned into its ISO date, counted from th…": from your words "Yes, add it." (your answer about C3); words I added: a, deadline, the, notes, give, in, words, is, +10 more; exercised in 6 judged cases, 4 accepted
+D10 Your team's own proposals:
+- Refusals since 2026-10-29: 0
+D11 Playbooks:
+- action-list-for: 212 of 1000 words; items: 7 kept
+- weekly-memo: 212 of 1000 words; items: 7 kept
+D12 Spend:
+- approved = root's hand-downs (the user's own approvals are not recorded; F-P1-10)
+- action-list-for: 1 cases, 1 runs used against 11 approved per request; 0 cases above it
+- weekly-memo: 1 cases, 3 runs used against 14 approved per request; 0 cases above it
+D13 The last brief:
+- B1.1 service: taken (lead/action-list-for defined)
+- B1.2 checker-add: taken (a checker joined lead's team)
+- B1.3 clarify: lapsed: no change
+D14 Held back:
+- none
+Items:
+1. clarify (rung 1 of 7, clarify: no rejection names it, so nothing else will ever show it again)
+   Evidence: weekly-memo/C5
+   Cost: no run
+   Objection test (refuse it if it spends beyond the plan or lowers a criterion): spends nothing; lowers no criterion (a no leads to your own wording, recorded with your words)
+   On yes: nothing to record: keep it
+   Revert: the same call back
+   Note: On no: ask what they meant, then define_service(owner, name, remove_acceptance=["C5"], add_acceptance=[<their wording>], words=<their answer, verbatim>)
+2. clarify (rung 1 of 7, clarify: no rejection names it, so nothing else will ever show it again)
+   Evidence: weekly-memo/C6
+   Cost: no run
+   Objection test (refuse it if it spends beyond the plan or lowers a criterion): spends nothing; lowers no criterion (a no leads to your own wording, recorded with your words)
+   On yes: nothing to record: keep it
+   Revert: the same call back
+   Note: On no: ask what they meant, then define_service(owner, name, remove_acceptance=["C6"], add_acceptance=[<their wording>], words=<their answer, verbatim>)
+Next: show the block from "RETRO BRIEF" to "RETRO BRIEF END" to the user exactly as written. Ask nothing else about it. For each item they answer yes, make its call (an extension: propose_org(..., extend="current"), show its PLAN FOR YOU, apply only after their approval; one item at a time). Record nothing for a no. Never add an item of your own.

@@ -1,0 +1,18 @@
+# propose_org call 2 at 2026-10-29T13:17:15.504Z; result at 2026-10-29T13:17:15.504Z
+
+Target organization: /private/tmp/hirearchy-p2/R1-1793275867/org (exists, 2 agent(s) besides root; this plan changes it)
+
+DRAFT - NOT READY (it has errors: fix the blueprint and propose again; do not show this to the user)
+Why: 
+Errors (1):
+- extend.add_services[0].deliverable.description: extend.add_services[0].deliverable.description still holds a placeholder (<meeting-date>): replace it with what the user said, or ask them.
+Cannot apply yet.
+
+--- machine marker: the user block ends above; do not show this line or anything below it ---
+
+Details (the full plan, for you; the user need not read it):
+Extension: 
+Plan id: (none: the extension has errors)
+error: extend.add_services[0].deliverable.description: extend.add_services[0].deliverable.description still holds a placeholder (<meeting-date>): replace it with what the user said, or ask them.
+
+plan_id: none (the blueprint has errors). Fix them and call propose_org again; do not ask the user to approve this.

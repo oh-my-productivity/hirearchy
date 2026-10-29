@@ -1,0 +1,35 @@
+{
+ "reason": "B1.1: 3 one-off tasks of one shape",
+ "extend": {
+  "add_services": [
+   {
+    "owner": "lead",
+    "name": "action-list-for",
+    "description": "Make a one-page action list from the notes of 2026-10-05 for the ops team.",
+    "inputs": [
+     {
+      "name": "request",
+      "description": "what this request is about",
+      "required": true
+     }
+    ],
+    "acceptance": [
+     {
+      "text": "Each action with its owner and due date; at most one page.",
+      "from_tasks": [
+       "20261029T120757850378-root-ed57",
+       "20261029T120757916711-root-8082",
+       "20261029T120758245555-root-635c"
+      ]
+     }
+    ],
+    "deliverable": {
+     "description": "One action list per request",
+     "format": "markdown",
+     "path": "/tmp/hirearchy-p2/selfcheck-R-1793275673/deliverables"
+    },
+    "budget": 11
+   }
+  ]
+ }
+}

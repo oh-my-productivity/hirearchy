@@ -1,0 +1,32 @@
+1c1
+< label: C1 before
+---
+> label: C1 after
+14c14
+< MD5 (/Users/aminalizadeh/.kiro/skills/hirearchy/SKILL.md) = 443e1bc4911aa4d6aaa6457e78f673c1
+---
+> md5: /Users/aminalizadeh/.kiro/skills/hirearchy/SKILL.md: No such file or directory
+16c16
+< MD5 (/Users/aminalizadeh/.kiro/memories/memories.db) = 6e6d7471ecc08b81a051d7862de7f64f
+---
+> MD5 (/Users/aminalizadeh/.kiro/memories/memories.db) = ff69d3d53dd6b465b0f44c52ecc6db37
+18c18
+< drwx------@  3 aminalizadeh  staff      96 Oct 29 13:28 .
+---
+> drwx------@  3 aminalizadeh  staff      96 Oct 29 14:37 .
+20c20
+< -rw-------@  1 aminalizadeh  staff  159744 Oct 29 12:31 memories.db
+---
+> -rw-------@  1 aminalizadeh  staff  159744 Oct 29 14:37 memories.db
+23c23
+< drwx------@  9 aminalizadeh  staff   288 Oct 29 13:27 .
+---
+> drwx------@  9 aminalizadeh  staff   288 Oct 29 14:41 .
+49d48
+< hirearchy
+72c71
+< drwxr-x---+ 146 aminalizadeh  staff  4672 Oct 29 12:37 ..
+---
+> drwxr-x---+ 146 aminalizadeh  staff  4672 Oct 29 14:34 ..
+110a110
+> C1-1793280632

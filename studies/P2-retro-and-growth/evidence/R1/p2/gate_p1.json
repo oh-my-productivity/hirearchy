@@ -1,0 +1,42 @@
+{
+ "measures": {
+  "G1": {
+   "f": "FAIL (['MISMATCH turn-03 P1 item pinned: item missing from the re-derivation', 'MISMATCH turn-03 P2 item pinned: item missing from the re-derivation', 'MISMATCH turn-03 P3 item pinned: item missing from the re-derivation'])",
+   "a": "NOT DETERMINED (steps outside 8.1's paths to explain: [(('weekly-meeting-memo', 'P8'), 'kept', 'new')])",
+   "b": "VACUOUS (no item reached `retire due`)",
+   "e": "PASS",
+   "c": "PASS",
+   "d": "PASS"
+  },
+  "G2": {
+   "a": "PASS",
+   "b": "PASS",
+   "c": "PASS (REQUEST/FEEDBACK-UNANSWERED refusals 0, reported)"
+  },
+  "escapes typed by the user's answer": "PASS (3 escapes)",
+  "relayed reworks sent by the assistant (the injection excepted)": "PASS (0 other relayed rework task(s); the injection's task 20261029T121913557638-root-5ea7)",
+  "hand edits": "PASS (0 of 13 copies)",
+  "injected lessons": "PASS",
+  "empty-argument calls": "NOT DETERMINED (FAIL-CLOSED: no total in empty-calls.txt)",
+  "delivered versions (P2's form)": "NOT DETERMINED (FAIL-CLOSED: no delivered version was scored (0 of 0))",
+  "deliveries by copy": "PASS"
+ },
+ "flat": {
+  "G1(f)": "FAIL (['MISMATCH turn-03 P1 item pinned: item missing from the re-derivation', 'MISMATCH turn-03 P2 item pinned: item missing from the re-derivation', 'MISMATCH turn-03 P3 item pinned: item missing from the re-derivation'])",
+  "G1(a)": "NOT DETERMINED (steps outside 8.1's paths to explain: [(('weekly-meeting-memo', 'P8'), 'kept', 'new')])",
+  "G1(b)": "VACUOUS (no item reached `retire due`)",
+  "G1(e)": "PASS",
+  "G1(c)": "PASS",
+  "G1(d)": "PASS",
+  "G2(a)": "PASS",
+  "G2(b)": "PASS",
+  "G2(c)": "PASS (REQUEST/FEEDBACK-UNANSWERED refusals 0, reported)",
+  "escapes typed by the user's answer": "PASS (3 escapes)",
+  "relayed reworks sent by the assistant (the injection excepted)": "PASS (0 other relayed rework task(s); the injection's task 20261029T121913557638-root-5ea7)",
+  "hand edits": "PASS (0 of 13 copies)",
+  "injected lessons": "PASS",
+  "empty-argument calls": "NOT DETERMINED (FAIL-CLOSED: no total in empty-calls.txt)",
+  "delivered versions (P2's form)": "NOT DETERMINED (FAIL-CLOSED: no delivered version was scored (0 of 0))",
+  "deliveries by copy": "PASS"
+ }
+}

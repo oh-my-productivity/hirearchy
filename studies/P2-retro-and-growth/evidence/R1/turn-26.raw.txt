@@ -1,0 +1,11 @@
+I recorded your OK on the 9 November action list. Nothing else is open.
+
+**Everything delivered** is in `/private/tmp/hirearchy-p2/R1-1793275867/deliverables/`:
+- **Memos:** for 2026-10-05, 10-12, 10-19, 10-26, 11-02 and 11-09.
+- **Ops action lists:** for 2026-10-05, 10-12, 10-19 and 11-09.
+
+Memos for the earlier meetings still use the old section order (Decisions before Action items). Tell me if you want any of them redone in the new order.
+
+**Standing services:** to run one, give me the notes file name.
+- `weekly-meeting-memo`: up to 12 runs per request.
+- `ops-action-list`: up to 8 runs per request.

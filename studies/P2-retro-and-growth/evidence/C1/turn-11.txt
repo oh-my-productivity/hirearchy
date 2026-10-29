@@ -1,0 +1,32 @@
+######## TURN 11  start 13:58:05  end 14:00:12  elapsed 127s  (local, 2026-10-29; UTC wall-clock start 2026-10-29T13:58:05Z end 2026-10-29T14:00:12Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Keep it. I don't know anything about that rework - I didn't ask for it. Now 2026-10-19.md please. I'll wait.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-11.stderr.txt):
+The memo for 19 October is done, but I haven't copied it to `deliverables`. Two Due cells depend on how you want vague phrases read, and you set the precedent last time with "before Friday". Both currently show "none".
+
+- **Lee, sign off the SSO renewal.** The notes say "probably by end of next week". The meeting was Monday 19 October, so that points to Friday 2026-10-30. The "probably" hedges it. Use 2026-10-30, or keep "none"?
+- **Sam, pair with Jo on the CI pipeline.** The notes say "during that first week", meaning Jo's first week, which starts Monday 26 October. That is a span, not a single day. I'd keep "none", unless you want 2026-10-30 (the end of that week).
+
+Here is the draft:
+
+```
+Summary: Platform team weekly, Monday 19 October 2026 (Present: Priya, Sam, Lee, Marta, Dev): decided to go ahead with the demo without the rate limiter, to renew with the current SSO vendor for twelve months, and to move this weekly to Monday 14:00; six action items.
+
+## Decisions
+- Go ahead with the customer demo but leave the rate limiter out of it.
+- Renew with the current SSO vendor for twelve months and revisit the market next year.
+- Move this weekly from Monday 10:00 to Monday 14:00, starting with the meeting on 26 October.
+
+## Actions
+| Owner  | Action                                                                  | Due        |
+| Marta  | Keep the agenda as sent                                                 | none       |
+| Lee    | Sign off on the renewal once legal replies, probably by end of next week| none       |
+| Marta  | Collect demo feedback and circulate it                                  | 2026-10-23 |
+| Dev    | Remove the deploy freeze in the pipeline config                         | 2026-10-24 |
+| Priya  | Present the rate limiter benchmark results at the next meeting on Oct 26| 2026-10-26 |
+| Sam    | Pair with Jo (not in attendee list) on the CI pipeline during that first week | none |
+```
+
+I checked it against `2026-10-19.md`. It has 3 of 3 decisions and 6 of 6 commitments, the Summary comes first, and it is 169 words. Jo is marked "not in attendee list" because Jo is named in the notes but isn't in the Present line.
+
+Tell me your answers and I'll send it back for the change. That costs about 3 more runs, within the 12.
