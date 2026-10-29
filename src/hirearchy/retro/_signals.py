@@ -24,6 +24,7 @@ CALL = 'propose_org(blueprint=<the blueprint of this item>, extend="current")'
 SLACK = Fraction(5, 4)  # the largest case of a repeated task, plus 25%
 FIX_RUNS = 3  # the runs of an in-team fix when it finds the defect (the author's fix, the re-check, the owner's routing)
 LINE_MAX = 300
+CLARIFY_QUOTE = 40  # the characters of each quotation in a clarify question, so that the question stays under 300
 ASK_NONE = 'About <its id>: add "<the rule, in their words>" as a lasting rule? Yes or no.'  # Phase 1's question when root has no reading yet
 
 
@@ -268,12 +269,12 @@ def clarify_items(rows: Sequence[Sourced], thresholds: RetroThresholds) -> tuple
         words_of_root = c.kind in ("user", "amendment") and len(c.added) >= thresholds.added_words
         if not (words_of_root or c.kind == "tasks") or c.accepted < thresholds.accepted_cases:
             continue
-        text = quoted(c.text)
+        text = quoted(c.text, CLARIFY_QUOTE)
         if c.kind == "tasks":
             question = f'{c.id} of {c.service} reads "{text}": I wrote it for your one-off tasks. Does it say what you meant?'
         else:
-            asked = f', your answer to "{quoted(c.asked)}"' if c.kind == "user" and c.asked else ""
-            question = f'{c.id} of {c.service} reads "{text}". It rests on your words "{quoted(c.quote)}"{asked}; the words {listed_added_words(c.added)} are mine. Does it say what you meant?'
+            asked = f', your answer to "{quoted(c.asked, CLARIFY_QUOTE)}"' if c.kind == "user" and c.asked else ""
+            question = f'{c.id} of {c.service} reads "{text}". It rests on your words "{quoted(c.quote, CLARIFY_QUOTE)}"{asked}; the words {listed_added_words(c.added)} are mine. Does it say what you meant?'
         items.append(Item(
             "clarify", f"clarify|{c.service}|{c.id}|{line_key(c.text)[:40]}", (f"{c.service}/{c.id}",), 0, 1, "no rejection names it, so nothing else will ever show it again", question,
             "nothing to record: keep it", "the same call back", "no run", "spends nothing; lowers no criterion (a no leads to your own wording, recorded with your words)",

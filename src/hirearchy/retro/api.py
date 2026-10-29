@@ -32,6 +32,8 @@ __all__ = [
     "RetroRecords",
     "RetroThresholds",
     "Section",
+    "brief_json",
+    "render_brief",
     "retro_thresholds",
 ]
 
@@ -195,4 +197,5 @@ class RetroRecords(Protocol):
 
 
 # Pure rules re-exported from their modules; they import the types above, so these imports come last.
+from ._render import brief_json, render_brief  # noqa: E402
 from ._thresholds import retro_thresholds  # noqa: E402

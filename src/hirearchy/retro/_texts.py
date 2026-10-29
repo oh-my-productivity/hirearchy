@@ -62,3 +62,22 @@ def cause_question(ref: str, service: str, when: datetime | None, words: str, ki
     if kind == "untyped":
         return CAUSE_UNTYPED.format(ref=ref, service=service, date=day(when), words=quoted(words))
     return CAUSE_DISPUTED.format(ref=ref, service=service, type=kind, also=", ".join(also), type_words=TYPE_WORDS.get(kind, kind))
+
+
+# The texts of the brief (design 4.7), word for word.
+HEADING = "RETRO BRIEF {id} ({since_words}: {v} verdicts of yours on {c} cases)"
+HEADING_AGAIN = "RETRO BRIEF {id} (shown again: no verdict of yours since {at}, so nothing new is recorded)"
+BLOCK_END = "RETRO BRIEF END"
+QUESTIONS = "Questions (one short answer each; any you leave lapse with no change at the next brief):"
+QUESTIONS_AGAIN = "Questions (from {id}; still open unless marked taken):"
+NO_QUESTIONS = "Questions: none this time."
+NO_ITEMS = "Items: none (held back: {k})."
+PROPOSALS = "Your team's own proposals (team-written; they change nothing): {n}"
+DETAILS = "Details (for you; the user need not read them):"
+OBJECTION = "Objection test (refuse it if it spends beyond the plan or lowers a criterion): {result}"
+NEXT = (
+    'Next: show the block from "RETRO BRIEF" to "RETRO BRIEF END" to the user exactly as written. Ask nothing else about it. For each item they answer yes, make its call '
+    '(an extension: propose_org(..., extend="current"), show its PLAN FOR YOU, apply only after their approval; one item at a time). Record nothing for a no. '
+    "Never add an item of your own."
+)
+LEDGER_NOTES = ("The record of earlier briefs cannot be read", "This brief was not recorded")  # the notes the user's block carries
