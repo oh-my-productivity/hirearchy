@@ -207,6 +207,8 @@ other than the owner contains the path literal in a write call (`write_text`, `a
 | `<state>/kiro-cwd/<org-id>/**` | `kiro` (`FsKiroState`: the empty working directory of each run) | - |
 | `~/.kiro/skills/hirearchy/SKILL.md` | `skill` (`FsSkillStore`) | - |
 
+**`RETIRED.md` (phase 2a).** The record of a retire (retired, by, reason, approved_in) is written inside the moved tree by `agents` (`FsAgentRegistry.archive`, under `.retired/**`) and inside a retired service copy by `services` (`FsServiceStore.retire`, under `<owner>/services/.retired/**`): the same writers as their rows. `retro` reads the copies through its own port `ServiceRetirements`, implemented in `app`.
+
 **Creator exceptions** (directories and empty files, never content), listed in `ownership.py` so the test knows them: `agents` creates the agent
 skeleton (`inbox/ inflight/ read/ sent/ work/ runs/`, empty `MEMORY.md`) at `create`, and `bootstrap` creates the root's four boxes and `.runtime/` at `init`; after
 creation the owner in the table is the only writer of content.
@@ -352,6 +354,9 @@ class OrgDocumentStore(Protocol):
 
 class EventSwitch(Protocol):
     def enabled(self) -> bool: """False when ORG.md is missing or events: false; re-read only when ORG.md changes (stat stamp)."""
+
+class OrgLimits(Protocol):   # phase 2a: the one writer of ORG.md's structural key, beside the document store
+    def set_max_depth(self, value: int) -> int: """Rewrite max_depth in ORG.md's settings block, every other key and the body byte for byte; returns the old value. The one way an extension changes the depth, so `settings` stays ORG.md's only writer."""
 ```
 Impl: `FsOrgSettings(OrgSettings, OrgDocumentStore)`, `CachingOrgSettings(OrgSettings)` (decorator, stamp cache; replaces
 `LenientOrg.config`), `StampedEventSwitch(EventSwitch)`; fakes `MemoryOrgSettings`.
@@ -393,6 +398,7 @@ class OrgHistory(Protocol):   # phase 0a.2: read-only questions to the commits a
     def text(self, commit: str, path: str, limit: int) -> bytes | None: """The bytes of the file at commit; None when absent, not a file or larger than limit."""
     def head(self) -> str | None: """The commit HEAD names now."""
     def changes(self, paths: Sequence[str], limit: int) -> list[Change] | None: """Phase 0b: the newest `limit` commits that changed some of the paths, newest first, one `Change(commit, when, path)` per path of a commit that is among the asked ones; [] for no path; None without a repository, git or an answer."""
+    def subject(self, commit: str) -> str | None: """Phase 2a: the first line of the commit's message; None when it cannot be read."""
 ```
 Impl: `GitOrgSnapshotter(GitClient)`, `FsIgnoreList(OrgPaths, AtomicWriter)`, `SubprocessGit(GitClient)` (every git call has a 2 s timeout and reads paths literally), `GitOrgHistory(GitClient, OrgLayout)`; fakes `RecordingGit`, `MemoryIgnoreList`, `MemoryOrgHistory`.
 The pure `blob_id(data, hexlen=40)` is the object id `git hash-object` gives (sha1 for 40, sha256 for 64). `OrgHistory` is the runtime field `org_history`; `reflection` reaches it only through `app`'s `GitCheckedVersions` and `GitBarHistory` (3.22). Phase 0b adds `Change(commit, when, path)` (a `NamedTuple`, exported), `OrgHistory.changes` (5 methods) and `GitClient.log` (8 methods, R7's maximum): `SubprocessGit.log` drops the paths that fail `is_history_path`, runs git with `cwd=root` and the 2 s timeout, and `GitOrgHistory.changes` parses each record (a 40- or 64-hex commit, an ISO time) and skips one that does not parse; the fakes `RecordingGit` and `MemoryOrgHistory` gain `log` and `changes`.
@@ -502,7 +508,7 @@ class CharterReader(Protocol):
 class AgentRegistry(Protocol):
     def create(self, addr: str, meta: Mapping[str, object], charter_text: str) -> None: """Directory skeleton, empty MEMORY.md, AGENT.md."""
     def rewrite_charter(self, addr: str, text: str) -> None: """Replace AGENT.md (callers did all authority checks)."""
-    def archive(self, addr: str, stamp: str) -> str: """Move to .retired/<addr with . for />-<stamp>; returns that name."""
+    def archive(self, addr: str, stamp: str, record: Mapping[str, str] | None = None) -> str: """Move to .retired/<addr with . for />-<stamp>; returns that name. Phase 2a: a `record` (retired, by, reason, approved_in) is written as `RETIRED.md` in the moved tree."""
 
 @dataclass(frozen=True)
 class RetiredTree: name: str; top_level: bool; path: Path   # + the property addr: the retired agent's address read from the name (the one rule that names a tree)
@@ -512,6 +518,9 @@ class RetiredArchive(Protocol):
     def run_count(self) -> int: """Run logs inside retired trees (today's review.retired_runs)."""
     def unspent_budget(self, tree: RetiredTree) -> int: """received - sent - runs of every agent dir inside the tree."""
     def credited(self) -> int: """Runs the runtime gave back with run credits (3.1) in the received boxes of every agent dir of every retired tree (phase 0a.2)."""
+    def record(self, tree: RetiredTree) -> Mapping[str, str]: """Phase 2a: the tree's `RETIRED.md` (retired, by, reason, approved_in); {} for a tree retired before it was kept."""
+    def memory(self, tree: RetiredTree, addr: str) -> str: """Phase 2a: MEMORY.md of an agent inside the tree, or ''."""
+    def results(self, tree: RetiredTree, addr: str) -> list[Message]: """Phase 2a: the results (reports) in the sent box of an agent inside the tree, oldest first."""
 ```
 Impl: `FsAgentDirectory`, `FsCharterReader`, `FsAgentRegistry(AtomicWriter)`, `FsRetiredArchive`; fake `MemoryAgents`
 (implements all four). `dashdata`'s wiring adds the decorators `CachingAgentDirectory` and `LenientCharterReader` (replace `LenientOrg.children/charter`).
@@ -755,13 +764,13 @@ class Retired(NamedTuple): addr: str; refunded: int; refunded_to: str | None
 class Hiring(Protocol):
     def hire(self, actor: str, name: str, role: str, charter: str, *, model: str | None = None, tools: Sequence[str] | None = None,
              can_hire: bool = False, max_children: int = 5, workspace: str | None = None, inputs: Sequence[str] | None = None,
-             approved: bool = False) -> str:
+             approved: bool = False, kind: str | None = None, approved_in: str | None = None) -> str:
         """Create a direct report; returns its address. Emits agent.hire. A report without `can_hire` gets `max_children` 0. A hirer other than root may not grant
         `can_hire` nor a `max_children` above its own unless `approved` (a person's decision: the blueprint applier, the CLI and the `Org` facade pass it, no MCP tool)."""
 
 class Retirement(Protocol):
     def retire(self, actor: str, name: str, reason: str) -> str: """retire_team(...).addr."""
-    def retire_team(self, actor: str, name: str, reason: str) -> Retired: """Fail the team's open tasks upward, refund unspent budget to the parent, archive, emit agent.retire."""
+    def retire_team(self, actor: str, name: str, reason: str, approved_in: str = "") -> Retired: """Fail the team's open tasks upward, refund unspent budget to the parent, archive (with RETIRED.md), emit agent.retire. Phase 2a: an agent may not retire a report that checks its team (`kind: verifier`); `approved_in` is the plan or change that approved a retire."""
 ```
 Impl: `RuleHiring(AgentDirectory, CharterReader, AgentRegistry, AgentSlots, OrgSettings, DocumentTemplates, AccessScopes, AuthorityPolicy, ModelResolver,
 Clock, EventSink)`, `RuleRetirement(AgentDirectory, AgentRegistry, TaskQuery, BudgetQuery, MessageDelivery, Notices, Clock, EventSink)`; `Retired` is defined in
@@ -822,7 +831,7 @@ class ServiceStore(Protocol):   # port: the files of one owner's services
     def read_playbook(self, owner: str, name: str) -> tuple[JsonObject, str] | None: ...
     def write_contract(self, owner: str, name: str, meta: JsonObject, body: str, archive_version: int | None) -> str: """Archive the old one as history/SERVICE.v<n>.md; returns the relative path."""
     def write_playbook(self, owner: str, name: str, version: int, meta: JsonObject, body: str, archive_version: int | None = None) -> str: """Phase 1: a compare-and-swap under the service's lock. The file on disk must be at `archive_version` (a missing or versionless file counts as 0), else `PlaybookRace` and nothing is written; archives the old one as history/PLAYBOOK.v<n>.md by an exclusive create; returns the relative path."""
-    def retire(self, owner: str, name: str, stamp: str) -> str: """Move to services/.retired/<name>-<stamp>."""
+    def retire(self, owner: str, name: str, stamp: str, record: Mapping[str, str] | None = None) -> str: """Move to services/.retired/<name>-<stamp>; phase 2a: a `record` is written as `RETIRED.md` in the copy."""
     def playbook_history(self, owner: str, name: str) -> list[tuple[int, JsonObject]]: ...
     def versions(self, owner: str, name: str, kind: str) -> list[tuple[int, JsonObject, str]]: """Every kept SERVICE or PLAYBOOK file, oldest first (history/, then the current one)."""
 
@@ -843,7 +852,7 @@ class ServiceCommands(Protocol):
                        words: str | None = None) -> str:
         """Define or amend. Root changes the acceptance criteria of an existing service only with `answers`+`about`+`words` (the user's recorded answer to a rejection)
         or `words` alone (a change they ask for on their own, never rule-(c) eligible), once every delivery has its verdict (phase 0a.2)."""
-    def retire_service(self, actor: str, owner: str, name: str, reason: str) -> str: ...
+    def retire_service(self, actor: str, owner: str, name: str, reason: str, approved_in: str = "") -> str: ...   # phase 2a: the retired copy holds RETIRED.md
     def request(self, actor: str, service: str, inputs: Mapping[str, object] | None, *, title: str = "", note: str = "",
                 extra_acceptance: Sequence[str] | None = None, budget: int | None = None, revises: str | None = None, source: str | None = None,
                 base: str | None = None) -> Message: """`base` (`delivered` | `latest`): which version a rework the user asked for starts from when relayed reworks changed the artifact after the judged delivery."""
@@ -1209,7 +1218,9 @@ class PlanRenderer(Protocol):
 class PlanIdentity(Protocol):
     def plan_id(self, bp: Mapping[str, object]) -> str: """12 hex of the normalized blueprint (independent of the organization)."""
 class BlueprintApplier(Protocol):
-    def apply(self, bp: Mapping[str, object], *, allowed_roots: Sequence[object] | None = None) -> Summary: """Hire parents first, define services, give the first task; roll back on failure."""
+    def apply(self, bp: Mapping[str, object], *, allowed_roots: Sequence[object] | None = None, require_sources: bool = False) -> Summary: """Hire parents first, define services, give the first task; roll back on failure. Phase 2a: `require_sources` (over MCP) refuses a criterion without a source."""
+class ExtensionApplying(Protocol):   # phase 2a: `propose_org(extend="current")`
+    def apply(self, bp: Mapping[str, object], *, plan_id: str | None, require_sources: bool = False, allowed_roots: Sequence[str | Path] | None = None) -> str: """Limits first, then the agents and services added, the charter lines and budgets changed, the services and agents retired; validated again against the files as they are now; a stale `plan_id` is refused; a failure while writing takes back every write before it."""
 class BlueprintExamples(Protocol):
     def example(self, kind: str = "research", base: Path | str = ".", service: bool = False) -> str: ...
 class WorkspaceProvisioner(Protocol):   # port
@@ -1474,6 +1485,30 @@ Screen goldens (`dashboard/tests/golden`, 34 plain-text screens) were taken from
 
 Totals and the split into I/O Protocols and role interfaces are in 4.5 (counted by a script over the code blocks of this section). The widest Protocol has 8 methods (`Notices`); `MailboxReader`, `RunLogReader`, `ServiceStore` have 7; kernel ports have at most 4. Package-private Protocols (collaborators inside one package, e.g. `IntegrityCheck`, `RoutePolicy`, `ArtifactNormalizer`, `LineWriter`) live in `_protocols.py`, follow the same rules (R6, R7) and are not counted.
 Phase 0a.2 adds the public Protocols `OrgHistory` (3.5), `JudgedVersions` (3.21), `DeliverableChecks` (3.22) and `GuardedSender` (3.20), and grows `GitClient` to 7 methods, `ServiceEvidence` to 4 and `RetiredArchive` to 4; `ServiceSteps` has 2. Phase 0a.3 adds the public Protocol `CaseAllowance` (3.21) and grows the private `RunCounter` (`stamps`) and `BudgetPlanning` (`client_round`, 6 methods). No Protocol has more than 8 methods. Phase 0b adds the public Protocols `CaseRecords` (3.22) and `QualityReport` (3.30), and grows `CaseHistory` to 5 methods, `OrgHistory` to 5 and `GitClient` to 8 (3.5); the private ports it adds are `BarHistory` and `ContractVersions` (reflection), `SignedDeliveries` (health), `FailCounts` and `ConfigSource` (progress). `OrgRuntime` gains the fields `case_records` and `quality_report`.
+
+### 3.38 `retro` (phase 2a)
+
+The human's periodic retro brief, derived from the files at each call (design `docs/design/org-growth-phase-2.md` 4). One stored state: the ledger of the briefs held.
+
+```python
+class RetroBriefs(Protocol):
+    def brief(self, *, since: datetime | None = None) -> Brief: """Root's brief. Without `since`: recorded as B<n> when a human verdict was created after the last brief's `at`, else the last brief shown again, recorded nowhere; with `since`: a look-back, recorded nowhere. OrgError only for a `since` in the future and when the agents cannot be listed; any other unreadable source becomes a line of its section."""
+
+class RetroDue(Protocol):
+    def due(self, *, listing: bool = False) -> str: """The line of a due retro for a reply or a listing ("Retro due: k verdicts of the user since the last brief (date) ..."), or "" below `after_verdicts`. It tells the assistant to offer, and to call retro() only after the user's yes. Never raises."""
+
+class RetroRecords(Protocol):
+    def last(self) -> BriefRecord | None: """The newest record."""
+    def records(self) -> tuple[BriefRecord, ...]: """Oldest first, at most 50."""
+    def asked(self) -> frozenset[str]: """Every item key ever offered, at most 1000."""
+    def append(self, record: BriefRecord) -> None: """Add the record; OrgError when the ledger cannot be written."""
+
+class CharterHistory(Protocol):   # consumer port (`_ports.py`), implemented by `app/_charter_history.py` over `snapshots.OrgHistory`
+    def versions(self, addrs: Sequence[str]) -> CharterVersions: """Consecutive committed versions of `<addr>/AGENT.md` and of ORG.md (max_depth changes), newest first; never raises."""
+    def subject(self, commit: str) -> str | None: """The commit's first line."""
+    def org_started(self) -> datetime | None: """The commit time of the oldest commit that added ORG.md."""
+```
+Pure: `render_brief(brief) -> str`, `brief_json(brief) -> JsonObject`, `retro_thresholds(config) -> (RetroThresholds, notes)` (ORG.md's optional `retro:` mapping), `parse_since(text) -> datetime`. Impl: `FileRetroBriefs(BriefSources, RetroRecords, ...)`, `LedgerRetroRecords(LedgerStore)` (`.runtime/retros.json`), `FileRetroDue`, `FileBriefSources` (the one place that reads the cases, contracts, agents, event log and health through their ports), `GitCharterHistory` and `FsServiceRetirements` (in `app`); fakes `MemoryRetroRecords`, `FixedRetroBriefs`, `FixedRetroDue`, `ScriptedCharterHistory`. The brief sends no message and writes only its ledger; a text a team wrote never nominates an item (`is_verifier` of `blueprint` and `lineage_class` of `reflection` are used, not copied).
 
 ---
 

@@ -49,7 +49,7 @@ uv run hirearchy status
 uv run hirearchy inbox
 ```
 
-Other commands: `hire ... --inputs PATH` (repeatable: read-only folders for the agent), `progress [TASK_ID] [--wait SECONDS]`, `plan`/`apply` (blueprints, below), `services`, `define-service`, `request`, `feedback`, `retire-service` ([services](#services-and-reflection)), `send` (note or budget grant), `resume <agent>`, `review [--dry-run]`, `run --once`, `upgrade-rules [--dry-run]`, `install-skill [--dest DIR] [--force]`, `mcp`, `kiro-profile` (this org's internal profile), and the read-only views of [Observability](#observability): `obs now [--watch S]`, `obs trace TASK_ID`, `obs metrics [--since 24h] [--by agent|tool|service|trace]`, `obs events [--since] [--until] [--agent] [--kind] [--trace] [--errors] [--limit N] [--follow]` (each with `--json`) and `check [--json]`.
+Other commands: `hire ... --inputs PATH` (repeatable: read-only folders for the agent), `progress [TASK_ID] [--wait SECONDS]`, `retro [--since DATE|DATETIME|MESSAGE_ID] [--json]` (the retro brief), `plan`/`apply` (blueprints, below; also an extension file, see [Retro and changes to the organization](#retro-and-changes-to-the-organization-phase-2a)), `services`, `define-service`, `request`, `feedback`, `retire-service` ([services](#services-and-reflection)), `send` (note or budget grant), `resume <agent>`, `review [--dry-run]`, `run --once`, `upgrade-rules [--dry-run]`, `install-skill [--dest DIR] [--force]`, `mcp`, `kiro-profile` (this org's internal profile), and the read-only views of [Observability](#observability): `obs now [--watch S]`, `obs trace TASK_ID`, `obs metrics [--since 24h] [--by agent|tool|service|trace]`, `obs events [--since] [--until] [--agent] [--kind] [--trace] [--errors] [--limit N] [--follow]` (each with `--json`) and `check [--json]`.
 
 ### Models
 
@@ -419,6 +419,9 @@ Everything is derived from **one append-only event log** written by the runtime 
 | `cli.command` | `command`, `ok`, `ms`, `error` |
 | `msg.deliver` | every message: `id`, `type`, `from`, `to`, `title`, `status`, `budget`, `reply_to`, `revises`, `supersedes`, `service`, `feedback`, `source`, `criterion`, `wake`, `hops`, `chars`, `trace_rule` (+ `trace_candidates` when ambiguous) |
 | `agent.hire` / `agent.retire`, `service.define` / `service.revise` / `service.retire` | who, what, returned budget; `service.revise` also `admitted` |
+| `extension.rolled_back` / `extension.partial` | an extension that failed midway: every write taken back (`plan_id`, `step`, `error`), or the writes that could not be taken back (`plan_id`, `done`, `failed`, `error`) |
+| `team_note.failed` | the quiet note that tells an owner of a new checker could not be written (`owner`, `agent`, `error`) |
+| `retro.ledger_unreadable` / `retro.record_failed` | `.runtime/retros.json` could not be read / the brief could not be recorded (`error`); the brief is still returned |
 
 **Never recorded:** message bodies, file contents, environment values, secrets. `tool.call` `args` keeps ids, addresses, clipped titles (80 characters), status, budget, paths, service names, verdicts and numbers; long text fields only as their length (`"summary_chars": 1234`); unset arguments are omitted. Errors are clipped to 500 characters. **Out of scope:** the provider is a black box. We observe a run's boundaries (start, end, exit, duration, batch) and every hirearchy tool call it makes, never kiro's internals (tokens, built-in tool calls, model reasoning). There are no exporters, dashboards, sampling or alerting; the field names are OTel-friendly so a file exporter can be added later as a pure function over the events.
 
@@ -578,17 +581,19 @@ organization to exist yet:
 - Goal workflow tools (root only; see [Create an org from a goal](#create-an-org-from-a-goal)):
   - `blueprint_example(kind="research")`: a ready-to-edit YAML blueprint with a comment on every field and a schema
     summary; `kind` is `research`, `documents`, `code` or `analysis`. Paths start in the server's working directory.
-  - `propose_org(blueprint)`: blueprint as YAML/JSON text in (its description carries the compact schema), out: the
+  - `propose_org(blueprint, extend=None)`: blueprint as YAML/JSON text in (its description carries the compact schema), out: the
     **PLAN FOR YOU** block to show the user verbatim, the full details, and `plan_id`; writes nothing; works in setup mode.
+    With `extend="current"` the blueprint is an extension of the organization that exists (see [Retro and changes to the organization](#retro-and-changes-to-the-organization-phase-2a)).
   - `apply_org(blueprint, approved=False, plan_id=None)`: refuses unless `approved=True` and `plan_id` equals the id
     of this blueprint (pass them only after the user approved the plan that `propose_org` returned), refuses in setup mode
     ("call create_org first") and on validation errors, otherwise hires the team, gives the first task and says to call
     `start`.
+  - `retro(since=None)`: the retro brief (root only); see [Retro and changes to the organization](#retro-and-changes-to-the-organization-phase-2a).
   - `start(max_runs=None, until_done=True)`: background scheduler that exits by itself when the work is done.
   - `progress(task_id=None, wait_seconds=0)`: the status lines described above plus the scheduler line; with
     `wait_seconds` it first waits for a change; in setup mode it explains the next step.
 - Other tools: `whoami`, `inbox`, `delegate`, `report`, `send`, `hire` (with `inputs` for read-only folders), `retire`, `reclaim`, `read`, `write`, `status`, `health`.
-  Agents get these (not `create_org`, `start`, `stop`, `blueprint_example`, `propose_org`, `apply_org`, `progress`). `report` tells an agent when
+  Agents get these (not `create_org`, `start`, `stop`, `blueprint_example`, `propose_org`, `apply_org`, `progress`, `quality`, `retro`). Root's own `hire`, `retire`, `write` of a charter and `write` of `ORG.md`'s `max_depth` are refused: they change the organization, so they go through an extension the user approves. `report` tells an agent when
   budget travelled up with its result; `send(..., budget=N)` to its parent gives runs back early. `reclaim(report, budget=None)` (managers and root; direct, idle reports only) pulls unspent runs back down the other way.
 - The server's instructions for root contain the workflow in five lines (ask once → `blueprint_example` + `propose_org` →
   show the PLAN FOR YOU block, wait for explicit approval → `create_org`/`apply_org(approved=True, plan_id)`/`start` →
@@ -847,6 +852,18 @@ changes nothing, so it does not end a request's "waiting on root" span in `obser
   an ORG.md that does not parse gives the defaults and a note.
 - *The timeline of bar changes.* Contract versions (and whether the user's answer confirmed each criterion), playbook versions, top-ups, and charter and model changes from the organization's git history (`unknown` without git). The marks are facts; no count is split by them.
 - *One-off tasks.* `feedback` also rates a task you sent without a service (no criterion, no link). The MCP tool and `Org` record it as your own `relayed` reading by default; the CLI records the user's (`--source human`).
+
+## Retro and changes to the organization (phase 2a)
+
+Design: `docs/design/org-growth-phase-2.md`. A retro brief shows the user what they said, what got past a check, whether past changes held, how the organization changed and who changed it, and at most 3 yes/no items, each with the one call its yes makes. It is derived from the files at each call; its only stored state is the ledger of the briefs held, `.runtime/retros.json` (ids and keys, never a client's words or a team's text).
+
+- *The brief.* `hirearchy retro [--since DATE|DATETIME|MESSAGE_ID] [--json]` and root's MCP tool `retro(since=None)` (agents never get it). Without `since` it is recorded as `B<n>` when a verdict of the user arrived since the last brief and is otherwise the last brief shown again; with `since` it is a look-back and recorded nowhere. It costs no run and sends no message. The items come only from the user's verdicts and runtime facts, never from a text a team wrote: a service for one-off work asked for again and again, a check for a criterion that fails again and again (or one more instruction for a check that signed the failures), a clarifying question for a widened criterion, a retire or a reclaim for an idle agent, a cause to type.
+- *Offered, then called.* After 3 verdicts of the user since the last brief (`retro: after_verdicts`), the replies of `feedback` and `services` carry a line that tells the assistant to offer a retro in one line and to call `retro()` only after the user's yes. The line wakes nobody.
+- *A change to the organization is an extension.* `propose_org(blueprint, extend="current")` takes `reason`, `needs` and `extend:` with `add_agents`, `add_services`, `add_charter_lines`, `remove_charter_lines`, `limits` (hiring limits and `max_depth`), `budgets`, `retire_services` and `retire` (`blueprint_example("extension")`). Its PLAN FOR YOU shows what is added, changed and removed; its `plan_id` holds only while nothing it touches has changed; `apply_org` applies limits first, then additions, changes and retires, and takes every write back if one fails. `hirearchy plan` and `hirearchy apply` take the same file.
+- *No other way in.* Over MCP root's `hire`, `retire`, a first `define_service`, a `write` of a charter and a `write` of `max_depth` are refused and point to the extension. An agent's rewrite of a report's charter keeps the plan's frontmatter keys (`kind`, `approved_in`, `hired_by`, `created`, `tools`, ...) and the lines under `## Added by your changes`, and an agent cannot retire a report that checks its team (`kind: verifier`).
+- *Who decided.* Every agent a plan creates carries `kind` (`verifier` for a check) and `approved_in: plan {id}` or `change {id}`; a service's SERVICE.md carries `approved_in` and `sources`; a retired tree or service copy holds `RETIRED.md` (who, when, why, the approval). The brief's "Changes to your organization" labels each change from these records and from the committed charters, and counts the charter edits nobody approved.
+- *Criteria and the user's words.* A criterion of an extension or of a plan over MCP is `{text, from: <the user's exact words in needs.elicitation>, asked: <the question>}` or `{text, default: true}` (an extension may also cite its one-off tasks: `{text, from_tasks: [ids]}`); the plan shows the words the assistant added to the user's, and refuses a quote that is not in `needs.elicitation`. At the terminal a string criterion shows `my wording: your words for it were not recorded`.
+- *Tunable.* The optional `retro:` mapping in `ORG.md` sets `after_verdicts`, `window`, `carry`, `items` (at most 3), `shape_cases`, `shape_overlap`, `criterion_cases`, `escapes`, `window_cases`, `saturation`, `added_words`, `accepted_cases`; a value that fails keeps its default and adds a note to the brief. They are labelled defaults, not findings.
 
 ## Security notes
 
