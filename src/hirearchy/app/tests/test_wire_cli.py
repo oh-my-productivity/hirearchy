@@ -1,4 +1,4 @@
-"""``wire_cli``: the command line over a real organization - the 27 commands in the order of the parser, the session that opens the runtime, the process's own
+"""``wire_cli``: the command line over a real organization - the 28 commands in the order of the parser, the session that opens the runtime, the process's own
 output and terminal, the tail of the event files, the scheduler's loop and the other entry points behind their ports, the plan before there is an organization."""
 
 from __future__ import annotations
@@ -34,7 +34,7 @@ from hirearchy.snapshots import RUNTIME_IGNORE_LINES
 
 COMMANDS = [
     "init", "hire", "task", "services", "define-service", "request", "feedback", "acknowledge-playbook", "retire-service", "plan", "apply", "send", "status", "health",
-    "progress", "quality", "upgrade-rules", "install-skill", "review", "inbox", "resume", "run", "mcp", "dash", "obs", "check", "kiro-profile",
+    "progress", "quality", "retro", "upgrade-rules", "install-skill", "review", "inbox", "resume", "run", "mcp", "dash", "obs", "check", "kiro-profile",
 ]
 
 
@@ -45,7 +45,7 @@ def team(tmp_path: Path) -> Org:
     return made
 
 
-def test_the_program_is_the_command_line_with_the_27_commands_in_order() -> None:
+def test_the_program_is_the_command_line_with_the_28_commands_in_order() -> None:
     assert isinstance(wire_cli.cli_app(), CliApp)
     session = AnnouncingOrgSession(os_locator(), wire_cli.RuntimeOrgOpener(), wire_cli.StandardOutput())
     commands = wire_cli.commands_over(session, wire_cli.StandardOutput(), wire_cli.StandardTerminal(), FakeClock())
@@ -295,3 +295,16 @@ def test_the_blueprint_commands_get_the_extension_applier(team: Org, tmp_path: P
     assert "there is no organization yet, so there is nothing to extend" in renderer.render_plan(bp, validator.validate(bp, org_exists=False))
     applied = team.runtime.extension_applier.apply(bp, plan_id=None, allowed_roots=[tmp_path])
     assert applied.startswith("applied the change ") and team.charter("ceo")[0]["max_children"] == 3
+
+
+def test_the_retro_command_is_wired(team: Org, capsys: pytest.CaptureFixture[str]) -> None:
+    """``hirearchy retro`` sits right after ``quality`` and prints the brief of the ``retro_briefs`` port of the runtime. [1.1] test_wire_cli.py re-read at the
+    base of this commit: its changes are the command list and the name of the first test (27 commands, now 28); the other tests do not touch ``retro``."""
+    session = AnnouncingOrgSession(os_locator(), wire_cli.RuntimeOrgOpener(), MemoryOutput())
+    commands = wire_cli.commands_over(session, MemoryOutput(), wire_cli.StandardTerminal(), FakeClock())
+    assert [c.__class__.__name__ for c in commands].index("RetroCommand") == [c.__class__.__name__ for c in commands].index("QualityCommand") + 1
+    wire_cli.run_cli(["--root", str(team.root), "retro"])
+    out = capsys.readouterr().out
+    assert out.startswith("RETRO BRIEF") and "RETRO BRIEF END" in out
+    wire_cli.run_cli(["--root", str(team.root), "retro", "--json"])
+    assert json.loads(capsys.readouterr().out)["id"] == "B1"

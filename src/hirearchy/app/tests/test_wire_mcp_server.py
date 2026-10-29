@@ -69,10 +69,18 @@ def test_the_tools_of_each_role(team: Org) -> None:
 
     assert tools(ROOT) == ["whoami", "inbox", "delegate", "report", "send", "reclaim", "hire", "retire", "read", "write", "status", "health", "services",
                            "define_service", "request", "feedback", "acknowledge_playbook", "observe", "create_org", "start", "stop", "blueprint_example", "propose_org",
-                           "apply_org", "progress", "quality"]
+                           "apply_org", "progress", "quality", "retro"]
     assert tools("ceo") == ["whoami", "inbox", "delegate", "report", "send", "reclaim", "hire", "retire", "read", "write", "status", "health", "services",
                             "define_service", "request", "feedback", "acknowledge_playbook"]
     assert tools("ceo/eng") == ["whoami", "inbox", "delegate", "report", "send", "reclaim", "hire", "retire", "read", "write", "status", "health"]
+
+
+def test_root_has_retro_and_agents_do_not(team: Org) -> None:
+    factory = wire_mcp_server.server_factory(OrgBinding(team.root, team))
+    assert "retro" in tool_names(cast(FastMCP, factory.build(ROOT)))
+    assert all("retro" not in tool_names(cast(FastMCP, factory.build(me))) for me in ("ceo", "ceo/eng"))
+    text = call(cast(FastMCP, factory.build(ROOT)), "retro")
+    assert text.startswith("RETRO BRIEF") and "RETRO BRIEF END" in text
 
 
 def test_the_instructions_are_the_texts_of_the_package(team: Org) -> None:

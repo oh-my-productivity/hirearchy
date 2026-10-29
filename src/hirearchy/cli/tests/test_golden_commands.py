@@ -25,8 +25,9 @@ def test_every_expected_text_has_a_scenario_and_every_scenario_a_text() -> None:
 
 def test_the_scenarios_cover_every_command() -> None:
     used = {scenario.argv[2] if scenario.argv[:1] == ("--root",) else scenario.argv[0] for scenario in _scenario.SCENARIOS.values() if scenario.argv}
-    # (mcp serves over stdio: test_mcp_command starts it in a process; acknowledge-playbook needs a covered playbook item: test_service_commands runs it)
-    assert set(_scenario.SUBCOMMANDS) - {"mcp", "acknowledge-playbook"} <= used
+    # (mcp serves over stdio: test_mcp_command starts it in a process; acknowledge-playbook needs a covered playbook item: test_service_commands runs it;
+    # retro prints dates of the organization's own clock: test_commands_retro runs it)
+    assert set(_scenario.SUBCOMMANDS) - {"mcp", "acknowledge-playbook", "retro"} <= used
 
 
 def test_the_normalizer_hides_the_access_hash_of_a_profile_name(tmp_path: Path) -> None:

@@ -1,0 +1,8 @@
+usage: hirearchy retro [-h] [--since DATE|DATETIME|MESSAGE_ID] [--json]
+
+options:
+  -h, --help            show this help message and exit
+  --since DATE|DATETIME|MESSAGE_ID
+                        a look-back over that window (recorded nowhere); a date is local midnight,
+                        a datetime needs its offset
+  --json                the same brief as JSON: every section and every count with its N

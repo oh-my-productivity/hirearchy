@@ -147,6 +147,7 @@ def server_factory(binding: OrgBindingPort, scheduler_control: Callable[[Schedul
     from ..mcp_server._tools_observe import ObservabilityTools
     from ..mcp_server._tools_progress import ProgressTools
     from ..mcp_server._tools_quality import QualityTools
+    from ..mcp_server._tools_retro import RetroTools
     from ..mcp_server._tools_scheduler import SchedulerTools
     from ..mcp_server._tools_services import DirectoryServiceRoles, ServiceTools
     from ..mcp_server._tools_setup import RootSetupTools
@@ -158,6 +159,7 @@ def server_factory(binding: OrgBindingPort, scheduler_control: Callable[[Schedul
     from ..progress import ProgressReporter, QualityReport
     from ..prompts import Whoami
     from ..reflection import DeliverableChecks, ServiceReports, ServiceSteps
+    from ..retro import RetroBriefs
     from ..services import ServiceCatalog, ServiceCommands, ServiceEvidence, ServiceHints
     from ..settings import OrgSettings
     from ..telemetry._summarize import JsonArgumentSummarizer
@@ -212,6 +214,7 @@ def server_factory(binding: OrgBindingPort, scheduler_control: Callable[[Schedul
         ),
         ProgressTools(text, of(ProgressReporter)),
         QualityTools(text, of(QualityReport)),
+        RetroTools(text, of(RetroBriefs)),
     ]
     recorder = ToolCallRecorder(
         binding, resources.event_sinks, resources.trace_scope, JsonArgumentSummarizer(),

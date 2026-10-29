@@ -1,11 +1,11 @@
 usage: hirearchy [-h] [--root ROOT]
-                 {init,hire,task,services,define-service,request,feedback,acknowledge-playbook,retire-service,plan,apply,send,status,health,progress,quality,upgrade-rules,install-skill,review,inbox,resume,run,mcp,dash,obs,check,kiro-profile}
+                 {init,hire,task,services,define-service,request,feedback,acknowledge-playbook,retire-service,plan,apply,send,status,health,progress,quality,retro,upgrade-rules,install-skill,review,inbox,resume,run,mcp,dash,obs,check,kiro-profile}
                  ...
 
 A file-based organization of agents, run over MCP.
 
 positional arguments:
-  {init,hire,task,services,define-service,request,feedback,acknowledge-playbook,retire-service,plan,apply,send,status,health,progress,quality,upgrade-rules,install-skill,review,inbox,resume,run,mcp,dash,obs,check,kiro-profile}
+  {init,hire,task,services,define-service,request,feedback,acknowledge-playbook,retire-service,plan,apply,send,status,health,progress,quality,retro,upgrade-rules,install-skill,review,inbox,resume,run,mcp,dash,obs,check,kiro-profile}
     init                create a new organization
     hire                create an agent (as root)
     task                give a task to an agent (as root)
@@ -28,6 +28,8 @@ positional arguments:
                         needs you
     quality             how the work root asked for has gone: verdicts, escapes and their causes,
                         runs per case, alarms, bar changes
+    retro               the retro brief: what the client said, what got past a check, whether past
+                        changes held, how the organization changed, and at most 3 yes/no items
     upgrade-rules       rewrite the rules in ORG.md to the current template (keeps settings and
                         mission)
     install-skill       copy the hirearchy assistant skill into a kiro skills directory (default

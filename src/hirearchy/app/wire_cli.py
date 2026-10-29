@@ -45,6 +45,7 @@ from ..cli._commands_ops import (
     UpgradeRulesCommand,
 )
 from ..cli._commands_org import HireCommand, InboxCommand, InitCommand, ResumeCommand, SendCommand, TaskCommand
+from ..cli._commands_retro import RetroCommand
 from ..cli._commands_services import (
     AcknowledgePlaybookCommand,
     DefineServiceCommand,
@@ -93,6 +94,7 @@ from ..observability._util import matcher, plain
 from ..overview import OrgTree
 from ..progress import ProgressReporter, QualityReport
 from ..reflection import ServiceReports, ServiceSteps
+from ..retro import RetroBriefs
 from ..review import HealthReviewer
 from ..scheduler._ports import Console
 from ..scheduler._run import LoopState
@@ -354,6 +356,7 @@ def commands_over(session: OrgSession, out: Output, terminal: Terminal, clock: C
         HealthCommand(session, get(HealthAnalyzer), get(HealthRenderer), out),
         ProgressCommand(session, get(ProgressReporter), out),
         QualityCommand(session, get(QualityReport), out),
+        RetroCommand(session, get(RetroBriefs), out),
         UpgradeRulesCommand(session, get(RulesUpgrader), out),
         InstallSkillCommand(unbound.get(SkillInstaller), out),
         ReviewCommand(session, get(HealthReviewer), snapshots, out),

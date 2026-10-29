@@ -287,7 +287,7 @@ SCENARIOS: dict[str, Scenario] = {
 
 SUBCOMMANDS = (
     "init", "hire", "task", "services", "define-service", "request", "feedback", "acknowledge-playbook", "retire-service", "plan", "apply", "send", "status",
-    "health", "progress", "quality", "upgrade-rules", "install-skill", "review", "inbox", "resume", "run", "mcp", "dash", "obs", "check", "kiro-profile",
+    "health", "progress", "quality", "retro", "upgrade-rules", "install-skill", "review", "inbox", "resume", "run", "mcp", "dash", "obs", "check", "kiro-profile",
 )
 OBS_VIEWS = ("now", "trace", "metrics", "events")
 
