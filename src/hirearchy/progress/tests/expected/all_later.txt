@@ -5,5 +5,5 @@
 Needs you: failed result from qa "Check": The source site is gone (message 20260101T120800001000-qa-002a)
 Needs you: blocked result from spare "Wait": Need the 2025 sales figures (message 20260101T120830001000-spare-0030)
 Needs you: failed result from ghost "Haunt": Agent ghost was retired by root: gone (message 20260101T120910003000-ghost-003f)
-Needs you: note from ceo "Budget request": I need 2 more runs for the rework (message 20260101T121000001000-ceo-0042)
-Needs you: runtime notice "ceo is out of budget": `ceo` has no budget left (message 20260101T121000003000-runtime-0045)
+Needs you: note from ceo "Budget request": I need 2 more runs for the rework (message 20260101T121000001000-ceo-0043)
+Needs you: runtime notice "ceo is out of budget": `ceo` has no budget left (message 20260101T121000003000-runtime-0046)
