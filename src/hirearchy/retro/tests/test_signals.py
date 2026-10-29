@@ -104,6 +104,14 @@ def test_the_prefilled_service_extension_validates_with_its_ask_the_user_placeho
     assert [i.code for i in validate(org, left) if i.level == "error"] == []  # answered, it is a valid change: the copied criteria are the ones of the named tasks
 
 
+def test_a_service_item_for_an_owner_with_a_checker_candidate_is_budgeted_for_the_grown_team() -> None:
+    (plain,) = service(three(), estimates={"lead": 10})
+    (grown,) = list(service_items(groups(three(), THRESHOLDS.shape_overlap), {}, frozenset(), {"lead": 10}, THRESHOLDS, {"lead": 15}))
+    assert plain.cost == "up to 10 runs per request" and grown.cost == "up to 15 runs per request" and json.loads(grown.blueprint)["extend"]["add_services"][0]["budget"] == 15
+    (other,) = list(service_items(groups(three(), THRESHOLDS.shape_overlap), {}, frozenset(), {"lead": 10}, THRESHOLDS, {"ceo": 40}))
+    assert other.cost == "up to 10 runs per request"  # the checker candidate is another owner's
+
+
 def test_the_service_items_revert_retires_the_service() -> None:
     (item,) = service(three())
     assert json.loads(item.revert_blueprint)["extend"] == {"retire_services": [{"owner": "lead", "service": "action-list-for", "reason": "revert of B{n}.{k}"}]}
@@ -222,6 +230,17 @@ def test_the_prefilled_checker_add_validates_on_the_documents_team_without_its_r
     (item,) = checker(ServiceFailures("brief", "lead", tuple(cases), 6, {"C4": "Every statement names its file"}, facts, ()))
     bp = json.loads(item.blueprint.replace("B{n}.{k}", "B1.1").replace('"memos"', '"brief"'))
     assert validate(org, bp) == []  # no error and no warning
+
+
+def test_checker_add_budgets_every_other_service_of_the_owner_that_the_grown_team_would_leave_below_its_estimate() -> None:
+    cases = [failed(f"M{n}", signer="lead", verifier=False, day=n) for n in (1, 2, 3)]
+    facts = owner(others=(("action-list", 12), ("roomy", 30), ("exact", 15)))  # the team grows from 12 to 15 runs with a reviewer: 12 + 1 + 2
+    (item,) = checker(memos(*cases, owner_facts=facts))
+    extend, undo = json.loads(item.blueprint)["extend"], json.loads(item.revert_blueprint)["extend"]
+    assert extend["budgets"] == [{"owner": "lead", "service": "memos", "budget": 17}, {"owner": "lead", "service": "action-list", "budget": 15}]
+    assert undo["budgets"] == [{"owner": "lead", "service": "memos", "budget": 15}, {"owner": "lead", "service": "action-list", "budget": 12}]
+    alone = json.loads(checker(memos(*cases))[0].blueprint)["extend"]
+    assert alone["budgets"] == [{"owner": "lead", "service": "memos", "budget": 17}]  # no other service: today's call
 
 
 # ------------------------------------------------------------------------------ the rules every signal keeps

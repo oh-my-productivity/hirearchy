@@ -21,7 +21,7 @@ from ._readings import (
     d14_held,
 )
 from ._shapes import groups
-from ._signals import REF, answer_items, cause_items, checker_items, clarify_items, idle_items, service_items
+from ._signals import REF, answer_items, cause_items, checker_items, clarify_items, grown_estimate, idle_items, service_items
 from ._texts import day
 from ._views import EffectFacts, Fate, ServiceFailures, TakenFix
 from .api import Brief, BriefRecord, Item, RetroBriefs, RetroRecords, RetroThresholds, Section, retro_thresholds
@@ -50,9 +50,11 @@ def _with_taken(failures: tuple[ServiceFailures, ...], records: tuple[BriefRecor
 def _candidates(facts: Facts, th: RetroThresholds, taken: frozenset[str], records: tuple[BriefRecord, ...]) -> tuple[list[Item], tuple[str, ...]]:
     """Every candidate of every signal, and the D6 lines the idle signal adds."""
     idle, d6_lines = idle_items(facts.flags, facts.last_checks, facts.owners)
+    checkers = checker_items(_with_taken(facts.failures, records, facts.effects), th)
+    adding = {i.effect.get("owner") for i in checkers if i.kind == "checker-add"}
+    grown = {f.owner: grown_estimate(f.owner_facts) for f in facts.failures if f.owner in adding}  # a service the same brief offers is budgeted for the team the checker leaves
     found = [
-        *service_items(groups(facts.one_offs, th.shape_overlap), facts.offers, taken, facts.estimates, th),
-        *checker_items(_with_taken(facts.failures, records, facts.effects), th), *idle,
+        *service_items(groups(facts.one_offs, th.shape_overlap), facts.offers, taken, facts.estimates, th, grown), *checkers, *idle,
         *clarify_items(facts.sourced, th), *cause_items(facts.passed), *answer_items(facts.said),
     ]
     return found, d6_lines

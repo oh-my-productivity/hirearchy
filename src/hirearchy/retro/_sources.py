@@ -249,9 +249,12 @@ class FileBriefSources(BriefSources):
         template = next((titles[str(self._charters.charter(a)[0].get("role"))] for a in team if self._is_check(a) and str(self._charters.charter(a)[0].get("role")) in titles), "")
         runs = tuple((n, r.base_runs) for n in self._roles.role_names() if (r := self._roles.get_role(n)) is not None)
         tools = meta.get("tools")
+        others = tuple(
+            (name, c.budget) for name in self._catalog.service_names(owner) if name != record.service and (c := self._catalog.read_contract(owner, name)) is not None
+        )
         return OwnerFacts(
             owner, len(self._directory.children(owner)), max_children if isinstance(max_children, int) and not isinstance(max_children, bool) else 5, bool(meta.get("can_hire")),
-            tuple(str(t) for t in tools) if isinstance(tools, list) else (), self._estimate(owner), record.budget, template, runs,
+            tuple(str(t) for t in tools) if isinstance(tools, list) else (), self._estimate(owner), record.budget, template, runs, others,
         )
 
     def _failures(self, record: ServiceRecord, window: int) -> ServiceFailures | None:

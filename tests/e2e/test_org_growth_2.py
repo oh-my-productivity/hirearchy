@@ -57,10 +57,10 @@ def deliver(org, owner, task):
     org.end_run(owner, ok=True)
 
 
-def the_user_judged_three_chores_and_rejected_three_memos_on_one_criterion(org):
+def the_user_judged_three_chores_and_rejected_three_memos_on_one_criterion(org, chores_to="ops"):
     for day in (2, 9, 16):  # three one-off tasks of one shape, each accepted by the user
-        task = org.delegate(ROOT, "ops", f"Action list for 2026-11-{day:02d}", "Turn the notes into a list.", "Every action has an owner", budget=3)
-        org.report("ops", task.id, "done", "Done.")
+        task = org.delegate(ROOT, chores_to, f"Action list for 2026-11-{day:02d}", "Turn the notes into a list.", "Every action has an owner", budget=3)
+        org.report(chores_to, task.id, "done", "Done.")
         org.feedback(ROOT, task.id, "accept", source="human")
     for topic in ("one", "two", "three"):  # three cases of the service the user rejected on C2 (no check of the team signs them), each answered by the user's link
         task = org.request(ROOT, "memos", {"topic": topic})
@@ -122,6 +122,27 @@ def test_the_exit_criterion_service_and_checker_through_the_brief_with_no_unprom
     assert "outside a plan" not in second and "outside the tools" not in second and "Unprompted charter edits: 0" in second
     counts = brief_json(org.runtime.retro_briefs.brief())["sections"]["d8"]["counts"]
     assert counts["unprompted_charter_edits"] == 0 and counts["changes"] >= 3
+
+
+@pytest.mark.parametrize("first", ["service", "checker"])
+def test_the_exit_study_on_one_lead_both_items_apply_as_the_brief_gives_them_in_either_order(tmp_path, first):
+    """Review F4 of build 2a: in the study's script root's one-off tasks and the failing service belong to the same lead. The brief's `service` and `checker-add` calls, made as
+    given (the user's two answers aside), both validate and apply whichever is taken first: the checker's call budgets every service of the lead for the team it leaves, and
+    the service's budget already covers that team."""
+    org = make_the_org(tmp_path)
+    the_user_judged_three_chores_and_rejected_three_memos_on_one_criterion(org, chores_to="ceo")
+    server = build_server(org, ROOT)
+    brief = call(server, "retro")
+    assert [i.kind for i in org.runtime.retro_records.last().items] == ["service", "checker-add"]
+    service, checker = item_blueprint(brief, 1), item_blueprint(brief, 2)
+    entry = service["extend"]["add_services"][0]
+    assert entry["owner"] == "ceo"
+    entry["deliverable"] = {"description": "one markdown list", "format": "markdown", "path": str(tmp_path / "out")}
+    (tmp_path / "out").mkdir()
+    for blueprint in ([service, checker] if first == "service" else [checker, service]):
+        assert "applied the change" in approve(server, blueprint)
+    assert sorted(org.runtime.service_catalog.service_names("ceo")) == ["action-list-for", "memos"]
+    assert "ceo/c2-checker" in org.runtime.agents.agents()
 
 
 # ------------------------------------------------------------------------------------------------------------ item 2: root's refusals and the extension paths

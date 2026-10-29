@@ -319,7 +319,8 @@ class TakenFix:
 @dataclass(frozen=True)
 class OwnerFacts:
     """What the call that adds a checker to a service reads of its owner's team (runtime facts only): its direct reports and limits, its tools, the estimate of the
-    team's runs now and the service's budget, the template of a check the team already has (``""`` for none) and the ``base_runs`` of the templates."""
+    team's runs now and the service's budget, the template of a check the team already has (``""`` for none), the ``base_runs`` of the templates and the budgets of the owner's
+    other services (``extend-budget`` checks every service of the owner against the team the change leaves)."""
 
     owner: str
     children: int
@@ -330,6 +331,7 @@ class OwnerFacts:
     old_budget: int
     verifier_template: str = ""
     template_runs: tuple[tuple[str, int], ...] = ()
+    others: tuple[tuple[str, int], ...] = ()  # the owner's other live services with their runs per request: the team with a checker must still fit each one's budget
 
 
 @dataclass(frozen=True)

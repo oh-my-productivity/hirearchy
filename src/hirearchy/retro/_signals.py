@@ -16,7 +16,7 @@ from ..services import line_key, listed_added_words
 from ._readings import answer_of
 from ._shapes import ShapeGroup, criteria_key, title_skeleton
 from ._texts import cause_question, day, quoted
-from ._views import FailedCase, HealthFlag, Passed, Said, ServiceFailures, Sourced, TakenFix
+from ._views import FailedCase, HealthFlag, OwnerFacts, Passed, Said, ServiceFailures, Sourced, TakenFix
 from .api import Item, RetroThresholds
 
 REF = "B{n}.{k}"  # where the call and the revert carry the id of the item, which the brief writes
@@ -46,9 +46,11 @@ def _name(skeleton: Sequence[str]) -> str:
 
 def service_items(
     found: Sequence[ShapeGroup], offers: Mapping[str, frozenset[tuple[str, ...]]], taken: frozenset[str], estimates: Mapping[str, int], thresholds: RetroThresholds,
+    grown: Mapping[str, int] | None = None,
 ) -> tuple[Item, ...]:
     """The ``service`` candidates: a shape group with at least ``shape_cases`` cases that carry the user's verdict, whose assignee is a top-level agent that offers no
-    service with the group's criteria key, and that is not the effect of an item already taken (``taken`` holds the keys)."""
+    service with the group's criteria key, and that is not the effect of an item already taken (``taken`` holds the keys). ``grown`` has, for an owner the same brief
+    gives a ``checker-add``, the team's runs with that checker: the service's budget is at least that, so the call validates before or after the checker's."""
     items: list[Item] = []
     for group in found:
         judged = [c for c in group.cases if c.judged]
@@ -62,6 +64,7 @@ def service_items(
         known = [c.runs for c in group.cases if not c.runs_unknown]
         estimate = estimates.get(group.assignee, 1)
         budget = max(math.ceil(Fraction(max(known)) * SLACK), estimate) if known else estimate
+        budget = max(budget, (grown or {}).get(group.assignee, 0))
         cost = f"up to {budget} runs per request" + ("" if known else " (no run count of these tasks could be read: the team's estimate)")
         ids = tuple(c.id for c in group.cases)
         reason = f"{REF}: {len(group.cases)} one-off tasks of one shape"
@@ -175,12 +178,23 @@ def _fix(s: ServiceFailures, cls: frozenset[str], verifier: str, cases: tuple[Fa
     )
 
 
+def checker_runs(o: OwnerFacts) -> tuple[str, int, int]:
+    """The template of the checker a call adds to the team of ``o``, its ``base_runs`` and the runs it adds to every request (its own pass and the owner's routing)."""
+    template = o.verifier_template or "reviewer"
+    base = dict(o.template_runs).get(template, 2)
+    return template, base, base + 1
+
+
+def grown_estimate(o: OwnerFacts) -> int:
+    """The runs the team of ``o`` needs with one more checker: a pass and a rework of the checker and one more report for the owner to process. Every service of the owner
+    must be budgeted at least that (``extend-budget``)."""
+    return o.team_estimate + checker_runs(o)[1] + 2
+
+
 def _add(s: ServiceFailures, cls: frozenset[str], cases: tuple[FailedCase, ...], taken: TakenFix | None, thresholds: RetroThresholds) -> Item:
     cid, text = _criterion(s, cls)
     o = s.owner_facts
-    template = o.verifier_template or "reviewer"
-    base = dict(o.template_runs).get(template, 2)
-    c = base + 1  # the runs it adds to every request: its own pass and the owner's routing
+    template, base, c = checker_runs(o)
     known = [x.rework_runs for x in cases if x.rework_runs is not None]
     r = Fraction(sum(known), len(known)) if known else None
     p = Fraction(len(cases), max(s.judged, len(cases)))
@@ -191,20 +205,24 @@ def _add(s: ServiceFailures, cls: frozenset[str], cases: tuple[FailedCase, ...],
         f"the instruction to {taken.verifier} ({taken.ref}) did not hold: it recurred in case {taken.recurred_case}" if taken is not None
         else "no check of the team signed these deliveries, so there is no check to instruct (rung 2); more workers do not catch a defect (rung 3)"
     )
-    budget = max(o.old_budget + c, o.team_estimate + base + 2)
+    budget = max(o.old_budget + c, grown_estimate(o))
+    wider = [{"owner": o.owner, "service": other, "budget": grown_estimate(o)} for other, b in sorted(o.others) if b < grown_estimate(o)]
+    back = [{"owner": o.owner, "service": other, "budget": b} for other, b in sorted(o.others) if b < grown_estimate(o)]
     agent: dict[str, object] = {"parent": o.owner, "name": name, "template": template}
     if "read" in o.tools:
         agent["tools"] = ["read"]
     agent["charter_extra"] = f"Check {cid} of {s.service} on every request: {text}. Report criteria met n of m like every check."
     extend: dict[str, object] = {"add_agents": [agent]}
-    undo: dict[str, object] = {"retire": [{"agent": f"{o.owner}/{name}", "reason": f"revert of {REF}"}], "budgets": [{"owner": o.owner, "service": s.service, "budget": o.old_budget}]}
+    undo: dict[str, object] = {
+        "retire": [{"agent": f"{o.owner}/{name}", "reason": f"revert of {REF}"}], "budgets": [{"owner": o.owner, "service": s.service, "budget": o.old_budget}, *back],
+    }
     if o.children >= o.max_children or not o.can_hire:
         limit: dict[str, object] = {"agent": o.owner, "max_children": o.children + 1}
-        back: dict[str, object] = {"agent": o.owner, "max_children": o.max_children}
+        before: dict[str, object] = {"agent": o.owner, "max_children": o.max_children}
         if not o.can_hire:
-            limit["can_hire"], back["can_hire"] = True, False
-        extend["limits"], undo["limits"] = [limit], [back]
-    extend["budgets"] = [{"owner": o.owner, "service": s.service, "budget": budget}]
+            limit["can_hire"], before["can_hire"] = True, False
+        extend["limits"], undo["limits"] = [limit], [before]
+    extend["budgets"] = [{"owner": o.owner, "service": s.service, "budget": budget}, *wider]
     extra = [f"net {float(net):.1f} = {_fmt(p)} × {_fmt(r)} − {c} − {_fmt(p)} × {FIX_RUNS}, from {len(cases)} of {max(s.judged, len(cases))} cases"] if net is not None and r is not None else []
     if "read" not in o.tools:
         extra.append(f"{o.owner} holds no read, so the checker can check only what the team's reports quote to it")
