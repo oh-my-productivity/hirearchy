@@ -28,6 +28,7 @@ from ._facts import Facts, proposals_of, writes_of
 from ._ports import CharterHistory, ORG, BriefSources, ServiceRetirements
 from ._shapes import criteria_key
 from ._thresholds import retro_thresholds
+from ._watch_facts import retire_candidates, watch_retires
 from ._texts import day
 from ._views import (
     Answering, AgentFact, EffectFacts, EventFacts, FailedCase, HealthFlag, OneOffCase, Occasion, OwnerFacts, Passed, PlaybookFacts, RetiredFact, Said, ServiceAlarms,
@@ -316,7 +317,14 @@ class FileBriefSources(BriefSources):
         current = [c for c in self._catalog.criteria(record.owner, record.service) if c.current]
         keys = {tuple(text_tokens(c.text)) for c in current}
         mirrors = [i for i in (playbook.items or ()) if tuple(text_tokens(i.text)) in keys]
-        return PlaybookFacts(record.service, len(playbook.body.split()), cap, tuple(sorted(states.items())), (), tuple(i.id for i in mirrors), sum(len(i.text.split()) for i in mirrors))
+        try:
+            versions = self._catalog.playbook_versions(record.owner, record.service)
+        except (OrgError, OSError):
+            versions = []
+        return PlaybookFacts(
+            record.service, len(playbook.body.split()), cap, tuple(sorted(states.items())), retire_candidates(playbook, versions, record.watch), tuple(i.id for i in mirrors),
+            sum(len(i.text.split()) for i in mirrors), watch_retires(record, versions),
+        )
 
     @staticmethod
     def _spend(record: ServiceRecord, since: datetime | None) -> SpendFacts:
@@ -394,7 +402,7 @@ class FileBriefSources(BriefSources):
         clarified: set[str] = set()
         for r in records:
             for a in r.assertions:
-                mark = next((m for m in r.timeline if isinstance(m, ContractMark) and m.basis == "answers" and m.answers == a.verdict.message.id), None)
+                mark = next((m for m in r.timeline if isinstance(m, ContractMark) and m.basis == "answers" and m.answers == a.id), None)
                 links = [msg_time(n) for n in a.verdict.link_notes if verdict_tier(n) == "human"]
                 if not links and mark is None:
                     waiting.add(a.id)
