@@ -20,7 +20,8 @@ from ._facts import Facts
 from ._ledger import PATH, State, LedgerRetroRecords, with_record
 from ._ports import CHARTER, ORG, BriefSources, CharterHistory, CharterPair, CharterVersions, ServiceRetirements
 from ._views import ServiceRetired
-from .api import Brief, BriefRecord, RetroBriefs, RetroRecords
+from ._due import FileRetroDue
+from .api import Brief, BriefRecord, RetroBriefs, RetroDue, RetroRecords
 
 
 class MemoryRetroRecords(RetroRecords):
@@ -105,11 +106,13 @@ class FixedSources(BriefSources):
         self.new = new
         self._started = started
         self.reads: list[tuple[datetime | None, datetime | None]] = []
+        self.afters: list[datetime | None] = []  # the ``after`` of each verdict count asked
 
     def started(self) -> datetime | None:
         return self._started
 
     def new_verdicts(self, after: datetime | None) -> int:
+        self.afters.append(after)
         return self.new
 
     def read(self, since: datetime | None, after: datetime | None) -> Facts:
@@ -127,6 +130,17 @@ class FixedRetroBriefs(RetroBriefs):
     def brief(self, *, since: datetime | None = None) -> Brief:
         self.calls.append(since)
         return self._brief
+
+
+class FixedRetroDue(RetroDue):
+    """Answers the lines it was given: ``reply`` for a reply and ``listing`` for a listing (both empty: nothing is due)."""
+
+    def __init__(self, reply: str = "", listing: str = "") -> None:
+        self._reply = reply
+        self._listing = listing
+
+    def due(self, *, listing: bool = False) -> str:
+        return self._listing if listing else self._reply
 
 
 @dataclass
@@ -162,7 +176,16 @@ def file_retro_briefs(tmp_path: Path) -> RetroBriefs:
     return briefs_over_fixed_facts(tmp_path).briefs
 
 
+def fixed_retro_due(tmp_path: Path) -> RetroDue:
+    return FixedRetroDue("Retro due: 3 verdicts of the user since the last brief (none yet). Once this delivery is settled, offer the user a retro in one line, and call retro() only after their yes.")
+
+
+def file_retro_due(tmp_path: Path) -> RetroDue:
+    return FileRetroDue(FixedSources(new=3), MemoryRetroRecords(), MemoryOrgSettings("---\nmission: m\n---\nrules\n"))
+
+
 IMPLEMENTATIONS: Mapping[type, Sequence[Callable[[Path], object]]] = {
     RetroRecords: [fs_retro_records, memory_retro_records],
     RetroBriefs: [file_retro_briefs, fixed_retro_briefs],
+    RetroDue: [file_retro_due, fixed_retro_due],
 }

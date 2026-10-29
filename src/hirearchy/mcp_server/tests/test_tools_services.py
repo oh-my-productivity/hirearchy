@@ -14,6 +14,7 @@ from hirearchy.kernel import ROOT, Message, OrgError
 from hirearchy.mcp_server._instructions import InstructionText
 from hirearchy.mcp_server._tools_services import DirectoryServiceRoles, ServiceTools
 from hirearchy.mcp_server.testing import AllowingStructureGuard, HeldBudgets, MemoryBinding, ScriptedReports, ScriptedSteps, agents_in
+from hirearchy.retro.testing import FixedRetroDue
 from hirearchy.services import BASE_HEADING, Admission, Contract, Criterion, Playbook, PlaybookChange, ServiceCatalog, ServiceCommands
 
 from ._support import call, described, fails, names, serve
@@ -85,12 +86,13 @@ class Commands(ServiceCommands):
 
 
 def tools(agents: MemoryAgents | None = None, offered: dict[str, list[str]] | None = None, exists: bool = True,
-          reports: ScriptedReports | None = None, steps: ScriptedSteps | None = None, needs_base: bool = False) -> tuple[ServiceTools, Commands]:
+          reports: ScriptedReports | None = None, steps: ScriptedSteps | None = None, needs_base: bool = False,
+          due: FixedRetroDue | None = None) -> tuple[ServiceTools, Commands]:
     agents, commands = agents or agents_in("ceo", "ceo/eng", "ops"), Commands(needs_base)
     roles = DirectoryServiceRoles(InstructionText(MemoryBinding(Path("/o"), exists=exists)), lambda: agents, lambda: agents, lambda: Catalog(offered or {}))
     return ServiceTools(
         roles, lambda: reports or ScriptedReports("SERVICES", {"req-1": "case total: 3 of 9"}), lambda: commands, lambda: HeldBudgets({"ceo": 5}),
-        lambda: steps or ScriptedSteps(), AllowingStructureGuard(),
+        lambda: steps or ScriptedSteps(), AllowingStructureGuard(), lambda: due or FixedRetroDue(),
     ), commands
 
 
@@ -218,7 +220,7 @@ def test_a_missing_organization_is_the_refusal_of_a_client_tool() -> None:
         raise OrgError("no organization at /o yet: call create_org(mission=...) first")
 
     roles = DirectoryServiceRoles(InstructionText(MemoryBinding(Path("/o"))), gone, gone, gone)  # type: ignore[arg-type]
-    group = ServiceTools(roles, gone, gone, gone, gone, AllowingStructureGuard())  # type: ignore[arg-type]
+    group = ServiceTools(roles, gone, gone, gone, gone, AllowingStructureGuard(), gone)  # type: ignore[arg-type]
     assert "call create_org" in fails(serve(group, ROOT), "services")
 
 
@@ -360,3 +362,33 @@ def test_a_failing_rework_step_never_fails_the_request(error: BaseException) -> 
     out = call(serve(group, ROOT), "request", service="brief", revises="old")
     assert out.endswith("Call start() if the scheduler is not running.\ncase total: 3 of 9")
     assert [c[0] for c in commands.calls] == ["request"]  # the rework was sent: the reply is what happened
+
+
+# ------------------------------------------------------------------------------ the trigger of a due retro (design 4.6, Q17): a line of the reply, root only
+
+DUE_REPLY = "Retro due: 3 verdicts of the user since the last brief (none yet). Once this delivery is settled, offer the user a retro in one line, and call retro() only after their yes."
+DUE_LISTING = "Retro due: 3 verdicts of the user since the last brief (none yet); offer the user a retro, and call retro() only after their yes."
+
+
+def test_feedback_after_the_third_verdict_appends_the_reply_form() -> None:
+    group, _ = tools(steps=ScriptedSteps(feedback=FEEDBACK_STEP), due=FixedRetroDue(DUE_REPLY, DUE_LISTING))
+    server = serve(group, ROOT)
+    receipt = "feedback reject recorded on t1 for ceo (message fb-1, source human, about C1 (not confirmed)); it does not wake ceo"
+    assert call(server, "feedback", task_id="t1", verdict="reject", note="No.", source="human", criterion=["C1"]) == f"{receipt}\n{FEEDBACK_STEP}\n{DUE_REPLY}"
+    assert call(server, "feedback", task_id="t1", verdict="accept", source="human").endswith(f"\n{DUE_REPLY}")
+    assert DUE_REPLY not in call(server, "feedback", task_id="t1", verdict="accept")  # a relayed verdict is not the user's: no trigger
+    assert DUE_REPLY not in call(server, "feedback", task_id="t1", verdict="reject", note="Yes.", source="human", criterion=["C1"], confirms="m-9")  # a link is no verdict
+    assert DUE_REPLY not in call(serve(group, "ceo"), "feedback", task_id="t1", verdict="accept")  # an agent's reply never carries it
+
+
+def test_a_reply_with_no_retro_due_is_the_old_reply() -> None:
+    group, _ = tools()
+    out = call(serve(group, ROOT), "feedback", task_id="t1", verdict="accept", source="human")
+    assert out == "feedback accept recorded on t1 for ceo (message fb-1, source human); it does not wake ceo"
+
+
+def test_services_appends_the_listing_form() -> None:
+    group, _ = tools(due=FixedRetroDue(DUE_REPLY, DUE_LISTING))
+    assert call(serve(group, ROOT), "services") == f"SERVICES [root]\n{DUE_LISTING}"
+    assert call(serve(group, "ceo"), "services") == "SERVICES [ceo]"  # an agent's listing is today's text
+    assert call(serve(tools()[0], ROOT), "services") == "SERVICES [root]"

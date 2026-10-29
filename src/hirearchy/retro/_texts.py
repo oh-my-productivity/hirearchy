@@ -81,3 +81,10 @@ NEXT = (
     "Never add an item of your own."
 )
 LEDGER_NOTES = ("The record of earlier briefs cannot be read", "This brief was not recorded")  # the notes the user's block carries
+
+# The trigger of a due retro (design 4.6, D17): a line of a reply or of a listing that tells root to OFFER the retro, and to call retro() only after the user's yes.
+DUE_REPLY = (
+    "Retro due: {k} verdicts of the user since the last brief ({date}). Once this delivery is settled, offer the user a retro in one line, and call retro() only after their yes."
+)
+DUE_LISTING = "Retro due: {k} verdicts of the user since the last brief ({date}); offer the user a retro, and call retro() only after their yes."
+NONE_YET = "none yet"

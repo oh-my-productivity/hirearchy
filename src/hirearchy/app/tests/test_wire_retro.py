@@ -7,8 +7,9 @@ from pathlib import Path
 
 from hirearchy.app import fields_retro, wire_retro, wiring
 from hirearchy.kernel import ROOT
-from hirearchy.retro import RetroBriefs, RetroRecords
+from hirearchy.retro import RetroBriefs, RetroDue, RetroRecords
 from hirearchy.retro._brief import FileRetroBriefs
+from hirearchy.retro._due import FileRetroDue
 from hirearchy.retro._ledger import LedgerRetroRecords
 from hirearchy.retro.testing import MemoryRetroRecords
 from hirearchy.telemetry import ProcessLabel
@@ -19,6 +20,7 @@ def test_the_runtime_has_the_ledger_and_the_brief(tmp_path: Path) -> None:
     runtime = wiring.open_runtime(tmp_path)
     assert isinstance(runtime.retro_records, LedgerRetroRecords) and isinstance(runtime.retro_records, RetroRecords)
     assert isinstance(runtime.retro_briefs, FileRetroBriefs) and isinstance(runtime.retro_briefs, RetroBriefs)
+    assert isinstance(runtime.retro_due, FileRetroDue) and isinstance(runtime.retro_due, RetroDue)
     assert wire_retro.register in wiring.registrars() and fields_retro.STEP == "C-retro"
 
 
@@ -58,3 +60,9 @@ def _org(tmp_path: Path) -> Path:
     org = Org.init(tmp_path / "org", "mission")
     org.hire(ROOT, "ceo", "Chief", "Lead.", can_hire=True)
     return org.root
+
+
+def test_the_trigger_reads_the_ledger_of_the_runtime(tmp_path: Path) -> None:
+    ledger = MemoryRetroRecords()
+    runtime = wiring.open_runtime(_org(tmp_path), {RetroRecords: ledger})
+    assert runtime.retro_due.due() == "" and runtime.retro_due.due(listing=True) == ""  # an organization with no verdict has nothing due

@@ -159,7 +159,7 @@ def server_factory(binding: OrgBindingPort, scheduler_control: Callable[[Schedul
     from ..progress import ProgressReporter, QualityReport
     from ..prompts import Whoami
     from ..reflection import DeliverableChecks, ServiceReports, ServiceSteps
-    from ..retro import RetroBriefs
+    from ..retro import RetroBriefs, RetroDue
     from ..services import ServiceCatalog, ServiceCommands, ServiceEvidence, ServiceHints
     from ..settings import OrgSettings
     from ..telemetry._summarize import JsonArgumentSummarizer
@@ -200,7 +200,7 @@ def server_factory(binding: OrgBindingPort, scheduler_control: Callable[[Schedul
         ),
         ServiceTools(
             DirectoryServiceRoles(text, directory, of(CharterReader), of(ServiceCatalog)), of(ServiceReports), of(ServiceCommands), of(BudgetQuery),
-            of(ServiceSteps), structure,
+            of(ServiceSteps), structure, of(RetroDue),
         ),
     ]
     root_only = [

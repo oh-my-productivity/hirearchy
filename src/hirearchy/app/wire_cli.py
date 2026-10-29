@@ -94,7 +94,7 @@ from ..observability._util import matcher, plain
 from ..overview import OrgTree
 from ..progress import ProgressReporter, QualityReport
 from ..reflection import ServiceReports, ServiceSteps
-from ..retro import RetroBriefs
+from ..retro import RetroBriefs, RetroDue
 from ..review import HealthReviewer
 from ..scheduler._ports import Console
 from ..scheduler._run import LoopState
@@ -343,10 +343,10 @@ def commands_over(session: OrgSession, out: Output, terminal: Terminal, clock: C
         InitCommand(session, get(OrgInitializer), text, out),
         HireCommand(session, get(Hiring), snapshots, text, out),
         TaskCommand(session, get(TaskAssigner), snapshots, text, out),
-        ServicesCommand(session, get(ServiceReports), out),
+        ServicesCommand(session, get(ServiceReports), out, get(RetroDue)),
         DefineServiceCommand(session, commands, get(ServiceCatalog), get(ContractNormalizer), snapshots, get(ServiceSteps), text, out),
         RequestCommand(session, commands, snapshots, get(ServiceSteps), out),
-        FeedbackCommand(session, commands, snapshots, get(ServiceSteps), out),
+        FeedbackCommand(session, commands, snapshots, get(ServiceSteps), out, get(RetroDue)),
         AcknowledgePlaybookCommand(session, commands, snapshots, text, out),
         RetireServiceCommand(session, commands, snapshots, out),
         PlanCommand(session, loader, validator_of(session, plan_time), renderer_of(session, plan_time), out),

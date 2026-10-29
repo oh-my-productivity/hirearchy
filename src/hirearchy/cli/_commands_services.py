@@ -6,16 +6,28 @@ import argparse
 
 from ..kernel import ROOT, Message, OrgError, Provider, norm
 from ..reflection import ServiceReports, ServiceSteps
+from ..retro import RetroDue
 from ..services import ContractNormalizer, ServiceCatalog, ServiceCommands
 from ..snapshots import OrgSnapshotter
 from ._ports import Arguments, Command, OrgSession, Output, TextSource
 
 
+def say_due(out: Output, due: Provider[RetroDue], *, listing: bool) -> None:
+    """The trigger line of a due retro (design 4.6, Q17), when there is one. It only advises, so it never fails the command."""
+    try:
+        line = due().due(listing=listing)
+    except (OrgError, OSError):
+        return
+    if line:
+        out.say(line)
+
+
 class ServicesCommand(Command):
-    def __init__(self, session: OrgSession, reports: Provider[ServiceReports], out: Output) -> None:
+    def __init__(self, session: OrgSession, reports: Provider[ServiceReports], out: Output, due: Provider[RetroDue]) -> None:
         self._session = session
         self._reports = reports
         self._out = out
+        self._due = due
 
     def add_arguments(self, sub: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
         s = sub.add_parser("services", help="list the services you can request from your direct reports, with their record")
@@ -24,6 +36,7 @@ class ServicesCommand(Command):
     def run(self, args: Arguments) -> None:
         self._session.open(args)
         self._out.say(self._reports().services_text(ROOT))
+        say_due(self._out, self._due, listing=True)
 
 
 def say_watch(out: Output, steps: ServiceSteps, rejection: str) -> None:
@@ -164,12 +177,14 @@ class RequestCommand(Command):
 class FeedbackCommand(Command):
     def __init__(
         self, session: OrgSession, commands: Provider[ServiceCommands], snapshots: Provider[OrgSnapshotter], steps: Provider[ServiceSteps], out: Output,
+        due: Provider[RetroDue],
     ) -> None:
         self._session = session
         self._commands = commands
         self._snapshots = snapshots
         self._steps = steps
         self._out = out
+        self._due = due
 
     def add_arguments(self, sub: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
         s = sub.add_parser("feedback", help="accept or reject a delivered service request (as root)")
@@ -206,6 +221,8 @@ class FeedbackCommand(Command):
             self._snapshots().commit(f"root: feedback {link.id} -> {link.to}")
             self._out.say(f"link on {msg.id} -> {link.to}: {link.criterion} (message {link.id}, source {link.source})")
             say_watch(self._out, self._steps(), msg.id)
+        if args.source == "human":
+            say_due(self._out, self._due, listing=False)
 
 
 class AcknowledgePlaybookCommand(Command):

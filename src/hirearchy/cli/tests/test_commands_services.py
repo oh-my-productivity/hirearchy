@@ -11,12 +11,14 @@ from hirearchy.cli._commands_services import (
 )
 from hirearchy.cli.testing import MemoryText
 from hirearchy.kernel import Message, OrgError
+from hirearchy.retro.testing import FixedRetroDue
 from hirearchy.services import Contract
 
 from ._fakes import FakeOffice, FakeReadings, FakeServices, new_office, new_readings, new_services, new_steps
 from ._support import Fixture, go, parse
 
 
+NO_DUE = lambda: FixedRetroDue()  # noqa: E731 - (the provider of a port with nothing due)
 TEXT = MemoryText({"criterion.md": "Has a title.\n", "notes.md": "For the owner.\n", "playbook.md": "Step one.\n"})
 
 
@@ -27,7 +29,7 @@ def define_world(tmp_path: Path, contracts: dict[tuple[str, str], Contract] | No
 
 def test_services_lists_what_root_can_request(tmp_path: Path) -> None:
     f, readings = Fixture(tmp_path), new_readings()
-    go(ServicesCommand(f.session, lambda: readings, f.out), "services")
+    go(ServicesCommand(f.session, lambda: readings, f.out, NO_DUE), "services")
     assert f.session.calls == [("open", False)]  # read-only: nothing is announced
     assert readings.last("services_text") == (("root",), {})
     assert f.out.stdout == "services text\n"
@@ -188,7 +190,7 @@ def test_an_input_without_an_equals_sign_is_refused_before_anything_is_asked(tmp
 
 def test_feedback_tells_the_owner_and_says_who(tmp_path: Path) -> None:
     f, services, office = Fixture(tmp_path), new_services(), new_office()
-    go(FeedbackCommand(f.session, lambda: services, lambda: office, lambda: new_steps(), f.out), "feedback", "r-1", "reject", "--note", "Too long.")
+    go(FeedbackCommand(f.session, lambda: services, lambda: office, lambda: new_steps(), f.out, NO_DUE), "feedback", "r-1", "reject", "--note", "Too long.")
     assert f.session.calls == [("open", True)]
     assert services.last("feedback") == (("root", "r-1", "reject", "Too long."), {"source": "human", "criterion": None, "confirms": None})
     assert office.last("commit") == (("root: feedback f-1 -> ceo",), {})
@@ -197,7 +199,7 @@ def test_feedback_tells_the_owner_and_says_who(tmp_path: Path) -> None:
 
 def test_feedback_defaults_to_source_human(tmp_path: Path) -> None:
     f, services, office = Fixture(tmp_path), new_services(), new_office()
-    command = FeedbackCommand(f.session, lambda: services, lambda: office, lambda: new_steps(), f.out)
+    command = FeedbackCommand(f.session, lambda: services, lambda: office, lambda: new_steps(), f.out, NO_DUE)
     go(command, "feedback", "r-1", "accept")
     assert services.last("feedback")[1]["source"] == "human"  # the CLI is the human's own terminal
     go(command, "feedback", "r-1", "accept", "--source", "relayed")
@@ -212,7 +214,7 @@ def commits(office: FakeOffice) -> list[object]:
 
 def test_feedback_reply_shows_the_message_id(tmp_path: Path) -> None:
     f, services, office = Fixture(tmp_path), new_services(), new_office()
-    go(FeedbackCommand(f.session, lambda: services, lambda: office, lambda: new_steps(), f.out), "feedback", "r-1", "reject", "--note", "No.",
+    go(FeedbackCommand(f.session, lambda: services, lambda: office, lambda: new_steps(), f.out, NO_DUE), "feedback", "r-1", "reject", "--note", "No.",
        "--criterion", "C1", "--criterion", "r2", "--source", "relayed")  # someone else's reading: the criterion stays on the verdict
     assert services.last("feedback") == (("root", "r-1", "reject", "No."), {"source": "relayed", "criterion": ["C1", "r2"], "confirms": None})
     assert f.out.stdout == "feedback reject on r-1 -> ceo (message f-1, source relayed, about C1, r2)\n"
@@ -222,7 +224,7 @@ def test_feedback_reply_shows_the_message_id(tmp_path: Path) -> None:
 def test_a_criterion_typed_with_a_rejection_is_recorded_as_the_users_link(tmp_path: Path) -> None:
     """The terminal is the user's own seat: a criterion typed with a rejection is their yes, so it is recorded as a `confirms` link."""
     f, services, office = Fixture(tmp_path), new_services(), new_office()
-    go(FeedbackCommand(f.session, lambda: services, lambda: office, lambda: new_steps(), f.out), "feedback", "r-1", "reject", "--note", "No.",
+    go(FeedbackCommand(f.session, lambda: services, lambda: office, lambda: new_steps(), f.out, NO_DUE), "feedback", "r-1", "reject", "--note", "No.",
        "--criterion", "C1", "--criterion", "r2")
     first, second = [c for c in services.calls if c[0] == "feedback"]
     assert first == ("feedback", ("root", "r-1", "reject", "No."), {"source": "human", "criterion": ["C1", "r2"], "confirms": None})
@@ -238,21 +240,21 @@ def test_a_failing_confirmation_keeps_the_committed_verdict(tmp_path: Path) -> N
     f, services, office = Fixture(tmp_path), new_services(), new_office()
     services.refuse_confirmation = OrgError("the link cannot be written")
     with pytest.raises(OrgError, match="the link cannot be written"):
-        go(FeedbackCommand(f.session, lambda: services, lambda: office, lambda: new_steps(), f.out), "feedback", "r-1", "reject", "--note", "No.", "--criterion", "C1")
+        go(FeedbackCommand(f.session, lambda: services, lambda: office, lambda: new_steps(), f.out, NO_DUE), "feedback", "r-1", "reject", "--note", "No.", "--criterion", "C1")
     assert commits(office) == ["root: feedback f-1 -> ceo"]  # the verdict is written and committed; rerun with --confirms f-1 --criterion ...
     assert f.out.stdout == "feedback reject on r-1 -> ceo (message f-1, source human, about C1)\n"
 
 
 def test_relayed_feedback_keeps_the_criterion_on_the_verdict(tmp_path: Path) -> None:
     f, services, office = Fixture(tmp_path), new_services(), new_office()
-    go(FeedbackCommand(f.session, lambda: services, lambda: office, lambda: new_steps(), f.out), "feedback", "r-1", "reject", "--note", "Maybe.",
+    go(FeedbackCommand(f.session, lambda: services, lambda: office, lambda: new_steps(), f.out, NO_DUE), "feedback", "r-1", "reject", "--note", "Maybe.",
        "--criterion", "C1", "--source", "relayed")
     assert [c[2]["confirms"] for c in services.calls if c[0] == "feedback"] == [None] and commits(office) == ["root: feedback f-1 -> ceo"]
 
 
 def test_feedback_confirms_reply_names_the_link(tmp_path: Path) -> None:
     f, services, office = Fixture(tmp_path), new_services(), new_office()
-    go(FeedbackCommand(f.session, lambda: services, lambda: office, lambda: new_steps(), f.out), "feedback", "r-1", "reject", "--note", "Yes, always.",
+    go(FeedbackCommand(f.session, lambda: services, lambda: office, lambda: new_steps(), f.out, NO_DUE), "feedback", "r-1", "reject", "--note", "Yes, always.",
        "--criterion", "C1", "--confirms", "m-9", "--source", "human")
     assert services.last("feedback") == (
         ("root", "r-1", "reject", "Yes, always."), {"source": "human", "criterion": ["C1"], "confirms": "m-9"},
@@ -263,7 +265,7 @@ def test_feedback_confirms_reply_names_the_link(tmp_path: Path) -> None:
 def test_feedback_accepts_only_a_verdict(tmp_path: Path) -> None:
     f, services, office = Fixture(tmp_path), new_services(), new_office()
     with pytest.raises(SystemExit):
-        parse(FeedbackCommand(f.session, lambda: services, lambda: office, lambda: new_steps(), f.out), "feedback", "r-1", "maybe")
+        parse(FeedbackCommand(f.session, lambda: services, lambda: office, lambda: new_steps(), f.out, NO_DUE), "feedback", "r-1", "maybe")
 
 
 def test_acknowledge_playbook_passes_the_arguments_says_its_line_and_snapshots(tmp_path: Path) -> None:
@@ -306,7 +308,7 @@ def test_the_watch_lines_follow_the_link_and_the_answer_line_by_line(tmp_path: P
     """Design 8.5: each sentence of ``watch_step`` is a line after today's line, for ``--confirms``, the automatic link and ``--answers``."""
     f, services, office = Fixture(tmp_path), new_services(), new_office()
     steps = new_steps(watch={"r-9": WATCH, "f-2": WATCH})
-    feedback = FeedbackCommand(f.session, lambda: services, lambda: office, lambda: steps, f.out)
+    feedback = FeedbackCommand(f.session, lambda: services, lambda: office, lambda: steps, f.out, NO_DUE)
     go(feedback, "feedback", "r-1", "reject", "--note", "Yes.", "--criterion", "C1", "--confirms", "r-9")
     assert f.out.stdout.splitlines()[-2:] == WATCH.splitlines() and steps.names() == ["watch_step"] and steps.calls[0][1] == ("r-9",)
     go(feedback, "feedback", "r-1", "reject", "--note", "No.", "--criterion", "C1")  # the automatic link: the rejection is the verdict just recorded (f-2)
@@ -318,3 +320,23 @@ def test_the_watch_lines_follow_the_link_and_the_answer_line_by_line(tmp_path: P
     assert f2.out.stdout.splitlines()[-2:] == WATCH.splitlines() and steps2.names() == ["watch_step"]
     go(command, "define-service", "ceo", "weekly", "--add-acceptance", "y", "--words", "On my own.")
     assert steps2.names() == ["watch_step"]  # no rejection answered: nothing to read
+
+
+DUE_REPLY = "Retro due: 3 verdicts of the user since the last brief (none yet). Once this delivery is settled, offer the user a retro in one line, and call retro() only after their yes."
+DUE_LISTING = "Retro due: 3 verdicts of the user since the last brief (none yet); offer the user a retro, and call retro() only after their yes."
+
+
+def test_hirearchy_feedback_and_services_append_the_trigger(tmp_path: Path) -> None:
+    due = lambda: FixedRetroDue(DUE_REPLY, DUE_LISTING)  # noqa: E731
+    f, services, office = Fixture(tmp_path), new_services(), new_office()
+    go(FeedbackCommand(f.session, lambda: services, lambda: office, lambda: new_steps(), f.out, due), "feedback", "r-1", "accept")
+    assert f.out.stdout == f"feedback accept on r-1 -> ceo (message f-1, source human)\n{DUE_REPLY}\n"
+    f2, readings = Fixture(tmp_path), new_readings()
+    go(ServicesCommand(f2.session, lambda: readings, f2.out, due), "services")
+    assert f2.out.stdout == f"services text\n{DUE_LISTING}\n"
+    f3 = Fixture(tmp_path)
+    go(FeedbackCommand(f3.session, lambda: services, lambda: office, lambda: new_steps(), f3.out, due), "feedback", "r-1", "accept", "--source", "relayed")
+    assert DUE_REPLY not in f3.out.stdout  # a relayed verdict is not the user's
+    go(FeedbackCommand(f3.session, lambda: services, lambda: office, lambda: new_steps(), f3.out, due), "feedback", "r-1", "reject", "--note", "No.", "--criterion", "none",
+       "--confirms", "m-1")
+    assert DUE_REPLY not in f3.out.stdout  # a link is no verdict

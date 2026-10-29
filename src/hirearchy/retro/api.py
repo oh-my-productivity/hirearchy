@@ -29,6 +29,7 @@ __all__ = [
     "RETRO_DEFAULTS",
     "RecordedItem",
     "RetroBriefs",
+    "RetroDue",
     "RetroRecords",
     "RetroThresholds",
     "Section",
@@ -170,6 +171,14 @@ class RetroBriefs(Protocol):
         """The brief for root, derived from the files. Without ``since`` it is recorded in the ledger as B<n> when a human verdict was created after the last brief's ``at``
         (or there is none), and is the last brief shown again, recorded nowhere, otherwise (4.2); with ``since`` it is a look-back brief over that window, recorded
         nowhere. ``OrgError`` for a ``since`` in the future and when the agents cannot be listed; every other unreadable source becomes a line of its section."""
+        ...
+
+
+@runtime_checkable
+class RetroDue(Protocol):
+    def due(self, *, listing: bool = False) -> str:
+        """The trigger line of a due retro (4.6) for a reply (``listing=False``) or for a listing, or ``""`` when no brief is due: the verdicts of the user since the last brief
+        are fewer than ``after_verdicts``. The line tells root to offer the user a retro and to call ``retro()`` only after their yes. Never raises: an unreadable source gives ``""``."""
         ...
 
 

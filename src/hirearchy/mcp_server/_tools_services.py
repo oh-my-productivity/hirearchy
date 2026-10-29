@@ -10,6 +10,7 @@ from ..agents import AgentDirectory, CharterReader
 from ..budget import BudgetQuery
 from ..kernel import ROOT, Message, OrgError, Provider
 from ..reflection import ServiceReports, ServiceSteps
+from ..retro import RetroDue
 from ..services import BASE_HEADING, ServiceCatalog, ServiceCommands, acknowledge_reply, playbook_reply
 from ._ports import ServiceRoles, SetupMode, StructureGuard, ToolGroup
 
@@ -52,7 +53,7 @@ def _step(make: Callable[[], str]) -> str:
 class ServiceTools(ToolGroup):
     def __init__(
         self, roles: ServiceRoles, reports: Provider[ServiceReports], commands: Provider[ServiceCommands], budgets: Provider[BudgetQuery],
-        steps: Provider[ServiceSteps], guard: StructureGuard,
+        steps: Provider[ServiceSteps], guard: StructureGuard, due: Provider[RetroDue],
     ) -> None:
         self._roles = roles
         self._reports = reports
@@ -60,6 +61,7 @@ class ServiceTools(ToolGroup):
         self._budgets = budgets
         self._steps = steps
         self._guard = guard
+        self._due = due
 
     def register(self, mcp: FastMCP, me: str) -> None:
         manager, owner = self._roles.manager(me), self._roles.owner(me)
@@ -70,7 +72,7 @@ class ServiceTools(ToolGroup):
         def services() -> str:
             """The standing services you can request from your direct reports and the ones you offer, with contract and
         playbook versions, inputs, budget per request and the record so far (requests, outcomes, runs, feedback)."""
-            return self._reports().services_text(me)
+            return self._reports().services_text(me) + (self._due_line(listing=True) if me == ROOT else "")
 
         if manager:
             self._register_client_tools(mcp, me)
@@ -138,6 +140,14 @@ class ServiceTools(ToolGroup):
             if answers and answers.strip():  # the user's answer: what it did to the watch follows (design 8.5)
                 return reply + _step(lambda: self._steps().watch_step(answers.strip()))
             return reply
+
+    def _due_line(self, *, listing: bool) -> str:
+        """The trigger line of a due retro (design 4.6, Q17) on its own line, or nothing: it only advises, so it never fails the reply it follows."""
+        try:
+            line = self._due().due(listing=listing)
+        except (OrgError, OSError):
+            return ""
+        return f"\n{line}" if line else ""
 
     def _register_agent_define(self, mcp: FastMCP, me: str) -> None:
         @mcp.tool()
@@ -213,7 +223,8 @@ class ServiceTools(ToolGroup):
                         f"it does not wake {msg.to}" + _step(lambda: self._steps().watch_step(confirms)))
             about = f", about {msg.criterion} (not confirmed)" if msg.criterion else ""
             return (f"feedback {verdict} recorded on {task_id} for {msg.to} (message {msg.id}, source {msg.source}{about}); "
-                    f"it does not wake {msg.to}" + _step(lambda: self._steps().feedback_step(msg)))
+                    f"it does not wake {msg.to}" + _step(lambda: self._steps().feedback_step(msg))
+                    + (self._due_line(listing=False) if msg.source == "human" else ""))
 
     def _register_agent_feedback(self, mcp: FastMCP, me: str) -> None:
         @mcp.tool()

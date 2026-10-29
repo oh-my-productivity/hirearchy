@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from ..retro import RetroBriefs, RetroRecords
+from ..retro import RetroBriefs, RetroDue, RetroRecords
 
 STEP: str | None = "C-retro"  # the step that filled this part (see test_runtime_fields)
 NOT_A_FIELD: dict[str, str] = {
@@ -18,3 +18,4 @@ NOT_A_FIELD: dict[str, str] = {
 class Fields:
     retro_records: RetroRecords
     retro_briefs: RetroBriefs
+    retro_due: RetroDue

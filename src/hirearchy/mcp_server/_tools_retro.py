@@ -25,11 +25,11 @@ class RetroTools(ToolGroup):
         @mcp.tool()
         async def retro(since: str | None = None) -> str:
             """The retro brief: what the client said, what got past a check, whether past changes held, how the organization changed, the team's own proposals,
-        and at most 3 yes/no items, each with its call. Call it when the user asks. Show the block from RETRO BRIEF to RETRO BRIEF END to the user exactly as
-        written; for each item they answer yes, make the call its Details give, one at a time; never add an item of your own. Without since it is recorded
-        when a verdict of the user arrived since the last brief (the last brief's items that were not taken then lapse with no change), and otherwise the
-        last brief is shown again and nothing is recorded. since (a date, a datetime or a message id): a look-back over that window, recorded nowhere.
-        Costs no run.
+        and at most 3 yes/no items, each with its call. Call it when the user asks, or after their yes to your offer when a reply says one is due. Show the block
+        from RETRO BRIEF to RETRO BRIEF END to the user exactly as written; for each item they answer yes, make the call its Details give, one at a time; never
+        add an item of your own. Without since it is recorded when a verdict of the user arrived since the last brief (the last brief's items that were not taken
+        then lapse with no change), and otherwise the last brief is shown again and nothing is recorded. since (a date, a datetime or a message id): a look-back
+        over that window, recorded nowhere. Costs no run.
         """
             if self._setup.active():
                 return self._setup.state()

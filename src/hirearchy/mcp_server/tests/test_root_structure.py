@@ -18,6 +18,7 @@ from hirearchy.mcp_server._tools_services import ServiceTools
 from hirearchy.mcp_server.testing import (
     HeldBudgets, ScriptedFiles, ScriptedHiring, ScriptedReports, ScriptedRetirement, ScriptedSteps, StaticNaming,
 )
+from hirearchy.retro.testing import FixedRetroDue
 from hirearchy.settings.testing import MemoryOrgSettings
 from hirearchy.services.testing import AdmittingServiceEvidence
 
@@ -102,7 +103,7 @@ def services(offered: dict[str, list[str]]) -> tuple[ServiceTools, Commands]:
     roles = DirectoryServiceRoles(InstructionText(MemoryBinding(Path("/o"), exists=True)), lambda: agents, lambda: agents, lambda: Catalog(offered))
     guard = RootStructureGuard(lambda: Catalog(offered), lambda: ScriptedFiles(HERE), lambda: MemoryOrgSettings(ORG_MD), lambda: OrgPaths(HERE))
     return ServiceTools(
-        roles, lambda: ScriptedReports("SERVICES"), lambda: commands, lambda: HeldBudgets({"ceo": 5}), lambda: ScriptedSteps(), guard,
+        roles, lambda: ScriptedReports("SERVICES"), lambda: commands, lambda: HeldBudgets({"ceo": 5}), lambda: ScriptedSteps(), guard, lambda: FixedRetroDue(),
     ), commands
 
 

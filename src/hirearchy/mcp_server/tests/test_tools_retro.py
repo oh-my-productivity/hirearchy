@@ -63,6 +63,11 @@ def test_before_an_organization_exists_the_setup_text_answers() -> None:
 
 
 def test_the_docstring_is_the_design_s() -> None:
-    text = described(serve(tools(FixedRetroBriefs(BRIEF)), ROOT))["retro"]
+    text = " ".join(described(serve(tools(FixedRetroBriefs(BRIEF)), ROOT))["retro"].split())  # (the description keeps the docstring's line breaks)
     assert text.startswith("The retro brief: what the client said, what got past a check, whether past changes held, how the organization changed, the team's own proposals")
-    assert "Call it when the user asks." in text and "Costs no run." in text and "never add an item of your own" in text
+    assert "Call it when the user asks, or" in text and "Costs no run." in text and "never add an item of your own" in text
+
+
+def test_the_docstring_says_offer_then_call_after_the_yes() -> None:
+    text = " ".join(described(serve(tools(FixedRetroBriefs(BRIEF)), ROOT))["retro"].split())
+    assert "Call it when the user asks, or after their yes to your offer when a reply says one is due. Show the block" in text
